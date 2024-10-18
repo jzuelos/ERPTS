@@ -161,9 +161,10 @@
   <section
     class="u-align-center u-border-2 u-border-grey-75 u-border-no-left u-border-no-right u-border-no-top u-clearfix u-container-align-center u-section-2"
     id="sec-ffed">
+    <!-- Add New ERPTS -->
     <div class="u-clearfix u-sheet u-sheet-1">
       <div class="u-form u-form-1">
-        <form action="https://forms.nicepagesrv.com/v2/form/process"
+        <form action=""
           class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form" source="email" name="form"
           style="padding: 10px;">
           <div class="u-form-group u-form-name u-form-partition-factor-3 u-label-top">
@@ -191,7 +192,7 @@
             <label for="select-11f0" class="u-form-control-hidden u-label"></label>
             <div class="u-form-select-wrapper">
               <select id="select-11f0" name="(Barangay)" class="u-input u-input-rectangle">
-                <option value="(Barangay)" data-calc="" selected="selected">(Barangay)</option>
+                <option value="(Barangay)" data-calc="" selected="selected">Barangay</option>
                 <option value="Item 2" data-calc="">Item 2</option>
                 <option value="Item 3" data-calc="">Item 3</option>
               </select>
