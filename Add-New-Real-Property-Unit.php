@@ -8,9 +8,7 @@
   <meta name="description" content="">
   <title>Add New Real Property Unit</title>
   <link rel="stylesheet" href="nicepage.css" media="screen">
-  <link rel="stylesheet" href="Add-New-Real-Property-Unit.css" media="screen">
-  <script class="u-script" type="text/javascript" src="jquery.js" defer=""></script>
-  <script class="u-script" type="text/javascript" src="nicepage.js" defer=""></script>
+  <link rel="stylesheet" href="Add-New-Real-Property-Unit.css">
   <meta name="generator" content="Nicepage 6.18.5, nicepage.com">
   <meta name="referrer" content="origin">
   <link id="u-theme-google-font" rel="stylesheet"
@@ -43,7 +41,7 @@
   } else {
     echo "Connected successfully"; // This will confirm a successful connection
   }
-  
+
   ?>
 
   <header class="u-clearfix u-custom-color-1 u-header u-header" id="sec-34db"><a href="#"
@@ -155,44 +153,49 @@
   </header>
   <section class="u-clearfix u-section-1" id="sec-4f2c">
     <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
-      <h2 class="u-text u-text-default u-text-1">Add New Real Property Unit</h2>
+      <h2 class="u-text u-text-default u-text-1">Property Information</h2>
     </div>
   </section>
+  <!-- 1st Section -->
   <section
     class="u-align-center u-border-2 u-border-grey-75 u-border-no-left u-border-no-right u-border-no-top u-clearfix u-container-align-center u-section-2"
     id="sec-ffed">
     <!-- Add New ERPTS -->
     <div class="u-clearfix u-sheet u-sheet-1">
       <div class="u-form u-form-1">
-        <form action=""
-          class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form" source="email" name="form"
+        <form action="" class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form" name="form"
           style="padding: 10px;">
+          <!--
           <div class="u-form-group u-form-name u-form-partition-factor-3 u-label-top">
-            <label for="name-5668" class="u-label">Last Name</label>
+            <label for="name-5668" class="u-label">House Number</label>
             <input type="text" id="name-5668" name="name" class="u-input u-input-rectangle" required="">
           </div>
           <div class="u-form-email u-form-group u-form-partition-factor-3 u-label-top">
-            <label for="email-5668" class="u-label">First Name</label>
+            <label for="email-5668" class="u-label">Street</label>
             <input type="email" id="email-5668" name="email" class="u-input u-input-rectangle" required="">
           </div>
           <div class="u-form-group u-form-partition-factor-3 u-label-top u-form-group-3">
             <label for="text-71a2" class="u-label">Middle Name</label>
             <input type="text" placeholder="" id="text-71a2" name="text" class="u-input u-input-rectangle">
           </div>
-          <div class="u-form-group u-label-top u-form-group-4">
-            <label for="text-e9d2" class="u-label">Address</label>
-            <input type="text" placeholder="" id="text-e9d2" name="text-1" class="u-input u-input-rectangle">
-          </div>
-          <div class="u-form-group u-label-top u-form-group-5">
-            <label for="text-e2e3" class="u-label">Location of Property</label>
-            <input type="text" placeholder="(Number and Street)" id="text-e2e3" name="text-2"
+          -->
+          <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-1"></div>
+          <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-12">
+            <label for="text-93dc" class="u-label">Location of Property</label>
+            <input type="text" placeholder="House Number" id="house_number" name="text-5"
               class="u-input u-input-rectangle">
           </div>
+          <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-13">
+            <label for="text-2f40" class="u-form-control-hidden u-label"></label>
+            <input type="text" id="block_number" name="text-6" class="u-input u-input-rectangle"
+              placeholder="Block Number">
+          </div>
+
           <div class="u-form-group u-form-partition-factor-2 u-form-select u-label-top u-form-group-6">
             <label for="select-11f0" class="u-form-control-hidden u-label"></label>
             <div class="u-form-select-wrapper">
-              <select id="select-11f0" name="(Barangay)" class="u-input u-input-rectangle">
-                <option value="(Barangay)" data-calc="" selected="selected">Barangay</option>
+              <select id="province" name="(Barangay)" class="u-input u-input-rectangle">
+                <option value="Province" data-calc="" selected="selected">Province</option>
                 <option value="Item 2" data-calc="">Item 2</option>
                 <option value="Item 3" data-calc="">Item 3</option>
               </select>
@@ -206,8 +209,8 @@
           <div class="u-form-group u-form-partition-factor-2 u-form-select u-label-top u-form-group-7">
             <label for="select-7617" class="u-form-control-hidden u-label"></label>
             <div class="u-form-select-wrapper">
-              <select id="select-7617" name="(City)" class="u-input u-input-rectangle">
-                <option value="(City)" data-calc="">(City)</option>
+              <select id="city" name="(City)" class="u-input u-input-rectangle">
+                <option value="(City)" data-calc="">City</option>
               </select>
               <svg class="u-caret u-caret-svg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
                 xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="16px" height="16px"
@@ -216,34 +219,84 @@
               </svg>
             </div>
           </div>
-          <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-8">
-            <label for="text-cc0a" class="u-label">Email</label>
-            <input type="text" id="text-cc0a" name="text-3" class="u-input u-input-rectangle"
-              placeholder="Enter Email Address">
+          <div class="u-form-group u-form-partition-factor-2 u-form-select u-label-top u-form-group-6">
+            <label for="select-11f0" class="u-form-control-hidden u-label"></label>
+            <div class="u-form-select-wrapper">
+              <select id="district" name="District" class="u-input u-input-rectangle">
+                <option value="District" data-calc="" selected="selected">District</option>
+                <option value="Item 2" data-calc="">Item 2</option>
+                <option value="Item 3" data-calc="">Item 3</option>
+              </select>
+              <svg class="u-caret u-caret-svg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="16px" height="16px"
+                viewBox="0 0 16 16" style="fill:currentColor;" xml:space="preserve">
+                <polygon class="st0" points="8,12 2,4 14,4 "></polygon>
+              </svg>
+            </div>
           </div>
-          <div class="u-form-date u-form-group u-form-partition-factor-2 u-label-top u-form-group-9">
-            <label for="date-0971" class="u-label">Date</label>
-            <input type="text" placeholder="MM/DD/YYYY" id="date-0971" name="date" class="u-input u-input-rectangle"
-              required="" data-date-format="mm/dd/yyyy">
+          <div class="u-form-group u-form-partition-factor-2 u-form-select u-label-top u-form-group-7">
+            <label for="select-7617" class="u-form-control-hidden u-label"></label>
+            <div class="u-form-select-wrapper">
+              <select id="barangay" name="Barangay" class="u-input u-input-rectangle">
+                <option value="(City)" data-calc="">Barangay</option>
+              </select>
+              <svg class="u-caret u-caret-svg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="16px" height="16px"
+                viewBox="0 0 16 16" style="fill:currentColor;" xml:space="preserve">
+                <polygon class="st0" points="8,12 2,4 14,4 "></polygon>
+              </svg>
+            </div>
           </div>
           <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-1"></div>
           <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-11">
-            <label for="text-4ef3" class="u-label">Boundaries</label>
-            <input type="text" placeholder="North" id="text-4ef3" name="text-4" class="u-input u-input-rectangle">
+            <label for="text-4ef3" class="u-label">Description of Land</label>
+            <input type="text" placeholder="Lot Number" id="lot_no" name="text-4" class="u-input u-input-rectangle">
           </div>
           <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-12">
             <label for="text-93dc" class="u-form-control-hidden u-label"></label>
-            <input type="text" placeholder="East" id="text-93dc" name="text-5" class="u-input u-input-rectangle">
+            <input type="text" placeholder="Zone Number" id="zone_no" name="text-5" class="u-input u-input-rectangle">
           </div>
           <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-13">
             <label for="text-2f40" class="u-form-control-hidden u-label"></label>
-            <input type="text" id="text-2f40" name="text-6" class="u-input u-input-rectangle" placeholder="South">
+            <input type="text" id="block_no" name="text-6" class="u-input u-input-rectangle"
+              placeholder="Block Number">
           </div>
           <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-14">
             <label for="text-7d2b" class="u-form-control-hidden u-label"></label>
-            <input type="text" placeholder="West" id="text-7d2b" name="text-7" class="u-input u-input-rectangle">
+            <input type="text" placeholder="Psd13" id="psd" name="text-7" class="u-input u-input-rectangle">
           </div>
+
           <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-2"></div>
+          <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-11">
+
+            <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-11">
+              <label for="text-4ef3" class="u-label">Description of Land</label>
+
+              <div class="u-form-checkbox">
+                <input type="checkbox" id="cb_affidavit" name="documents" value="affidavit">
+                <label for="affidavit">&nbsp;&nbsp;&nbsp;Affidavit of Ownership</label>
+              </div>
+
+              <div class="u-form-checkbox">
+                <input type="checkbox" id="cb_barangay" name="documents" value="barangay">
+                <label for="barangay">&nbsp;&nbsp;&nbsp;Barangay Certificate</label>
+              </div>
+
+              <div class="u-form-checkbox">
+                <input type="checkbox" id="cb_tag" name="documents" value="land_tagging">
+                <label for="land-tagging">&nbsp;&nbsp;&nbsp;Land Tagging</label>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="button-group" style="margin-top: 20px; display: flex; gap: 10px;">
+            <a href="#" class="u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Submit</a>
+            <a href="#" class="clear-button u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Clear</a>
+            <a href="#" class="u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Cancel</a>
+          </div>
+
+          <!--
           <div class="u-form-group u-form-partition-factor-3 u-label-top u-form-group-16">
             <label for="text-5634" class="u-label">Kind of Property</label>
             <input type="text" placeholder="" id="text-5634" name="text-8" class="u-input u-input-rectangle">
@@ -284,13 +337,13 @@
           <div class="u-form-send-message u-form-send-success"> Thank you! Your message has been sent. </div>
           <div class="u-form-send-error u-form-send-message"> Unable to send your message. Please fix errors then try
             again. </div>
-          <input type="hidden" value="" name="recaptchaResponse">
-          <input type="hidden" name="formServices" value="">
+            -->
         </form>
       </div>
     </div>
   </section>
-  <section
+  <!-- 2nd Section -->
+  <<!-- <section
     class="u-align-center u-border-2 u-border-grey-75 u-border-no-left u-border-no-right u-border-no-top u-clearfix u-container-align-center u-section-3"
     id="sec-8a3b">
     <div class="u-clearfix u-sheet u-sheet-1">
@@ -378,7 +431,11 @@
         </table>
       </div>
     </div>
-  </section>
+    </section>
+    -->
+
+    <!-- 3rd Section -->
+    <!--
   <section class="u-align-center u-clearfix u-container-align-center u-section-4" id="carousel_fa37">
     <div class="u-clearfix u-sheet u-sheet-1">
       <h4 class="u-text u-text-default u-text-1">Plant and Trees Appraisal</h4>
@@ -469,14 +526,15 @@
       </a>
     </div>
   </section>
+  -->
 
-
-
-  <footer class="u-align-center u-clearfix u-container-align-center u-footer u-grey-80 u-footer" id="sec-7e36">
-    <div class="u-clearfix u-sheet u-sheet-1">
-      <p class="u-small-text u-text u-text-variant u-text-1">Sample text. Click to select the Text Element.</p>
-    </div>
-  </footer>
+    <footer class="u-align-center u-clearfix u-container-align-center u-footer u-grey-80 u-footer" id="sec-7e36">
+      <div class="u-clearfix u-sheet u-sheet-1">
+        <p class="u-small-text u-text u-text-variant u-text-1">Sample text. Click to select the Text Element.</p>
+      </div>
+    </footer>
+    
+    <script src="Add-New-Real-Property-Unit.js"></script>
 
 </body>
 
