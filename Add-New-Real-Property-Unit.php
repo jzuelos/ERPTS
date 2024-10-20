@@ -8,41 +8,66 @@
   <meta name="description" content="">
   <title>Add New Real Property Unit</title>
   <link rel="stylesheet" href="nicepage.css" media="screen">
-  <link rel="stylesheet" href="Add-New-Real-Property-Unit.css">
-  <meta name="generator" content="Nicepage 6.18.5, nicepage.com">
-  <meta name="referrer" content="origin">
-  <link id="u-theme-google-font" rel="stylesheet"
-    href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i">
-
-  <script type="application/ld+json">{
-    "@context": "http://schema.org",
-    "@type": "Organization",
-    "name": "Site 2 (Orig)",
-    "logo": "images/coconut_.__1_-removebg-preview1.png"
-}</script>
-  <meta name="theme-color" content="#478ac9">
-  <meta property="og:title" content="Add New Real Property Unit">
-  <meta property="og:description" content="">
-  <meta property="og:type" content="website">
-  <meta data-intl-tel-input-cdn-path="intlTelInput/">
 </head>
 
 <body data-path-to-root="./" data-include-products="false" class="u-body u-xl-mode" data-lang="en">
 
   <?php
-  require_once 'database.php'; // Include the database connection class
-  
-  // Get the database connection
+  error_reporting(E_ALL);
+  ini_set('display_errors', 1);
+
+  require_once 'database.php';
+
   $conn = Database::getInstance();
 
-  // Check if the connection is successful
   if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
-  } else {
-    echo "Connected successfully"; // This will confirm a successful connection
   }
 
+  session_start(); // Start the session at the top of your script
+  
+  if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $house_number = filter_input(INPUT_POST, 'house_number', FILTER_SANITIZE_NUMBER_INT);
+    $block_number = filter_input(INPUT_POST, 'block_number', FILTER_SANITIZE_NUMBER_INT);
+    $province = filter_input(INPUT_POST, 'province', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $city = filter_input(INPUT_POST, 'city', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $district = filter_input(INPUT_POST, 'district', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $barangay = filter_input(INPUT_POST, 'barangay', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $house_tag = filter_input(INPUT_POST, 'house_tag_number', FILTER_SANITIZE_NUMBER_INT);
+    $land_area = filter_input(INPUT_POST, 'land_area', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+
+    $desc_land = htmlspecialchars($_POST['lot_no'], ENT_QUOTES) . ' ' .
+      htmlspecialchars($_POST['zone_no'], ENT_QUOTES) . ' ' .
+      htmlspecialchars($_POST['block_no'], ENT_QUOTES) . ' ' .
+      htmlspecialchars($_POST['psd'], ENT_QUOTES);
+
+      $documents = isset($_POST['documents']) && is_array($_POST['documents']) ? implode(", ", $_POST['documents']) : '';
+
+    $stmt = $conn->prepare("INSERT INTO p_info (house_no, block_no, province, city, district, barangay, house_tag_no, land_area, desc_land, documents) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssssssss", $house_number, $block_number, $province, $city, $district, $barangay, $house_tag, $land_area, $desc_land, $documents);
+
+    if ($stmt->execute()) {
+      // Set confirmation message
+      $_SESSION['message'] = "Property Added";
+      // Redirect to avoid re-submission
+      header("Location: " . $_SERVER['PHP_SELF']);
+      exit;
+    } else {
+      echo "<p>Error: " . $stmt->error . "</p>";
+    }
+
+    $stmt->close();
+  }
+
+  // Display confirmation message
+  if (isset($_SESSION['message'])) {
+    echo "<p>" . $_SESSION['message'] . "</p>";
+    unset($_SESSION['message']); // Clear the message after displaying
+  }
+
+  $conn->close();
   ?>
+
 
   <header class="u-clearfix u-custom-color-1 u-header u-header" id="sec-34db"><a href="#"
       class="u-image u-logo u-image-1" data-image-width="2000" data-image-height="2000">
@@ -160,41 +185,27 @@
   <section
     class="u-align-center u-border-2 u-border-grey-75 u-border-no-left u-border-no-right u-border-no-top u-clearfix u-container-align-center u-section-2"
     id="sec-ffed">
+
     <!-- Add New ERPTS -->
     <div class="u-clearfix u-sheet u-sheet-1">
       <div class="u-form u-form-1">
-        <form action="" class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form" name="form"
-          style="padding: 10px;">
-          <!--
-          <div class="u-form-group u-form-name u-form-partition-factor-3 u-label-top">
-            <label for="name-5668" class="u-label">House Number</label>
-            <input type="text" id="name-5668" name="name" class="u-input u-input-rectangle" required="">
-          </div>
-          <div class="u-form-email u-form-group u-form-partition-factor-3 u-label-top">
-            <label for="email-5668" class="u-label">Street</label>
-            <input type="email" id="email-5668" name="email" class="u-input u-input-rectangle" required="">
-          </div>
-          <div class="u-form-group u-form-partition-factor-3 u-label-top u-form-group-3">
-            <label for="text-71a2" class="u-label">Middle Name</label>
-            <input type="text" placeholder="" id="text-71a2" name="text" class="u-input u-input-rectangle">
-          </div>
-          -->
+        <form action="" id="propertyForm" class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form" method="POST" style="padding: 10px;" onsubmit="return validateForm();">
           <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-1"></div>
           <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-12">
             <label for="text-93dc" class="u-label">Location of Property</label>
-            <input type="text" placeholder="House Number" id="house_number" name="text-5"
+            <input type="number" placeholder="House Number" id="house_number" name="house_number"
               class="u-input u-input-rectangle">
           </div>
           <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-13">
             <label for="text-2f40" class="u-form-control-hidden u-label"></label>
-            <input type="text" id="block_number" name="text-6" class="u-input u-input-rectangle"
+            <input type="number" id="block_number" name="block_number" class="u-input u-input-rectangle"
               placeholder="Block Number">
           </div>
 
           <div class="u-form-group u-form-partition-factor-2 u-form-select u-label-top u-form-group-6">
             <label for="select-11f0" class="u-form-control-hidden u-label"></label>
             <div class="u-form-select-wrapper">
-              <select id="province" name="(Barangay)" class="u-input u-input-rectangle">
+              <select id="province" name="province" class="u-input u-input-rectangle" required>
                 <option value="Province" data-calc="" selected="selected">Province</option>
                 <option value="Item 2" data-calc="">Item 2</option>
                 <option value="Item 3" data-calc="">Item 3</option>
@@ -209,7 +220,7 @@
           <div class="u-form-group u-form-partition-factor-2 u-form-select u-label-top u-form-group-7">
             <label for="select-7617" class="u-form-control-hidden u-label"></label>
             <div class="u-form-select-wrapper">
-              <select id="city" name="(City)" class="u-input u-input-rectangle">
+              <select id="city" name="city" class="u-input u-input-rectangle">
                 <option value="(City)" data-calc="">City</option>
               </select>
               <svg class="u-caret u-caret-svg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
@@ -222,7 +233,7 @@
           <div class="u-form-group u-form-partition-factor-2 u-form-select u-label-top u-form-group-6">
             <label for="select-11f0" class="u-form-control-hidden u-label"></label>
             <div class="u-form-select-wrapper">
-              <select id="district" name="District" class="u-input u-input-rectangle">
+              <select id="district" name="district" class="u-input u-input-rectangle">
                 <option value="District" data-calc="" selected="selected">District</option>
                 <option value="Item 2" data-calc="">Item 2</option>
                 <option value="Item 3" data-calc="">Item 3</option>
@@ -237,7 +248,7 @@
           <div class="u-form-group u-form-partition-factor-2 u-form-select u-label-top u-form-group-7">
             <label for="select-7617" class="u-form-control-hidden u-label"></label>
             <div class="u-form-select-wrapper">
-              <select id="barangay" name="Barangay" class="u-input u-input-rectangle">
+              <select id="barangay" name="barangay" class="u-input u-input-rectangle">
                 <option value="(City)" data-calc="">Barangay</option>
               </select>
               <svg class="u-caret u-caret-svg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
@@ -247,294 +258,86 @@
               </svg>
             </div>
           </div>
+
+          <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-1"></div>
+          <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-12">
+            <label for="text-93dc" class="u-label">House Tag Number</label>
+            <input type="number" placeholder="House Tag Number" id="house_tag_number" name="house_tag_number"
+              class="u-input u-input-rectangle">
+          </div>
+
+          <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-1"></div>
+          <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-12">
+            <label for="text-93dc" class="u-label">Land Area</label>
+            <input type="number" placeholder="Land Area" id="land_area" name="land_area"
+              class="u-input u-input-rectangle" required>
+          </div>
+
           <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-1"></div>
           <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-11">
             <label for="text-4ef3" class="u-label">Description of Land</label>
-            <input type="text" placeholder="Lot Number" id="lot_no" name="text-4" class="u-input u-input-rectangle">
+            <input type="number" placeholder="Lot Number" id="lot_no" name="lot_no" class="u-input u-input-rectangle">
           </div>
           <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-12">
             <label for="text-93dc" class="u-form-control-hidden u-label"></label>
-            <input type="text" placeholder="Zone Number" id="zone_no" name="text-5" class="u-input u-input-rectangle">
+            <input type="number" placeholder="Zone Number" id="zone_no" name="zone_no"
+              class="u-input u-input-rectangle">
           </div>
           <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-13">
             <label for="text-2f40" class="u-form-control-hidden u-label"></label>
-            <input type="text" id="block_no" name="text-6" class="u-input u-input-rectangle"
+            <input type="number" id="block_no" name="block_no" class="u-input u-input-rectangle"
               placeholder="Block Number">
           </div>
           <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-14">
             <label for="text-7d2b" class="u-form-control-hidden u-label"></label>
-            <input type="text" placeholder="Psd13" id="psd" name="text-7" class="u-input u-input-rectangle">
+            <input type="number" placeholder="Psd13" id="psd" name="psd" class="u-input u-input-rectangle">
           </div>
 
           <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-2"></div>
           <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-11">
 
             <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-11">
-              <label for="text-4ef3" class="u-label">Description of Land</label>
+              <label for="text-4ef3" class="u-label">Documents</label>
 
               <div class="u-form-checkbox">
-                <input type="checkbox" id="cb_affidavit" name="documents" value="affidavit">
-                <label for="affidavit">&nbsp;&nbsp;&nbsp;Affidavit of Ownership</label>
+                <input type="checkbox" id="cb_affidavit" name="documents[]" value="affidavit">
+                <label for="cb_affidavit">&nbsp;&nbsp;&nbsp;Affidavit of Ownership</label>
               </div>
 
               <div class="u-form-checkbox">
-                <input type="checkbox" id="cb_barangay" name="documents" value="barangay">
-                <label for="barangay">&nbsp;&nbsp;&nbsp;Barangay Certificate</label>
+                <input type="checkbox" id="cb_barangay" name="documents[]" value="barangay">
+                <label for="cb_barangay">&nbsp;&nbsp;&nbsp;Barangay Certificate</label>
               </div>
 
               <div class="u-form-checkbox">
-                <input type="checkbox" id="cb_tag" name="documents" value="land_tagging">
-                <label for="land-tagging">&nbsp;&nbsp;&nbsp;Land Tagging</label>
+                <input type="checkbox" id="cb_tag" name="documents[]" value="land_tagging">
+                <label for="cb_tag">&nbsp;&nbsp;&nbsp;Land Tagging</label>
               </div>
+
             </div>
 
           </div>
 
           <div class="button-group" style="margin-top: 20px; display: flex; gap: 10px;">
-            <a href="#" class="u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Submit</a>
-            <a href="#" class="clear-button u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Clear</a>
+            <button type="submit"
+              class="u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Submit</button>
+            <button type="button"
+              class="clear-button u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Clear</button>
             <a href="#" class="u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Cancel</a>
           </div>
 
-          <!--
-          <div class="u-form-group u-form-partition-factor-3 u-label-top u-form-group-16">
-            <label for="text-5634" class="u-label">Kind of Property</label>
-            <input type="text" placeholder="" id="text-5634" name="text-8" class="u-input u-input-rectangle">
-          </div>
-          <div class="u-form-group u-form-partition-factor-3 u-label-top u-form-group-17">
-            <label for="text-6f19" class="u-label">Area</label>
-            <input type="text" placeholder="" id="text-6f19" name="text-9" class="u-input u-input-rectangle">
-          </div>
-          <div class="u-form-group u-form-partition-factor-3 u-label-top u-form-group-18">
-            <label for="text-3a03" class="u-label">Actual Use</label>
-            <input type="text" placeholder="" id="text-3a03" name="text-10" class="u-input u-input-rectangle">
-          </div>
-          <div class="u-form-group u-form-partition-factor-3 u-label-top u-form-group-19">
-            <label for="text-2939" class="u-label">Market Value</label>
-            <input type="text" placeholder="" id="text-2939" name="text-11" class="u-input u-input-rectangle">
-          </div>
-          <div class="u-form-group u-form-partition-factor-3 u-label-top u-form-group-20">
-            <label for="text-8a17" class="u-label">Assessment Level</label>
-            <input type="text" placeholder="" id="text-8a17" name="text-12" class="u-input u-input-rectangle">
-          </div>
-          <div class="u-form-group u-form-partition-factor-3 u-label-top u-form-group-21">
-            <label for="text-135e" class="u-label">Assessed Value</label>
-            <input type="text" placeholder="" id="text-135e" name="text-13" class="u-input u-input-rectangle">
-          </div>
-          <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-22">
-            <label for="text-5fb5" class="u-label">Value</label>
-            <input type="text" placeholder="" id="text-5fb5" name="text-14" class="u-input u-input-rectangle">
-          </div>
-          <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-23">
-            <label for="text-95ec" class="u-label">PIN</label>
-            <input type="text" placeholder="" id="text-95ec" name="text-15" class="u-input u-input-rectangle">
-          </div>
-          <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-3"></div>
-          <div class="u-align-right u-form-group u-form-submit u-label-top">
-            <a href="#" class="u-border-none u-btn u-btn-submit u-button-style u-none u-btn-1">Clear</a>
-            <input type="submit" value="submit" class="u-form-control-hidden">
-          </div>
-          <div class="u-form-send-message u-form-send-success"> Thank you! Your message has been sent. </div>
-          <div class="u-form-send-error u-form-send-message"> Unable to send your message. Please fix errors then try
-            again. </div>
-            -->
         </form>
       </div>
     </div>
   </section>
-  <!-- 2nd Section -->
-  <<!-- <section
-    class="u-align-center u-border-2 u-border-grey-75 u-border-no-left u-border-no-right u-border-no-top u-clearfix u-container-align-center u-section-3"
-    id="sec-8a3b">
-    <div class="u-clearfix u-sheet u-sheet-1">
-      <h4 class="u-text u-text-default u-text-1">Land Appraisal</h4>
-      <div class="u-expanded-width u-table u-table-responsive u-table-1">
-        <table class="u-table-entity u-table-entity-1">
-          <colgroup>
-            <col width="16.6%">
-            <col width="16.6%">
-            <col width="16.6%">
-            <col width="16.6%">
-            <col width="17%">
-            <col width="16.6%">
-          </colgroup>
-          <thead class="u-black u-table-header u-table-header-1">
-            <tr style="height: 67px;">
-              <th class="u-align-center u-border-1 u-border-black u-table-cell">Classification</th>
-              <th class="u-align-center u-border-1 u-border-black u-table-cell">Sub-Class</th>
-              <th class="u-align-center u-border-1 u-border-black u-table-cell">Area</th>
-              <th class="u-align-center u-border-1 u-border-black u-table-cell">Actual Use</th>
-              <th class="u-align-center u-border-1 u-border-black u-table-cell">Unit Value </th>
-              <th class="u-align-center u-border-1 u-border-black u-table-cell">Market Value </th>
-            </tr>
-          </thead>
-          <tbody class="u-table-body">
-            <tr style="height: 75px;">
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Row 1</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-            </tr>
-            <tr style="height: 76px;">
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Row 2</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-            </tr>
-            <tr style="height: 76px;">
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Row 3</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-            </tr>
-            <tr style="height: 76px;">
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Row 4</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-            </tr>
-            <tr style="height: 76px;">
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-            </tr>
-            <tr style="height: 76px;">
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-            </tr>
-          </tbody>
-          <tfoot class="u-table-footer">
-            <tr style="height: 47px;">
-              <td class="u-align-center u-border-1 u-border-grey-15 u-table-cell u-table-cell-43">TOTAL</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    </div>
-    </section>
-    -->
 
-    <!-- 3rd Section -->
-    <!--
-  <section class="u-align-center u-clearfix u-container-align-center u-section-4" id="carousel_fa37">
+  <footer class="u-align-center u-clearfix u-container-align-center u-footer u-grey-80 u-footer" id="sec-7e36">
     <div class="u-clearfix u-sheet u-sheet-1">
-      <h4 class="u-text u-text-default u-text-1">Plant and Trees Appraisal</h4>
-      <div class="u-expanded-width u-table u-table-responsive u-table-1">
-        <table class="u-table-entity u-table-entity-1">
-          <colgroup>
-            <col width="16.6%">
-            <col width="16.6%">
-            <col width="16.6%">
-            <col width="16.6%">
-            <col width="17%">
-            <col width="16.6%">
-          </colgroup>
-          <thead class="u-black u-table-header u-table-header-1">
-            <tr style="height: 67px;">
-              <th class="u-align-center u-border-1 u-border-black u-table-cell">Classification</th>
-              <th class="u-align-center u-border-1 u-border-black u-table-cell">Sub-Class</th>
-              <th class="u-align-center u-border-1 u-border-black u-table-cell">Area</th>
-              <th class="u-align-center u-border-1 u-border-black u-table-cell">Actual Use</th>
-              <th class="u-align-center u-border-1 u-border-black u-table-cell">Unit Value </th>
-              <th class="u-align-center u-border-1 u-border-black u-table-cell">Market Value </th>
-            </tr>
-          </thead>
-          <tbody class="u-table-body">
-            <tr style="height: 75px;">
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Row 1</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-            </tr>
-            <tr style="height: 76px;">
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Row 2</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-            </tr>
-            <tr style="height: 76px;">
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Row 3</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-            </tr>
-            <tr style="height: 76px;">
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Row 4</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell">Description</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-            </tr>
-            <tr style="height: 76px;">
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-            </tr>
-            <tr style="height: 76px;">
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-            </tr>
-          </tbody>
-          <tfoot class="u-table-footer">
-            <tr style="height: 47px;">
-              <td class="u-align-center u-border-1 u-border-grey-15 u-table-cell u-table-cell-43">TOTAL</td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-              <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-      <a href="#" class="u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius u-btn-1">Print<span
-          style="font-weight: 700;"></span>
-      </a>
+      <p class="u-small-text u-text u-text-variant u-text-1">Sample text. Click to select the Text Element.</p>
     </div>
-  </section>
-  -->
+  </footer>
 
-    <footer class="u-align-center u-clearfix u-container-align-center u-footer u-grey-80 u-footer" id="sec-7e36">
-      <div class="u-clearfix u-sheet u-sheet-1">
-        <p class="u-small-text u-text u-text-variant u-text-1">Sample text. Click to select the Text Element.</p>
-      </div>
-    </footer>
-    
-    <script src="Add-New-Real-Property-Unit.js"></script>
+  <script src="Add-New-Real-Property-Unit.js"></script>
 
 </body>
 
