@@ -327,9 +327,9 @@
           <table class="u-table">
             <thead>
               <tr>
-                <th class="u-table-header">Column 1</th>
-                <th class="u-table-header">Column 2</th>
-                <th class="u-table-header">Column 3</th>
+                <th class="u-table-header">Name</th>
+                <th class="u-table-header">Address</th>
+                <th class="u-table-header">Check</th>
               </tr>
             </thead>
             <tbody>
@@ -364,9 +364,10 @@
     </div>
   </section>
 
+  <!-- Footer -->
   <footer class="u-align-center u-clearfix u-container-align-center u-footer u-grey-80 u-footer" id="sec-7e36">
     <div class="u-clearfix u-sheet u-sheet-1">
-      <p class="u-small-text u-text u-text-variant u-text-1">Sample text. Click to select the Text Element.</p>
+      <p class="u-small-text u-text u-text-variant u-text-1"></p>
     </div>
   </footer>
 
