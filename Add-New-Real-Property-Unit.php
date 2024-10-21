@@ -8,6 +8,7 @@
   <meta name="description" content="">
   <title>Add New Real Property Unit</title>
   <link rel="stylesheet" href="nicepage.css" media="screen">
+  <link rel="stylesheet" href="Add-New-Real-Property-Unit.css">
 </head>
 
 <body data-path-to-root="./" data-include-products="false" class="u-body u-xl-mode" data-lang="en">
@@ -22,6 +23,8 @@
 
   if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
+  } else {
+    echo "Connected";
   }
 
   session_start(); // Start the session at the top of your script
@@ -41,7 +44,7 @@
       htmlspecialchars($_POST['block_no'], ENT_QUOTES) . ' ' .
       htmlspecialchars($_POST['psd'], ENT_QUOTES);
 
-      $documents = isset($_POST['documents']) && is_array($_POST['documents']) ? implode(", ", $_POST['documents']) : '';
+    $documents = isset($_POST['documents']) && is_array($_POST['documents']) ? implode(", ", $_POST['documents']) : '';
 
     $stmt = $conn->prepare("INSERT INTO p_info (house_no, block_no, province, city, district, barangay, house_tag_no, land_area, desc_land, documents) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssssssss", $house_number, $block_number, $province, $city, $district, $barangay, $house_tag, $land_area, $desc_land, $documents);
@@ -189,7 +192,8 @@
     <!-- Add New ERPTS -->
     <div class="u-clearfix u-sheet u-sheet-1">
       <div class="u-form u-form-1">
-        <form action="" id="propertyForm" class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form" method="POST" style="padding: 10px;" onsubmit="return validateForm();">
+        <form action="" id="propertyForm" class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form"
+          method="POST" style="padding: 10px;" onsubmit="return validateForm();">
           <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-1"></div>
           <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-12">
             <label for="text-93dc" class="u-label">Location of Property</label>
@@ -317,6 +321,34 @@
             </div>
 
           </div>
+
+          <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-2"></div>
+          <table class="u-table u-table-1" style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr>
+                <th class="u-table-header" style="border: 1px solid #ccc; padding: 8px; text-align: left;">Column 1</th>
+                <th class="u-table-header" style="border: 1px solid #ccc; padding: 8px; text-align: left;">Column 2</th>
+                <th class="u-table-header" style="border: 1px solid #ccc; padding: 8px; text-align: left;">Column 3</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="border: 1px solid #ccc; padding: 8px;">Row 1, Cell 1</td>
+                <td style="border: 1px solid #ccc; padding: 8px;">Row 1, Cell 2</td>
+                <td style="border: 1px solid #ccc; padding: 8px;">Row 1, Cell 3</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid #ccc; padding: 8px;">Row 2, Cell 1</td>
+                <td style="border: 1px solid #ccc; padding: 8px;">Row 2, Cell 2</td>
+                <td style="border: 1px solid #ccc; padding: 8px;">Row 2, Cell 3</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid #ccc; padding: 8px;">Row 3, Cell 1</td>
+                <td style="border: 1px solid #ccc; padding: 8px;">Row 3, Cell 2</td>
+                <td style="border: 1px solid #ccc; padding: 8px;">Row 3, Cell 3</td>
+              </tr>
+            </tbody>
+          </table>
 
           <div class="button-group" style="margin-top: 20px; display: flex; gap: 10px;">
             <button type="submit"
