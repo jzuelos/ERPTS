@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 20, 2024 at 04:16 PM
+-- Generation Time: Oct 21, 2024 at 04:15 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,25 @@ SET time_zone = "+00:00";
 --
 -- Database: `erpts`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `owners_tb`
+--
+
+CREATE TABLE `owners_tb` (
+  `own_id` int(30) NOT NULL,
+  `own_name` varchar(50) NOT NULL,
+  `tin_no` int(20) NOT NULL,
+  `house_no` varchar(20) NOT NULL,
+  `street` varchar(30) NOT NULL,
+  `barangay` varchar(30) NOT NULL,
+  `district` varchar(20) NOT NULL,
+  `city` varchar(20) NOT NULL,
+  `province` varchar(20) NOT NULL,
+  `own_info` varchar(70) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -46,24 +65,17 @@ CREATE TABLE `p_info` (
 --
 
 INSERT INTO `p_info` (`p_id`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `house_tag_no`, `land_area`, `desc_land`, `documents`) VALUES
-(1, 23432, 23423, 'Item 3', '(City)', 'Item 2', '(City)', 4234, 2342, '423423 4234 423423 23423', ''),
-(2, 23432, 23423, 'Item 3', '(City)', 'Item 2', '(City)', 4234, 2342, '423423 4234 423423 23423', ''),
-(3, 23432, 23423, 'Item 3', '(City)', 'Item 2', '(City)', 4234, 2342, '423423 4234 423423 23423', ''),
-(4, 24234, 4234, 'Item 2', '(City)', 'Item 2', '(City)', 23432, 42342, '4234 4234 23423 23423', ''),
-(5, 24234, 4234, 'Item 2', '(City)', 'Item 2', '(City)', 23432, 42342, '4234 4234 23423 23423', ''),
-(6, 24234, 4234, 'Item 2', '(City)', 'Item 2', '(City)', 23432, 42342, '4234 4234 23423 23423', ''),
-(7, 24234, 4234, 'Item 2', '(City)', 'Item 2', '(City)', 23432, 42342, '4234 4234 23423 23423', ''),
-(8, 24234, 4234, 'Item 2', '(City)', 'Item 2', '(City)', 23432, 42342, '4234 4234 23423 23423', ''),
-(9, 2342, 4234, 'Item 2', '(City)', 'Item 3', '(City)', 4234, 2342, '423423 4234 24342 23423', ''),
-(10, 42354, 53245, 'Item 2', '(City)', 'Item 2', '(City)', 42345, 52345, '5345 5345 54345 34523', ''),
-(11, 2342, 23423, 'Item 2', '(City)', 'Item 3', '(City)', 42342, 4234, '423432 4234 423423 23423', ''),
-(12, 0, 0, 'Province', '(City)', 'District', '(City)', 0, 0, '   ', 'affidavit, barangay, land_tagg'),
-(13, 0, 0, 'Province', '(City)', 'District', '(City)', 0, 0, '   ', ''),
-(14, 0, 0, 'Province', '(City)', 'District', '(City)', 0, 0, '   ', '');
+(16, 4234, 2345234, 'Item 2', '(City)', 'Item 2', '(City)', 234, 42453, '2342 4234 42342 ', 'affidavit, barangay, land_tagg');
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `owners_tb`
+--
+ALTER TABLE `owners_tb`
+  ADD PRIMARY KEY (`own_id`);
 
 --
 -- Indexes for table `p_info`
@@ -76,10 +88,16 @@ ALTER TABLE `p_info`
 --
 
 --
+-- AUTO_INCREMENT for table `owners_tb`
+--
+ALTER TABLE `owners_tb`
+  MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `p_info`
 --
 ALTER TABLE `p_info`
-  MODIFY `p_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `p_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
