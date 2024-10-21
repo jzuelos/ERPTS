@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-alert("o paano?");
+alert("paano");
 
 function validateForm() {
   const checkboxes = document.querySelectorAll('input[name="documents[]"]');

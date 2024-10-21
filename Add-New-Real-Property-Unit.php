@@ -323,29 +323,30 @@
           </div>
 
           <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-2"></div>
-          <table class="u-table u-table-1" style="width: 100%; border-collapse: collapse;">
+          <label for="text-4ef3" class="u-label">Owner</label>
+          <table class="u-table">
             <thead>
               <tr>
-                <th class="u-table-header" style="border: 1px solid #ccc; padding: 8px; text-align: left;">Column 1</th>
-                <th class="u-table-header" style="border: 1px solid #ccc; padding: 8px; text-align: left;">Column 2</th>
-                <th class="u-table-header" style="border: 1px solid #ccc; padding: 8px; text-align: left;">Column 3</th>
+                <th class="u-table-header">Column 1</th>
+                <th class="u-table-header">Column 2</th>
+                <th class="u-table-header">Column 3</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td style="border: 1px solid #ccc; padding: 8px;">Row 1, Cell 1</td>
-                <td style="border: 1px solid #ccc; padding: 8px;">Row 1, Cell 2</td>
-                <td style="border: 1px solid #ccc; padding: 8px;">Row 1, Cell 3</td>
+                <td>Row 1, Cell 1</td>
+                <td>Row 1, Cell 2</td>
+                <td>Row 1, Cell 3</td>
               </tr>
               <tr>
-                <td style="border: 1px solid #ccc; padding: 8px;">Row 2, Cell 1</td>
-                <td style="border: 1px solid #ccc; padding: 8px;">Row 2, Cell 2</td>
-                <td style="border: 1px solid #ccc; padding: 8px;">Row 2, Cell 3</td>
+                <td>Row 2, Cell 1</td>
+                <td>Row 2, Cell 2</td>
+                <td>Row 2, Cell 3</td>
               </tr>
               <tr>
-                <td style="border: 1px solid #ccc; padding: 8px;">Row 3, Cell 1</td>
-                <td style="border: 1px solid #ccc; padding: 8px;">Row 3, Cell 2</td>
-                <td style="border: 1px solid #ccc; padding: 8px;">Row 3, Cell 3</td>
+                <td>Row 3, Cell 1</td>
+                <td>Row 3, Cell 2</td>
+                <td>Row 3, Cell 3</td>
               </tr>
             </tbody>
           </table>
@@ -355,7 +356,7 @@
               class="u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Submit</button>
             <button type="button"
               class="clear-button u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Clear</button>
-            <a href="#" class="u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Cancel</a>
+            <a href="Real-Property-Unit-List.html" class="u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Cancel</a>
           </div>
 
         </form>
