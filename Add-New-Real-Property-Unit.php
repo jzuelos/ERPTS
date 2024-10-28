@@ -67,10 +67,7 @@
     echo "<p>" . $_SESSION['message'] . "</p>";
     unset($_SESSION['message']); // Clear the message after displaying
   }
-
-  $conn->close();
   ?>
-
 
   <header class="u-clearfix u-custom-color-1 u-header u-header" id="sec-34db"><a href="#"
       class="u-image u-logo u-image-1" data-image-width="2000" data-image-height="2000">
@@ -324,39 +321,81 @@
 
           <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-2"></div>
           <label for="text-4ef3" class="u-label">Owner</label>
+          <!-- Owner Search Section -->
+    
           <table class="u-table">
             <thead>
               <tr>
-                <th class="u-table-header">Name</th>
+                <th class="u-table-header">ID</th>
+                <th class="u-table-header">Owner Name</th>
                 <th class="u-table-header">Address</th>
-                <th class="u-table-header">Check</th>
+                <th class="u-table-header">Select</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Row 1, Cell 1</td>
-                <td>Row 1, Cell 2</td>
-                <td>Row 1, Cell 3</td>
-              </tr>
-              <tr>
-                <td>Row 2, Cell 1</td>
-                <td>Row 2, Cell 2</td>
-                <td>Row 2, Cell 3</td>
-              </tr>
-              <tr>
-                <td>Row 3, Cell 1</td>
-                <td>Row 3, Cell 2</td>
-                <td>Row 3, Cell 3</td>
-              </tr>
+              <?php
+              // Search logic
+              if (isset($_GET['search'])) {
+                $searchTerm = filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING);
+                $stmt = $conn->prepare("SELECT * FROM owners_tb WHERE own_fname LIKE ? OR own_surname LIKE ?");
+                $likeTerm = '%' . $searchTerm . '%';
+                $stmt->bind_param("ss", $likeTerm, $likeTerm);
+                $stmt->execute();
+                $result = $stmt->get_result();
+
+                if ($result && $result->num_rows > 0) {
+                  while ($row = $result->fetch_assoc()) {
+                    $ownerId = htmlspecialchars($row['own_id'], ENT_QUOTES);
+                    $fullName = htmlspecialchars($row['own_fname'] . ', ' . $row['own_surname'], ENT_QUOTES);
+                    $address = htmlspecialchars($row['street'] . ', ' . $row['barangay'] . ', ' . $row['city'] . ', ' . $row['province'], ENT_QUOTES);
+
+                    echo "<tr>";
+                    echo "<td>" . $ownerId . "</td>";
+                    echo "<td>" . $fullName . "</td>";
+                    echo "<td>" . $address . "</td>";
+                    echo "<td><input type='checkbox' name='selected_ids[]' value='" . $ownerId . "'></td>";
+                    echo "</tr>";
+                  }
+                } else {
+                  echo "<tr><td colspan='4'>No data found</td></tr>";
+                }
+                $stmt->close();
+              } else {
+                // Default query to display all owners
+                $result = $conn->query("SELECT * FROM owners_tb");
+
+                if ($result && $result->num_rows > 0) {
+                  while ($row = $result->fetch_assoc()) {
+                    $ownerId = htmlspecialchars($row['own_id'], ENT_QUOTES);
+                    $fullName = htmlspecialchars($row['own_fname'] . ', ' . $row['own_surname'], ENT_QUOTES);
+                    $address = htmlspecialchars($row['street'] . ', ' . $row['barangay'] . ', ' . $row['city'] . ', ' . $row['province'], ENT_QUOTES);
+
+                    echo "<tr>";
+                    echo "<td>" . $ownerId . "</td>";
+                    echo "<td>" . $fullName . "</td>";
+                    echo "<td>" . $address . "</td>";
+                    echo "<td><input type='checkbox' name='selected_ids[]' value='" . $ownerId . "'></td>";
+                    echo "</tr>";
+                  }
+                } else {
+                  echo "<tr><td colspan='4'>No data found</td></tr>";
+                }
+              }
+
+              // Close the connection
+              $conn->close();
+              ?>
             </tbody>
           </table>
+
 
           <div class="button-group" style="margin-top: 20px; display: flex; gap: 10px;">
             <button type="submit"
               class="u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Submit</button>
             <button type="button"
               class="clear-button u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Clear</button>
-            <a href="Real-Property-Unit-List.html" class="u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Cancel</a>
+            <a href="Real-Property-Unit-List.html"
+              class="u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Cancel</a>
           </div>
 
         </form>
