@@ -1,17 +1,20 @@
-<!DOCTYPE html>
-<html style="font-size: 16px;" lang="en">
+<!doctype html>
+<html lang="en">
 
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Required meta tags -->
   <meta charset="utf-8">
-  <meta name="keywords" content="">
-  <meta name="description" content="">
-  <title>Add New Real Property Unit</title>
-  <link rel="stylesheet" href="nicepage.css" media="screen">
-  <link rel="stylesheet" href="Add-New-Real-Property-Unit.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
+    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" href="main_layout.css">
+  <title>Electronic Real Property Tax System</title>
 </head>
 
-<body data-path-to-root="./" data-include-products="false" class="u-body u-xl-mode" data-lang="en">
+
+<body>
 
   <?php
   error_reporting(E_ALL);
@@ -39,27 +42,40 @@
     $house_tag = filter_input(INPUT_POST, 'house_tag_number', FILTER_SANITIZE_NUMBER_INT);
     $land_area = filter_input(INPUT_POST, 'land_area', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
 
-    $desc_land = htmlspecialchars($_POST['lot_no'], ENT_QUOTES) . ' ' .
-      htmlspecialchars($_POST['zone_no'], ENT_QUOTES) . ' ' .
-      htmlspecialchars($_POST['block_no'], ENT_QUOTES) . ' ' .
-      htmlspecialchars($_POST['psd'], ENT_QUOTES);
+    // Ensure the following are checked before using
+    $lot_no = isset($_POST['lot_no']) ? htmlspecialchars($_POST['lot_no'], ENT_QUOTES) : '';
+    $zone_no = isset($_POST['zone_no']) ? htmlspecialchars($_POST['zone_no'], ENT_QUOTES) : '';
+    $block_no = isset($_POST['block_no']) ? htmlspecialchars($_POST['block_no'], ENT_QUOTES) : '';
+    $psd = isset($_POST['psd']) ? htmlspecialchars($_POST['psd'], ENT_QUOTES) : '';
 
-    $documents = isset($_POST['documents']) && is_array($_POST['documents']) ? implode(", ", $_POST['documents']) : '';
+    $desc_land = "$lot_no $zone_no $block_no $psd";
 
-    $stmt = $conn->prepare("INSERT INTO p_info (house_no, block_no, province, city, district, barangay, house_tag_no, land_area, desc_land, documents) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssssssss", $house_number, $block_number, $province, $city, $district, $barangay, $house_tag, $land_area, $desc_land, $documents);
+    // Handle documents checkbox
+    $documents = isset($_POST['documents']) ? implode(', ', $_POST['documents']) : '';
 
-    if ($stmt->execute()) {
-      // Set confirmation message
-      $_SESSION['message'] = "Property Added";
-      // Redirect to avoid re-submission
-      header("Location: " . $_SERVER['PHP_SELF']);
-      exit;
+    // Validate required fields before executing the statement
+    if ($house_number && $city) {
+      $stmt = $conn->prepare("INSERT INTO p_info (house_no, block_no, province, city, district, barangay, house_tag_no, land_area, desc_land, documents) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+      if ($stmt) {
+        $stmt->bind_param("ssssssssss", $house_number, $block_number, $province, $city, $district, $barangay, $house_tag, $land_area, $desc_land, $documents);
+
+        if ($stmt->execute()) {
+          // Set confirmation message
+          $_SESSION['message'] = "Property Added";
+          header("Location: " . $_SERVER['PHP_SELF']);
+          exit;
+        } else {
+          echo "<p>Error: " . $stmt->error . "</p>";
+        }
+
+        $stmt->close();
+      } else {
+        echo "<p>Error preparing statement: " . $conn->error . "</p>";
+      }
     } else {
-      echo "<p>Error: " . $stmt->error . "</p>";
+      echo "<p>Error: House number and city are required.</p>";
     }
-
-    $stmt->close();
   }
 
   // Display confirmation message
@@ -69,267 +85,169 @@
   }
   ?>
 
-  <header class="u-clearfix u-custom-color-1 u-header u-header" id="sec-34db"><a href="#"
-      class="u-image u-logo u-image-1" data-image-width="2000" data-image-height="2000">
-      <img src="images/coconut_.__1_-removebg-preview1.png" class="u-logo-image u-logo-image-1">
+  <!-- Header Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
+    <a class="navbar-brand">
+      <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top"
+        alt="">
+      Electronic Real Property Tax System
     </a>
-    <nav class="u-dropdown-icon u-menu u-menu-dropdown u-offcanvas u-menu-1" data-responsive-from="MD">
-      <div class="menu-collapse" style="font-size: 0.875rem; letter-spacing: 0px; font-weight: 500;">
-        <a class="u-button-style u-custom-active-border-color u-custom-active-color u-custom-border u-custom-border-color u-custom-borders u-custom-color u-custom-hover-border-color u-custom-hover-color u-custom-left-right-menu-spacing u-custom-padding-bottom u-custom-text-active-color u-custom-text-color u-custom-text-decoration u-custom-text-hover-color u-custom-top-bottom-menu-spacing u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base"
-          href="#">
-          <svg class="u-svg-link" viewBox="0 0 24 24">
-            <use xlink:href="#menu-hamburger"></use>
-          </svg>
-          <svg class="u-svg-content" version="1.1" id="menu-hamburger" viewBox="0 0 16 16" x="0px" y="0px"
-            xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
-            <g>
-              <rect y="1" width="16" height="2"></rect>
-              <rect y="7" width="16" height="2"></rect>
-              <rect y="13" width="16" height="2"></rect>
-            </g>
-          </svg>
-        </a>
-      </div>
-      <div class="u-custom-menu u-nav-container">
-        <ul class="u-nav u-spacing-2 u-unstyled u-nav-1">
-          <li class="u-nav-item"><a
-              class="u-border-3 u-border-active-palette-3-base u-border-hover-palette-3-base u-border-no-left u-border-no-right u-border-no-top u-button-style u-nav-link u-text-active-palette-3-light-1 u-text-hover-white"
-              href="Home.html" style="padding: 10px 20px;">Home</a>
-          </li>
-          <li class="u-nav-item"><a
-              class="u-border-3 u-border-active-palette-3-base u-border-hover-palette-3-base u-border-no-left u-border-no-right u-border-no-top u-button-style u-nav-link u-text-active-palette-3-light-1 u-text-hover-white"
-              href="RPU-Management.html" style="padding: 10px 20px;">RPU Management</a>
-            <div class="u-nav-popup">
-              <ul class="u-border-1 u-border-grey-75 u-h-spacing-11 u-nav u-unstyled u-v-spacing-1 u-nav-2">
-                <li class="u-nav-item"><a
-                    class="u-active-palette-3-base u-button-style u-hover-palette-3-base u-nav-link u-white"
-                    href="Real-Property-Unit-List.html">Real Property Unit List</a>
-                </li>
-                <li class="u-nav-item"><a
-                    class="u-active-palette-3-base u-button-style u-hover-palette-3-base u-nav-link u-white"
-                    href="FAAS.html">FAAS</a>
-                </li>
-                <li class="u-nav-item"><a
-                    class="u-active-palette-3-base u-button-style u-hover-palette-3-base u-nav-link u-white"
-                    href="Tax-Declaration-List.html">Tax Declaration List</a>
-                </li>
-                <li class="u-nav-item"><a
-                    class="u-active-palette-3-base u-button-style u-hover-palette-3-base u-nav-link u-white"
-                    href="Track.html">Track</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="u-nav-item"><a
-              class="u-border-3 u-border-active-palette-3-base u-border-hover-palette-3-base u-border-no-left u-border-no-right u-border-no-top u-button-style u-nav-link u-text-active-palette-3-light-1 u-text-hover-white"
-              href="Transaction.html" style="padding: 10px 20px;">Transaction</a>
-          </li>
-          <li class="u-nav-item"><a
-              class="u-border-3 u-border-active-palette-3-base u-border-hover-palette-3-base u-border-no-left u-border-no-right u-border-no-top u-button-style u-nav-link u-text-active-palette-3-light-1 u-text-hover-white"
-              href="Reports.html" style="padding: 10px 20px;">Reports</a>
-          </li>
-        </ul>
-      </div>
-      <div class="u-custom-menu u-nav-container-collapse">
-        <div class="u-black u-container-style u-inner-container-layout u-opacity u-opacity-95 u-sidenav">
-          <div class="u-inner-container-layout u-sidenav-overflow">
-            <div class="u-menu-close"></div>
-            <ul class="u-align-center u-nav u-popupmenu-items u-unstyled u-nav-3">
-              <li class="u-nav-item"><a class="u-button-style u-nav-link" href="Home.html">Home</a>
-              </li>
-              <li class="u-nav-item"><a class="u-button-style u-nav-link" href="RPU-Management.html">RPU Management</a>
-                <div class="u-nav-popup">
-                  <ul class="u-border-1 u-border-grey-75 u-h-spacing-11 u-nav u-unstyled u-v-spacing-1 u-nav-4">
-                    <li class="u-nav-item"><a class="u-button-style u-nav-link" href="Real-Property-Unit-List.html">Real
-                        Property Unit List</a>
-                    </li>
-                    <li class="u-nav-item"><a class="u-button-style u-nav-link" href="FAAS.html">FAAS</a>
-                    </li>
-                    <li class="u-nav-item"><a class="u-button-style u-nav-link" href="Tax-Declaration-List.html">Tax
-                        Declaration List</a>
-                    </li>
-                    <li class="u-nav-item"><a class="u-button-style u-nav-link" href="Track.html">Track</a>
-                    </li>
-                  </ul>
-                </div>
-              </li>
-              <li class="u-nav-item"><a class="u-button-style u-nav-link" href="Transaction.html">Transaction</a>
-              </li>
-              <li class="u-nav-item"><a class="u-button-style u-nav-link" href="Reports.html">Reports</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="u-black u-menu-overlay u-opacity u-opacity-70"></div>
-      </div>
-      <style class="menu-style">
-        @media (max-width: 939px) {
-          [data-responsive-from="MD"] .u-nav-container {
-            display: none;
-          }
 
-          [data-responsive-from="MD"] .menu-collapse {
-            display: block;
-          }
-        }
-      </style>
-    </nav>
-    <p class="u-custom-font u-heading-font u-text u-text-default u-text-1">Electronic Real Property Tax System</p>
-  </header>
-  <section class="u-clearfix u-section-1" id="sec-4f2c">
-    <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
-      <h2 class="u-text u-text-default u-text-1">Property Information</h2>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto"> <!-- Use ml-auto to align items to the right -->
+        <li class="nav-item">
+          <a class="nav-link" href="Home.php">Home<span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item dropdown active">
+          <a class="nav-link dropdown-toggle" href="RPU-Management.php" id="navbarDropdown" role="button"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            RPU Management
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="Real-Property-Unit-List.php">RPU List</a>
+            <a class="dropdown-item" href="FAAS.php">FAAS</a>
+            <a class="dropdown-item" href="Tax-Declaration-List.php">Tax Declaration</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="Track.php">Track Paper</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="Transaction.php">Transaction</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="Reports.php">Reports</a>
+        </li>
+        <li class="nav-item" style="margin-left: 20px">
+          <button type="button" class="btn btn-danger" data-toggle="button" aria-pressed="false" autocomplete="off">
+            Log Out</button>
+        </li>
+      </ul>
     </div>
+  </nav>
+
+  <!-- Main Header -->
+  <section class="text-center my-4">
+    <h2 class="text-primary">Property Information</h2>
   </section>
-  <!-- 1st Section -->
-  <section
-    class="u-align-center u-border-2 u-border-grey-75 u-border-no-left u-border-no-right u-border-no-top u-clearfix u-container-align-center u-section-2"
-    id="sec-ffed">
 
-    <!-- Add New ERPTS -->
-    <div class="u-clearfix u-sheet u-sheet-1">
-      <div class="u-form u-form-1">
-        <form action="" id="propertyForm" class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form"
-          method="POST" style="padding: 10px;" onsubmit="return validateForm();">
-          <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-1"></div>
-          <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-12">
-            <label for="text-93dc" class="u-label">Location of Property</label>
-            <input type="number" placeholder="House Number" id="house_number" name="house_number"
-              class="u-input u-input-rectangle">
-          </div>
-          <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-13">
-            <label for="text-2f40" class="u-form-control-hidden u-label"></label>
-            <input type="number" id="block_number" name="block_number" class="u-input u-input-rectangle"
-              placeholder="Block Number">
+  <!-- Form Section -->
+  <section class="container my-4">
+    <div class="card">
+      <div class="card-body">
+        <form action="" id="propertyForm" method="POST" onsubmit="return validateForm();">
+
+          <!-- Location of Property -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="house_number" class="form-label">Location of Property (House Number)</label>
+              <input type="number" id="house_number" name="house_number" class="form-control" placeholder="House Number"
+                required>
+            </div>
+            <div class="col-md-6">
+              <label for="block_number" class="form-label">Block Number</label>
+              <input type="number" id="block_number" name="block_number" class="form-control"
+                placeholder="Block Number">
+            </div>
           </div>
 
-          <div class="u-form-group u-form-partition-factor-2 u-form-select u-label-top u-form-group-6">
-            <label for="select-11f0" class="u-form-control-hidden u-label"></label>
-            <div class="u-form-select-wrapper">
-              <select id="province" name="province" class="u-input u-input-rectangle" required>
-                <option value="Province" data-calc="" selected="selected">Province</option>
-                <option value="Item 2" data-calc="">Item 2</option>
-                <option value="Item 3" data-calc="">Item 3</option>
+          <!-- Province, City, District, Barangay -->
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <label for="province" class="form-label">Province</label>
+              <select id="province" name="province" class="form-select" required>
+                <option value="" disabled selected>Select Province</option>
+                <option value="Province 1">Province 1</option>
+                <option value="Province 2">Province 2</option>
               </select>
-              <svg class="u-caret u-caret-svg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-                xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="16px" height="16px"
-                viewBox="0 0 16 16" style="fill:currentColor;" xml:space="preserve">
-                <polygon class="st0" points="8,12 2,4 14,4 "></polygon>
-              </svg>
             </div>
-          </div>
-          <div class="u-form-group u-form-partition-factor-2 u-form-select u-label-top u-form-group-7">
-            <label for="select-7617" class="u-form-control-hidden u-label"></label>
-            <div class="u-form-select-wrapper">
-              <select id="city" name="city" class="u-input u-input-rectangle">
-                <option value="(City)" data-calc="">City</option>
+            <div class="col-md-3">
+              <label for="city" class="form-label">City</label>
+              <select id="city" name="city" class="form-select">
+                <option value="" disabled selected>Select City</option>
+                <option value="Labo">Labo</option>
+                <option value="Daet">Daet</option>
               </select>
-              <svg class="u-caret u-caret-svg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-                xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="16px" height="16px"
-                viewBox="0 0 16 16" style="fill:currentColor;" xml:space="preserve">
-                <polygon class="st0" points="8,12 2,4 14,4 "></polygon>
-              </svg>
             </div>
-          </div>
-          <div class="u-form-group u-form-partition-factor-2 u-form-select u-label-top u-form-group-6">
-            <label for="select-11f0" class="u-form-control-hidden u-label"></label>
-            <div class="u-form-select-wrapper">
-              <select id="district" name="district" class="u-input u-input-rectangle">
-                <option value="District" data-calc="" selected="selected">District</option>
-                <option value="Item 2" data-calc="">Item 2</option>
-                <option value="Item 3" data-calc="">Item 3</option>
+            <div class="col-md-3">
+              <label for="district" class="form-label">District</label>
+              <select id="district" name="district" class="form-select" required>
+                <option value="" disabled selected>Select District</option>
+                <option value="District 1">District 1</option>
+                <option value="District 2">District 2</option>
               </select>
-              <svg class="u-caret u-caret-svg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-                xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="16px" height="16px"
-                viewBox="0 0 16 16" style="fill:currentColor;" xml:space="preserve">
-                <polygon class="st0" points="8,12 2,4 14,4 "></polygon>
-              </svg>
             </div>
-          </div>
-          <div class="u-form-group u-form-partition-factor-2 u-form-select u-label-top u-form-group-7">
-            <label for="select-7617" class="u-form-control-hidden u-label"></label>
-            <div class="u-form-select-wrapper">
-              <select id="barangay" name="barangay" class="u-input u-input-rectangle">
-                <option value="(City)" data-calc="">Barangay</option>
+
+            <div class="col-md-3">
+              <label for="barangay" class="form-label">Barangay</label>
+              <select id="barangay" name="barangay" class="form-select">
+                <option value="" disabled selected>Select Barangay</option>
+                <option value="Kalamunding">Kalamunding</option>
+                <option value="Bautista">Bautista</option>
               </select>
-              <svg class="u-caret u-caret-svg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-                xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="16px" height="16px"
-                viewBox="0 0 16 16" style="fill:currentColor;" xml:space="preserve">
-                <polygon class="st0" points="8,12 2,4 14,4 "></polygon>
-              </svg>
             </div>
           </div>
 
-          <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-1"></div>
-          <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-12">
-            <label for="text-93dc" class="u-label">House Tag Number</label>
-            <input type="number" placeholder="House Tag Number" id="house_tag_number" name="house_tag_number"
-              class="u-input u-input-rectangle">
-          </div>
-
-          <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-1"></div>
-          <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-12">
-            <label for="text-93dc" class="u-label">Land Area</label>
-            <input type="number" placeholder="Land Area" id="land_area" name="land_area"
-              class="u-input u-input-rectangle" required>
-          </div>
-
-          <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-1"></div>
-          <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-11">
-            <label for="text-4ef3" class="u-label">Description of Land</label>
-            <input type="number" placeholder="Lot Number" id="lot_no" name="lot_no" class="u-input u-input-rectangle">
-          </div>
-          <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-12">
-            <label for="text-93dc" class="u-form-control-hidden u-label"></label>
-            <input type="number" placeholder="Zone Number" id="zone_no" name="zone_no"
-              class="u-input u-input-rectangle">
-          </div>
-          <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-13">
-            <label for="text-2f40" class="u-form-control-hidden u-label"></label>
-            <input type="number" id="block_no" name="block_no" class="u-input u-input-rectangle"
-              placeholder="Block Number">
-          </div>
-          <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-14">
-            <label for="text-7d2b" class="u-form-control-hidden u-label"></label>
-            <input type="number" placeholder="Psd13" id="psd" name="psd" class="u-input u-input-rectangle">
-          </div>
-
-          <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-2"></div>
-          <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-11">
-
-            <div class="u-form-group u-form-partition-factor-2 u-label-top u-form-group-11">
-              <label for="text-4ef3" class="u-label">Documents</label>
-
-              <div class="u-form-checkbox">
-                <input type="checkbox" id="cb_affidavit" name="documents[]" value="affidavit">
-                <label for="cb_affidavit">&nbsp;&nbsp;&nbsp;Affidavit of Ownership</label>
-              </div>
-
-              <div class="u-form-checkbox">
-                <input type="checkbox" id="cb_barangay" name="documents[]" value="barangay">
-                <label for="cb_barangay">&nbsp;&nbsp;&nbsp;Barangay Certificate</label>
-              </div>
-
-              <div class="u-form-checkbox">
-                <input type="checkbox" id="cb_tag" name="documents[]" value="land_tagging">
-                <label for="cb_tag">&nbsp;&nbsp;&nbsp;Land Tagging</label>
-              </div>
-
+          <!-- House Tag Number and Land Area -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="house_tag_number" class="form-label">House Tag Number</label>
+              <input type="number" id="house_tag_number" name="house_tag_number" class="form-control"
+                placeholder="House Tag Number">
             </div>
-
+            <div class="col-md-6">
+              <label for="land_area" class="form-label">Land Area (sq. m)</label>
+              <input type="number" id="land_area" name="land_area" class="form-control" placeholder="Land Area"
+                required>
+            </div>
           </div>
 
-          <div class="u-border-3 u-border-grey-dark-1 u-form-group u-form-line u-line u-line-horizontal u-line-2"></div>
-          <label for="text-4ef3" class="u-label">Owner</label>
+          <!-- Description of Land -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="lot_no" class="form-label">Lot Number</label>
+              <input type="number" id="lot_no" name="lot_no" class="form-control" placeholder="Lot Number">
+            </div>
+            <div class="col-md-6">
+              <label for="zone_no" class="form-label">Zone Number</label>
+              <input type="number" id="zone_no" name="zone_no" class="form-control" placeholder="Zone Number">
+            </div>
+          </div>
+
+          <!-- Documents -->
+          <fieldset class="border p-3 mb-3">
+            <legend class="w-auto">Documents</legend>
+            <div class="form-check">
+              <input type="checkbox" id="cb_affidavit" name="documents[]" value="affidavit" class="form-check-input">
+              <label for="cb_affidavit" class="form-check-label">Affidavit of Ownership</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" id="cb_barangay" name="documents[]" value="barangay" class="form-check-input">
+              <label for="cb_barangay" class="form-check-label">Barangay Certificate</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" id="cb_tag" name="documents[]" value="land_tagging" class="form-check-input">
+              <label for="cb_tag" class="form-check-label">Land Tagging</label>
+            </div>
+          </fieldset>
+
           <!-- Owner Search Section -->
-    
-          <table class="u-table">
-            <thead>
+          <div class="mb-3">
+            <label for="owner_search" class="form-label">Search for Owner</label>
+            <input type="text" id="owner_search" name="owner_search" class="form-control" placeholder="Search Owner">
+          </div>
+
+          <table class="table table-bordered mb-3">
+            <thead class="table-light">
               <tr>
-                <th class="u-table-header">ID</th>
-                <th class="u-table-header">Owner Name</th>
-                <th class="u-table-header">Address</th>
-                <th class="u-table-header">Select</th>
+                <th>ID</th>
+                <th>Owner Name</th>
+                <th>Address</th>
+                <th>Select</th>
               </tr>
             </thead>
             <tbody>
@@ -388,14 +306,11 @@
             </tbody>
           </table>
 
-
-          <div class="button-group" style="margin-top: 20px; display: flex; gap: 10px;">
-            <button type="submit"
-              class="u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Submit</button>
-            <button type="button"
-              class="clear-button u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Clear</button>
-            <a href="Real-Property-Unit-List.html"
-              class="u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-radius">Cancel</a>
+          <!-- Button Group -->
+          <div class="d-flex justify-content-end mt-4">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" class="btn btn-secondary ml-2 clear-button">Clear</button>
+            <a href="Real-Property-Unit-List.php" class="btn btn-danger ml-2">Cancel</a>
           </div>
 
         </form>
@@ -404,14 +319,25 @@
   </section>
 
   <!-- Footer -->
-  <footer class="u-align-center u-clearfix u-container-align-center u-footer u-grey-80 u-footer" id="sec-7e36">
-    <div class="u-clearfix u-sheet u-sheet-1">
-      <p class="u-small-text u-text u-text-variant u-text-1"></p>
+  <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
+    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+      © 2020 Copyright:
+      <a class="text-body" href="https://mdbootstrap.com/">MDBootstrap.com</a>
     </div>
   </footer>
 
   <script src="Add-New-Real-Property-Unit.js"></script>
-
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
+    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
+    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+    crossorigin="anonymous"></script>
 </body>
 
 </html>
