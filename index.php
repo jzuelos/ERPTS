@@ -15,60 +15,46 @@
 
 <body>
   <!-- Main Body -->
-  <section class="u-clearfix u-section-1" id="sec-9525">
-    <div class="u-clearfix u-sheet u-sheet-1">
-      <div class="data-layout-selected u-clearfix u-expanded-width u-layout-wrap u-layout-wrap-1">
-        <div class="u-layout">
-          <div class="u-layout-row">
-            <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-1">
-
-              <!--Log In Container-->
-              <div class="u-container-layout u-container-layout-1">
-                <h2 class="u-text u-text-default u-text-1" data-animation-name="customAnimationIn"
-                  data-animation-duration="2000" data-animation-delay="0">Log<span
-                    style="text-decoration: underline !important;"></span> In
-                </h2>
-                <div class="custom-expanded u-form u-form-1">
-                  <div class="u-form-group u-form-name">
-                    <label for="name-ef01" class="u-label">Username</label>
-                    <input type="text" id="name-ef01" name="username" class="u-input u-input-rectangle" required="">
-                  </div>
-                  <div class="u-form-group">
-                    <label for="email-ef01" class="u-label">Password</label>
-                    <input type="text" id="email-ef01" name="password" class="u-input u-input-rectangle"
-                      required="required">
-                  </div>
-                  <div class="u-align-right u-form-group u-form-submit">
-                    <a href="Home.php"
-                      class="u-border-none u-btn u-btn-round u-btn-submit u-button-style u-palette-3-base u-radius u-btn-1">Log
-                      In</a>
-                    <input type="submit" value="submit" class="u-form-control-hidden">
-                  </div>
-                </div>
-              </div>
-
+  <section class="container py-5" id="sec-9525">
+    <div class="row justify-content-center">
+      <!-- Log In Container -->
+      <div class="col-md-6 col-lg-4 mb-4 mt-3">
+        <div class="card shadow p-4">
+          <h2 class="text-center">Log In</h2>
+          <form action="Home.php" method="POST">
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" id="username" name="username" class="form-control" required>
             </div>
-            <div class="u-container-style u-layout-cell u-shape-rectangle u-size-30 u-layout-cell-2">
-              <div class="u-container-layout u-container-layout-2">
-                <div
-                  class="custom-expanded u-border-1 u-border-grey-75 u-container-style u-custom-color-1 u-group u-shape-rectangle u-group-1">
-                  <div class="u-container-layout u-container-layout-3">
-                    <h4 class="u-align-center u-text u-text-default u-text-2"> Welcome to ERPTS</h4>
-                    <h4 class="u-align-left u-text u-text-default u-text-3"> From the Assessor’s Module you can:<br>
-                      <br>Search for any information in one of the following documents: <br>
-                      <br>Owner’s Declaration (OD)<br>Assessor’s Field Sheet / Field Appraisal and Assessment Sheet
-                      (AFS/FAAS)<br>Tax Declaration (TD)<br>Real Property Tax Order of Payment (RPTOP)<br>
-                      <br>You can also encode new real property information. To do so, begin with Owner’s Declaration
-                      screen and go through the appropriate steps:<br>
-                      <br>Encode Property Information (in the OD)<br>Encode or Select Owner Information (in the
-                      OD)<br>Encode Real Property Information (in the AFS / FAAS)<br>Encode Tax related Information (in
-                      the TD)<br>Generate the RPTOP<br>
-                    </h4>
-                  </div>
-                </div>
-              </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" id="password" name="password" class="form-control" required>
             </div>
-          </div>
+            <div class="text-right">
+              <button type="submit" class="btn login-btn">Log In</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Welcome Box -->
+      <div class="col-md-6 col-lg-6">
+        <div class="box-379576 text-white" style="background-color: #379576; padding: 20px; border-radius: 5px;">
+          <h4 class="text-center">Welcome to ERPTS</h4>
+          <p>From the Assessor’s Module you can:</p>
+          <ul>
+            <li>Search for information in Owner’s Declaration (OD), Assessor’s Field Sheet/FAAS, Tax Declaration (TD),
+              or RPTOP.</li>
+            <li>Encode new real property information.</li>
+          </ul>
+          <p>To begin:</p>
+          <ul>
+            <li>Encode Property Information in the OD</li>
+            <li>Select or encode Owner Information</li>
+            <li>Encode Real Property Information in the AFS/FAAS</li>
+            <li>Encode Tax-related Information in the TD</li>
+            <li>Generate the RPTOP</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -81,7 +67,6 @@
       <a class="text-body" href="https://mdbootstrap.com/">MDBootstrap.com</a>
     </div>
   </footer>
-
 
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
