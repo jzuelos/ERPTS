@@ -13,7 +13,6 @@
   <title>Electronic Real Property Tax System</title>
 </head>
 
-
 <body>
 
   <?php
@@ -132,19 +131,95 @@
 
   <!-- Main Header -->
   <section class="text-center my-4">
-    <h2 class="text-primary">Property Information</h2>
+    <h2 class="text-black">Property Information</h2>
   </section>
 
   <!-- Form Section -->
   <section class="container my-4">
     <div class="card">
       <div class="card-body">
+        <!-- Owner Search Section -->
+        <div class="mb-3">
+          <form action="" method="GET" id="ownerSearchForm">
+            <label for="owner_search" class="form-label">Search for Owner</label>
+            <div class="input-group">
+              <input type="text" id="owner_search" name="search" class="form-control" placeholder="Search Owner"
+                required>
+              <button type="submit" class="btn btn-primary">Search</button>
+              <button type="button" class="btn btn-secondary clear-button"
+                onclick="clearOwnerSearchForm()">Clear</button>
+            </div>
+          </form>
+        </div>
+
+        <table class="table table-bordered mb-3">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Owner Name</th>
+              <th>Address</th>
+              <th>Select</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            // Search logic
+            if (isset($_GET['search'])) {
+              $searchTerm = filter_input(INPUT_GET, 'search', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+              $stmt = $conn->prepare("SELECT * FROM owners_tb WHERE own_fname LIKE ? OR own_surname LIKE ?");
+              $likeTerm = '%' . $searchTerm . '%';
+              $stmt->bind_param("ss", $likeTerm, $likeTerm);
+              $stmt->execute();
+              $result = $stmt->get_result();
+
+              if ($result && $result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                  $ownerId = htmlspecialchars($row['own_id'], ENT_QUOTES);
+                  $fullName = htmlspecialchars($row['own_fname'] . ', ' . $row['own_surname'], ENT_QUOTES);
+                  $address = htmlspecialchars($row['street'] . ', ' . $row['barangay'] . ', ' . $row['city'] . ', ' . $row['province'], ENT_QUOTES);
+
+                  echo "<tr>";
+                  echo "<td>" . $ownerId . "</td>";
+                  echo "<td>" . $fullName . "</td>";
+                  echo "<td>" . $address . "</td>";
+                  echo "<td><input type='checkbox' name='selected_ids[]' value='" . $ownerId . "'></td>";
+                  echo "</tr>";
+                }
+              } else {
+                echo "<tr><td colspan='4'>No data found</td></tr>";
+              }
+              $stmt->close();
+            } else {
+              // Default query to display all owners
+              $result = $conn->query("SELECT * FROM owners_tb");
+
+              if ($result && $result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                  $ownerId = htmlspecialchars($row['own_id'], ENT_QUOTES);
+                  $fullName = htmlspecialchars($row['own_fname'] . ', ' . $row['own_surname'], ENT_QUOTES);
+                  $address = htmlspecialchars($row['street'] . ', ' . $row['barangay'] . ', ' . $row['city'] . ', ' . $row['province'], ENT_QUOTES);
+
+                  echo "<tr>";
+                  echo "<td>" . $ownerId . "</td>";
+                  echo "<td>" . $fullName . "</td>";
+                  echo "<td>" . $address . "</td>";
+                  echo "<td><input type='checkbox' name='selected_ids[]' value='" . $ownerId . "'></td>";
+                  echo "</tr>";
+                }
+              } else {
+                echo "<tr><td colspan='4'>No data found</td></tr>";
+              }
+            }
+            ?>
+          </tbody>
+        </table>
+
         <form action="" id="propertyForm" method="POST" onsubmit="return validateForm();">
 
           <!-- Location of Property -->
           <div class="row mb-3">
             <div class="col-md-6">
-              <label for="house_number" class="form-label">Location of Property (House Number)</label>
+              <label for="house_number" class="form-label">Location of Property</label>
               <input type="number" id="house_number" name="house_number" class="form-control" placeholder="House Number"
                 required>
             </div>
@@ -235,84 +310,12 @@
             </div>
           </fieldset>
 
-          <!-- Owner Search Section -->
-          <div class="mb-3">
-            <label for="owner_search" class="form-label">Search for Owner</label>
-            <input type="text" id="owner_search" name="owner_search" class="form-control" placeholder="Search Owner">
-          </div>
-
-          <table class="table table-bordered mb-3">
-            <thead class="table-light">
-              <tr>
-                <th>ID</th>
-                <th>Owner Name</th>
-                <th>Address</th>
-                <th>Select</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              // Search logic
-              if (isset($_GET['search'])) {
-                $searchTerm = filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING);
-                $stmt = $conn->prepare("SELECT * FROM owners_tb WHERE own_fname LIKE ? OR own_surname LIKE ?");
-                $likeTerm = '%' . $searchTerm . '%';
-                $stmt->bind_param("ss", $likeTerm, $likeTerm);
-                $stmt->execute();
-                $result = $stmt->get_result();
-
-                if ($result && $result->num_rows > 0) {
-                  while ($row = $result->fetch_assoc()) {
-                    $ownerId = htmlspecialchars($row['own_id'], ENT_QUOTES);
-                    $fullName = htmlspecialchars($row['own_fname'] . ', ' . $row['own_surname'], ENT_QUOTES);
-                    $address = htmlspecialchars($row['street'] . ', ' . $row['barangay'] . ', ' . $row['city'] . ', ' . $row['province'], ENT_QUOTES);
-
-                    echo "<tr>";
-                    echo "<td>" . $ownerId . "</td>";
-                    echo "<td>" . $fullName . "</td>";
-                    echo "<td>" . $address . "</td>";
-                    echo "<td><input type='checkbox' name='selected_ids[]' value='" . $ownerId . "'></td>";
-                    echo "</tr>";
-                  }
-                } else {
-                  echo "<tr><td colspan='4'>No data found</td></tr>";
-                }
-                $stmt->close();
-              } else {
-                // Default query to display all owners
-                $result = $conn->query("SELECT * FROM owners_tb");
-
-                if ($result && $result->num_rows > 0) {
-                  while ($row = $result->fetch_assoc()) {
-                    $ownerId = htmlspecialchars($row['own_id'], ENT_QUOTES);
-                    $fullName = htmlspecialchars($row['own_fname'] . ', ' . $row['own_surname'], ENT_QUOTES);
-                    $address = htmlspecialchars($row['street'] . ', ' . $row['barangay'] . ', ' . $row['city'] . ', ' . $row['province'], ENT_QUOTES);
-
-                    echo "<tr>";
-                    echo "<td>" . $ownerId . "</td>";
-                    echo "<td>" . $fullName . "</td>";
-                    echo "<td>" . $address . "</td>";
-                    echo "<td><input type='checkbox' name='selected_ids[]' value='" . $ownerId . "'></td>";
-                    echo "</tr>";
-                  }
-                } else {
-                  echo "<tr><td colspan='4'>No data found</td></tr>";
-                }
-              }
-
-              // Close the connection
-              $conn->close();
-              ?>
-            </tbody>
-          </table>
-
           <!-- Button Group -->
           <div class="d-flex justify-content-end mt-4">
             <button type="submit" class="btn btn-primary">Submit</button>
-            <button type="button" class="btn btn-secondary ml-2 clear-button">Clear</button>
+            <button type="button" class="btn btn-secondary ml-2" onclick="clearMainForm()">Clear Form</button>
             <a href="Real-Property-Unit-List.php" class="btn btn-danger ml-2">Cancel</a>
           </div>
-
         </form>
       </div>
     </div>
@@ -326,7 +329,8 @@
     </div>
   </footer>
 
-  <script src="Add-New-Real-Property-Unit.js"></script>
+  <script src="http://localhost/ERPTS/Add-New-Real-Property-Unit.js"></script>
+
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
