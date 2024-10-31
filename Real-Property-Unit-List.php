@@ -3,41 +3,42 @@
 
 <head>
   <!-- Required meta tags -->
-  <meta charset="utf-8"> 
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> 
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
-    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous"> 
+    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link rel="stylesheet" href="main_layout.css">
-  <link rel="stylesheet" href="Real-Property-Unit-List.css"> 
-  <title>Electronic Real Property Tax System</title> 
+  <link rel="stylesheet" href="Real-Property-Unit-List.css">
+  <title>Electronic Real Property Tax System</title>
 </head>
 
 <body>
   <!-- Header Navigation -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-custom"> 
+  <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
     <a class="navbar-brand">
-      <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top" alt=""> 
+      <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top"
+        alt="">
       Electronic Real Property Tax System
     </a>
 
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span> 
+      <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent"> 
-      <ul class="navbar-nav ml-auto"> 
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto">
         <li class="nav-item">
-          <a class="nav-link" href="Home.php">Home</a> 
+          <a class="nav-link" href="Home.php">Home</a>
         </li>
-        <li class="nav-item dropdown active"> 
+        <li class="nav-item dropdown active">
           <a class="nav-link dropdown-toggle" href="RPU-Management.php" id="navbarDropdown" role="button"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             RPU Management
           </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown"> 
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <a class="dropdown-item active" href="Real-Property-Unit-List.php">RPU List</a>
             <a class="dropdown-item" href="FAAS.php">FAAS</a>
             <a class="dropdown-item" href="Tax-Declaration.php">Tax Declaration</a>
@@ -46,26 +47,26 @@
           </div>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="Transaction.php">Transaction</a> 
+          <a class="nav-link" href="Transaction.php">Transaction</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="Reports.php">Reports</a> 
+          <a class="nav-link" href="Reports.php">Reports</a>
         </li>
         <li class="nav-item ml-3">
-          <button type="button" class="btn btn-danger">Log Out</button> 
+          <button type="button" class="btn btn-danger">Log Out</button>
         </li>
       </ul>
     </div>
   </nav>
 
   <!-- Main Body -->
-  <section class="container mt-5"> 
-    <div class="card p-4"> 
-      <h3 class="mb-4">Real Property Units List</h3> 
-      <div class="form-row mb-4"> 
+  <section class="container mt-5">
+    <div class="card p-4">
+      <h3 class="mb-4">Real Property Units List</h3>
+      <div class="form-row mb-4">
         <div class="col-auto">
-          <label for="searchInput" class="sr-only">Search</label> 
-          <div class="input-group"> 
+          <label for="searchInput" class="sr-only">Search</label>
+          <div class="input-group">
             <input type="text" class="form-control" id="searchInput" placeholder="Search"> <!-- Search input -->
             <select class="custom-select" id="barangayDropdown"> <!-- Dropdown for barangay selection -->
               <option selected value="">All Barangay</option> <!-- Default option -->
@@ -77,10 +78,9 @@
         </div>
 
         <div class="col-auto">
-    <button type="button" class="btn btn-success btn-hover" onclick="filterTable()">Search</button>
-    <button type="button" class="btn btn-success btn-hover" onclick="addNewRPU()">Add new RPU</button>
-  </div>
-
+          <button type="button" class="btn btn-success btn-hover" onclick="filterTable()">Search</button>
+          <a href="Add-New-Real-Property-Unit.php" class="btn btn-success btn-hover">Add new RPU</a>
+        </div>
       </div>
 
       <!-- Table -->
@@ -124,11 +124,11 @@
       </div>
 
       <!-- View All Button -->
-      <div class="view-all-container d-flex mt-3"> 
+      <div class="view-all-container d-flex mt-3">
         <div class="ml-auto">
           <button type="button" class="btn btn-info">View All</button>
+        </div>
       </div>
-    </div>
   </section>
 
   <!-- Footer -->
@@ -140,7 +140,7 @@
   </footer>
 
   <!-- Optional JavaScript -->
-  <script src="http://localhost/ERPTS/Real-Property-Unit-List.js"></script> 
+  <script src="http://localhost/ERPTS/Real-Property-Unit-List.js"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
