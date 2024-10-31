@@ -1,101 +1,91 @@
-.u-section-1 .u-sheet-1 {
-  min-height: 119px;
+/* General Body Styles */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa; 
+  color: #333;
+  margin: 0;
+  padding: 0;
 }
 
-.u-section-1 .u-text-1 {
-  font-weight: 700;
-  margin: 33px auto 33px 0;
-}.u-section-2 .u-sheet-1 {
-  min-height: 1002px;
+/* Card Styles */
+.card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+  background-color: #ffffff;
+  padding: 30px;
 }
 
-.u-section-2 .u-form-1 {
-  height: 882px;
-  width: 1094px;
-  margin: 60px auto;
+/* Form Group Styles */
+.form-group {
+  margin-bottom: 1.5rem;
 }
 
-.u-section-2 .u-form-group-1 {
-  margin-left: 0;
+.form-check {
+  margin-bottom: 1rem; 
 }
 
-.u-section-2 .u-form-group-2 {
-  margin-left: 0;
+.form-check-label {
+  font-weight: 600;
+  color: #555; 
 }
 
-.u-section-2 .u-line-1 {
-  height: 0;
+/* Input and Select Styles */
+.form-control {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 10px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
 }
 
-.u-section-2 .u-form-group-4 {
-  margin-left: 0;
+.form-control:focus {
+  border-color: #1d72b8; 
+  box-shadow: 0 0 5px rgba(29, 114, 184, 0.3);
+  outline: none;
 }
 
-.u-section-2 .u-form-group-5 {
-  margin-left: 0;
+/* Checkbox Styles */
+.form-check-input {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-top: 0.2rem; 
+  margin-right: 10px; 
 }
 
-.u-section-2 .u-form-group-6 {
-  margin-left: 0;
+.form-check-label {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 0; 
 }
 
-.u-section-2 .u-form-group-7 {
-  margin-left: 0;
+/* Date Input Styles */
+input[type="date"] {
+  font-family: inherit;
 }
 
-.u-section-2 .u-form-group-8 {
-  margin-left: 0;
+/* Divider Line */
+hr {
+  border-top: 1px solid #e0e0e0; 
+  margin: 20px 0;
 }
 
-.u-section-2 .u-line-2 {
-  height: 0;
+/* Button Styles */
+.btn-primary {
+  background-color: #1d72b8;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
 }
 
-.u-section-2 .u-form-group-10 {
-  margin-left: 0;
+.btn-primary:hover {
+  background-color: #145a86;
 }
 
-.u-section-2 .u-form-group-11 {
-  margin-left: 0;
-}
-
-.u-section-2 .u-form-group-12 {
-  margin-left: 0;
-}
-
-.u-section-2 .u-form-group-13 {
-  margin-left: 0;
-  justify-content: right;
-}
-
-.u-section-2 .u-btn-1 {
-  background-image: none;
-  --radius: 10px;
-  font-weight: 700;
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-
-@media (max-width: 1199px) {
-  .u-section-2 .u-form-1 {
-    width: 940px;
-  }
-}
-
-@media (max-width: 991px) {
-  .u-section-2 .u-form-1 {
-    width: 720px;
-  }
-}
-
-@media (max-width: 767px) {
-  .u-section-2 .u-form-1 {
-    width: 540px;
-  }
-}
-
-@media (max-width: 575px) {
-  .u-section-2 .u-form-1 {
-    width: 340px;
-  }
+/* Right-aligned Text for Buttons */
+.text-right {
+  margin-top: 20px;
 }

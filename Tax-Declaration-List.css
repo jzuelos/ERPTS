@@ -5,11 +5,11 @@
   overflow: hidden;
   border-radius: 8px;
   margin-top: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow for a modern look */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
 }
 
 .modern-table thead th {
-  color: #ffffff; /* White text for contrast */
+  color: #ffffff; 
   font-weight: bold;
   border: none;
   padding: 12px;
@@ -21,7 +21,7 @@
 }
 
 .modern-table tbody tr:hover {
-  background-color: #f8f9fa; /* Lighter hover effect for a cleaner look */
+  background-color: #f8f9fa; 
 }
 
 .modern-table td, .modern-table th {
@@ -35,7 +35,7 @@
   color: #6c757d;
 }
 
-/* Button styling */
+
 .btn-outline-primary {
   border-color: #1d72b8;
   color: #1d72b8;
