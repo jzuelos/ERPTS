@@ -1,0 +1,63 @@
+/* Style for the table */
+.modern-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  margin-top: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow for a modern look */
+}
+
+.modern-table thead th {
+  color: #ffffff; /* White text for contrast */
+  font-weight: bold;
+  border: none;
+  padding: 12px;
+  text-transform: uppercase;
+}
+
+.modern-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.modern-table tbody tr:hover {
+  background-color: #f8f9fa; /* Lighter hover effect for a cleaner look */
+}
+
+.modern-table td, .modern-table th {
+  padding: 15px;
+  border-top: 1px solid #dee2e6;
+}
+
+/* Subtext style under the Owner header */
+.owner-subtext {
+  font-size: 0.8em;
+  color: #6c757d;
+}
+
+/* Button styling */
+.btn-outline-primary {
+  border-color: #1d72b8;
+  color: #1d72b8;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-outline-primary:hover {
+  background-color: #1d72b8;
+  color: #ffffff;
+}
+
+/* Custom GO button style */
+.btn-custom {
+  color: #ffffff;
+  background-color: #1d72b8;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+.btn-custom:hover {
+  background-color: #145a86;
+  color: #ffffff;
+}
+
