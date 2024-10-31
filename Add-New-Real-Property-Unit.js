@@ -1,5 +1,31 @@
 document.addEventListener('DOMContentLoaded', function () {
     const mainForm = document.getElementById('propertyForm');
+    const ownerSearchForm = document.getElementById('ownerSearchForm');
+
+    // Owner search form submission
+    ownerSearchForm.addEventListener("submit", async function (event) {
+        event.preventDefault(); // Prevent page reload
+
+        // Collect form data
+        const formData = new FormData(ownerSearchForm);
+        const params = new URLSearchParams(formData).toString(); // Convert form data to query string
+
+        try {
+            // Send data using fetch API
+            const response = await fetch("http://localhost/ERPTS/func_sOwn.php?" + params, { // Adjust to the correct URL if necessary
+                method: "GET"
+            });
+
+            const result = await response.text(); // Get the server response
+
+            // Inject the result into the table body for displaying
+            document.getElementById("resultsBody").innerHTML = result; // Only replace the table body content
+
+        } catch (error) {
+            console.error("Error:", error);
+            alert("An error occurred while searching."); // Alert for errors
+        }
+    });
 
     // Main form submission
     mainForm.addEventListener('submit', function (event) {
@@ -8,6 +34,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+function performSearch() {
+    // Define the search functionality here
+    alert("Search function executed");
+    // Add logic to retrieve and display search results
+}
 
 // Function to clear the owner search form
 function clearOwnerSearchForm() {
@@ -42,6 +74,7 @@ function validateDocumentsForm() {
     if (!isChecked) {
         alert('Please select at least one document.'); // Alert user if no checkbox is checked
         return false; // Prevent form submission
+    } else {
+        return true; // Allow form submission
     }
-    return true; // Allow form submission
 }

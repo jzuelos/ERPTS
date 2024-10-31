@@ -14,23 +14,21 @@
 </head>
 
 <body>
-
   <?php
+  session_start(); // Start session at the top
+  
   error_reporting(E_ALL);
   ini_set('display_errors', 1);
 
   require_once 'database.php';
 
   $conn = Database::getInstance();
-
   if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
   } else {
     echo "Connected";
   }
 
-  session_start(); // Start the session at the top of your script
-  
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $house_number = filter_input(INPUT_POST, 'house_number', FILTER_SANITIZE_NUMBER_INT);
     $block_number = filter_input(INPUT_POST, 'block_number', FILTER_SANITIZE_NUMBER_INT);
@@ -41,7 +39,6 @@
     $house_tag = filter_input(INPUT_POST, 'house_tag_number', FILTER_SANITIZE_NUMBER_INT);
     $land_area = filter_input(INPUT_POST, 'land_area', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
 
-    // Ensure the following are checked before using
     $lot_no = isset($_POST['lot_no']) ? htmlspecialchars($_POST['lot_no'], ENT_QUOTES) : '';
     $zone_no = isset($_POST['zone_no']) ? htmlspecialchars($_POST['zone_no'], ENT_QUOTES) : '';
     $block_no = isset($_POST['block_no']) ? htmlspecialchars($_POST['block_no'], ENT_QUOTES) : '';
@@ -49,25 +46,20 @@
 
     $desc_land = "$lot_no $zone_no $block_no $psd";
 
-    // Handle documents checkbox
     $documents = isset($_POST['documents']) ? implode(', ', $_POST['documents']) : '';
 
-    // Validate required fields before executing the statement
     if ($house_number && $city) {
       $stmt = $conn->prepare("INSERT INTO p_info (house_no, block_no, province, city, district, barangay, house_tag_no, land_area, desc_land, documents) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
       if ($stmt) {
         $stmt->bind_param("ssssssssss", $house_number, $block_number, $province, $city, $district, $barangay, $house_tag, $land_area, $desc_land, $documents);
 
         if ($stmt->execute()) {
-          // Set confirmation message
           $_SESSION['message'] = "Property Added";
           header("Location: " . $_SERVER['PHP_SELF']);
           exit;
         } else {
           echo "<p>Error: " . $stmt->error . "</p>";
         }
-
         $stmt->close();
       } else {
         echo "<p>Error preparing statement: " . $conn->error . "</p>";
@@ -77,10 +69,9 @@
     }
   }
 
-  // Display confirmation message
   if (isset($_SESSION['message'])) {
     echo "<p>" . $_SESSION['message'] . "</p>";
-    unset($_SESSION['message']); // Clear the message after displaying
+    unset($_SESSION['message']);
   }
   ?>
 
@@ -161,58 +152,11 @@
               <th>Select</th>
             </tr>
           </thead>
-          <tbody>
-            <?php
-            // Search logic
-            if (isset($_GET['search'])) {
-              $searchTerm = filter_input(INPUT_GET, 'search', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-              $stmt = $conn->prepare("SELECT * FROM owners_tb WHERE own_fname LIKE ? OR own_surname LIKE ?");
-              $likeTerm = '%' . $searchTerm . '%';
-              $stmt->bind_param("ss", $likeTerm, $likeTerm);
-              $stmt->execute();
-              $result = $stmt->get_result();
-
-              if ($result && $result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                  $ownerId = htmlspecialchars($row['own_id'], ENT_QUOTES);
-                  $fullName = htmlspecialchars($row['own_fname'] . ', ' . $row['own_surname'], ENT_QUOTES);
-                  $address = htmlspecialchars($row['street'] . ', ' . $row['barangay'] . ', ' . $row['city'] . ', ' . $row['province'], ENT_QUOTES);
-
-                  echo "<tr>";
-                  echo "<td>" . $ownerId . "</td>";
-                  echo "<td>" . $fullName . "</td>";
-                  echo "<td>" . $address . "</td>";
-                  echo "<td><input type='checkbox' name='selected_ids[]' value='" . $ownerId . "'></td>";
-                  echo "</tr>";
-                }
-              } else {
-                echo "<tr><td colspan='4'>No data found</td></tr>";
-              }
-              $stmt->close();
-            } else {
-              // Default query to display all owners
-              $result = $conn->query("SELECT * FROM owners_tb");
-
-              if ($result && $result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                  $ownerId = htmlspecialchars($row['own_id'], ENT_QUOTES);
-                  $fullName = htmlspecialchars($row['own_fname'] . ', ' . $row['own_surname'], ENT_QUOTES);
-                  $address = htmlspecialchars($row['street'] . ', ' . $row['barangay'] . ', ' . $row['city'] . ', ' . $row['province'], ENT_QUOTES);
-
-                  echo "<tr>";
-                  echo "<td>" . $ownerId . "</td>";
-                  echo "<td>" . $fullName . "</td>";
-                  echo "<td>" . $address . "</td>";
-                  echo "<td><input type='checkbox' name='selected_ids[]' value='" . $ownerId . "'></td>";
-                  echo "</tr>";
-                }
-              } else {
-                echo "<tr><td colspan='4'>No data found</td></tr>";
-              }
-            }
-            ?>
+          <tbody id="resultsBody">
+          
           </tbody>
         </table>
+
 
         <form action="" id="propertyForm" method="POST" onsubmit="return validateForm();">
 
