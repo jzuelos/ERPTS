@@ -1,0 +1,50 @@
+/* Custom styles for a modern table */
+.modern-table {
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .modern-table th {
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #495057;
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+  }
+  
+  .modern-table td {
+    padding: 12px;
+    vertical-align: middle;
+    border-top: 1px solid #dee2e6;
+  }
+  
+  .modern-table tr:hover {
+    background-color: #f1f3f5;
+    transition: background-color 0.2s ease;
+  }
+  
+  .badge-warning {
+    background-color: #ffc107;
+    color: #212529;
+    font-size: 0.85rem;
+    border-radius: 0.25rem;
+  }
+  
+  .badge-success {
+    background-color: #28a745;
+    color: #fff;
+    font-size: 0.85rem;
+    border-radius: 0.25rem;
+  }
+  
+  .btn-info {
+    background-color: #17a2b8;
+    border: none;
+    color: white;
+  }
+  
+  .btn-info:hover {
+    background-color: #138496;
+  }
+  
