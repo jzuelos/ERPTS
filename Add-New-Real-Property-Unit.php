@@ -14,6 +14,7 @@
 </head>
 
 <body>
+  <div id="selectedOwnerDisplay"></div> <!-- Display area for selected owner IDs -->
   <?php
   session_start(); // Start session at the top
   
@@ -25,8 +26,6 @@
   $conn = Database::getInstance();
   if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
-  } else {
-    echo "Connected";
   }
 
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -48,13 +47,25 @@
 
     $documents = isset($_POST['documents']) ? implode(', ', $_POST['documents']) : '';
 
+    // Get selected owner IDs from the hidden input field
+    $selected_owner_ids = isset($_POST['selected_owner_ids']) ? explode(',', $_POST['selected_owner_ids']) : [];
+
+    // Convert the array of strings to an array of integers
+    $selected_owner_ids = array_map('intval', $selected_owner_ids);
+
     if ($house_number && $city) {
-      $stmt = $conn->prepare("INSERT INTO p_info (house_no, block_no, province, city, district, barangay, house_tag_no, land_area, desc_land, documents) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+      // Prepare SQL statement to insert property
+      $stmt = $conn->prepare("INSERT INTO p_info (house_no, block_no, province, city, district, barangay, house_tag_no, land_area, desc_land, documents, ownID_Fk) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
       if ($stmt) {
-        $stmt->bind_param("ssssssssss", $house_number, $block_number, $province, $city, $district, $barangay, $house_tag, $land_area, $desc_land, $documents);
+        // Use the first selected owner ID (or handle cases with no owner IDs)
+        $owner_id = !empty($selected_owner_ids) ? $selected_owner_ids[0] : null;
+
+        // Bind the parameters
+        $stmt->bind_param("iissssiissi", $house_number, $block_number, $province, $city, $district, $barangay, $house_tag, $land_area, $desc_land, $documents, $owner_id);
 
         if ($stmt->execute()) {
-          $_SESSION['message'] = "Property Added";
+          $_SESSION['message'] = "Property Added with owner ID: " . htmlspecialchars($owner_id);
           header("Location: " . $_SERVER['PHP_SELF']);
           exit;
         } else {
@@ -74,6 +85,9 @@
     unset($_SESSION['message']);
   }
   ?>
+
+
+
 
   <!-- Header Navigation -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
@@ -189,6 +203,7 @@
         </table>
 
         <form action="" id="propertyForm" method="POST" onsubmit="return validateForm();">
+          <input type="hidden" name="selected_owner_ids" id="selected_owner_ids" />
 
           <!-- Location of Property -->
           <div class="row mb-3">

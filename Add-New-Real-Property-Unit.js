@@ -1,6 +1,21 @@
 document.addEventListener('DOMContentLoaded', function () {
     const mainForm = document.getElementById('propertyForm');
     const ownerSearchForm = document.getElementById('ownerSearchForm');
+    const selectedOwnerDisplay = document.getElementById('selectedOwnerDisplay'); // Display area for selected owner IDs
+
+    // Function to update the display of selected owner IDs
+    function updateSelectedOwners() {
+        // Get selected IDs from checkboxes
+        const selectedIds = Array.from(document.querySelectorAll('input[name="selected_ids[]"]:checked')).map(cb => cb.value);
+
+        // Display the selected IDs
+        selectedOwnerDisplay.innerHTML = selectedIds.length > 0
+            ? `<p>Selected Owner IDs: ${selectedIds.join(', ')}</p>`
+            : '<p>No owners selected.</p>'; // Message when no owners are selected
+
+        // Update hidden input in main form with selected IDs
+        document.getElementById('selected_owner_ids').value = selectedIds.join(','); // Store as a comma-separated string
+    }
 
     // Owner search form submission
     ownerSearchForm.addEventListener("submit", async function (event) {
@@ -11,22 +26,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
         try {
             // Send data using fetch API
-            const response = await fetch("http://localhost/ERPTS/func_sOwn.php", { // URL remains the same
-                method: "POST", // Set method to POST
-                body: formData // Pass the form data as the body of the request
+            const response = await fetch("http://localhost/ERPTS/func_sOwn.php", {
+                method: "POST",
+                body: formData
             });
 
             const result = await response.text(); // Get the server response
 
             // Inject the result into the table body for displaying
-            document.getElementById("resultsBody").innerHTML = result; // Only replace the table body content
+            document.getElementById("resultsBody").innerHTML = result;
+
+            // Update the display of selected owners after loading new results
+            updateSelectedOwners();
 
         } catch (error) {
             console.error("Error:", error);
-            alert("An error occurred while searching."); // Alert for errors
+            alert("An error occurred while searching.");
         }
     });
 
+    // Event listener for checkboxes to update selected IDs display
+    document.addEventListener('change', function (event) {
+        if (event.target.matches('input[name="selected_ids[]"]')) {
+            updateSelectedOwners(); // Update the selected owners display on checkbox change
+        }
+    });
 
     // Main form submission
     mainForm.addEventListener('submit', function (event) {
@@ -35,6 +59,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+
+
 
 function performSearch() {
     // Define the search functionality here
