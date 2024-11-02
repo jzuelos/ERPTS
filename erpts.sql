@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 02, 2024 at 10:34 AM
+-- Generation Time: Nov 02, 2024 at 01:32 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -71,35 +71,18 @@ CREATE TABLE `p_info` (
   `house_tag_no` int(10) NOT NULL,
   `land_area` int(50) NOT NULL,
   `desc_land` varchar(50) NOT NULL,
-  `documents` varchar(30) NOT NULL
+  `documents` varchar(30) NOT NULL,
+  `ownId_Fk` int(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `p_info`
 --
 
-INSERT INTO `p_info` (`p_id`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `house_tag_no`, `land_area`, `desc_land`, `documents`) VALUES
-(16, 4234, 2345234, 'Item 2', '(City)', 'Item 2', '(City)', 234, 42453, '2342 4234 42342 ', 'affidavit, barangay, land_tagg'),
-(17, 0, 0, 'Province', '(City)', 'District', '(City)', 0, 23423, '   ', 'affidavit'),
-(18, 0, 0, 'Province', '(City)', 'District', '(City)', 0, 23, '   ', 'land_tagging'),
-(19, 0, 0, 'Province', '(City)', 'District', '(City)', 0, 213, '   ', 'barangay'),
-(20, 0, 0, 'Province', '(City)', 'District', '(City)', 0, 213, '   ', 'land_tagging'),
-(21, 234, 242134, 'Province 1', 'Province 1', 'District 2', 'District 1', 0, 4234, '   ', 'barangay'),
-(22, 31242, 0, 'Province 1', 'Province 1', 'District 2', 'District 1', 0, 4234, '   ', 'affidavit'),
-(23, 34213, 0, 'Province 2', 'Labo', 'District 2', 'Bautista', 0, 312412, '   ', 'affidavit, barangay'),
-(24, 34234, 2342, 'Province 1', 'Daet', 'District 1', 'Bautista', 0, 42342, '   ', 'affidavit'),
-(25, 423, 4234, 'Province 1', 'Labo', 'District 1', 'Bautista', 423, 23423, '   ', 'affidavit'),
-(26, 2342, 0, 'Province 2', 'Daet', 'District 2', 'Bautista', 0, 4234, '   ', 'barangay'),
-(27, 423, 0, 'Province 1', 'Daet', 'District 2', 'Kalamunding', 0, 4234, '   ', 'barangay'),
-(28, 423, 0, 'Province 1', 'Labo', 'District 1', 'Kalamunding', 0, 4324, '   ', 'barangay'),
-(29, 4234, 4234, 'Province 1', 'Daet', 'District 2', 'Kalamunding', 0, 4234, '   ', 'barangay'),
-(30, 23423, 0, 'Province 1', 'Labo', 'District 2', 'Bautista', 0, 343234, '   ', ''),
-(31, 3423, 0, 'Province 1', 'Labo', 'District 1', 'Kalamunding', 0, 4234, '   ', 'affidavit'),
-(32, 4234, 0, 'Province 1', 'Labo', 'District 1', 'Bautista', 234, 4234, '   ', 'affidavit'),
-(33, 2342, 0, 'Province 1', 'Daet', 'District 1', 'Kalamunding', 0, 4234, '   ', 'barangay'),
-(34, 423, 0, 'Province 1', 'Labo', 'District 2', 'Kalamunding', 42342, 23423, '   ', 'barangay'),
-(35, 2342, 3423, 'Province 2', 'Labo', 'District 1', 'Bautista', 0, 4234, '   ', 'affidavit'),
-(36, 423, 0, 'Province 1', 'Daet', 'District 1', 'Bautista', 0, 12345, '   ', 'affidavit');
+INSERT INTO `p_info` (`p_id`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `house_tag_no`, `land_area`, `desc_land`, `documents`, `ownId_Fk`) VALUES
+(76, 4234, 0, 'Province 1', 'Labo', 'District 1', 'Kalamunding', 0, 4234, '   ', 'affidavit, barangay', 2),
+(77, 4234, 0, 'Province 1', 'Labo', 'District 1', 'Bautista', 0, 4234, '   ', 'affidavit, barangay', 1),
+(80, 423, 0, 'Province 1', 'Labo', 'District 1', 'Bautista', 0, 423, '   ', 'affidavit, barangay', 1);
 
 --
 -- Indexes for dumped tables
@@ -115,7 +98,8 @@ ALTER TABLE `owners_tb`
 -- Indexes for table `p_info`
 --
 ALTER TABLE `p_info`
-  ADD PRIMARY KEY (`p_id`);
+  ADD PRIMARY KEY (`p_id`),
+  ADD KEY `fk_owner` (`ownId_Fk`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -131,7 +115,17 @@ ALTER TABLE `owners_tb`
 -- AUTO_INCREMENT for table `p_info`
 --
 ALTER TABLE `p_info`
-  MODIFY `p_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `p_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `p_info`
+--
+ALTER TABLE `p_info`
+  ADD CONSTRAINT `fk_owner` FOREIGN KEY (`ownId_Fk`) REFERENCES `owners_tb` (`own_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
