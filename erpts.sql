@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 29, 2024 at 01:28 PM
+-- Generation Time: Nov 02, 2024 at 10:34 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -48,7 +48,11 @@ CREATE TABLE `owners_tb` (
 
 INSERT INTO `owners_tb` (`own_id`, `own_fname`, `own_mname`, `own_surname`, `tin_no`, `house_no`, `street`, `barangay`, `district`, `city`, `province`, `own_info`) VALUES
 (1, 'zuelos', '', 'john lloyd', 0, '', 'luzaragga', 'kalamunding', '2', 'labo', 'camarines norte', ''),
-(2, 'melanie', '', 'zuelos', 0, '', 'suzara', 'gumamela', '2', 'daet', 'camarines sur', '');
+(2, 'melanie', '', 'zuelos', 0, '', 'suzara', 'gumamela', '2', 'daet', 'camarines sur', ''),
+(3, 'emel', 'v.', 'zuelos', 0, '', 'luzaragga', 'dalas', '2', 'labo', 'camarines sur', ''),
+(4, 'jennifer', 'v.', 'zuelos', 0, '', 'luzaragga', 'gumamela', '2', 'labo', 'camarines sur', ''),
+(5, 'zuelos', 'v.', 'jomel', 0, '', 'suzara', 'gumamela', '2', 'labo', 'camarines sur', ''),
+(6, 'melchor', 'v', 'zuelos', 0, '', 'suzara', 'kalamunding', '2', 'daet', 'camarines norte', '');
 
 -- --------------------------------------------------------
 
@@ -82,7 +86,20 @@ INSERT INTO `p_info` (`p_id`, `house_no`, `block_no`, `province`, `city`, `distr
 (20, 0, 0, 'Province', '(City)', 'District', '(City)', 0, 213, '   ', 'land_tagging'),
 (21, 234, 242134, 'Province 1', 'Province 1', 'District 2', 'District 1', 0, 4234, '   ', 'barangay'),
 (22, 31242, 0, 'Province 1', 'Province 1', 'District 2', 'District 1', 0, 4234, '   ', 'affidavit'),
-(23, 34213, 0, 'Province 2', 'Labo', 'District 2', 'Bautista', 0, 312412, '   ', 'affidavit, barangay');
+(23, 34213, 0, 'Province 2', 'Labo', 'District 2', 'Bautista', 0, 312412, '   ', 'affidavit, barangay'),
+(24, 34234, 2342, 'Province 1', 'Daet', 'District 1', 'Bautista', 0, 42342, '   ', 'affidavit'),
+(25, 423, 4234, 'Province 1', 'Labo', 'District 1', 'Bautista', 423, 23423, '   ', 'affidavit'),
+(26, 2342, 0, 'Province 2', 'Daet', 'District 2', 'Bautista', 0, 4234, '   ', 'barangay'),
+(27, 423, 0, 'Province 1', 'Daet', 'District 2', 'Kalamunding', 0, 4234, '   ', 'barangay'),
+(28, 423, 0, 'Province 1', 'Labo', 'District 1', 'Kalamunding', 0, 4324, '   ', 'barangay'),
+(29, 4234, 4234, 'Province 1', 'Daet', 'District 2', 'Kalamunding', 0, 4234, '   ', 'barangay'),
+(30, 23423, 0, 'Province 1', 'Labo', 'District 2', 'Bautista', 0, 343234, '   ', ''),
+(31, 3423, 0, 'Province 1', 'Labo', 'District 1', 'Kalamunding', 0, 4234, '   ', 'affidavit'),
+(32, 4234, 0, 'Province 1', 'Labo', 'District 1', 'Bautista', 234, 4234, '   ', 'affidavit'),
+(33, 2342, 0, 'Province 1', 'Daet', 'District 1', 'Kalamunding', 0, 4234, '   ', 'barangay'),
+(34, 423, 0, 'Province 1', 'Labo', 'District 2', 'Kalamunding', 42342, 23423, '   ', 'barangay'),
+(35, 2342, 3423, 'Province 2', 'Labo', 'District 1', 'Bautista', 0, 4234, '   ', 'affidavit'),
+(36, 423, 0, 'Province 1', 'Daet', 'District 1', 'Bautista', 0, 12345, '   ', 'affidavit');
 
 --
 -- Indexes for dumped tables
@@ -108,13 +125,13 @@ ALTER TABLE `p_info`
 -- AUTO_INCREMENT for table `owners_tb`
 --
 ALTER TABLE `owners_tb`
-  MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `p_info`
 --
 ALTER TABLE `p_info`
-  MODIFY `p_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `p_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
