@@ -8,12 +8,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Collect form data
         const formData = new FormData(ownerSearchForm);
-        const params = new URLSearchParams(formData).toString(); // Convert form data to query string
 
         try {
             // Send data using fetch API
-            const response = await fetch("http://localhost/ERPTS/func_sOwn.php?" + params, { // Adjust to the correct URL if necessary
-                method: "GET"
+            const response = await fetch("http://localhost/ERPTS/func_sOwn.php", { // URL remains the same
+                method: "POST", // Set method to POST
+                body: formData // Pass the form data as the body of the request
             });
 
             const result = await response.text(); // Get the server response
@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
             alert("An error occurred while searching."); // Alert for errors
         }
     });
+
 
     // Main form submission
     mainForm.addEventListener('submit', function (event) {
@@ -78,3 +79,4 @@ function validateDocumentsForm() {
         return true; // Allow form submission
     }
 }
+

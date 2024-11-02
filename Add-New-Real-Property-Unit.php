@@ -131,7 +131,7 @@
       <div class="card-body">
         <!-- Owner Search Section -->
         <div class="mb-3">
-          <form action="" method="GET" id="ownerSearchForm">
+          <form action="" method="POST" id="ownerSearchForm">
             <label for="owner_search" class="form-label">Search for Owner</label>
             <div class="input-group">
               <input type="text" id="owner_search" name="search" class="form-control" placeholder="Search Owner"
@@ -146,17 +146,47 @@
         <table class="table table-bordered mb-3">
           <thead class="table-light">
             <tr>
-              <th>ID</th>
-              <th>Owner Name</th>
-              <th>Address</th>
-              <th>Select</th>
+              <th class="text-center align-middle">ID</th>
+              <th class="text-center align-middle">Owner Name<br><small>(Surname, Firstname)</small></th>
+              <th class="text-center align-middle">Address<br><small>(Street, Barangay, City, Province)</small></th>
+              <th class="text-center align-middle">Select</th>
             </tr>
           </thead>
           <tbody id="resultsBody">
-          
+            <?php
+            // Include the database connection
+            require_once 'database.php';
+
+            // Get the database connection
+            $conn = Database::getInstance();
+
+            // Fetch initial data
+            $stmt = $conn->prepare("SELECT * FROM owners_tb ORDER BY own_surname ASC, own_fname ASC LIMIT 5");
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result && $result->num_rows > 0) {
+              while ($row = $result->fetch_assoc()) {
+                $ownerId = htmlspecialchars($row['own_id'], ENT_QUOTES);
+                $fullName = htmlspecialchars($row['own_fname'] . ', ' . $row['own_surname'], ENT_QUOTES);
+                $address = htmlspecialchars($row['street'] . ', ' . $row['barangay'] . ', ' . $row['city'] . ', ' . $row['province'], ENT_QUOTES);
+
+                // Output each row
+                echo "<tr>";
+                echo "<td class='text-center align-middle'>" . $ownerId . "</td>";
+                echo "<td class='text-center align-middle'>" . $fullName . "</td>";
+                echo "<td class='text-center align-middle'>" . $address . "</td>";
+                echo "<td class='text-center align-middle'><input type='checkbox' name='selected_ids[]' value='" . $ownerId . "'></td>";
+                echo "</tr>";
+              }
+            } else {
+              echo "<tr><td colspan='4' class='text-center'>No data found</td></tr>";
+            }
+
+            $stmt->close();
+            ?>
           </tbody>
         </table>
-
 
         <form action="" id="propertyForm" method="POST" onsubmit="return validateForm();">
 
