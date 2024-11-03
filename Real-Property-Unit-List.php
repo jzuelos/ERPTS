@@ -1,6 +1,39 @@
+<?php
+session_start(); // Start session at the top
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+require_once 'database.php';
+
+$conn = Database::getInstance();
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+} else {
+    echo "Connected";
+}
+
+// Fetch property units along with their owners
+$sql = "SELECT p.p_id, p.house_no, p.block_no, p.province, p.city, p.district, p.barangay, 
+               p.house_tag_no, p.land_area, p.desc_land, p.documents,
+               CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname) AS owner
+        FROM p_info p
+        LEFT JOIN owners_tb o ON p.house_no = o.house_no AND p.barangay = o.barangay"; // Adjust this JOIN condition if necessary
+
+$propertyUnits = [];
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $propertyUnits[] = $row;
+    }
+} else {
+    echo "No records found";
+}
+?>
+
 <!doctype html>
 <html lang="en">
-
 <head>
   <!-- Required meta tags -->
   <meta charset="utf-8">
@@ -18,8 +51,7 @@
   <!-- Header Navigation -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
     <a class="navbar-brand">
-      <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top"
-        alt="">
+      <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top" alt="">
       Electronic Real Property Tax System
     </a>
 
@@ -90,35 +122,25 @@
             <tr>
               <th>OD ID</th>
               <th>Owner</th>
-              <th>Location</th>
+              <th>Location <br><small>(Street, Barangay, City, Province)</small></th>
               <th>Land Area</th>
               <th>Edit</th>
             </tr>
           </thead>
           <tbody>
-            <!-- Table rows with property data -->
-            <tr>
-              <td>12345</td>
-              <td>John Doe</td>
-              <td>Street 1, Barangay 1</td>
-              <td>500 sqm</td>
-              <td><a href="FAAS.php" class="btn btn-primary">EDIT</a></td> <!-- Edit button -->
-            </tr>
-            <tr>
-              <td>67890</td>
-              <td>Jane Smith</td>
-              <td>Street 2, Barangay 2</td>
-              <td>300 sqm</td>
-              <td><a href="FAAS.php" class="btn btn-primary">EDIT</a></td>
-            </tr>
-            <tr>
-              <td>11223</td>
-              <td>Mike Johnson</td>
-              <td>Street 3, Barangay 3</td>
-              <td>400 sqm</td>
-              <td><a href="FAAS.php" class="btn btn-primary">EDIT</a></td>
-            </tr>
-            <!-- More rows can be added here -->
+            <?php
+            // Display the fetched data in table rows
+            foreach ($propertyUnits as $unit) {
+                // Using available fields from p_info and owner's name
+                echo "<tr>
+                        <td>{$unit['p_id']}</td>
+                        <td>{$unit['owner']}</td>
+                        <td>{$unit['house_no']}, {$unit['barangay']}, {$unit['city']}, {$unit['province']}</td>
+                        <td>{$unit['land_area']}</td>
+                        <td><a href='FAAS.php?id={$unit['p_id']}' class='btn btn-primary'>EDIT</a></td>
+                      </tr>";
+            }
+            ?>
           </tbody>
         </table>
       </div>
@@ -151,5 +173,4 @@
     integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
 </body>
-
 </html>
