@@ -40,7 +40,7 @@
           <div class="dropdown-menu" aria-labelledby="navbarDropdown"> 
             <a class="dropdown-item active" href="Real-Property-Unit-List.php">RPU List</a>
             <a class="dropdown-item" href="FAAS.php">FAAS</a>
-            <a class="dropdown-item" href="Tax-Declaration.php">Tax Declaration</a>
+            <a class="dropdown-item" href="Tax-Declaration-List.php">Tax Declaration</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="Track.php">Track Paper</a>
           </div>
