@@ -10,11 +10,11 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link rel="stylesheet" href="main_layout.css">
+  <link rel="stylesheet" href="Admin-Page-2.css">
   <title>Electronic Real Property Tax System</title>
-  <link rel="stylesheet" href="Real-Property-Unit-List.css">
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
   <!-- Header Navigation -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
     <a class="navbar-brand">
@@ -59,80 +59,47 @@
     </div>
   </nav>
 
-  <!-- Main Body -->
-  <section class="container mt-5">
-    <div class="card p-4">
-      <h3 class="mb-4">Real Property Units List</h3>
-      <div class="form-row mb-4">
-        <div class="col-auto">
-          <label for="searchInput" class="sr-only">Search</label>
-          <div class="input-group">
-            <input type="text" class="form-control" id="searchInput" placeholder="Search"> <!-- Search input -->
-            <select class="custom-select" id="barangayDropdown"> <!-- Dropdown for barangay selection -->
-              <option selected value="">All Barangay</option> <!-- Default option -->
-              <option value="Barangay 1">Barangay 1</option>
-              <option value="Barangay 2">Barangay 2</option>
-              <option value="Barangay 3">Barangay 3</option>
-            </select>
+ <!-- Main Content -->
+ <main class="container my-5 d-flex justify-content-center align-items-center flex-column">
+  <section class="w-100" style="max-width: 1100px;">
+    <div class="status-container mb-4 text-center">
+      <h5 class="text-muted" style="font-size: 1.25rem;">Server Status: <span class="text-success font-weight-bold">Online</span></h5>
+      <h3 class="text-secondary" style="font-size: 2rem;">Admin</h3>
+    </div>
+
+    <div class="control-panel card border-0 shadow rounded-lg mb-5 p-5">
+      <div class="card-body">
+        <h4 class="card-title mb-4 text-center" style="font-size: 1.75rem;">Control Panel</h4>
+        <div class="row">
+          <div class="col-lg-6 mb-4">
+            <a href="User-Control.html" class="text-decoration-none">
+              <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5">
+                <div class="card-body d-flex align-items-center">
+                  <img src="images/AdIc1.png" alt="User Control Icon" class="mr-4" width="60">
+                  <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">User Control</h5>
+                </div>
+              </div>
+            </a>
+          </div>
+          <div class="col-lg-6 mb-4">
+            <a href="Admin-Modify.html" class="text-decoration-none">
+              <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5">
+                <div class="card-body d-flex align-items-center">
+                  <img src="images/AdIc2.png" alt="Sheet Modification Icon" class="mr-4" width="60">
+                  <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">Sheet Modification</h5>
+                </div>
+              </div>
+            </a>
           </div>
         </div>
-
-        <div class="col-auto">
-          <button type="button" class="btn btn-success btn-hover" onclick="filterTable()">Search</button>
-          <a href="Add-New-Real-Property-Unit.php" class="btn btn-success btn-hover">Add new RPU</a>
-        </div>
       </div>
-
-      <!-- Table -->
-      <div class="table-responsive">
-        <table class="table table-bordered text-center modern-table" id="propertyTable"> <!-- Responsive table -->
-          <thead class="thead-dark">
-            <tr>
-              <th>OD ID</th>
-              <th>Owner</th>
-              <th>Location</th>
-              <th>Land Area</th>
-              <th>Edit</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Table rows with property data -->
-            <tr>
-              <td>12345</td>
-              <td>John Doe</td>
-              <td>Street 1, Barangay 1</td>
-              <td>500 sqm</td>
-              <td><a href="FAAS.php" class="btn btn-primary">EDIT</a></td> <!-- Edit button -->
-            </tr>
-            <tr>
-              <td>67890</td>
-              <td>Jane Smith</td>
-              <td>Street 2, Barangay 2</td>
-              <td>300 sqm</td>
-              <td><a href="FAAS.php" class="btn btn-primary">EDIT</a></td>
-            </tr>
-            <tr>
-              <td>11223</td>
-              <td>Mike Johnson</td>
-              <td>Street 3, Barangay 3</td>
-              <td>400 sqm</td>
-              <td><a href="FAAS.php" class="btn btn-primary">EDIT</a></td>
-            </tr>
-            <!-- More rows can be added here -->
-          </tbody>
-        </table>
-      </div>
-
-      <!-- View All Button -->
-      <div class="view-all-container d-flex mt-3">
-        <div class="ml-auto">
-          <button type="button" class="btn btn-info">View All</button>
-        </div>
-      </div>
+    </div>
   </section>
+</main>
 
-  <!-- Footer -->
-  <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
+
+ <!-- Footer -->
+ <footer class="bg-body-tertiary text-center text-lg-start">
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
       © 2020 Copyright:
       <a class="text-body" href="https://mdbootstrap.com/">MDBootstrap.com</a>
@@ -151,5 +118,4 @@
     integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
 </body>
-
 </html>
