@@ -15,8 +15,53 @@
 </head>
 
 <body>
+<!-- Header Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-custom">
+    <a class="navbar-brand" href="#">
+        <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top" alt="">
+        Electronic Real Property Tax System
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="Home.php">Home<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item dropdown active">
+                <a class="nav-link dropdown-toggle" href="RPU-Management.php" id="navbarDropdown" role="button"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    RPU Management
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="Real-Property-Unit-List.php">RPU List</a>
+                    <a class="dropdown-item" href="FAAS.php">FAAS</a>
+                    <a class="dropdown-item" href="Tax-Declaration-List.php">Tax Declaration</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="Track.php">Track Paper</a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="Transaction.php">Transaction</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="Reports.php">Reports</a>
+            </li>
+            <li class="nav-item">
+                <button type="button" class="btn btn-danger">Log Out</button>
+            </li>
+        </ul>
+    </div>
+</nav>
 
-<?php
+
+<!-- Main Content -->
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Create New User</h2>
+    <form action="" method="POST">
+    <?php
     session_start(); // Start session at the top
     
     error_reporting(E_ALL);
@@ -103,54 +148,6 @@
         unset($_SESSION['message']);
     }
 ?>
-
-<!-- Header Navigation -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-custom">
-    <a class="navbar-brand" href="#">
-        <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top" alt="">
-        Electronic Real Property Tax System
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="Home.php">Home<span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item dropdown active">
-                <a class="nav-link dropdown-toggle" href="RPU-Management.php" id="navbarDropdown" role="button"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    RPU Management
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="Real-Property-Unit-List.php">RPU List</a>
-                    <a class="dropdown-item" href="FAAS.php">FAAS</a>
-                    <a class="dropdown-item" href="Tax-Declaration-List.php">Tax Declaration</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="Track.php">Track Paper</a>
-                </div>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="Transaction.php">Transaction</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="Reports.php">Reports</a>
-            </li>
-            <li class="nav-item">
-                <button type="button" class="btn btn-danger">Log Out</button>
-            </li>
-        </ul>
-    </div>
-</nav>
-
-
-<!-- Main Content -->
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Create New User</h2>
-    <form action="" method="POST">
-
         <!-- User Credentials Section -->
         <div class="mb-4">
             <legend class="font-weight-bold">User Credentials</legend>
