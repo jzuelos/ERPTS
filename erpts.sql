@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 02, 2024 at 01:32 PM
+-- Generation Time: Nov 05, 2024 at 02:29 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -84,6 +84,33 @@ INSERT INTO `p_info` (`p_id`, `house_no`, `block_no`, `province`, `city`, `distr
 (77, 4234, 0, 'Province 1', 'Labo', 'District 1', 'Bautista', 0, 4234, '   ', 'affidavit, barangay', 1),
 (80, 423, 0, 'Province 1', 'Labo', 'District 1', 'Bautista', 0, 423, '   ', 'affidavit, barangay', 1);
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `user_id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `last_name` varchar(50) NOT NULL,
+  `first_name` varchar(50) NOT NULL,
+  `middle_name` varchar(50) DEFAULT NULL,
+  `gender` enum('Male','Female') NOT NULL,
+  `birthdate` date DEFAULT NULL,
+  `marital_status` enum('Single','Married') NOT NULL,
+  `tin` varchar(15) DEFAULT NULL,
+  `house_number` varchar(10) DEFAULT NULL,
+  `street` varchar(100) DEFAULT NULL,
+  `barangay` varchar(50) DEFAULT NULL,
+  `district` varchar(50) DEFAULT NULL,
+  `municipality` varchar(50) DEFAULT NULL,
+  `province` varchar(50) DEFAULT NULL,
+  `contact_number` varchar(15) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
 -- Indexes for dumped tables
 --
@@ -102,6 +129,13 @@ ALTER TABLE `p_info`
   ADD KEY `fk_owner` (`ownId_Fk`);
 
 --
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -116,6 +150,12 @@ ALTER TABLE `owners_tb`
 --
 ALTER TABLE `p_info`
   MODIFY `p_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
