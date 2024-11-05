@@ -15,62 +15,6 @@
 </head>
 
 <body>
-<?php
-session_start();
-require_once 'database.php';
-
-// Establish a database connection
-$conn = Database::getInstance();
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Variable to hold the success message
-$successMessage = '';
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Collect and sanitize input
-    $firstName = filter_input(INPUT_POST, 'firstName', FILTER_SANITIZE_STRING);
-    $middleName = filter_input(INPUT_POST, 'middleName', FILTER_SANITIZE_STRING);
-    $surname = filter_input(INPUT_POST, 'surname', FILTER_SANITIZE_STRING);
-    $tinNumber = filter_input(INPUT_POST, 'tinNumber', FILTER_SANITIZE_STRING);
-    $houseNumber = filter_input(INPUT_POST, 'houseNumber', FILTER_SANITIZE_STRING);
-    $street = filter_input(INPUT_POST, 'street', FILTER_SANITIZE_STRING);
-    $barangay = filter_input(INPUT_POST, 'barangay', FILTER_SANITIZE_STRING);
-    $district = filter_input(INPUT_POST, 'district', FILTER_SANITIZE_STRING);
-    $city = filter_input(INPUT_POST, 'city', FILTER_SANITIZE_STRING);
-    $province = filter_input(INPUT_POST, 'province', FILTER_SANITIZE_STRING);
-    $telephone = filter_input(INPUT_POST, 'telephone', FILTER_SANITIZE_STRING);
-    $fax = filter_input(INPUT_POST, 'fax', FILTER_SANITIZE_STRING);
-    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-    $website = filter_input(INPUT_POST, 'website', FILTER_SANITIZE_URL);
-
-    // Set website to NULL if empty
-    $website = empty($website) ? null : $website;
-
-    // Prepare SQL statement to insert owner
-    $stmt = $conn->prepare("INSERT INTO owners_tb (own_fname, own_mname, own_surname, tin_no, house_no, street, barangay, district, city, province, own_info) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    if ($stmt) {
-        // Concatenate contact information
-        $own_info = "$telephone, $fax, $email, $website";
-
-        $stmt->bind_param("sssssssssss", $firstName, $middleName, $surname, $tinNumber, $houseNumber, $street, $barangay, $district, $city, $province, $own_info);
-        $stmt->execute();
-
-        if ($stmt->affected_rows > 0) {
-            $successMessage = "Record added successfully!";
-        } else {
-            $successMessage = "Error adding record.";
-        }
-
-        $stmt->close();
-    } else {
-        $successMessage = "Error preparing statement: " . $conn->error;
-    }
-}
-$conn->close();
-?>
-
   <!-- Header Navigation -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-custom"> 
     <a class="navbar-brand">
@@ -118,69 +62,69 @@ $conn->close();
 <section class="container mt-5">
   <div class="card p-4 shadow-sm form-container">
     <h3 class="mb-4 text-center">Add Property Owner</h3>
-    <form action="" method="POST">
+    <form>
       <!-- Owner's Information -->
       <div class="form-group">
         <label for="firstName">First Name</label>
-        <input type="text" class="form-control input-field" id="firstName" name="firstName" placeholder="Enter First Name" required>
+        <input type="text" class="form-control input-field" id="firstName" placeholder="Enter First Name">
       </div>
       <div class="form-group">
         <label for="middleName">Middle Name</label>
-        <input type="text" class="form-control input-field" id="middleName" name="middleName" placeholder="Enter Middle Name">
+        <input type="text" class="form-control input-field" id="middleName" placeholder="Enter Middle Name">
       </div>
       <div class="form-group">
         <label for="surname">Surname</label>
-        <input type="text" class="form-control input-field" id="surname" name="surname" placeholder="Enter Surname" required>
+        <input type="text" class="form-control input-field" id="surname" placeholder="Enter Surname">
       </div>
       <div class="form-group">
         <label for="tinNumber">TIN No.</label>
-        <input type="text" class="form-control input-field" id="tinNumber" name="tinNumber" placeholder="Enter TIN Number" required>
+        <input type="text" class="form-control input-field" id="tinNumber" placeholder="Enter TIN Number">
       </div>
 
       <!-- Address -->
       <h5 class="mt-4">Address</h5>
       <div class="form-group">
         <label for="houseNumber">House Number</label>
-        <input type="text" class="form-control input-field" id="houseNumber" name="houseNumber" placeholder="Enter House Number" required>
+        <input type="text" class="form-control input-field" id="houseNumber" placeholder="Enter House Number">
       </div>
       <div class="form-group">
         <label for="street">Street</label>
-        <input type="text" class="form-control input-field" id="street" name="street" placeholder="Enter Street" required>
+        <input type="text" class="form-control input-field" id="street" placeholder="Enter Street">
       </div>
       <div class="form-group">
         <label for="barangay">Barangay</label>
-        <input type="text" class="form-control input-field" id="barangay" name="barangay" placeholder="Enter Barangay" required>
+        <input type="text" class="form-control input-field" id="barangay" placeholder="Enter Barangay">
       </div>
       <div class="form-group">
         <label for="district">District</label>
-        <input type="text" class="form-control input-field" id="district" name="district" placeholder="Enter District" required>
+        <input type="text" class="form-control input-field" id="district" placeholder="Enter District">
       </div>
       <div class="form-group">
         <label for="city">City</label>
-        <input type="text" class="form-control input-field" id="city" name="city" placeholder="Enter City" required>
+        <input type="text" class="form-control input-field" id="city" placeholder="Enter City">
       </div>
       <div class="form-group">
         <label for="province">Province</label>
-        <input type="text" class="form-control input-field" id="province" name="province" placeholder="Enter Province" required>
+        <input type="text" class="form-control input-field" id="province" placeholder="Enter Province">
       </div>
 
       <!-- Owner Contact Information -->
-      <h5 class="mt-4">Owner Information<small> (Optional)</small></h5>
+      <h5 class="mt-4">Owner Information</h5>
       <div class="form-group">
         <label for="telephone">Telephone</label>
-        <input type="text" class="form-control input-field" id="telephone" name="telephone" placeholder="Enter Telephone Number">
+        <input type="text" class="form-control input-field" id="telephone" placeholder="Enter Telephone Number">
       </div>
       <div class="form-group">
         <label for="fax">Fax</label>
-        <input type="text" class="form-control input-field" id="fax" name="fax" placeholder="Enter Fax Number">
+        <input type="text" class="form-control input-field" id="fax" placeholder="Enter Fax Number">
       </div>
       <div class="form-group">
         <label for="email">Email</label>
-        <input type="email" class="form-control input-field" id="email" name="email" placeholder="Enter Email Address">
+        <input type="email" class="form-control input-field" id="email" placeholder="Enter Email Address">
       </div>
       <div class="form-group">
         <label for="website">Website</label>
-        <input type="url" class="form-control input-field" id="website" name="website" placeholder="Enter Website URL">
+        <input type="url" class="form-control input-field" id="website" placeholder="Enter Website URL">
       </div>
 
       <button type="submit" class="btn btn-primary submit-btn">Submit</button>
@@ -189,21 +133,23 @@ $conn->close();
 </section>
 
   <!-- Footer -->
-  <footer class="footer mt-auto py-3 bg-custom"> 
-    <div class="container"> 
-      <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span> 
+  <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
+    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+      © 2020 Copyright:
+      <a class="text-body" href="https://mdbootstrap.com/">MDBootstrap.com</a>
     </div>
   </footer>
 
   <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3oAi1Kn5/yo9M4aW5rY1LYi9Cj3jRIvYIZAZ5h8oW7B5h2C7z5e8B2CKy7uWgG"
+  <script src="http://localhost/ERPTS/Real-Property-Unit-List.js"></script> 
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.11.0/dist/umd/popper.min.js"
-    integrity="sha384-1A2Z3A6C0e0gB3b3gmJ3g5BO5x0B1DAIlxgG5F8bB1Zqf7uE2W0p1Fh0b2RM0G1Z9"
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
+    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-Chfqqxu3y5C8LQXhSh2gN5F6azZ9L2H8eY+mcO8b6Q8R9SQh7PQe0i0K+8zG3p7U"
+    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
 </body>
 
