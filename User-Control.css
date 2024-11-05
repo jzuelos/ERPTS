@@ -1,0 +1,55 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+.section-user-management {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table th {
+    text-align: left;
+    font-weight: bold;
+}
+
+.table td {
+    vertical-align: middle; 
+}
+
+.table td.text-center {
+    text-align: center;
+}
+
+
+input[type="checkbox"] {
+    transform: scale(1.2);
+    margin: 0;
+}
+
+
+.edit-icon {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.btn-outline-primary {
+    color: #489474; 
+    border-color: #489474; 
+}
+
+.btn-outline-primary:hover {
+    background-color: #489474; 
+    color: #fff; 
+}
