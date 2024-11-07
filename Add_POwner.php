@@ -52,7 +52,7 @@
           <a class="nav-link" href="Reports.php">Reports</a> 
         </li>
         <li class="nav-item ml-3">
-          <button type="button" class="btn btn-danger">Log Out</button> 
+          <a href="logout.php" class="btn btn-danger">Log Out</a> 
         </li>
       </ul>
     </div>
@@ -65,6 +65,17 @@
     <form action="" method="POST">
 <?php
   session_start(); // Start session at the top
+
+  // Check if the user is logged in by verifying if 'user_id' exists in the session
+  if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php"); // Redirect to login page if user is not logged in
+    exit; // Stop further execution after redirection
+  }
+
+  // Prevent the browser from caching this page
+  header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
+  header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
+  header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility
 
   // Display all errors for debugging
   error_reporting(E_ALL);

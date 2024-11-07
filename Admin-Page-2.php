@@ -1,3 +1,18 @@
+<?php
+  session_start();
+
+  // Check if the user is logged in by verifying if 'user_id' exists in the session
+  if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php"); // Redirect to login page if user is not logged in
+    exit; // Stop further execution after redirection
+  }
+
+  // Prevent the browser from caching this page
+  header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
+  header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
+  header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility
+?>
+
 <!doctype html>
 <html lang="en">
 
@@ -53,7 +68,7 @@
           <a class="nav-link" href="Reports.php">Reports</a>
         </li>
         <li class="nav-item ml-3">
-          <button type="button" class="btn btn-danger">Log Out</button>
+          <a href="logout.php" class="btn btn-danger">Log Out</a>
         </li>
       </ul>
     </div>
@@ -72,7 +87,7 @@
         <h4 class="card-title mb-4 text-center" style="font-size: 1.75rem;">Control Panel</h4>
         <div class="row">
           <div class="col-lg-6 mb-4">
-            <a href="User-Control.html" class="text-decoration-none">
+            <a href="User-Control.php" class="text-decoration-none">
               <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5">
                 <div class="card-body d-flex align-items-center">
                   <img src="images/AdIc1.png" alt="User Control Icon" class="mr-4" width="60">
@@ -82,7 +97,7 @@
             </a>
           </div>
           <div class="col-lg-6 mb-4">
-            <a href="Admin-Modify.html" class="text-decoration-none">
+            <a href="Admin-Modify.php" class="text-decoration-none">
               <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5">
                 <div class="card-body d-flex align-items-center">
                   <img src="images/AdIc2.png" alt="Sheet Modification Icon" class="mr-4" width="60">
