@@ -1,6 +1,20 @@
+<?php
+session_start();  // Start the session to access session variables
+
+// Check if the user is logged in by verifying if 'user_id' exists in the session
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php"); // Redirect to login page if user is not logged in
+    exit; // Stop further execution after redirection
+}
+
+// Prevent the browser from caching this page
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
+header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
+header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility
+?>
+
 <!doctype html>
 <html lang="en">
-
 <head>
   <!-- Required meta tags -->
   <meta charset="utf-8">
@@ -51,9 +65,9 @@
         <li class="nav-item">
           <a class="nav-link" href="Reports.php">Reports</a>
         </li>
-        <li class="nav-item" style = "margin-left: 20px">
-          <button type="button" class="btn btn-danger" data-toggle="button" aria-pressed="false" autocomplete="off">
-            Log Out</button>
+        <li class="nav-item" style="margin-left: 20px">
+          <!-- Logout button linking to logout.php -->
+          <a href="logout.php" class="btn btn-danger">Log Out</a>
         </li>
       </ul>
     </div>
@@ -64,7 +78,7 @@
     <div class="row">
       <!-- Large Horizontal Grid on the Left -->
       <div class="col-lg-8">
-        <div class="bg-secondary text-white py-5" style = "height: 270px";>Assessor's Information</div>
+        <div class="bg-secondary text-white py-5" style="height: 270px;">Assessor's Information</div>
       </div>
 
       <!-- Two Square Grids on the Right -->
@@ -91,9 +105,7 @@
     </div>
   </footer>
 
-
   <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
@@ -104,5 +116,4 @@
     integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
 </body>
-
 </html>
