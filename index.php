@@ -1,3 +1,64 @@
+<?php
+session_start(); // Start session at the top
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+require_once 'database.php'; // Include your database connection
+
+$conn = Database::getInstance();
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Capture and sanitize form data
+    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+    // Check if username and password are not empty
+    if (empty($username) || empty($password)) {
+        $_SESSION['error'] = "Username or password cannot be empty!";
+    } else {
+        // Query the database to check if the user exists
+        $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
+
+        if ($stmt) {
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result && $result->num_rows > 0) {
+                $user = $result->fetch_assoc();
+
+                // Verify the password
+                if (password_verify($password, $user['password'])) {
+                    // Set session variables on successful login
+                    $_SESSION['user_id'] = $user['user_id'];
+                    $_SESSION['username'] = $user['username'];
+                    $_SESSION['logged_in'] = true;
+
+                    // Redirect to the home page or dashboard
+                    header("Location: Home.php");
+                    exit();
+                } else {
+                    // Incorrect password
+                    $_SESSION['error'] = "Incorrect password!";
+                }
+            } else {
+                // Username does not exist
+                $_SESSION['error'] = "Username does not exist!";
+            }
+
+            $stmt->close();
+        } else {
+            $_SESSION['error'] = "Error preparing statement: " . $conn->error;
+        }
+    }
+}
+
+$conn->close();
+?>
 <!doctype html>
 <html lang="en">
 
@@ -23,8 +84,14 @@
         <div class="logo-container">
           <img src="images/coconut_.__1_-removebg-preview1.png" alt="ERPTS Logo" class="logo">
         </div>
-        <h2 class="text-center ">LOG IN</h2>
-        <form action="Home.php" method="POST">
+        <h2 class="text-center">LOG IN</h2>
+
+        <!-- Display error message if login fails -->
+        <?php if (isset($_SESSION['error'])): ?>
+          <p style="color: red;"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
+        <?php endif; ?>
+
+        <form method="POST">
           <div class="form-group">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" class="form-control rounded-pill" required>
