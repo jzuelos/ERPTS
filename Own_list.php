@@ -1,18 +1,50 @@
+<?php
+session_start();
+
+// Check if the user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php"); // Redirect to login page if not logged in
+    exit;
+}
+
+// Prevent caching
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
+require_once 'database.php';
+
+$conn = Database::getInstance();
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch owners from the database
+$sql = "SELECT own_id, own_fname, own_mname, own_surname, house_no, street, barangay, district, city, province, own_info 
+        FROM owners_tb";
+
+$owners = [];
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $owners[] = $row;
+    }
+}
+?>
+
 <!doctype html>
 <html lang="en">
 
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-  <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="Own_list.css">
-  <title>Electronic Real Property Tax System</title>
   <link rel="stylesheet" href="Real-Property-Unit-List.css">
+  <title>Electronic Real Property Tax System</title>
 </head>
 
 <body>
@@ -54,7 +86,7 @@
           <a class="nav-link" href="Reports.php">Reports</a>
         </li>
         <li class="nav-item ml-3">
-          <button type="button" class="btn btn-danger">Log Out</button>
+          <a href="logout.php" class="btn btn-danger">Log Out</a>
         </li>
       </ul>
     </div>
@@ -68,20 +100,18 @@
         <div class="col-auto">
           <label for="searchInput" class="sr-only">Search</label>
           <div class="input-group">
-            <input type="text" class="form-control" id="searchInput" placeholder="Search"> <!-- Search input -->
-            </select>
+            <input type="text" class="form-control" id="searchInput" placeholder="Search">
           </div>
         </div>
 
         <div class="col-auto">
           <button type="button" class="btn btn-success btn-hover" onclick="filterTable()">Search</button>
-
         </div>
       </div>
 
       <!-- Table -->
       <div class="table-responsive">
-        <table class="table table-bordered text-center modern-table" id="propertyTable"> <!-- Responsive table -->
+        <table class="table table-bordered text-center modern-table" id="propertyTable">
           <thead class="thead-dark">
             <tr>
               <th>ID</th>
@@ -92,29 +122,21 @@
             </tr>
           </thead>
           <tbody>
-            <!-- Table rows with property data -->
-                <tr>
-                     <td>54321</td>
-                     <td>Alice Brown</td>
-                    <td>Street 4, Barangay 4</td>
-                    <td></td>
-                    <td><a href="FAAS.php" class="btn btn-primary">EDIT</a></td>
-                        </tr>
+            <?php if (!empty($owners)): ?>
+                <?php foreach ($owners as $owner): ?>
                     <tr>
-                    <td>98765</td>
-                    <td>David Green</td>
-                    <td>Street 5, Barangay 5</td>
-                    <td></td>
-                    <td><a href="FAAS.php" class="btn btn-primary">EDIT</a></td>
-                        </tr>
-                    <tr>
-                    <td>22446</td>
-                    <td>Susan White</td>
-                    <td>Street 6, Barangay 6</td>
-                    <td></td>
-                    <td><a href="FAAS.php" class="btn btn-primary">EDIT</a></td>
+                        <td><?= htmlspecialchars($owner['own_id']) ?></td>
+                        <td><?= htmlspecialchars($owner['own_fname'] . ' ' . $owner['own_mname'] . ' ' . $owner['own_surname']) ?></td>
+                        <td><?= htmlspecialchars($owner['house_no'] . ', ' . $owner['street'] . ', ' . $owner['barangay'] . ', ' . $owner['district'] . ', ' . $owner['city'] . ', ' . $owner['province']) ?></td>
+                        <td><?= htmlspecialchars($owner['own_info']) ?></td>
+                        <td><a href="FAAS.php?own_id=<?= htmlspecialchars($owner['own_id']) ?>" class="btn btn-primary">EDIT</a></td>
                     </tr>
-            <!-- More rows can be added here -->
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="5">No records found</td>
+                </tr>
+            <?php endif; ?>
           </tbody>
         </table>
       </div>
