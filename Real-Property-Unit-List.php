@@ -116,8 +116,8 @@ if ($result->num_rows > 0) {
             <input type="text" class="form-control" id="searchInput" placeholder="Search"> <!-- Search input -->
             <select class="custom-select" id="barangayDropdown"> <!-- Dropdown for barangay selection -->
               <option selected value="">All Barangay</option> <!-- Default option -->
-              <option value="Barangay 1">Barangay 1</option>
-              <option value="Barangay 2">Barangay 2</option>
+              <option value="Kalamunding">Kalamunding</option>
+              <option value="Bautista">Bautista</option>
               <option value="Barangay 3">Barangay 3</option>
             </select>
           </div>

@@ -56,7 +56,6 @@
     </div>
 </nav>
 
-
 <!-- Main Content -->
 <div class="container mt-5">
     <h2 class="text-center mb-4">Create New User</h2>
@@ -238,7 +237,7 @@
 
             <div class="form-group">
                 <label for="house_number">House Number:</label>
-                <input type="text" id="house_number" name="house_number" class="form-control" required>
+                <input type="text" id="house_number" name="house_number" class="form-control">
             </div>
 
             <div class="form-group">
@@ -273,7 +272,7 @@
 
             <div class="form-group">
                 <label for="email">Email:</label>
-                <input type="email" id="email" name="email" class="form-control" required>
+                <input type="email" id="email" name="email" class="form-control">
             </div>
         </div>
 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 05, 2024 at 02:29 PM
+-- Generation Time: Nov 08, 2024 at 02:58 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -82,7 +82,11 @@ CREATE TABLE `p_info` (
 INSERT INTO `p_info` (`p_id`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `house_tag_no`, `land_area`, `desc_land`, `documents`, `ownId_Fk`) VALUES
 (76, 4234, 0, 'Province 1', 'Labo', 'District 1', 'Kalamunding', 0, 4234, '   ', 'affidavit, barangay', 2),
 (77, 4234, 0, 'Province 1', 'Labo', 'District 1', 'Bautista', 0, 4234, '   ', 'affidavit, barangay', 1),
-(80, 423, 0, 'Province 1', 'Labo', 'District 1', 'Bautista', 0, 423, '   ', 'affidavit, barangay', 1);
+(80, 423, 0, 'Province 1', 'Labo', 'District 1', 'Bautista', 0, 423, '   ', 'affidavit, barangay', 1),
+(81, 2147483647, 423, 'Province 2', 'Daet', 'District 1', 'Bautista', 0, 42342, '   ', 'affidavit, barangay, land_tagg', 1),
+(82, 43, 0, 'Province 2', 'Labo', 'District 1', 'Bautista', 423, 33, '   ', 'barangay', 3),
+(83, 423, 3, 'Province 1', 'Labo', 'District 1', 'Bautista', 432, 3242, '   ', 'affidavit', 5),
+(84, 4234, 0, 'Province 1', 'Labo', 'District 2', 'Kalamunding', 423, 897, '   ', 'barangay', 1);
 
 -- --------------------------------------------------------
 
@@ -108,8 +112,17 @@ CREATE TABLE `users` (
   `municipality` varchar(50) DEFAULT NULL,
   `province` varchar(50) DEFAULT NULL,
   `contact_number` varchar(15) DEFAULT NULL,
-  `email` varchar(100) DEFAULT NULL
+  `email` varchar(100) DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 0,
+  `user_type` varchar(20) NOT NULL DEFAULT 'To Be Fixed'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`user_id`, `username`, `password`, `last_name`, `first_name`, `middle_name`, `gender`, `birthdate`, `marital_status`, `tin`, `house_number`, `street`, `barangay`, `district`, `municipality`, `province`, `contact_number`, `email`, `status`, `user_type`) VALUES
+(6, 'username', '$2y$10$hUAqqmcCIDXnVvR81hmjuO7r.2x3tnlKu6yruJFKjr6LnIoPgnRK.', 'name', 'user', '', 'Male', '2003-11-14', 'Single', '1234', '1', '1', '1', '1', '1', '1', '1', 'testing@testing.com', 0, 'To Be Fixed');
 
 --
 -- Indexes for dumped tables
@@ -149,13 +162,13 @@ ALTER TABLE `owners_tb`
 -- AUTO_INCREMENT for table `p_info`
 --
 ALTER TABLE `p_info`
-  MODIFY `p_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
+  MODIFY `p_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Constraints for dumped tables

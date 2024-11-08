@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="main_layout.css">
     <link rel="stylesheet" href="User-Control.css">
 </head>
-<body data-path-to-root="./" data-include-products="false" class="u-body u-xl-mode" data-lang="en">
+<body>
 
 <?php
     session_start(); // Start session at the top
