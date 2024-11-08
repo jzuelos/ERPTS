@@ -71,3 +71,16 @@
     background-color: #138496;
   }
   
+  .add-owner-button {
+    background-color: #28a745; /* Bootstrap success color */
+    color: white; /* Text color */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 15px; /* Padding */
+    font-size: 16px; /* Font size */
+    transition: background-color 0.3s; /* Smooth background change */
+  }
+  
+  .add-owner-button:hover {
+    background-color: #218838; /* Darker green on hover */
+  }

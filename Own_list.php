@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Check if the user is logged in
+/* Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php"); // Redirect to login page if not logged in
     exit;
@@ -30,7 +30,7 @@ if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $owners[] = $row;
     }
-}
+}*/
 ?>
 
 <!doctype html>
@@ -142,11 +142,10 @@ if ($result->num_rows > 0) {
       </div>
 
       <!-- View All Button -->
-      <div class="view-all-container d-flex mt-3">
-        <div class="ml-auto">
-          <button type="button" class="btn btn-info">View All</button>
-        </div>
-      </div>
+      <div class="d-flex justify-content-between mt-3">
+      <button type="button" class="btn btn-success add-owner-button">Add Owner</button>
+      <button type="button" class="btn btn-info">View All</button>
+    </div>
   </section>
 
   <!-- Footer -->
