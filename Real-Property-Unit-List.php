@@ -2,10 +2,10 @@
 session_start();  // Start session at the top to access session variables
 
 // Check if the user is logged in by verifying if 'user_id' exists in the session
-if (!isset($_SESSION['user_id'])) {
+/*if (!isset($_SESSION['user_id'])) {
     header("Location: index.php"); // Redirect to login page if user is not logged in
     exit; // Stop further execution after redirection
-}
+}*/
 
 // Prevent the browser from caching this page
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Prevent caching
@@ -19,32 +19,34 @@ require_once 'database.php';
 
 $conn = Database::getInstance();
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+  die("Connection failed: " . $conn->connect_error);
 } else {
-    echo "Connected";
+  echo "Connected";
 }
 
-// Fetch property units along with their owners
-$sql = "SELECT p.p_id, p.house_no, p.block_no, p.province, p.city, p.district, p.barangay, 
-               p.house_tag_no, p.land_area, p.desc_land, p.documents,
-               CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname) AS owner
+// Fetch property units along with their owners, sorted by latest ID first
+$sql = "SELECT p.p_id, p.house_no, p.block_no, p.barangay, p.province, p.city, p.district, p.land_area,
+               CONCAT(o.own_fname, ', ', o.own_mname, ' ', o.own_surname) AS owner
         FROM p_info p
-        LEFT JOIN owners_tb o ON p.house_no = o.house_no AND p.barangay = o.barangay"; // Adjust this JOIN condition if necessary
+        LEFT JOIN owners_tb o ON p.ownId_Fk = o.own_id
+        ORDER BY p.p_id DESC"; // Sort by latest p_id first
 
 $propertyUnits = [];
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $propertyUnits[] = $row;
-    }
+  while ($row = $result->fetch_assoc()) {
+    $propertyUnits[] = $row;
+  }
 } else {
-    echo "No records found";
+  echo "No records found";
 }
+
 ?>
 
 <!doctype html>
 <html lang="en">
+
 <head>
   <!-- Required meta tags -->
   <meta charset="utf-8">
@@ -62,7 +64,8 @@ if ($result->num_rows > 0) {
   <!-- Header Navigation -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
     <a class="navbar-brand">
-      <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top" alt="">
+      <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top"
+        alt="">
       Electronic Real Property Tax System
     </a>
 
@@ -133,27 +136,32 @@ if ($result->num_rows > 0) {
             <tr>
               <th>OD ID</th>
               <th>Owner</th>
-              <th>Location <br><small>(Street, Barangay, City, Province)</small></th>
+              <th>Location <br><small>(Barangay, City, Province)</small></th>
               <th>Land Area</th>
               <th>Edit</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="tableBody">
             <?php
             // Display the fetched data in table rows
             foreach ($propertyUnits as $unit) {
-                // Using available fields from p_info and owner's name
-                echo "<tr>
-                        <td>{$unit['p_id']}</td>
-                        <td>{$unit['owner']}</td>
-                        <td>{$unit['house_no']}, {$unit['barangay']}, {$unit['city']}, {$unit['province']}</td>
-                        <td>{$unit['land_area']}</td>
-                        <td><a href='FAAS.php?id={$unit['p_id']}' class='btn btn-primary'>EDIT</a></td>
-                      </tr>";
+              echo "<tr>
+                    <td>{$unit['p_id']}</td>
+                    <td>{$unit['owner']}</td>
+                    <td>{$unit['house_no']}, {$unit['barangay']}, {$unit['city']}, {$unit['province']}</td>
+                    <td>{$unit['land_area']}</td>
+                    <td><a href='FAAS.php?id={$unit['p_id']}' class='btn btn-primary'>EDIT</a></td>
+                  </tr>";
             }
             ?>
           </tbody>
         </table>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div class="pagination-controls mta-3">
+        <label for="pageSelect">Page: </label>
+        <select id="pageSelect" onchange="changePage()"></select>
       </div>
 
       <!-- View All Button -->
@@ -184,4 +192,5 @@ if ($result->num_rows > 0) {
     integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
 </body>
+
 </html>
