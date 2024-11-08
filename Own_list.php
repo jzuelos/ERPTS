@@ -143,7 +143,7 @@ if ($result->num_rows > 0) {
 
       <!-- View All Button -->
       <div class="d-flex justify-content-between mt-3">
-      <button type="button" class="btn btn-success add-owner-button">Add Owner</button>
+      <a href="Add_POwner.php" class="btn btn-success add-owner-button">Add Owner</a>
       <button type="button" class="btn btn-info">View All</button>
     </div>
   </section>
