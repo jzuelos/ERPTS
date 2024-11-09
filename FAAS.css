@@ -1,0 +1,71 @@
+/* General form styling */
+.form-card {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Group styling for input fields */
+.form-group {
+  margin-bottom: 20px;
+}
+
+/* Style for input fields and text areas */
+.form-control {
+  border-radius: 4px;
+  padding: 10px;
+  font-size: 14px;
+  width: 100%; 
+  margin-top: 5px;
+}
+
+/* Textarea specific styling */
+textarea.form-control {
+  resize: none;
+}
+
+/* Label Styling */
+label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* Edit Button Styling */
+button.btn-outline-primary {
+  border-radius: 30px;
+  font-size: 14px;
+  padding: 5px 15px;
+}
+
+button.btn-outline-primary:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Add spacing between different form sections */
+.d-flex.justify-content-between {
+  margin-bottom: 30px; /* Adds space between the title and the first form element */
+}
+
+/* Specific styles for the Memoranda section */
+section.container.my-5 {
+  margin-top: 40px; /* Adds top margin for separation */
+}
+
+section.container.my-5 .form-group {
+  margin-bottom: 30px; /* Adds space below the Memoranda field */
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .col-md-6 {
+    max-width: 100%;
+    padding: 0;
+  }
+}
+
+
