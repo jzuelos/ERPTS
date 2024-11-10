@@ -20,8 +20,6 @@ require_once 'database.php';
 $conn = Database::getInstance();
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
-} else {
-  echo "Connected";
 }
 
 // Fetch property units along with their owners, sorted by latest ID first
