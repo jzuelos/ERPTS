@@ -40,6 +40,18 @@ if ($result->num_rows > 0) {
   echo "No records found";
 }
 
+// Fetch barangay options for the dropdown
+$barangayOptions = '';
+$barangayQuery = "SELECT brgy_id, brgy_name FROM brgy";
+$barangayResult = $conn->query($barangayQuery);
+
+if ($barangayResult->num_rows > 0) {
+    while ($barangayRow = $barangayResult->fetch_assoc()) {
+        $barangayOptions .= '<option value="' . $barangayRow['brgy_id'] . '">' . $barangayRow['brgy_name'] . '</option>';
+    }
+} else {
+    $barangayOptions = '<option value="">No Barangays Available</option>';
+}
 ?>
 
 <!doctype html>
@@ -112,11 +124,9 @@ if ($result->num_rows > 0) {
           <label for="searchInput" class="sr-only">Search</label>
           <div class="input-group">
             <input type="text" class="form-control" id="searchInput" placeholder="Search"> <!-- Search input -->
-            <select class="custom-select" id="barangayDropdown"> <!-- Dropdown for barangay selection -->
-              <option selected value="">All Barangay</option> <!-- Default option -->
-              <option value="Kalamunding">Kalamunding</option>
-              <option value="Bautista">Bautista</option>
-              <option value="Barangay 3">Barangay 3</option>
+            <select class="custom-select" id="barangayDropdown" name="barangay"> <!-- Dropdown for barangay selection -->
+              <option selected value="">All Barangay</option>
+              <?php echo $barangayOptions; ?> <!-- PHP-generated barangay options -->
             </select>
           </div>
         </div>
