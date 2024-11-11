@@ -17,13 +17,13 @@
   <div id="selectedOwnerDisplay"></div> <!-- Display area for selected owner IDs -->
   <?php
   session_start(); // Start session at the top
-  
+
   // Check if the user is logged in by verifying if 'user_id' exists in the session
   if (!isset($_SESSION['user_id'])) {
     header("Location: index.php"); // Redirect to login page if user is not logged in
     exit; // Stop further execution after redirection
   }
-
+  
   // Prevent the browser from caching this page
   header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
   header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
@@ -77,7 +77,8 @@
 
         if ($stmt->execute()) {
           $_SESSION['message'] = "Property Added with owner ID: " . htmlspecialchars($owner_id);
-          header("Location: " . $_SERVER['PHP_SELF']);
+          $_SESSION['property_added'] = true; // Set session variable to trigger modal
+          header("Location: " . $_SERVER['PHP_SELF']); // Redirect to the same page
           exit;
         } else {
           echo "<p>Error: " . $stmt->error . "</p>";
@@ -91,11 +92,50 @@
     }
   }
 
+  if (isset($_SESSION['property_added']) && $_SESSION['property_added'] === true) {
+    // Clear the session variable after use
+    unset($_SESSION['property_added']);
+
+    // Trigger the modal popup after the property is added
+    echo "<script>
+    window.onload = function() {
+      $('#confirmationModal').modal('show');
+    };
+  </script>";
+  }
+
   if (isset($_SESSION['message'])) {
     echo "<p>" . $_SESSION['message'] . "</p>";
     unset($_SESSION['message']);
   }
   ?>
+
+  <!-- Bootstrap Modal for Confirmation -->
+  <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmationModalLabel">Property Added</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Property added <br> Do you want to continue to the FAAS sheet?
+        </div>
+        <div class="modal-footer">
+          <a href="FAAS.php" class="btn btn-primary">Yes</a>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include Bootstrap JS and dependencies -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
 
   <!-- Header Navigation -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
@@ -135,7 +175,7 @@
           <a class="nav-link" href="Reports.php">Reports</a>
         </li>
         <li class="nav-item" style="margin-left: 20px">
-        <a href="logout.php" class="btn btn-danger">Log Out</a>
+          <a href="logout.php" class="btn btn-danger">Log Out</a>
         </li>
       </ul>
     </div>
