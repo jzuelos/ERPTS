@@ -5,7 +5,7 @@ session_start();
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php"); // Redirect to login page if not logged in
     exit;
-}
+}*/
 
 // Prevent caching
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
@@ -16,7 +16,7 @@ require_once 'database.php';
 
 $conn = Database::getInstance();
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+  die("Connection failed: " . $conn->connect_error);
 }
 
 // Fetch owners from the database
@@ -27,10 +27,10 @@ $owners = [];
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $owners[] = $row;
-    }
-}*/
+  while ($row = $result->fetch_assoc()) {
+    $owners[] = $row;
+  }
+}
 ?>
 
 <!doctype html>
@@ -48,8 +48,8 @@ if ($result->num_rows > 0) {
 </head>
 
 <body>
- <!-- Header Navigation -->
- <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
+  <!-- Header Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
     <a class="navbar-brand">
       <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top"
         alt="">
@@ -114,38 +114,46 @@ if ($result->num_rows > 0) {
         <table class="table table-bordered text-center modern-table" id="propertyTable">
           <thead class="thead-dark">
             <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Address</th>
-              <th>Information</th>
-              <th>Edit</th>
+              <th class="text-center align-middle">ID</th>
+              <th class="text-center align-middle">Name</th>
+              <th class="text-center align-middle">Address <br><small>House No., Street, District</small></th>
+              <th class="text-center align-middle">Information</th>
+              <th class="text-center align-middle">Edit</th>
             </tr>
           </thead>
           <tbody>
             <?php if (!empty($owners)): ?>
-                <?php foreach ($owners as $owner): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($owner['own_id']) ?></td>
-                        <td><?= htmlspecialchars($owner['own_fname'] . ' ' . $owner['own_mname'] . ' ' . $owner['own_surname']) ?></td>
-                        <td><?= htmlspecialchars($owner['house_no'] . ', ' . $owner['street'] . ', ' . $owner['barangay'] . ', ' . $owner['district'] . ', ' . $owner['city'] . ', ' . $owner['province']) ?></td>
-                        <td><?= htmlspecialchars($owner['own_info']) ?></td>
-                        <td><a href="FAAS.php?own_id=<?= htmlspecialchars($owner['own_id']) ?>" class="btn btn-primary">EDIT</a></td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
+              <?php foreach ($owners as $owner): ?>
                 <tr>
-                    <td colspan="5">No records found</td>
+                  <td><?= htmlspecialchars($owner['own_id']) ?></td>
+                  <td><?= htmlspecialchars($owner['own_fname'] . ' ' . $owner['own_mname'] . ' ' . $owner['own_surname']) ?></td>
+                  <td><?= htmlspecialchars($owner['house_no'] . ', ' . $owner['street'] . ', ' . $owner['barangay'] . ', ' . $owner['city'] . ', ' . $owner['district'] . ', ' . $owner['province']) ?></td>
+                  <td><?= htmlspecialchars($owner['own_info']) ?></td>
+                  <td><a href="FAAS.php?own_id=<?= htmlspecialchars($owner['own_id']) ?>" class="btn btn-primary">EDIT</a></td>
                 </tr>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <tr>
+                <td colspan="5">No records found</td>
+              </tr>
             <?php endif; ?>
           </tbody>
         </table>
       </div>
 
+      <div class="d-flex align-items-center mt-3">
+        <a href="javascript:void(0)" id="backBtn" class="mr-2"><<</a>
+            <span class="mr-2">Page:</span>
+            <select id="pageSelect" class="form-control form-control-sm w-auto mr-2"></select>
+            <a href="javascript:void(0)" id="nextBtn" class="ml-2">>></a>
+      </div>
+
+
       <!-- View All Button -->
       <div class="d-flex justify-content-between mt-3">
-      <a href="Add_POwner.php" class="btn btn-success add-owner-button">Add Owner</a>
-      <button type="button" class="btn btn-info">View All</button>
-    </div>
+        <a href="Add_POwner.php" class="btn btn-success add-owner-button">Add Owner</a>
+        <button type="button" class="btn btn-info">View All</button>
+      </div>
   </section>
 
   <!-- Footer -->
