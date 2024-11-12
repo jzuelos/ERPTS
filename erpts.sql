@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 10, 2024 at 03:58 AM
+-- Generation Time: Nov 12, 2024 at 04:30 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -47,12 +47,26 @@ CREATE TABLE `owners_tb` (
 --
 
 INSERT INTO `owners_tb` (`own_id`, `own_fname`, `own_mname`, `own_surname`, `tin_no`, `house_no`, `street`, `barangay`, `district`, `city`, `province`, `own_info`) VALUES
-(1, 'zuelos', '', 'john lloyd', 0, '', 'luzaragga', 'kalamunding', '2', 'labo', 'camarines norte', ''),
-(2, 'melanie', '', 'zuelos', 0, '', 'suzara', 'gumamela', '2', 'daet', 'camarines sur', ''),
-(3, 'emel', 'v.', 'zuelos', 0, '', 'luzaragga', 'dalas', '2', 'labo', 'camarines sur', ''),
-(4, 'jennifer', 'v.', 'zuelos', 0, '', 'luzaragga', 'gumamela', '2', 'labo', 'camarines sur', ''),
-(5, 'zuelos', 'v.', 'jomel', 0, '', 'suzara', 'gumamela', '2', 'labo', 'camarines sur', ''),
-(6, 'melchor', 'v', 'zuelos', 0, '', 'suzara', 'kalamunding', '2', 'daet', 'camarines norte', '');
+(1, 'zuelos', '', 'john lloyd', 0, '', 'luzaragga', 'kalamunding', '2', 'labo', 'camarines norte', '');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `propertyowner`
+--
+
+CREATE TABLE `propertyowner` (
+  `pO_id` int(50) NOT NULL,
+  `property_id` int(50) NOT NULL,
+  `owner_id` int(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `propertyowner`
+--
+
+INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`) VALUES
+(14, 108, 1);
 
 -- --------------------------------------------------------
 
@@ -62,6 +76,7 @@ INSERT INTO `owners_tb` (`own_id`, `own_fname`, `own_mname`, `own_surname`, `tin
 
 CREATE TABLE `p_info` (
   `p_id` int(10) NOT NULL,
+  `ownID_Fk` int(50) NOT NULL,
   `house_no` int(10) NOT NULL,
   `block_no` int(10) NOT NULL,
   `province` varchar(30) NOT NULL,
@@ -71,22 +86,16 @@ CREATE TABLE `p_info` (
   `house_tag_no` int(10) NOT NULL,
   `land_area` int(50) NOT NULL,
   `desc_land` varchar(50) NOT NULL,
-  `documents` varchar(30) NOT NULL,
-  `ownId_Fk` int(20) NOT NULL
+  `documents` varchar(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `p_info`
 --
 
-INSERT INTO `p_info` (`p_id`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `house_tag_no`, `land_area`, `desc_land`, `documents`, `ownId_Fk`) VALUES
-(76, 4234, 0, 'Province 1', 'Labo', 'District 1', 'Kalamunding', 0, 4234, '   ', 'affidavit, barangay', 2),
-(77, 4234, 0, 'Province 1', 'Labo', 'District 1', 'Bautista', 0, 4234, '   ', 'affidavit, barangay', 1),
-(80, 423, 0, 'Province 1', 'Labo', 'District 1', 'Bautista', 0, 423, '   ', 'affidavit, barangay', 1),
-(81, 2147483647, 423, 'Province 2', 'Daet', 'District 1', 'Bautista', 0, 42342, '   ', 'affidavit, barangay, land_tagg', 1),
-(82, 43, 0, 'Province 2', 'Labo', 'District 1', 'Bautista', 423, 33, '   ', 'barangay', 3),
-(83, 423, 3, 'Province 1', 'Labo', 'District 1', 'Bautista', 432, 3242, '   ', 'affidavit', 5),
-(84, 4234, 0, 'Province 1', 'Labo', 'District 2', 'Kalamunding', 423, 897, '   ', 'barangay', 1);
+INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `house_tag_no`, `land_area`, `desc_land`, `documents`) VALUES
+(107, 1, 3213, 0, 'Province 1', 'Labo', 'District 1', 'Kalamunding', 3123, 312, '   ', 'affidavit'),
+(108, 1, 3123, 0, 'Province 1', 'Daet', 'District 1', 'Bautista', 3123, 312, '   ', 'affidavit');
 
 -- --------------------------------------------------------
 
@@ -135,11 +144,19 @@ ALTER TABLE `owners_tb`
   ADD PRIMARY KEY (`own_id`);
 
 --
+-- Indexes for table `propertyowner`
+--
+ALTER TABLE `propertyowner`
+  ADD PRIMARY KEY (`pO_id`),
+  ADD KEY `property_id` (`property_id`),
+  ADD KEY `owner_id` (`owner_id`);
+
+--
 -- Indexes for table `p_info`
 --
 ALTER TABLE `p_info`
   ADD PRIMARY KEY (`p_id`),
-  ADD KEY `fk_owner` (`ownId_Fk`);
+  ADD KEY `ownID_FK` (`ownID_Fk`);
 
 --
 -- Indexes for table `users`
@@ -159,10 +176,16 @@ ALTER TABLE `owners_tb`
   MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
+-- AUTO_INCREMENT for table `propertyowner`
+--
+ALTER TABLE `propertyowner`
+  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
 -- AUTO_INCREMENT for table `p_info`
 --
 ALTER TABLE `p_info`
-  MODIFY `p_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
+  MODIFY `p_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=109;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -175,10 +198,17 @@ ALTER TABLE `users`
 --
 
 --
+-- Constraints for table `propertyowner`
+--
+ALTER TABLE `propertyowner`
+  ADD CONSTRAINT `owner_id` FOREIGN KEY (`owner_id`) REFERENCES `owners_tb` (`own_id`),
+  ADD CONSTRAINT `property_id` FOREIGN KEY (`property_id`) REFERENCES `p_info` (`p_id`);
+
+--
 -- Constraints for table `p_info`
 --
 ALTER TABLE `p_info`
-  ADD CONSTRAINT `fk_owner` FOREIGN KEY (`ownId_Fk`) REFERENCES `owners_tb` (`own_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `ownID_FK` FOREIGN KEY (`ownID_Fk`) REFERENCES `owners_tb` (`own_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -19,11 +19,11 @@
   session_start(); // Start session at the top
 
   // Check if the user is logged in by verifying if 'user_id' exists in the session
-  if (!isset($_SESSION['user_id'])) {
+  /*if (!isset($_SESSION['user_id'])) {
     header("Location: index.php"); // Redirect to login page if user is not logged in
     exit; // Stop further execution after redirection
-  }
-  
+  }*/
+
   // Prevent the browser from caching this page
   header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
   header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
@@ -64,39 +64,94 @@
     // Convert the array of strings to an array of integers
     $selected_owner_ids = array_map('intval', $selected_owner_ids);
 
+    // Debugging: Print selected owner IDs
+    echo "<pre>";
+    print_r($selected_owner_ids);
+    echo "</pre>";
+
     if ($house_number && $city) {
-      // Prepare SQL statement to insert property
-      $stmt = $conn->prepare("INSERT INTO p_info (house_no, block_no, province, city, district, barangay, house_tag_no, land_area, desc_land, documents, ownID_Fk) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+      // Start a transaction to ensure atomicity of the insertions
+      $conn->begin_transaction();
 
-      if ($stmt) {
-        // Use the first selected owner ID (or handle cases with no owner IDs)
-        $owner_id = !empty($selected_owner_ids) ? $selected_owner_ids[0] : null;
+      try {
+        // Prepare SQL statement to insert property into p_info table
+        $stmt = $conn->prepare("INSERT INTO p_info (house_no, block_no, province, city, district, barangay, house_tag_no, land_area, desc_land, documents, ownID_Fk) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-        // Bind the parameters
-        $stmt->bind_param("iissssiissi", $house_number, $block_number, $province, $city, $district, $barangay, $house_tag, $land_area, $desc_land, $documents, $owner_id);
+        if ($stmt) {
+          // Use the first selected owner ID (or handle cases with no owner IDs)
+          $owner_id = !empty($selected_owner_ids) ? $selected_owner_ids[0] : null;
 
-        if ($stmt->execute()) {
-          $_SESSION['message'] = "Property Added with owner ID: " . htmlspecialchars($owner_id);
-          $_SESSION['property_added'] = true; // Set session variable to trigger modal
-          header("Location: " . $_SERVER['PHP_SELF']); // Redirect to the same page
-          exit;
+          // Bind the parameters
+          $stmt->bind_param("iissssiissi", $house_number, $block_number, $province, $city, $district, $barangay, $house_tag, $land_area, $desc_land, $documents, $owner_id);
+
+          if ($stmt->execute()) {
+            // Get the last inserted property ID
+            $property_id = $stmt->insert_id;
+
+            // Debugging: Print the inserted property ID
+            echo "<p>Inserted Property ID: $property_id</p>";
+
+            // Insert into propertyowner table for each selected owner
+            if (!empty($selected_owner_ids)) {
+              foreach ($selected_owner_ids as $owner_id) {
+                // Ensure that the owner exists before inserting into propertyowner
+                $check_owner_stmt = $conn->prepare("SELECT 1 FROM owners_tb WHERE own_id = ?");
+                $check_owner_stmt->bind_param("i", $owner_id);
+                $check_owner_stmt->execute();
+                $check_owner_stmt->store_result();
+
+                if ($check_owner_stmt->num_rows > 0) {
+                  // If the owner exists, insert into the propertyowner table
+                  $owner_stmt = $conn->prepare("INSERT INTO propertyowner (property_id, owner_id) VALUES (?, ?)");
+
+                  // Debug: Print the SQL query
+                  if ($owner_stmt === false) {
+                    echo "<p>Error preparing statement for propertyowner insertion: " . $conn->error . "</p>";
+                    echo "<p>SQL Query: INSERT INTO propertyowner (property_id, owner_id) VALUES ($property_id, $owner_id)</p>";  // Debug SQL query
+                  } else {
+                    $owner_stmt->bind_param("ii", $property_id, $owner_id);
+                    if ($owner_stmt->execute()) {
+                      $owner_stmt->close();
+                    } else {
+                      echo "<p>Error executing statement: " . $owner_stmt->error . "</p>";
+                    }
+                  }
+                } else {
+                  echo "<p>Error: Owner with ID $owner_id does not exist.</p>";
+                }
+
+                $check_owner_stmt->close();
+              }
+            }
+
+            // Commit the transaction after all inserts
+            $conn->commit();
+
+            // Session message and redirect
+            $_SESSION['message'] = "Property Added with owner ID(s): " . htmlspecialchars(implode(", ", $selected_owner_ids));
+            $_SESSION['property_added'] = true; // Set session variable to trigger modal
+            header("Location: " . $_SERVER['PHP_SELF']); // Redirect to the same page
+            exit;
+          } else {
+            throw new Exception("Error: " . $stmt->error);
+          }
+          $stmt->close();
         } else {
-          echo "<p>Error: " . $stmt->error . "</p>";
+          throw new Exception("Error preparing statement: " . $conn->error);
         }
-        $stmt->close();
-      } else {
-        echo "<p>Error preparing statement: " . $conn->error . "</p>";
+      } catch (Exception $e) {
+        // If an error occurs, rollback the transaction
+        $conn->rollback();
+        echo "<p>Transaction failed: " . $e->getMessage() . "</p>";
       }
     } else {
       echo "<p>Error: House number and city are required.</p>";
     }
   }
 
+  // Show modal after successful property addition
   if (isset($_SESSION['property_added']) && $_SESSION['property_added'] === true) {
-    // Clear the session variable after use
     unset($_SESSION['property_added']);
-
-    // Trigger the modal popup after the property is added
     echo "<script>
     window.onload = function() {
       $('#confirmationModal').modal('show');
@@ -104,10 +159,12 @@
   </script>";
   }
 
+  // Display session message
   if (isset($_SESSION['message'])) {
     echo "<p>" . $_SESSION['message'] . "</p>";
     unset($_SESSION['message']);
   }
+
   ?>
 
   <!-- Bootstrap Modal for Confirmation -->
