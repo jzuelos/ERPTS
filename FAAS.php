@@ -11,6 +11,31 @@
   header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
   header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
   header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility */
+
+require_once 'database.php';
+$conn = Database::getInstance();
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$p_id = $_GET['id']; // Get the property ID from the URL
+
+// Fetch the property and owner data
+$sql = "SELECT p.p_id, p.house_no, p.block_no, p.barangay, p.province, p.city, p.district, p.land_area, 
+               CONCAT(o.own_fname, ', ', o.own_mname, ' ', o.own_surname) AS owner_name
+        FROM p_info p
+        LEFT JOIN owners_tb o ON p.ownId_Fk = o.own_id
+        WHERE p.p_id = $p_id";
+
+
+$result = $conn->query($sql);
+$property = $result->fetch_assoc();
+
+if (!$property) {
+    echo "Property not found!";
+    exit;
+}
 ?>
 
 <!doctype html>
@@ -86,20 +111,14 @@
     </div>
     <button type="button" class="btn btn-outline-primary btn-sm" id="editOwnerBtn" onclick="showOISModal()">Edit</button>
   </div>
-  
-  <!-- Form Card -->
+
   <div class="card border-0 shadow p-4 rounded-3">
     <div id="owner-info" class="row">
       <div class="col-md-6 mb-4">
         <form>
           <div class="mb-3">
             <label for="ownerName" class="form-label">Company or Owner</label>
-            <input type="text" class="form-control" id="ownerName" placeholder="Enter company or owner name" disabled>
-          </div>
-          <div class="button-group d-flex align-items-center">
-            <button type="button" class="btn btn-outline-danger me-2" id="removeOwner" onclick="enableButtons()">Remove</button>
-            <a href="#" class="btn btn-link text-decoration-none" id="addOwner" onclick="enableButtons()">Add</a>
-            <a href="#" class="btn btn-link text-decoration-none" id="searchOwner" onclick="enableButtons()">Search</a>
+            <input type="text" class="form-control" id="ownerName" value="<?php echo $property['owner_name']; ?>" disabled>
           </div>
         </form>
       </div>
@@ -107,12 +126,7 @@
         <form>
           <div class="mb-3">
             <label for="ownerInputName" class="form-label">Name</label>
-            <input type="text" class="form-control" id="ownerInputName" placeholder="Enter name" disabled>
-          </div>
-          <div class="button-group d-flex align-items-center">
-            <button type="button" class="btn btn-outline-danger me-2" id="removeName" onclick="enableButtons()">Remove</button>
-            <a href="#" class="btn btn-link text-decoration-none" id="addName" onclick="enableButtons()">Add</a>
-            <a href="#" class="btn btn-link text-decoration-none" id="searchName" onclick="enableButtons()">Search</a>
+            <input type="text" class="form-control" id="ownerInputName" value="<?php echo $property['owner_name']; ?>" disabled>
           </div>
         </form>
       </div>
@@ -133,11 +147,11 @@
         <form id="editOwnerForm">
           <div class="mb-3">
             <label for="ownerNameModal" class="form-label">Company or Owner</label>
-            <input type="text" class="form-control" id="ownerNameModal" placeholder="Enter company or owner name">
+            <input type="text" class="form-control" id="ownerNameModal" value="<?php echo $property['owner_name']; ?>">
           </div>
           <div class="mb-3">
             <label for="ownerInputNameModal" class="form-label">Name</label>
-            <input type="text" class="form-control" id="ownerInputNameModal" placeholder="Enter name">
+            <input type="text" class="form-control" id="ownerInputNameModal" value="<?php echo $property['owner_name']; ?>">
           </div>
         </form>
       </div>
@@ -168,31 +182,31 @@
         <div class="col-md-6 mb-4">
           <div class="mb-3">
             <label for="barangay" class="form-label">Barangay</label>
-            <input type="text" class="form-control" id="barangay" placeholder="Enter barangay" disabled>
+            <input type="text" class="form-control" id="barangay" value="<?php echo $property['barangay']; ?>" placeholder="Enter barangay" disabled>
           </div>
         </div>
         <div class="col-md-6 mb-4">
           <div class="mb-3">
             <label for="municipality" class="form-label">Municipality</label>
-            <input type="text" class="form-control" id="municipality" placeholder="Enter municipality" disabled>
+            <input type="text" class="form-control" id="municipality" value="<?php echo $property['city']; ?>" placeholder="Enter municipality" disabled>
           </div>
         </div>
         <div class="col-md-6 mb-4">
           <div class="mb-3">
             <label for="province" class="form-label">Province</label>
-            <input type="text" class="form-control" id="province" placeholder="Enter province" disabled>
+            <input type="text" class="form-control" id="province" value="<?php echo $property['province']; ?>" placeholder="Enter province" disabled>
           </div>
         </div>
         <div class="col-md-6 mb-4">
           <div class="mb-3">
             <label for="houseNumber" class="form-label">House Number</label>
-            <input type="text" class="form-control" id="houseNumber" placeholder="Enter house number" disabled>
+            <input type="text" class="form-control" id="houseNumber" value="<?php echo $property['house_no']; ?>" placeholder="Enter house number" disabled>
           </div>
         </div>
         <div class="col-md-6 mb-4">
           <div class="mb-3">
             <label for="landArea" class="form-label">Land Area</label>
-            <input type="text" class="form-control" id="landArea" placeholder="Enter land area" disabled>
+            <input type="text" class="form-control" id="landArea" value="<?php echo $property['land_area']; ?>" placeholder="Enter land area" disabled>
           </div>
         </div>
         <div class="col-md-6 mb-4">
