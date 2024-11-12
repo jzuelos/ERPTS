@@ -2,7 +2,7 @@
   session_start();
 
   // Check if the user is logged in by verifying if 'user_id' exists in the session
-  if (!isset($_SESSION['user_id'])) {
+ /* if (!isset($_SESSION['user_id'])) {
     header("Location: index.php"); // Redirect to login page if user is not logged in
     exit; // Stop further execution after redirection
   }
@@ -10,8 +10,8 @@
   // Prevent the browser from caching this page
   header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
   header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
-  header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility
-?>
+  header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility */
+?> 
 
 <!doctype html>
 <html lang="en">
@@ -24,6 +24,7 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="Admin-Page-2.css">
   <title>Electronic Real Property Tax System</title>
@@ -82,33 +83,39 @@
       <h3 class="text-secondary" style="font-size: 2rem;">Admin</h3>
     </div>
 
-    <div class="control-panel card border-0 shadow rounded-lg mb-5 p-5">
-      <div class="card-body">
-        <h4 class="card-title mb-4 text-center" style="font-size: 1.75rem;">Control Panel</h4>
-        <div class="row">
-          <div class="col-lg-6 mb-4">
-            <a href="User-Control.php" class="text-decoration-none">
-              <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5">
-                <div class="card-body d-flex align-items-center">
-                  <img src="images/AdIc1.png" alt="User Control Icon" class="mr-4" width="60">
-                  <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">User Control</h5>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div class="col-lg-6 mb-4">
-            <a href="Admin-Modify.php" class="text-decoration-none">
-              <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5">
-                <div class="card-body d-flex align-items-center">
-                  <img src="images/AdIc2.png" alt="Sheet Modification Icon" class="mr-4" width="60">
-                  <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">Sheet Modification</h5>
-                </div>
-              </div>
-            </a>
-          </div>
+    <div class="row">
+  <div class="col-lg-4 mb-4">
+    <a href="User-Control.php" class="text-decoration-none">
+      <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+        <div class="card-body d-flex align-items-center justify-content-center">
+          <i class="fas fa-user mr-4" style="font-size: 2rem;"></i>
+          <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">User Control</h5>
         </div>
       </div>
-    </div>
+    </a>
+  </div>
+  <div class="col-lg-4 mb-4">
+    <a href="Admin-Modify.php" class="text-decoration-none">
+      <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+        <div class="card-body d-flex align-items-center justify-content-center">
+          <i class="fas fa-edit mr-4" style="font-size: 2rem;"></i>
+          <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">Sheet Modification</h5>
+        </div>
+      </div>
+    </a>
+  </div>
+  <!-- Location Button -->
+  <div class="col-lg-4 mb-4">
+    <a href="Location.php" class="text-decoration-none">
+      <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+        <div class="card-body d-flex align-items-center justify-content-center">
+          <i class="fas fa-map-marker-alt mr-4" style="font-size: 2rem;"></i>
+          <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">Location</h5>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
   </section>
 </main>
 
