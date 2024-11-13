@@ -19,22 +19,25 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$p_id = $_GET['id']; // Get the property ID from the URL
+$property = null; // Default to null in case no property is loaded
 
-// Fetch the property and owner data
-$sql = "SELECT p.p_id, p.house_no, p.block_no, p.barangay, p.province, p.city, p.district, p.land_area, 
-               CONCAT(o.own_fname, ', ', o.own_mname, ' ', o.own_surname) AS owner_name
-        FROM p_info p
-        LEFT JOIN owners_tb o ON p.ownId_Fk = o.own_id
-        WHERE p.p_id = $p_id";
+// Check if 'id' is provided in the URL
+if (isset($_GET['id']) && !empty($_GET['id'])) {
+    $p_id = $_GET['id']; // Get the property ID from the URL
 
+    // Prepare the SQL statement with a placeholder
+    $sql = "SELECT p.p_id, p.house_no, p.block_no, p.barangay, p.province, p.city, p.district, p.land_area, 
+                   CONCAT(o.own_fname, ', ', o.own_mname, ' ', o.own_surname) AS owner_name
+            FROM p_info p
+            LEFT JOIN owners_tb o ON p.ownId_Fk = o.own_id
+            WHERE p.p_id = ?";
 
-$result = $conn->query($sql);
-$property = $result->fetch_assoc();
-
-if (!$property) {
-    echo "Property not found!";
-    exit;
+    // Prepare and execute the statement
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $p_id); // Bind the parameter as an integer
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $property = $result->fetch_assoc();
 }
 ?>
 
@@ -118,7 +121,9 @@ if (!$property) {
         <form>
           <div class="mb-3">
             <label for="ownerName" class="form-label">Company or Owner</label>
-            <input type="text" class="form-control" id="ownerName" value="<?php echo $property['owner_name']; ?>" disabled>
+            <input type="text" class="form-control" id="ownerName" 
+                   value="<?php echo isset($property['owner_name']) ? htmlspecialchars($property['owner_name']) : ''; ?>" 
+                   placeholder="Enter Company or Owner" disabled>
           </div>
         </form>
       </div>
@@ -126,7 +131,9 @@ if (!$property) {
         <form>
           <div class="mb-3">
             <label for="ownerInputName" class="form-label">Name</label>
-            <input type="text" class="form-control" id="ownerInputName" value="<?php echo $property['owner_name']; ?>" disabled>
+            <input type="text" class="form-control" id="ownerInputName" 
+                   value="<?php echo isset($property['owner_name']) ? htmlspecialchars($property['owner_name']) : ''; ?>" 
+                   placeholder="Enter Owner" disabled>
           </div>
         </form>
       </div>
@@ -147,11 +154,15 @@ if (!$property) {
         <form id="editOwnerForm">
           <div class="mb-3">
             <label for="ownerNameModal" class="form-label">Company or Owner</label>
-            <input type="text" class="form-control" id="ownerNameModal" value="<?php echo $property['owner_name']; ?>">
+            <input type="text" class="form-control" id="ownerNameModal" 
+                   value="<?php echo isset($property['owner_name']) ? htmlspecialchars($property['owner_name']) : ''; ?>" 
+                   placeholder="Enter Company or Owner">
           </div>
           <div class="mb-3">
             <label for="ownerInputNameModal" class="form-label">Name</label>
-            <input type="text" class="form-control" id="ownerInputNameModal" value="<?php echo $property['owner_name']; ?>">
+            <input type="text" class="form-control" id="ownerInputNameModal" 
+                   value="<?php echo isset($property['owner_name']) ? htmlspecialchars($property['owner_name']) : ''; ?>" 
+                   placeholder="Enter Owner">
           </div>
         </form>
       </div>
@@ -176,64 +187,82 @@ if (!$property) {
         <div class="col-md-6 mb-4">
           <div class="mb-3">
             <label for="street" class="form-label">Street</label>
-            <input type="text" class="form-control" id="street" placeholder="Enter street" disabled>
+            <input type="text" class="form-control" id="street" 
+                   value="<?php echo isset($property['street']) ? htmlspecialchars($property['street']) : ''; ?>" 
+                   placeholder="Enter Street" disabled>
           </div>
         </div>
         <div class="col-md-6 mb-4">
           <div class="mb-3">
             <label for="barangay" class="form-label">Barangay</label>
-            <input type="text" class="form-control" id="barangay" value="<?php echo $property['barangay']; ?>" placeholder="Enter barangay" disabled>
+            <input type="text" class="form-control" id="barangay" 
+                   value="<?php echo isset($property['barangay']) ? htmlspecialchars($property['barangay']) : ''; ?>" 
+                   placeholder="Enter Barangay" disabled>
           </div>
         </div>
         <div class="col-md-6 mb-4">
           <div class="mb-3">
             <label for="municipality" class="form-label">Municipality</label>
-            <input type="text" class="form-control" id="municipality" value="<?php echo $property['city']; ?>" placeholder="Enter municipality" disabled>
+            <input type="text" class="form-control" id="municipality" 
+                   value="<?php echo isset($property['city']) ? htmlspecialchars($property['city']) : ''; ?>" 
+                   placeholder="Enter Municipality" disabled>
           </div>
         </div>
         <div class="col-md-6 mb-4">
           <div class="mb-3">
             <label for="province" class="form-label">Province</label>
-            <input type="text" class="form-control" id="province" value="<?php echo $property['province']; ?>" placeholder="Enter province" disabled>
+            <input type="text" class="form-control" id="province" 
+                   value="<?php echo isset($property['province']) ? htmlspecialchars($property['province']) : ''; ?>" 
+                   placeholder="Enter Province" disabled>
           </div>
         </div>
         <div class="col-md-6 mb-4">
           <div class="mb-3">
             <label for="houseNumber" class="form-label">House Number</label>
-            <input type="text" class="form-control" id="houseNumber" value="<?php echo $property['house_no']; ?>" placeholder="Enter house number" disabled>
+            <input type="text" class="form-control" id="houseNumber" 
+                   value="<?php echo isset($property['house_no']) ? htmlspecialchars($property['house_no']) : ''; ?>" 
+                   placeholder="Enter House Number" disabled>
           </div>
         </div>
         <div class="col-md-6 mb-4">
           <div class="mb-3">
             <label for="landArea" class="form-label">Land Area</label>
-            <input type="text" class="form-control" id="landArea" value="<?php echo $property['land_area']; ?>" placeholder="Enter land area" disabled>
+            <input type="text" class="form-control" id="landArea" 
+                   value="<?php echo isset($property['land_area']) ? htmlspecialchars($property['land_area']) : ''; ?>" 
+                   placeholder="Enter Land Area" disabled>
           </div>
         </div>
         <div class="col-md-6 mb-4">
           <div class="mb-3">
             <label for="zoneNumber" class="form-label">Zone Number</label>
-            <input type="text" class="form-control" id="zoneNumber" placeholder="Enter zone number" disabled>
+            <input type="text" class="form-control" id="zoneNumber" 
+                   value="<?php echo isset($property['zone_no']) ? htmlspecialchars($property['zone_no']) : ''; ?>" 
+                   placeholder="Enter Zone Number" disabled>
           </div>
         </div>
         <div class="col-md-6 mb-4">
           <div class="mb-3">
             <label for="ardNumber" class="form-label">ARD Number</label>
-            <input type="text" class="form-control" id="ardNumber" placeholder="Enter ARD number" disabled>
+            <input type="text" class="form-control" id="ardNumber" 
+                   value="<?php echo isset($property['ard_no']) ? htmlspecialchars($property['ard_no']) : ''; ?>" 
+                   placeholder="Enter ARD Number" disabled>
           </div>
         </div>
         <div class="col-md-6 mb-4">
           <div class="mb-3">
             <label for="taxability" class="form-label">Taxability</label>
             <select class="form-control" id="taxability" disabled>
-              <option value="Taxable">Taxable</option>
-              <option value="Non-Taxable">Non-Taxable</option>
+              <option value="Taxable" <?php echo (isset($property['taxability']) && $property['taxability'] == 'Taxable') ? 'selected' : ''; ?>>Taxable</option>
+              <option value="Non-Taxable" <?php echo (isset($property['taxability']) && $property['taxability'] == 'Non-Taxable') ? 'selected' : ''; ?>>Non-Taxable</option>
             </select>
           </div>
         </div>
         <div class="col-md-6 mb-4">
           <div class="mb-3">
             <label for="effectivity" class="form-label">Effectivity</label>
-            <input type="text" class="form-control" id="effectivity" placeholder="Enter effectivity date" disabled>
+            <input type="text" class="form-control" id="effectivity" 
+                   value="<?php echo isset($property['effectivity']) ? htmlspecialchars($property['effectivity']) : ''; ?>" 
+                   placeholder="Enter Effectivity Date" disabled>
           </div>
         </div>
       </div>
@@ -241,7 +270,7 @@ if (!$property) {
   </div>
 </section>
 
-  <!-- Modal for Editing Property Information -->
+<!-- Modal for Editing Property Information -->
 <div class="modal fade" id="editPropertyModal" tabindex="-1" aria-labelledby="editPropertyModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -256,46 +285,64 @@ if (!$property) {
             <!-- Location Fields -->
             <div class="col-12 mb-3">
               <label for="streetModal" class="form-label">Street</label>
-              <input type="text" class="form-control" id="streetModal" placeholder="Enter street">
+              <input type="text" class="form-control" id="streetModal" 
+                     value="<?php echo isset($property['street']) ? htmlspecialchars($property['street']) : ''; ?>" 
+                     placeholder="Enter Street">
             </div>
             <div class="col-12 mb-3">
               <label for="barangayModal" class="form-label">Barangay</label>
-              <input type="text" class="form-control" id="barangayModal" placeholder="Enter barangay">
+              <input type="text" class="form-control" id="barangayModal" 
+                     value="<?php echo isset($property['barangay']) ? htmlspecialchars($property['barangay']) : ''; ?>" 
+                     placeholder="Enter Barangay">
             </div>
             <div class="col-12 mb-3">
               <label for="municipalityModal" class="form-label">Municipality</label>
-              <input type="text" class="form-control" id="municipalityModal" placeholder="Enter municipality">
+              <input type="text" class="form-control" id="municipalityModal" 
+                     value="<?php echo isset($property['city']) ? htmlspecialchars($property['city']) : ''; ?>" 
+                     placeholder="Enter Municipality">
             </div>
             <div class="col-12 mb-3">
               <label for="provinceModal" class="form-label">Province</label>
-              <input type="text" class="form-control" id="provinceModal" placeholder="Enter province">
+              <input type="text" class="form-control" id="provinceModal" 
+                     value="<?php echo isset($property['province']) ? htmlspecialchars($property['province']) : ''; ?>" 
+                     placeholder="Enter Province">
             </div>
             <div class="col-12 mb-3">
               <label for="houseNumberModal" class="form-label">House Number</label>
-              <input type="text" class="form-control" id="houseNumberModal" placeholder="Enter house number">
+              <input type="text" class="form-control" id="houseNumberModal" 
+                     value="<?php echo isset($property['house_no']) ? htmlspecialchars($property['house_no']) : ''; ?>" 
+                     placeholder="Enter House Number">
             </div>
             <div class="col-12 mb-3">
               <label for="landAreaModal" class="form-label">Land Area</label>
-              <input type="text" class="form-control" id="landAreaModal" placeholder="Enter land area">
+              <input type="text" class="form-control" id="landAreaModal" 
+                     value="<?php echo isset($property['land_area']) ? htmlspecialchars($property['land_area']) : ''; ?>" 
+                     placeholder="Enter Land Area">
             </div>
             <div class="col-12 mb-3">
               <label for="zoneNumberModal" class="form-label">Zone Number</label>
-              <input type="text" class="form-control" id="zoneNumberModal" placeholder="Enter zone number">
+              <input type="text" class="form-control" id="zoneNumberModal" 
+                     value="<?php echo isset($property['zone_no']) ? htmlspecialchars($property['zone_no']) : ''; ?>" 
+                     placeholder="Enter Zone Number">
             </div>
             <div class="col-12 mb-3">
               <label for="ardNumberModal" class="form-label">ARD Number</label>
-              <input type="text" class="form-control" id="ardNumberModal" placeholder="Enter ARD number">
+              <input type="text" class="form-control" id="ardNumberModal" 
+                     value="<?php echo isset($property['ard_no']) ? htmlspecialchars($property['ard_no']) : ''; ?>" 
+                     placeholder="Enter ARD Number">
             </div>
             <div class="col-12 mb-3">
               <label for="taxabilityModal" class="form-label">Taxability</label>
               <select class="form-control" id="taxabilityModal">
-                <option value="Taxable">Taxable</option>
-                <option value="Non-Taxable">Non-Taxable</option>
+                <option value="Taxable" <?php echo (isset($property['taxability']) && $property['taxability'] == 'Taxable') ? 'selected' : ''; ?>>Taxable</option>
+                <option value="Non-Taxable" <?php echo (isset($property['taxability']) && $property['taxability'] == 'Non-Taxable') ? 'selected' : ''; ?>>Non-Taxable</option>
               </select>
             </div>
             <div class="col-12 mb-3">
               <label for="effectivityModal" class="form-label">Effectivity</label>
-              <input type="text" class="form-control" id="effectivityModal" placeholder="Enter effectivity date">
+              <input type="text" class="form-control" id="effectivityModal" 
+                     value="<?php echo isset($property['effectivity']) ? htmlspecialchars($property['effectivity']) : ''; ?>" 
+                     placeholder="Enter Effectivity Date">
             </div>
           </div>
         </form>
