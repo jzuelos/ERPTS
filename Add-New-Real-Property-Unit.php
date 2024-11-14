@@ -39,7 +39,9 @@
     die("Connection failed: " . $conn->connect_error);
   }
 
+  // Check if form is submitted via POST
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Sanitize inputs
     $house_number = filter_input(INPUT_POST, 'house_number', FILTER_SANITIZE_NUMBER_INT);
     $block_number = filter_input(INPUT_POST, 'block_number', FILTER_SANITIZE_NUMBER_INT);
     $province = filter_input(INPUT_POST, 'province', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -55,82 +57,80 @@
     $psd = isset($_POST['psd']) ? htmlspecialchars($_POST['psd'], ENT_QUOTES) : '';
 
     $desc_land = "$lot_no $zone_no $block_no $psd";
-
     $documents = isset($_POST['documents']) ? implode(', ', $_POST['documents']) : '';
 
-    // Get selected owner IDs from the hidden input field
     $selected_owner_ids = isset($_POST['selected_owner_ids']) ? explode(',', $_POST['selected_owner_ids']) : [];
-
-    // Convert the array of strings to an array of integers
     $selected_owner_ids = array_map('intval', $selected_owner_ids);
 
-    // Debugging: Print selected owner IDs
-    echo "<pre>";
-    print_r($selected_owner_ids);
-    echo "</pre>";
-
+    // Ensure house number and city are provided
     if ($house_number && $city) {
-      // Start a transaction to ensure atomicity of the insertions
       $conn->begin_transaction();
 
       try {
-        // Prepare SQL statement to insert property into p_info table
+        // Insert property data into p_info table
         $stmt = $conn->prepare("INSERT INTO p_info (house_no, block_no, province, city, district, barangay, house_tag_no, land_area, desc_land, documents, ownID_Fk) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
         if ($stmt) {
-          // Use the first selected owner ID (or handle cases with no owner IDs)
           $owner_id = !empty($selected_owner_ids) ? $selected_owner_ids[0] : null;
-
-          // Bind the parameters
           $stmt->bind_param("iissssiissi", $house_number, $block_number, $province, $city, $district, $barangay, $house_tag, $land_area, $desc_land, $documents, $owner_id);
 
           if ($stmt->execute()) {
-            // Get the last inserted property ID
             $property_id = $stmt->insert_id;
 
-            // Debugging: Print the inserted property ID
-            echo "<p>Inserted Property ID: $property_id</p>";
-
-            // Insert into propertyowner table for each selected owner
+            // Insert owners into propertyowner table and collect propertyowner_ids
+            $propertyowner_ids = [];
             if (!empty($selected_owner_ids)) {
               foreach ($selected_owner_ids as $owner_id) {
-                // Ensure that the owner exists before inserting into propertyowner
+                // Ensure the owner exists
                 $check_owner_stmt = $conn->prepare("SELECT 1 FROM owners_tb WHERE own_id = ?");
                 $check_owner_stmt->bind_param("i", $owner_id);
                 $check_owner_stmt->execute();
                 $check_owner_stmt->store_result();
 
                 if ($check_owner_stmt->num_rows > 0) {
-                  // If the owner exists, insert into the propertyowner table
+                  // Insert into propertyowner table and get the propertyowner_id
                   $owner_stmt = $conn->prepare("INSERT INTO propertyowner (property_id, owner_id) VALUES (?, ?)");
-
-                  // Debug: Print the SQL query
-                  if ($owner_stmt === false) {
-                    echo "<p>Error preparing statement for propertyowner insertion: " . $conn->error . "</p>";
-                    echo "<p>SQL Query: INSERT INTO propertyowner (property_id, owner_id) VALUES ($property_id, $owner_id)</p>";  // Debug SQL query
-                  } else {
+                  if ($owner_stmt) {
                     $owner_stmt->bind_param("ii", $property_id, $owner_id);
                     if ($owner_stmt->execute()) {
-                      $owner_stmt->close();
+                      // Get the last inserted propertyowner_id
+                      $propertyowner_id = $owner_stmt->insert_id;
+                      $propertyowner_ids[] = $propertyowner_id; // Collect owner IDs
                     } else {
-                      echo "<p>Error executing statement: " . $owner_stmt->error . "</p>";
+                      throw new Exception("Error inserting into propertyowner: " . $owner_stmt->error);
                     }
+                    $owner_stmt->close();
+                  } else {
+                    throw new Exception("Error preparing statement for propertyowner insertion: " . $conn->error);
                   }
                 } else {
                   echo "<p>Error: Owner with ID $owner_id does not exist.</p>";
                 }
-
                 $check_owner_stmt->close();
               }
             }
 
-            // Commit the transaction after all inserts
-            $conn->commit();
+            // Now insert a single FAAS record with all the owner IDs as JSON
+            $faas_stmt = $conn->prepare("INSERT INTO FAAS (pro_id, propertyowner_id) VALUES (?, ?)");
+            if ($faas_stmt) {
+              // Convert the owner IDs array to JSON format
+              $owners_json = json_encode($propertyowner_ids);
 
-            // Session message and redirect
+              $faas_stmt->bind_param("is", $property_id, $owners_json);
+              if ($faas_stmt->execute()) {
+                echo "<p>Inserted into FAAS for property_id $property_id with owners: " . implode(", ", $propertyowner_ids) . ".</p>";
+              } else {
+                throw new Exception("Error executing FAAS insertion: " . $faas_stmt->error);
+              }
+              $faas_stmt->close();
+            } else {
+              throw new Exception("Error preparing FAAS statement: " . $conn->error);
+            }
+
+            // Commit the transaction
+            $conn->commit();
             $_SESSION['message'] = "Property Added with owner ID(s): " . htmlspecialchars(implode(", ", $selected_owner_ids));
-            $_SESSION['property_added'] = true; // Set session variable to trigger modal
-            header("Location: " . $_SERVER['PHP_SELF']); // Redirect to the same page
+            $_SESSION['property_added'] = true;
+            header("Location: " . $_SERVER['PHP_SELF']);
             exit;
           } else {
             throw new Exception("Error: " . $stmt->error);
@@ -140,7 +140,7 @@
           throw new Exception("Error preparing statement: " . $conn->error);
         }
       } catch (Exception $e) {
-        // If an error occurs, rollback the transaction
+        // Rollback the transaction in case of error
         $conn->rollback();
         echo "<p>Transaction failed: " . $e->getMessage() . "</p>";
       }
@@ -153,10 +153,10 @@
   if (isset($_SESSION['property_added']) && $_SESSION['property_added'] === true) {
     unset($_SESSION['property_added']);
     echo "<script>
-    window.onload = function() {
-      $('#confirmationModal').modal('show');
-    };
-  </script>";
+  window.onload = function() {
+    $('#confirmationModal').modal('show');
+  };
+</script>";
   }
 
   // Display session message

@@ -2,10 +2,10 @@
 session_start();  // Start session at the top to access session variables
 
 // Check if the user is logged in by verifying if 'user_id' exists in the session
-if (!isset($_SESSION['user_id'])) {
+/*if (!isset($_SESSION['user_id'])) {
     header("Location: index.php"); // Redirect to login page if user is not logged in
     exit; // Stop further execution after redirection
-}
+}*/
 
 // Prevent the browser from caching this page
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Prevent caching
