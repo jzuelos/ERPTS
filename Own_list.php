@@ -96,18 +96,19 @@ if ($result->num_rows > 0) {
   <section class="container mt-5">
     <div class="card p-4">
       <h3 class="mb-4">Owner's List</h3>
-      <div class="form-row mb-4">
-        <div class="col-auto">
-          <label for="searchInput" class="sr-only">Search</label>
-          <div class="input-group">
-            <input type="text" class="form-control" id="searchInput" placeholder="Search">
-          </div>
-        </div>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+    <label for="searchInput" class="sr-only">Search</label>
+    <div class="input-group">
+      <input type="text" class="form-control" id="searchInput" placeholder="Search">
+      <div class="input-group-append">
 
-        <div class="col-auto">
-          <button type="button" class="btn btn-success btn-hover" onclick="filterTable()">Search</button>
+        <button type="button" class="btn btn-success btn-hover" onclick="filterTable()">Search</button>
         </div>
       </div>
+   </div>
+       <a href="Merge_Owners.php" class="btn btn-primary">Merge Owners</a>
+    </div>
 
       <!-- Table -->
       <div class="table-responsive">
