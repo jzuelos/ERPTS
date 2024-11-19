@@ -1,20 +1,6 @@
-<?php
-session_start();  // Start the session to access session variables
-
-// Check if the user is logged in by verifying if 'user_id' exists in the session
-if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php"); // Redirect to login page if user is not logged in
-    exit; // Stop further execution after redirection
-}
-
-// Prevent the browser from caching this page
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
-header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
-header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility
-?>
-
 <!doctype html>
 <html lang="en">
+
 <head>
   <!-- Required meta tags -->
   <meta charset="utf-8">
@@ -23,7 +9,10 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <link rel="stylesheet" href="main_layout.css">
+  <link rel="stylesheet" href="Home.css">
   <title>Electronic Real Property Tax System</title>
 </head>
 
@@ -65,37 +54,78 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
         <li class="nav-item">
           <a class="nav-link" href="Reports.php">Reports</a>
         </li>
-        <li class="nav-item" style="margin-left: 20px">
-          <!-- Logout button linking to logout.php -->
-          <a href="logout.php" class="btn btn-danger">Log Out</a>
+        <li class="nav-item" style = "margin-left: 20px">
+          <button type="button" class="btn btn-danger" data-toggle="button" aria-pressed="false" autocomplete="off">
+            Log Out</button>
         </li>
       </ul>
     </div>
   </nav>
 
-  <!-- Main Body -->
+  <!--Main Body-->
   <div class="container py-5 my-3">
-    <div class="row">
-      <!-- Large Horizontal Grid on the Left -->
-      <div class="col-lg-8">
-        <div class="bg-secondary text-white py-5" style="height: 270px;">Assessor's Information</div>
-      </div>
-
-      <!-- Two Square Grids on the Right -->
-      <div class="col-lg-4">
-        <div class="row">
-          <!-- Top Square -->
-          <div class="col-12 mb-3">
-            <div class="bg-secondary text-white p-5">Top Square</div>
-          </div>
-          <!-- Bottom Square -->
-          <div class="col-12">
-            <div class="bg-secondary text-white p-5">Bottom Square</div>
-          </div>
+    <div class="row justify-content-center">
+        <!-- Large Horizontal Grid on the Left -->
+        <div class="col-lg-8 mb-3">
+            <div class="modern-card">
+                <h3>Assessor's Office</h3>
+                <p>The Assessor's Office is a vital part of local government, tasked with determining the value of properties for taxation purposes. 
+                  By conducting detailed property appraisals and analyzing market trends, the office ensures that property tax assessments are fair and equitable.
+                   This process is crucial for funding essential community services like schools, infrastructure, and public safety. The office also provides 
+                   transparency and assistance to property owners, offering guidance on assessment processes and handling appeals. Through its commitment 
+                   to accuracy and fairness, the Assessor's Office supports the financial health and growth of the community.</p>
+                
+                              <!-- Image Slider -->
+                <div id="imageCarousel" class="carousel slide mt-4" data-bs-ride="carousel" data-bs-interval="3500">
+                    <div class="carousel-inner">
+                        <!-- First Slide -->
+                        <div class="carousel-item active">
+                            <img src="images/Doc2.jpg" class="d-block w-100" alt="Image 1">
+                        </div>
+                        <!-- Second Slide -->
+                        <div class="carousel-item">
+                            <img src="images/Doc3.jpg" class="d-block w-100" alt="Image 2">
+                        </div>
+                        <!-- Third Slide -->
+                        <div class="carousel-item">
+                            <img src="images/Doc4.jpg" class="d-block w-100" alt="Image 3">
+                        </div>
+                    </div>
+                    <!-- Previous Button -->
+                    <button class="carousel-control-prev custom-arrow" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <!-- Next Button -->
+                    <button class="carousel-control-next custom-arrow" type="button" data-bs-target="#imageCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+</div>
+</div>
+        <!-- Two Square Grids on the Right -->
+        <div class="col-lg-4">
+            <div class="row">
+                <!-- Top Square -->
+                <div class="col-12 mb-3">
+                    <div class="modern-card">
+                        <h3>Owner Statistics</h3>
+                        <p>Comprehensive data on property ownership trends and demographics.</p>
+                    </div>
+                </div>
+                <!-- Bottom Square -->
+                <div class="col-12">
+                    <div class="modern-card">
+                        <h3>Property Listings</h3>
+                        <p>Current listings and market analysis for properties in the area.</p>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
+
 
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
@@ -105,7 +135,10 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
     </div>
   </footer>
 
+
   <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
@@ -115,5 +148,8 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
     integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
+
 </html>
