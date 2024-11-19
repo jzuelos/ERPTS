@@ -1,3 +1,46 @@
+<?php
+require_once 'database.php';
+
+$conn = Database::getInstance();
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+  // Fetch owners from the database
+  $sql = "SELECT 
+  po.pO_id, 
+  po.property_id, 
+  po.owner_id, 
+  o.own_id, 
+  o.own_fname, 
+  o.own_mname, 
+  o.own_surname, 
+  o.house_no, 
+  o.street, 
+  o.barangay, 
+  o.district, 
+  o.city, 
+  o.province, 
+  o.own_info, 
+  p.property_name, 
+  p.property_type 
+FROM 
+  propertyowner po
+JOIN 
+  owners_tb o ON po.owner_id = o.own_id
+JOIN 
+  p_info p ON po.property_id = p.p_id";
+
+$owners = [];
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+while ($row = $result->fetch_assoc()) {
+$owners[] = $row;
+}
+}
+
+?>
+
 <!doctype html>
 <html lang="en">
 
@@ -60,7 +103,7 @@
 <section class="container mt-5 table-container">
     <div class="table-title">Merge Owners</div>
     <div class="table-responsive">
-      <table class="table table-striped table-hover">
+      <table class="table table-striped table-hover text-center">
         <thead class="thead-dark">
           <tr>
             <th scope="col" class="center-input">Choose Person</th>
@@ -69,7 +112,7 @@
             <th scope="col">Last Name</th>
             <th scope="col">First Name</th>
             <th scope="col">Middle Name</th>
-            <th scope="col">Address</th>
+            <th scope="col" style="width: 300px;">Address</th>
           </tr>
         </thead>
         <tbody>
