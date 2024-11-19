@@ -84,3 +84,15 @@
   .add-owner-button:hover {
     background-color: #218838; /* Darker green on hover */
   }
+
+  .modal-dialog {
+    max-width: 900px; /* Adjust the width as needed */
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-control {
+    width: 100%;
+  }
