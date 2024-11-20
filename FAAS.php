@@ -26,7 +26,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
   $p_id = $_GET['id']; // Get the property ID from the URL
 
   // Prepare the SQL statement with a placeholder
-  $sql = "SELECT p.p_id, p.house_no, p.block_no, p.barangay, p.province, p.city, p.district, p.land_area, 
+  $sql = "SELECT p.p_id, p.house_no, p.block_no, p.street, p.barangay, p.province, p.city, p.district, p.land_area, 
                    CONCAT(o.own_fname, ', ', o.own_mname, ' ', o.own_surname) AS owner_name
             FROM p_info p
             LEFT JOIN owners_tb o ON p.ownId_Fk = o.own_id
@@ -183,6 +183,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     <div class="card border-0 shadow p-4 rounded-3">
       <form id="property-info">
         <div class="row">
+        <input type="hidden" id="propertyIdModal" value="<?php echo isset($property['p_id']) ? htmlspecialchars($property['p_id']) : ''; ?>"> 
           <!-- Location Fields -->
           <div class="col-md-6 mb-4">
             <div class="mb-3">
@@ -283,6 +284,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
           <form id="editPropertyForm">
             <div class="row">
               <!-- Location Fields -->
+              <input type="hidden" id="propertyIdModal" value="<?php echo isset($property['p_id']) ? htmlspecialchars($property['p_id']) : ''; ?>">
               <div class="col-12 mb-3">
                 <label for="streetModal" class="form-label">Street</label>
                 <input type="text" class="form-control" id="streetModal"

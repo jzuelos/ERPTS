@@ -59,6 +59,7 @@ function showEditPropertyModal() {
 // Function to save the Property Information data from the modal
 function savePropertyData() {
   // Get data from modal fields
+  var propertyId = document.getElementById('propertyIdModal').value;
   var street = document.getElementById('streetModal').value;
   var barangay = document.getElementById('barangayModal').value;
   var municipality = document.getElementById('municipalityModal').value;
@@ -70,21 +71,36 @@ function savePropertyData() {
   var taxability = document.getElementById('taxabilityModal').value;
   var effectivity = document.getElementById('effectivityModal').value;
 
-  // Save the data back to the form fields
-  document.getElementById('street').value = street;
-  document.getElementById('barangay').value = barangay;
-  document.getElementById('municipality').value = municipality;
-  document.getElementById('province').value = province;
-  document.getElementById('houseNumber').value = houseNumber;
-  document.getElementById('landArea').value = landArea;
-  document.getElementById('zoneNumber').value = zoneNumber;
-  document.getElementById('ardNumber').value = ardNumber;
-  document.getElementById('taxability').value = taxability;
-  document.getElementById('effectivity').value = effectivity;
+  // Log to check if values are being captured
+  console.log("Saving property with ID:", propertyId);
 
-  // Close the modal
-  var myModal = bootstrap.Modal.getInstance(document.getElementById('editPropertyModal'));
-  myModal.hide();
+  // Create an AJAX request
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "FAASupdate_property.php", true);
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+  // Handle response
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4 && xhr.status === 200) {
+      console.log("Response:", xhr.responseText); // Debugging
+      alert("Property information updated successfully!");
+      var myModal = bootstrap.Modal.getInstance(document.getElementById('editPropertyModal'));
+      myModal.hide();
+    }
+  };
+
+  // Send data to PHP script
+  xhr.send("property_id=" + encodeURIComponent(propertyId) +
+           "&street=" + encodeURIComponent(street) +
+           "&barangay=" + encodeURIComponent(barangay) +
+           "&municipality=" + encodeURIComponent(municipality) +
+           "&province=" + encodeURIComponent(province) +
+           "&houseNumber=" + encodeURIComponent(houseNumber) +
+           "&landArea=" + encodeURIComponent(landArea) +
+           "&zoneNumber=" + encodeURIComponent(zoneNumber) +
+           "&ardNumber=" + encodeURIComponent(ardNumber) +
+           "&taxability=" + encodeURIComponent(taxability) +
+           "&effectivity=" + encodeURIComponent(effectivity));
 }
 
 //Function to show Plant and Trees modal

@@ -1,3 +1,28 @@
+<?php
+  session_start();  // Start session at the top to access session variables
+
+  // Check if the user is logged in by verifying if 'user_id' exists in the session
+  /*if (!isset($_SESSION['user_id'])) {
+      header("Location: index.php"); // Redirect to login page if user is not logged in
+      exit; // Stop further execution after redirection
+  }*/
+
+  // Prevent the browser from caching this page
+  header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Prevent caching
+  header("Cache-Control: post-check=0, pre-check=0", false); // Additional no-cache headers
+  header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility
+
+  error_reporting(E_ALL);
+  ini_set('display_errors', 1);
+
+  require_once 'database.php';
+
+  $conn = Database::getInstance();
+  if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+  }
+?>
+
 <!doctype html>
 <html lang="en">
 
@@ -17,6 +42,18 @@
 </head>
 
 <body>
+<?php
+    // Fetch total number of owners
+    $query_owners = "SELECT COUNT(*) AS total_owners FROM owners_tb";
+    $result_owners = $conn->query($query_owners);
+    $total_owners = $result_owners->fetch_assoc()['total_owners'];
+
+    // Fetch total number of properties
+    $query_properties = "SELECT COUNT(*) AS total_properties FROM p_info";
+    $result_properties = $conn->query($query_properties);
+    $total_properties = $result_properties->fetch_assoc()['total_properties'];
+?>
+
   <!-- Header Navigation -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
     <a class="navbar-brand">
@@ -104,28 +141,31 @@
                 </div>
 </div>
 </div>
-        <!-- Two Square Grids on the Right -->
-        <div class="col-lg-4">
-            <div class="row">
-                <!-- Top Square -->
-                <div class="col-12 mb-3">
-                    <div class="modern-card">
-                        <h3>Owner Statistics</h3>
-                        <p>Comprehensive data on property ownership trends and demographics.</p>
-                    </div>
-                </div>
-                <!-- Bottom Square -->
-                <div class="col-12">
-                    <div class="modern-card">
-                        <h3>Property Listings</h3>
-                        <p>Current listings and market analysis for properties in the area.</p>
-                    </div>
-                </div>
-            </div>
+<!-- Two Square Grids on the Right -->
+<div class="col-lg-4">
+  <div class="row">
+    <!-- Top Square -->
+    <div class="col-12 mb-3">
+      <a href="Own_list.php" style="text-decoration: none;">
+        <div class="modern-card">
+          <h3>Owner Statistics</h3>
+          <p>Comprehensive data on property ownership trends and demographics.</p>
+          <span id="owner-count" class="badge badge-secondary mt-2">Number of Owners: Fetching data...</span>
         </div>
+      </a>
     </div>
+    <!-- Bottom Square -->
+    <div class="col-12">
+      <a href="Real-Property-Unit-List.php" style="text-decoration: none;">
+        <div class="modern-card">
+          <h3>Property Listings</h3>
+          <p>Current listings and market analysis for properties in the area.</p>
+          <span id="property-count" class="badge badge-secondary mt-2">Number of Properties: Fetching data...</span>
+        </div>
+      </a>
+    </div>
+  </div>
 </div>
-
 
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
@@ -149,6 +189,18 @@
     integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Set timeout to simulate fetching data from the server
+    document.addEventListener("DOMContentLoaded", function() {
+      // Get the PHP values and update the page after a delay to simulate data fetching
+      setTimeout(() => {
+        // Replace inner HTML with PHP variables for counts
+        document.getElementById('owner-count').innerHTML = 'Number of Owners: <?php echo $total_owners; ?>';
+        document.getElementById('property-count').innerHTML = 'Number of Properties: <?php echo $total_properties; ?>';
+      }, 500); // Simulate a delay (500 ms) for loading
+    });
+  </script>
 
 </body>
 
