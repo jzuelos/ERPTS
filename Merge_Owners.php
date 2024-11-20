@@ -1,12 +1,38 @@
 <?php
+// Prevent caching of this page
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Pragma: no-cache");
+header("Expires: 0");
+
 require_once 'database.php';
 
 $conn = Database::getInstance();
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
-  // Fetch owners from the database
-  $sql = "SELECT 
+
+// Check if the user is logged in by verifying if 'user_id' exists in the session
+/*if (!isset($_SESSION['user_id'])) {
+  header("Location: index.php"); // Redirect to login page if user is not logged in
+  exit; // Stop further execution after redirection
+}*/
+
+// Set the number of records per page
+$records_per_page = 5;
+
+// Get the current page number (if not set, default to page 1)
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$start_from = ($page - 1) * $records_per_page;
+
+// Fetch the total number of records
+$total_sql = "SELECT COUNT(*) AS total FROM propertyowner";
+$total_result = $conn->query($total_sql);
+$total_row = $total_result->fetch_assoc();
+$total_records = $total_row['total'];
+$total_pages = ceil($total_records / $records_per_page);
+
+// Modify the original query to fetch paginated records
+$sql = "SELECT 
   po.pO_id, 
   po.property_id, 
   po.owner_id, 
@@ -20,25 +46,31 @@ if ($conn->connect_error) {
   o.district, 
   o.city, 
   o.province, 
-  o.own_info, 
-  p.property_name, 
-  p.property_type 
+  o.own_info
 FROM 
   propertyowner po
 JOIN 
   owners_tb o ON po.owner_id = o.own_id
 JOIN 
-  p_info p ON po.property_id = p.p_id";
+  p_info p ON po.property_id = p.p_id
+ORDER BY o.own_surname ASC, o.own_fname ASC  -- Sort first by surname, then by first name
+LIMIT $start_from, $records_per_page";
 
+// Fetch data for the current page
 $owners = [];
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
-while ($row = $result->fetch_assoc()) {
-$owners[] = $row;
-}
+  while ($row = $result->fetch_assoc()) {
+    $owners[] = $row;
+  }
 }
 
+// Fetch the total count of pO_id from the propertyowner table
+$total_sql = "SELECT COUNT(pO_id) AS total_pO FROM propertyowner";
+$total_result = $conn->query($total_sql);
+$total_row = $total_result->fetch_assoc();
+$total_pO_count = $total_row['total_pO'];
 ?>
 
 <!doctype html>
@@ -99,43 +131,69 @@ $owners[] = $row;
     </div>
   </nav>
 
-<!--Main Body-->
-<section class="container mt-5 table-container">
-    <div class="table-title">Merge Owners</div>
-    <div class="table-responsive">
-      <table class="table table-striped table-hover text-center">
-        <thead class="thead-dark">
-          <tr>
-            <th scope="col" class="center-input">Choose Person</th>
-            <th scope="col" class="center-input">Show/Hide Properties</th>
-            <th scope="col">Person ID</th>
-            <th scope="col">Last Name</th>
-            <th scope="col">First Name</th>
-            <th scope="col">Middle Name</th>
-            <th scope="col" style="width: 300px;">Address</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="center-input"><input type="radio" name="personChoice"></td>
-            <td class="center-input"><input type="checkbox" name="propertyDisplay"></td>
-            <td>1</td>
-            <td>Doe</td>
-            <td>John</td>
-            <td>C</td>
-            <td>123 Main St</td>
-          </tr>
-         <!-- Repeat <tr> for each row of data -->
-        </tbody>
-      </table>
-    </div>
-    <div class="btn-container">
-    <button type="button" class="btn btn-custom">Retain Owners</button>
-</div>
-  </section> 
+  <!--Main Body-->
+  <form method="post" action="Merge_Owners.php">
+    <section class="container mt-5 table-container">
+      <div class="table-title">Merge Owners</div>
+      <div class="table-responsive">
+        <div class="d-flex justify-content-end mb-2">
+          <div class="total-count">
+            <strong>Total Count:</strong> <?= $total_pO_count ?>
+          </div>
+        </div>
+        <table class="table table-striped table-hover text-center">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col" class="center-input">Choose Person</th>
+              <th scope="col" class="center-input" style="width:50px;">Show/Hide Properties</th>
+              <th scope="col">Person ID</th>
+              <th scope="col">Last Name</th>
+              <th scope="col">First Name</th>
+              <th scope="col">Middle Name</th>
+              <th scope="col" style="width: 300px;">Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($owners as $owner): ?>
+              <tr>
+                <td class="center-input"><input type="radio" name="personChoice[]" value="<?= $owner['owner_id']; ?>"></td>
+                <td class="center-input"><input type="checkbox" name="propertyDisplay[]" value="<?= $owner['property_id']; ?>"></td>
+                <td><?= $owner['pO_id']; ?></td>
+                <td><?= $owner['own_surname']; ?></td>
+                <td><?= $owner['own_fname']; ?></td>
+                <td><?= $owner['own_mname']; ?></td>
+                <td><?= $owner['house_no'] . ' ' . $owner['street'] . ', ' . $owner['barangay'] . ', ' . $owner['district'] . ', ' . $owner['city'] . ', ' . $owner['province']; ?></td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
 
- <!-- Footer -->
- <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
+      <div class="pagination">
+        <!-- Pagination controls -->
+        <?php if ($page > 1): ?>
+          <a href="Merge_Owners.php?page=1">First</a>&nbsp;&nbsp;
+          <a href="Merge_Owners.php?page=<?= $page - 1 ?>">
+            << </a>&nbsp;&nbsp;
+            <?php endif; ?>
+
+            <span>Page <?= $page ?> of <?= $total_pages ?></span>&nbsp;&nbsp;
+
+            <?php if ($page < $total_pages): ?>
+              <a href="Merge_Owners.php?page=<?= $page + 1 ?>">>></a>&nbsp;&nbsp;
+              <a href="Merge_Owners.php?page=<?= $total_pages ?>">Last</a>
+            <?php endif; ?>
+      </div>
+
+      <div class="btn-container">
+        <button type="submit" name="mergeOwners" class="btn btn-custom">Merge Owners</button>
+      </div>
+    </section>
+  </form>
+
+
+  <!-- Footer -->
+  <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
       © 2020 Copyright:
       <a class="text-body" href="https://mdbootstrap.com/">MDBootstrap.com</a>
@@ -148,7 +206,6 @@ $owners[] = $row;
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-
 </body>
 
 </html>
