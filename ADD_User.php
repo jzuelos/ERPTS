@@ -302,5 +302,44 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
         integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
         crossorigin="anonymous"></script>
+        <script>
+            // Capitalize input fields
+            function capitalizeInput(event) {
+                event.target.value = event.target.value.replace(/\b\w/g, function (char) {
+                    return char.toUpperCase();
+                });
+            }
+
+            // Ensure TIN contains only numbers
+            function validateTIN(event) {
+                let value = event.target.value;
+                event.target.value = value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+            }
+
+            // Function to restrict contact number to 11 digits
+            document.getElementById('contact_number').addEventListener('input', function(event) {
+                let value = event.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+                if (value.length > 11) {
+                    value = value.substring(0, 11); // Limit to 11 digits
+                }
+                event.target.value = value;
+            });
+
+            // Attach event listeners to input fields
+            document.addEventListener('DOMContentLoaded', function () {
+                // Capitalize fields
+                const capitalizeFields = document.querySelectorAll('#lastname, #firstname, #middlename, #street, #barangay, #district, #municipality, #province');
+                capitalizeFields.forEach(function (field) {
+                    field.addEventListener('input', capitalizeInput);
+                });
+
+                // Validate TIN to allow only numbers
+                document.getElementById('tin').addEventListener('input', validateTIN);
+
+                // Validate Contact Number to allow only 11 digits
+                document.getElementById('contact_number').addEventListener('input', validateContactNumber);
+            });
+        </script>
+
 </body>
 </html>
