@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 14, 2024 at 03:01 PM
+-- Generation Time: Nov 20, 2024 at 12:55 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -142,7 +142,8 @@ CREATE TABLE `owners_tb` (
 
 INSERT INTO `owners_tb` (`own_id`, `own_fname`, `own_mname`, `own_surname`, `tin_no`, `house_no`, `street`, `barangay`, `district`, `city`, `province`, `own_info`) VALUES
 (1, 'zuelos', '', 'john lloyd', 0, '', 'luzaragga', 'kalamunding', '2', 'labo', 'camarines norte', ''),
-(7, 'Renz', 'Dionela', 'Dioneda', 4234, '32423', 'asdfasd', 'fasdf', 'asdf', 'fasdf', 'fdasf', 'Telephone: , Fax: , Email: , Website: ');
+(7, 'Renz', 'Dionela', 'Dioneda', 4234, '32423', 'asdfasd', 'fasdf', 'asdf', 'fasdf', 'fdasf', 'Telephone: , Fax: , Email: , Website: '),
+(8, 'Senz', 'Dionela', 'Dioneda', 423, '423412', 'fasdfasdf', 'asdgasdg', 'xzfasd', 'fasefw', 'rawdsf', '');
 
 -- --------------------------------------------------------
 
@@ -172,7 +173,8 @@ INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`) VALUES
 (37, 126, 7),
 (38, 126, 1),
 (41, 128, 7),
-(42, 128, 1);
+(42, 128, 1),
+(43, 115, 8);
 
 -- --------------------------------------------------------
 
@@ -241,7 +243,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `last_name`, `first_name`, `middle_name`, `gender`, `birthdate`, `marital_status`, `tin`, `house_number`, `street`, `barangay`, `district`, `municipality`, `province`, `contact_number`, `email`, `status`, `user_type`) VALUES
-(6, 'username', '$2y$10$hUAqqmcCIDXnVvR81hmjuO7r.2x3tnlKu6yruJFKjr6LnIoPgnRK.', 'name', 'user', '', 'Male', '2003-11-14', 'Single', '1234', '1', '1', '1', '1', '1', '1', '1', 'testing@testing.com', 0, 'To Be Fixed');
+(8, ' username', '$2y$10$mw.E9y7TH5O3hTIwdU.w8.ZF1q9zzwkTtd3lqc5AQZPxXSE/FD2cO', 'Zuelos', 'John Lloyd', 'Villacruel', 'Male', '2003-04-09', 'Single', '131254325234234', '', 'Luzaragga', 'Kalamunding', '1', 'Labo', 'Camarines Norte', '09165217083', '', 0, 'To Be Fixed');
 
 --
 -- Indexes for dumped tables
@@ -309,13 +311,13 @@ ALTER TABLE `faas`
 -- AUTO_INCREMENT for table `owners_tb`
 --
 ALTER TABLE `owners_tb`
-  MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `propertyowner`
 --
 ALTER TABLE `propertyowner`
-  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `p_info`
@@ -327,7 +329,7 @@ ALTER TABLE `p_info`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Constraints for dumped tables
