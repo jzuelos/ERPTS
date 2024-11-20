@@ -51,7 +51,7 @@ if ($barangayResult->num_rows > 0) {
     }
 } else {
     $barangayOptions = '<option value="">No Barangays Available</option>';
-}
+} 
 ?> 
 
 <!doctype html>
@@ -180,13 +180,12 @@ if ($barangayResult->num_rows > 0) {
 </div>
   </section>
 
-<!-- Modal -->
+<!-- View All Modal -->
 <div class="modal fade" id="viewAllModal" tabindex="-1" aria-labelledby="viewAllModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="viewAllModalLabel">All Properties</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="table-responsive">

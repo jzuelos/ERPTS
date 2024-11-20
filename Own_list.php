@@ -5,7 +5,7 @@ session_start();
 /*if (!isset($_SESSION['user_id'])) {
     header("Location: index.php"); // Redirect to login page if not logged in
     exit;
-}*/
+}
 
 // Prevent caching
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
@@ -30,7 +30,7 @@ if ($result->num_rows > 0) {
   while ($row = $result->fetch_assoc()) {
     $owners[] = $row;
   }
-}
+}*/
 ?>
 
 <!doctype html>
@@ -166,7 +166,7 @@ if ($result->num_rows > 0) {
       <!-- View All Button -->
       <div class="d-flex justify-content-between mt-3">
         <a href="Add_POwner.php" class="btn btn-success add-owner-button">Add Owner</a>
-        <button type="button" class="btn btn-info">View All</button>
+        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#viewAllModal">View All</button>
       </div>
   </section>
 
@@ -265,6 +265,51 @@ if ($result->num_rows > 0) {
   </div>
 </div>
 
+<!-- View All Modal -->
+<div class="modal fade" id="viewAllModal" tabindex="-1" aria-labelledby="viewAllModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewAllModalLabel">All Owners</h5>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-bordered text-center modern-table">
+            <thead class="thead-dark">
+              <tr>
+                <th class="text-center align-middle">ID</th>
+                <th class="text-center align-middle">Name</th>
+                <th class="text-center align-middle">Address <br><small>House No., Street, District</small></th>
+                <th class="text-center align-middle">Information</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php if (!empty($owners)): ?>
+                <?php foreach ($owners as $owner): ?>
+                  <tr>
+                    <td><?= htmlspecialchars($owner['own_id']) ?></td>
+                    <td><?= htmlspecialchars($owner['own_fname'] . ' ' . $owner['own_mname'] . ' ' . $owner['own_surname']) ?></td>
+                    <td><?= htmlspecialchars($owner['house_no'] . ', ' . $owner['street'] . ', ' . $owner['barangay'] . ', ' . $owner['city'] . ', ' . $owner['district'] . ', ' . $owner['province']) ?></td>
+                    <td><?= htmlspecialchars($owner['own_info']) ?></td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="4">No records found</td>
+                </tr>
+              <?php endif; ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
@@ -282,6 +327,8 @@ if ($result->num_rows > 0) {
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
