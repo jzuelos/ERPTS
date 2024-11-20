@@ -1,5 +1,5 @@
 <?php
-session_start();  // Start session at the top to access session variables
+session_start();  //Start session at the top to access session variables
 
 // Check if the user is logged in by verifying if 'user_id' exists in the session
 /*if (!isset($_SESSION['user_id'])) {
@@ -52,7 +52,7 @@ if ($barangayResult->num_rows > 0) {
 } else {
     $barangayOptions = '<option value="">No Barangays Available</option>';
 }
-?>
+?> 
 
 <!doctype html>
 <html lang="en">
@@ -166,19 +166,61 @@ if ($barangayResult->num_rows > 0) {
         </table>
       </div>
 
-      <!-- Pagination Controls -->
-      <div class="pagination-controls mta-3">
-        <label for="pageSelect">Page: </label>
-        <select id="pageSelect" onchange="changePage()"></select>
-      </div>
+<!-- Pagination Controls -->
+<div class="pagination-controls mta-3">
+  <label for="pageSelect">Page: </label>
+  <select id="pageSelect" onchange="changePage()"></select>
+</div>
 
-      <!-- View All Button -->
-      <div class="view-all-container d-flex mt-3">
-        <div class="ml-auto">
-          <button type="button" class="btn btn-info">View All</button>
+    <!-- View All Button -->
+<div class="view-all-container d-flex mt-3">
+  <div class="ml-auto">
+    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#viewAllModal">View All</button>
+  </div>
+</div>
+  </section>
+
+<!-- Modal -->
+<div class="modal fade" id="viewAllModal" tabindex="-1" aria-labelledby="viewAllModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewAllModalLabel">All Properties</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-bordered text-center modern-table">
+            <thead>
+              <tr>
+                <th>OD ID</th>
+                <th>Owner</th>
+                <th>Location <br><small>(Barangay, City, Province)</small></th>
+                <th>Land Area</th>
+              </tr>
+            </thead>
+            <tbody id="modalTableBody">
+              <?php
+              // Display the fetched data in modal table rows
+              foreach ($propertyUnits as $unit) {
+                echo "<tr>
+                      <td>{$unit['p_id']}</td>
+                      <td>{$unit['owner']}</td>
+                      <td>{$unit['house_no']}, {$unit['barangay']}, {$unit['city']}, {$unit['province']}</td>
+                      <td>{$unit['land_area']}</td>
+                    </tr>";
+              }
+              ?>
+            </tbody>
+          </table>
         </div>
       </div>
-  </section>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
@@ -199,6 +241,8 @@ if ($barangayResult->num_rows > 0) {
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
     integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
