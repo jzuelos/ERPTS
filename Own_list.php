@@ -20,7 +20,7 @@ if ($conn->connect_error) {
 }
 
 // Fetch owners from the database
-$sql = "SELECT own_id, own_fname, own_mname, own_surname, house_no, street, barangay, district, city, province, own_info 
+$sql = "SELECT own_id, own_fname, own_mname, own_surname, tin_no, house_no, street, barangay, district, city, province, own_info 
         FROM owners_tb";
 
 $owners = [];
@@ -131,7 +131,21 @@ if ($result->num_rows > 0) {
             <td><?= htmlspecialchars($owner['house_no'] . ', ' . $owner['street'] . ', ' . $owner['barangay'] . ', ' . $owner['city'] . ', ' . $owner['district'] . ', ' . $owner['province']) ?></td>
             <td><?= htmlspecialchars($owner['own_info']) ?></td>
             <td>
-              <button class="btn btn-primary" data-toggle="modal" data-target="#editModal" data-id="<?= htmlspecialchars($owner['own_id']) ?>">EDIT</button>
+            <button class="btn btn-primary" 
+            data-toggle="modal" 
+            data-target="#editModal" 
+            data-id="<?= htmlspecialchars($owner['own_id']) ?>" 
+            data-fname="<?= htmlspecialchars($owner['own_fname']) ?>" 
+            data-mname="<?= htmlspecialchars($owner['own_mname']) ?>" 
+            data-sname="<?= htmlspecialchars($owner['own_surname']) ?>" 
+            data-tin="<?= htmlspecialchars($owner['tin_no'] ?? '') ?>" 
+            data-house="<?= htmlspecialchars($owner['house_no']) ?>" 
+            data-street="<?= htmlspecialchars($owner['street']) ?>" 
+            data-barangay="<?= htmlspecialchars($owner['barangay']) ?>" 
+            data-district="<?= htmlspecialchars($owner['district']) ?>" 
+            data-city="<?= htmlspecialchars($owner['city']) ?>" 
+            data-province="<?= htmlspecialchars($owner['province']) ?>">
+            EDIT</button>
             </td>
           </tr>
         <?php endforeach; ?>
@@ -186,12 +200,11 @@ if ($result->num_rows > 0) {
             </div>
           </div>
           <div class="form-group">
-            <label for="tinNo">Tin No.</label>
+            <label for="tinNo">TIN No.</label>
             <input type="text" class="form-control" id="tinNo" placeholder="Enter TIN number">
           </div>
 
-          <!-- Address -->
-          <h5>Address</h5>
+          <!-- Address Fields -->
           <div class="form-row">
             <div class="form-group col-md-6">
               <label for="houseNumber">House Number</label>
@@ -269,6 +282,76 @@ if ($result->num_rows > 0) {
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Capitalize first letter of text input fields
+      const capitalizeInput = (event) => {
+        const input = event.target;
+        let value = input.value;
+        input.value = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+      };
+
+      // Add event listeners to text input fields
+      const textInputs = document.querySelectorAll(
+        "#firstName, #middleName, #surname, #street, #barangay, #district, #city, #province"
+      );
+
+      textInputs.forEach(input => {
+        input.addEventListener("input", capitalizeInput);
+      });
+
+      // Limit phone number and fax to 11 digits
+      const limitPhoneFax = (event) => {
+        let value = event.target.value;
+        if (value.length > 11) {
+          event.target.value = value.slice(0, 11); // Limit to 11 characters
+        }
+      };
+
+      // Add event listeners to phone and fax input fields
+      const phoneFaxInputs = document.querySelectorAll("#telephone, #fax");
+
+      phoneFaxInputs.forEach(input => {
+        input.addEventListener("input", (event) => {
+          // Allow only numbers
+          event.target.value = event.target.value.replace(/[^0-9]/g, "");
+          limitPhoneFax(event);
+        });
+      });
+
+      // Handle modal data population
+      $('#editModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget); // Button that triggered the modal
+
+        // Extract data attributes
+        const id = button.data('id');
+        const fname = button.data('fname');
+        const mname = button.data('mname');
+        const sname = button.data('sname');
+        const tin = button.data('tin');
+        const house = button.data('house');
+        const street = button.data('street');
+        const barangay = button.data('barangay');
+        const district = button.data('district');
+        const city = button.data('city');
+        const province = button.data('province');
+
+        // Populate the modal fields
+        const modal = $(this);
+        modal.find('#firstName').val(fname);
+        modal.find('#middleName').val(mname);
+        modal.find('#surname').val(sname);
+        modal.find('#tinNo').val(tin);
+        modal.find('#houseNumber').val(house);
+        modal.find('#street').val(street);
+        modal.find('#barangay').val(barangay);
+        modal.find('#district').val(district);
+        modal.find('#city').val(city);
+        modal.find('#province').val(province);
+      });
+    });
+  </script>
 
 </body>
 
