@@ -11,7 +11,7 @@ session_start();
   header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
   header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
   header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility 
-
+*/
 require_once 'database.php';
 $conn = Database::getInstance();
 
@@ -26,7 +26,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
   $p_id = $_GET['id']; // Get the property ID from the URL
 
   // Prepare the SQL statement with a placeholder
-  $sql = "SELECT p.p_id, p.house_no, p.block_no, p.street, p.barangay, p.province, p.city, p.district, p.land_area, 
+  $sql = "SELECT p.p_id, p.house_no, p.block_no, p.barangay, p.province, p.city, p.district, p.land_area, 
                    CONCAT(o.own_fname, ', ', o.own_mname, ' ', o.own_surname) AS owner_name
             FROM p_info p
             LEFT JOIN owners_tb o ON p.ownId_Fk = o.own_id
@@ -38,7 +38,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
   $stmt->execute();
   $result = $stmt->get_result();
   $property = $result->fetch_assoc();
-} */
+}
 ?>
 
 <!doctype html>
@@ -387,6 +387,38 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
       </div>
     </div>
   </div>
+
+  <script>
+  // Function to capitalize the first letter of each word in the specified fields
+  function capitalizeFirstLetter(element) {
+    element.value = element.value.replace(/\b\w/g, function(char) { return char.toUpperCase(); });
+  }
+
+  // Function to allow only numeric input in ARD Number
+  function restrictToNumbers(element) {
+    element.value = element.value.replace(/[^0-9]/g, ''); // Removes any non-numeric character
+  }
+
+  // Event listeners for the required fields
+  document.getElementById("streetModal").addEventListener("input", function() {
+    capitalizeFirstLetter(this);
+  });
+  document.getElementById("barangayModal").addEventListener("input", function() {
+    capitalizeFirstLetter(this);
+  });
+  document.getElementById("municipalityModal").addEventListener("input", function() {
+    capitalizeFirstLetter(this);
+  });
+  document.getElementById("provinceModal").addEventListener("input", function() {
+    capitalizeFirstLetter(this);
+  });
+
+  // Event listener for ARD Number to restrict input to numbers only
+  document.getElementById("ardNumberModal").addEventListener("input", function() {
+    restrictToNumbers(this);
+  });
+</script>
+
 
   <!-- LAND Section -->
   <section class="container my-5" id="land-section">
