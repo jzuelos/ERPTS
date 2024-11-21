@@ -11,6 +11,7 @@ header("Expires: 0");
 
 require_once 'database.php';
 
+// Establish database connection
 $conn = Database::getInstance();
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
@@ -62,84 +63,80 @@ if ($result->num_rows > 0) {
   }
 }
 
-/*
-// Handle merging logic if the form is submitted
-if (isset($_POST['mergeOwners'])) {
-  if (isset($_POST['personChoice']) && count($_POST['personChoice']) > 1) {
-    $selected_owners = $_POST['personChoice'];
-    $main_owner_id = $selected_owners[0]; // First selected owner as the main owner
-    $other_owners = array_slice($selected_owners, 1); // All other owners to merge
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retainOwnersButton'])) {
+  echo 'Form is being submitted.<br>';
 
-    // Step 1: Update the `propertyowner` table to reassign properties
-    foreach ($other_owners as $owner_id) {
-      $update_sql = "UPDATE propertyowner SET owner_id = ? WHERE owner_id = ?";
-      $stmt = $conn->prepare($update_sql);
-      $stmt->bind_param("ii", $main_owner_id, $owner_id);
-      $stmt->execute();
-    }
+  // Get the selected person ID from the radio button
+  if (isset($_POST['personChoiceModal'])) {
+    $selectedPersonID = $_POST['personChoiceModal'];
+    echo 'Selected person ID: ' . $selectedPersonID . '<br>';
 
-    // Step 2: Update the `owners_tb` table to consolidate information
-    foreach ($other_owners as $owner_id) {
-      // Retrieve redundant owner's details
-      $owner_sql = "SELECT * FROM owners_tb WHERE own_id = ?";
-      $stmt = $conn->prepare($owner_sql);
-      $stmt->bind_param("i", $owner_id);
-      $stmt->execute();
-      $result = $stmt->get_result();
-      if ($result->num_rows > 0) {
-        $redundant_owner = $result->fetch_assoc();
+    // Get all selected owners' property IDs (showProperties[])
+    $selectedOwners = isset($_POST['showProperties']) ? $_POST['showProperties'] : [];
+    echo 'Selected property IDs: ';
+    print_r($selectedOwners);
+    echo '<br>';
 
-        // Fetch main owner's existing details
-        $main_owner_sql = "SELECT * FROM owners_tb WHERE own_id = ?";
-        $stmt2 = $conn->prepare($main_owner_sql);
-        $stmt2->bind_param("i", $main_owner_id);
-        $stmt2->execute();
-        $main_owner_result = $stmt2->get_result();
-        $main_owner = $main_owner_result->fetch_assoc();
+    // Loop through each selected owner and move properties to the selected person
+    foreach ($selectedOwners as $ownerID) {
+      // Exclude the selected person from being deleted
+      if ($ownerID != $selectedPersonID) {
+        // Step 1: Transfer the properties from the current owner to the selected person
+        $stmt = $conn->prepare("UPDATE propertyowner SET owner_id = ? WHERE owner_id = ?");
 
-        // Update the main owner's details if fields are missing
-        $updated_fname = empty($main_owner['own_fname']) ? $redundant_owner['own_fname'] : $main_owner['own_fname'];
-        $updated_mname = empty($main_owner['own_mname']) ? $redundant_owner['own_mname'] : $main_owner['own_mname'];
-        $updated_surname = empty($main_owner['own_surname']) ? $redundant_owner['own_surname'] : $main_owner['own_surname'];
-        $updated_address = empty($main_owner['house_no']) ? $redundant_owner['house_no'] : $main_owner['house_no'];
+        if ($stmt === false) {
+          echo "Error preparing UPDATE query: " . $conn->error;
+          exit;
+        }
 
-        // Update the main owner's record in `owners_tb`
-        $update_main_owner_sql = "UPDATE owners_tb SET 
-                  own_fname = ?, 
-                  own_mname = ?, 
-                  own_surname = ?, 
-                  house_no = ?, 
-                  street = ?, 
-                  barangay = ?, 
-                  district = ?, 
-                  city = ?, 
-                  province = ?, 
-                  own_info = ?
-              WHERE own_id = ?";
-        $stmt3 = $conn->prepare($update_main_owner_sql);
-        $stmt3->bind_param(
-          "ssssssssssi",
-          $updated_fname,
-          $updated_mname,
-          $updated_surname,
-          $updated_address,
-          $redundant_owner['street'],
-          $redundant_owner['barangay'],
-          $redundant_owner['district'],
-          $redundant_owner['city'],
-          $redundant_owner['province'],
-          $redundant_owner['own_info'],
-          $main_owner_id
-        );
-        $stmt3->execute();
+        $stmt->bind_param("ii", $selectedPersonID, $ownerID);
+
+        if (!$stmt->execute()) {
+          echo "Error executing UPDATE query: " . $stmt->error;
+          exit;
+        }
+
+        // Step 2: Optionally delete the owner if no longer needed
+        $stmt = $conn->prepare("DELETE FROM propertyowner WHERE owner_id = ?");
+
+        if ($stmt === false) {
+          echo "Error preparing DELETE query: " . $conn->error;
+          exit;
+        }
+
+        $stmt->bind_param("i", $ownerID);
+
+        if (!$stmt->execute()) {
+          echo "Error executing DELETE query: " . $stmt->error;
+          exit;
+        }
       }
     }
 
-    echo "<div class='alert alert-success'>Merging completed successfully. Owners have been updated.</div>";
+    // Step 3: Optionally delete the selected person from property_owners if required
+    $stmt = $conn->prepare("DELETE FROM propertyowner WHERE owner_id = ?");
+    if ($stmt === false) {
+      echo "Error preparing DELETE query for selected person: " . $conn->error;
+      exit;
+    }
+    $stmt->bind_param("i", $selectedPersonID);
+    if (!$stmt->execute()) {
+      echo "Error executing DELETE query for selected person: " . $stmt->error;
+      exit;
+    }
+
+    // Redirect to the same page to reload the table with updated data
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+
+    echo "Properties and owners merged successfully!";
   } else {
-    echo "<div class='alert alert-warning'>Please select at least two owners to merge.</div>";
+    echo "No person selected for merging.";
   }
-}*/
+} else {
+  echo "No form submission detected.";
+}
+
 
 // Fetch the total count of pO_id from the propertyowner table
 $total_sql = "SELECT COUNT(pO_id) AS total_pO FROM propertyowner";
@@ -332,7 +329,7 @@ $total_pO_count = $total_row['total_pO'];
               </div>
             </section>
             <div class="modal-footer">
-              <button type="submit" name="mergeOwners" class="btn btn-custom">Retain Owners</button>
+              <button type="submit" name="retainOwnersButton" class="btn btn-custom">Retain Owners</button>
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
           </form>
