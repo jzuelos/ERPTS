@@ -10,7 +10,7 @@ session_start();
   // Prevent the browser from caching this page
   header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
   header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
-  header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility */
+  header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility 
 
 require_once 'database.php';
 $conn = Database::getInstance();
@@ -38,7 +38,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
   $stmt->execute();
   $result = $stmt->get_result();
   $property = $result->fetch_assoc();
-}
+} */
 ?>
 
 <!doctype html>
@@ -103,76 +103,107 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
   </nav>
   <!--Main Body-->
 
-  <!-- Owner's Information Section -->
-  <section class="container mt-5" id="owner-info-section">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div class="d-flex align-items-center">
-        <a href="Real-Property-Unit-List.php">
-          <img src="images/backward.png" width="35" height="35" alt="Back">
-        </a>
-        <h4 class="ml-3 mb-0">Owner's Information</h4>
-      </div>
-      <button type="button" class="btn btn-outline-primary btn-sm" id="editOwnerBtn" onclick="showOISModal()">Edit</button>
+<!-- Owner's Information Section -->
+<section class="container mt-5" id="owner-info-section">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex align-items-center">
+      <a href="Real-Property-Unit-List.php">
+        <img src="images/backward.png" width="35" height="35" alt="Back">
+      </a>
+      <h4 class="ms-3 mb-0">Owner's Information</h4>
     </div>
+    <button type="button" class="btn btn-outline-primary btn-sm" id="editOwnerBtn" onclick="showOISModal()">Edit</button>
+  </div>
 
-    <div class="card border-0 shadow p-4 rounded-3">
-      <div id="owner-info" class="row">
-        <div class="col-md-6 mb-4">
-          <form>
-            <div class="mb-3">
-              <label for="ownerName" class="form-label">Company or Owner</label>
-              <input type="text" class="form-control" id="ownerName"
-                value="<?php echo isset($property['owner_name']) ? htmlspecialchars($property['owner_name']) : ''; ?>"
-                placeholder="Enter Company or Owner" disabled>
-            </div>
-          </form>
-        </div>
-        <div class="col-md-6 mb-4">
-          <form>
-            <div class="mb-3">
-              <label for="ownerInputName" class="form-label">Name</label>
-              <input type="text" class="form-control" id="ownerInputName"
-                value="<?php echo isset($property['owner_name']) ? htmlspecialchars($property['owner_name']) : ''; ?>"
-                placeholder="Enter Owner" disabled>
-            </div>
-          </form>
-        </div>
+  <div class="card border-0 shadow p-4 rounded-3">
+    <div id="owner-info" class="row">
+      <div class="col-md-12 mb-4">
+        <form>
+          <div class="mb-3 w-50">
+            <label for="ownerName" class="form-label">Company or Owner</label>
+            <input type="text" class="form-control" id="ownerName"
+              value="<?php echo isset($property['owner_name']) ? htmlspecialchars($property['owner_name']) : ''; ?>"
+              placeholder="Enter Company or Owner" disabled>
+          </div>
+        </form>
       </div>
-    </div>
-  </section>
-
-  <!-- Modal for Editing Owner's Information -->
-  <div class="modal fade" id="editOwnerModal" tabindex="-1" aria-labelledby="editOwnerModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editOwnerModalLabel">Edit Owner's Information</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Owner's Information Form inside Modal -->
-          <form id="editOwnerForm">
-            <div class="mb-3">
-              <label for="ownerNameModal" class="form-label">Company or Owner</label>
-              <input type="text" class="form-control" id="ownerNameModal"
-                value="<?php echo isset($property['owner_name']) ? htmlspecialchars($property['owner_name']) : ''; ?>"
-                placeholder="Enter Company or Owner">
-            </div>
-            <div class="mb-3">
-              <label for="ownerInputNameModal" class="form-label">Name</label>
-              <input type="text" class="form-control" id="ownerInputNameModal"
-                value="<?php echo isset($property['owner_name']) ? htmlspecialchars($property['owner_name']) : ''; ?>"
-                placeholder="Enter Owner">
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="saveOwnerData()">Save changes</button>
-        </div>
+      <div class="col-md-12">
+        <h6 class="mb-3">Name</h6>
+        <form class="row">
+          <div class="col-md-4 mb-3">
+            <label for="firstName" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="firstName"
+              value="<?php echo isset($property['first_name']) ? htmlspecialchars($property['first_name']) : ''; ?>"
+              placeholder="Enter First Name" disabled>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="middleName" class="form-label">Middle Name</label>
+            <input type="text" class="form-control" id="middleName"
+              value="<?php echo isset($property['middle_name']) ? htmlspecialchars($property['middle_name']) : ''; ?>"
+              placeholder="Enter Middle Name" disabled>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="lastName" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="lastName"
+              value="<?php echo isset($property['last_name']) ? htmlspecialchars($property['last_name']) : ''; ?>"
+              placeholder="Enter Last Name" disabled>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+</section>
+
+ <!-- Modal for Editing Owner's Information -->
+<div class="modal fade" id="editOwnerModal" tabindex="-1" aria-labelledby="editOwnerModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editOwnerModalLabel">Edit Owner's Information</h5>
+      </div>
+      <div class="modal-body">
+        <!-- Owner's Information Form inside Modal -->
+        <form id="editOwnerForm">
+          <!-- Company or Owner Section -->
+          <div class="mb-3">
+            <label for="ownerNameModal" class="form-label">Company or Owner</label>
+            <input type="text" class="form-control" id="ownerNameModal"
+              value="<?php echo isset($property['owner_name']) ? htmlspecialchars($property['owner_name']) : ''; ?>"
+              placeholder="Enter Company or Owner">
+          </div>
+
+          <hr class="my-4">
+
+          <!-- Name Section -->
+          <h6 class="mb-3">Name</h6>
+          <div class="mb-3">
+            <label for="firstNameModal" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="firstNameModal"
+              value="<?php echo isset($property['first_name']) ? htmlspecialchars($property['first_name']) : ''; ?>"
+              placeholder="Enter First Name">
+          </div>
+          <div class="mb-3">
+            <label for="middleNameModal" class="form-label">Middle Name</label>
+            <input type="text" class="form-control" id="middleNameModal"
+              value="<?php echo isset($property['middle_name']) ? htmlspecialchars($property['middle_name']) : ''; ?>"
+              placeholder="Enter Middle Name">
+          </div>
+          <div class="mb-3">
+            <label for="lastNameModal" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="lastNameModal"
+              value="<?php echo isset($property['last_name']) ? htmlspecialchars($property['last_name']) : ''; ?>"
+              placeholder="Enter Last Name">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="saveOwnerData()">Save changes</button>
+        <button type="button" class="btn btn-success" onclick="addOwnerData()">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
 
   <!-- Property Information Section -->
   <section class="container my-5" id="property-info-section">
