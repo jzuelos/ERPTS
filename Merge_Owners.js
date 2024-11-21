@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Get references to elements
-    const form = document.querySelector('form');
     const mergeOwnersButton = document.getElementById('mergeOwnersButton');
     const modalBody = document.getElementById('modalBody');
     const mergeOwnersModal = $('#mergeOwnersModal'); // jQuery reference to the modal
@@ -63,8 +62,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 <td>${middleName}</td>
                 <td>${address}</td>
             `;
-
-
             // Append the new row to the modal table
             modalBody.appendChild(newRow);
         });
