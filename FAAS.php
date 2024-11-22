@@ -203,31 +203,6 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
   </div>
 </div>
 
-<script>
-// Function to capitalize the first letter of each word
-function capitalizeFirstLetter(element) {
-  element.value = element.value.replace(/\b\w/g, function(char) {
-    return char.toUpperCase();
-  });
-}
-
-// Attach the function to the 'input' event of each relevant field
-document.addEventListener("DOMContentLoaded", function() {
-  // Apply to each input field in the owner info section and modal
-  const fieldsToCapitalize = ['ownerName', 'firstName', 'middleName', 'lastName', 
-                              'ownerNameModal', 'firstNameModal', 'middleNameModal', 'lastNameModal'];
-
-  fieldsToCapitalize.forEach(fieldId => {
-    const inputField = document.getElementById(fieldId);
-    if (inputField) {
-      inputField.addEventListener("input", function() {
-        capitalizeFirstLetter(inputField);
-      });
-    }
-  });
-});
-</script>
-
   <!-- Property Information Section -->
   <section class="container my-5" id="property-info-section">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -410,38 +385,6 @@ document.addEventListener("DOMContentLoaded", function() {
       </div>
     </div>
   </div>
-
-  <script>
-    // Function to capitalize the first letter of each word in the specified fields
-    function capitalizeFirstLetter(element) {
-      element.value = element.value.replace(/\b\w/g, function(char) { return char.toUpperCase(); });
-    }
-
-    // Function to allow only numeric input in ARD Number
-    function restrictToNumbers(element) {
-      element.value = element.value.replace(/[^0-9]/g, ''); // Removes any non-numeric character
-    }
-
-    // Event listeners for the required fields
-    document.getElementById("streetModal").addEventListener("input", function() {
-      capitalizeFirstLetter(this);
-    });
-    document.getElementById("barangayModal").addEventListener("input", function() {
-      capitalizeFirstLetter(this);
-    });
-    document.getElementById("municipalityModal").addEventListener("input", function() {
-      capitalizeFirstLetter(this);
-    });
-    document.getElementById("provinceModal").addEventListener("input", function() {
-      capitalizeFirstLetter(this);
-    });
-
-    // Event listener for ARD Number to restrict input to numbers only
-    document.getElementById("ardNumberModal").addEventListener("input", function() {
-      restrictToNumbers(this);
-    });
-  </script>
-
 
   <!-- LAND Section -->
   <section class="container my-5" id="land-section">
@@ -1212,6 +1155,47 @@ document.addEventListener("DOMContentLoaded", function() {
       <a class="text-body" href="https://mdbootstrap.com/">MDBootstrap.com</a>
     </div>
   </footer>
+
+  <script>
+  // Function to capitalize the first letter of each word
+  function capitalizeFirstLetter(element) {
+    element.value = element.value.replace(/\b\w/g, function(char) {
+      return char.toUpperCase();
+    });
+  }
+
+  // Function to allow only numeric input in ARD Number
+  function restrictToNumbers(element) {
+    element.value = element.value.replace(/[^0-9]/g, ''); // Removes any non-numeric character
+  }
+
+  // Attach the function to the 'input' event of each relevant field after DOM is fully loaded
+  document.addEventListener("DOMContentLoaded", function() {
+    // Apply capitalization to specific input fields in the owner info section and modal
+    const fieldsToCapitalize = [
+      'ownerName', 'firstName', 'middleName', 'lastName',
+      'ownerNameModal', 'firstNameModal', 'middleNameModal', 'lastNameModal',
+      'streetModal', 'barangayModal', 'municipalityModal', 'provinceModal'
+    ];
+
+    fieldsToCapitalize.forEach(fieldId => {
+      const inputField = document.getElementById(fieldId);
+      if (inputField) {
+        inputField.addEventListener("input", function() {
+          capitalizeFirstLetter(inputField);
+        });
+      }
+    });
+
+    // Event listener for ARD Number to restrict input to numbers only
+    const ardNumberField = document.getElementById("ardNumberModal");
+    if (ardNumberField) {
+      ardNumberField.addEventListener("input", function() {
+        restrictToNumbers(ardNumberField);
+      });
+    }
+  });
+  </script>
 
   <!-- Optional JavaScript -->
   <script src="http://localhost/ERPTS/main_layout.js"></script>
