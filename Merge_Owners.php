@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-/*error_reporting(E_ALL);
+error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Prevent caching of this page
@@ -120,7 +120,7 @@ if ($total_result && $total_result->num_rows > 0) {
     $total_pO_count = $total_row['total_pO'];
 } else {
     $total_pO_count = 0; // Default to 0 if no rows found
-}*/
+}
 ?>
 
 <!doctype html>
@@ -192,23 +192,26 @@ if ($total_result && $total_result->num_rows > 0) {
         </a>
         <div class="table-title">Merge Owners</div>
     </div>
-          <!-- Search Bar (on the left side) -->
-          <div>
-            <label for="searchInput" class="sr-only">Search</label>
-            <div class="input-group">
-              <input type="text" class="form-control w-50" id="searchInput" placeholder="Search">
-              <div class="input-group-append">
-                <button type="button" class="btn btn-success btn-hover" onclick="filterTable()">Search</button>
-              </div>
-            </div>
-          </div>
+          <!-- Search Bar -->
+  <div class="input-group" style="width: 300px;">
+    <input 
+      type="text" 
+      class="form-control" 
+      id="searchInput" 
+      placeholder="Search" 
+      aria-label="Search">
+    <div class="input-group-append">
+      <button 
+        type="button" 
+        class="btn btn-success btn-hover" 
+        onclick="filterTable()">Search</button>
+    </div>
+  </div>
 
-          <!-- Total Count (on the right side) -->
-          <div class="total-count">
-            <strong>Total Count:</strong> <?= $total_pO_count ?>
-          </div>
-        </div>
-      </div>
+  <!-- Total Count -->
+  <div class="total-count text-right">
+    <strong>Total Count:</strong> <?= $total_pO_count ?>
+  </div>
 
       <table class="table table-striped table-hover text-center">
         <thead class="thead-dark">

@@ -1,43 +1,43 @@
 .table-container {
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
-  .table-title {
-    color: black;
-    padding: 20px;
-    font-size: 22px;
-    font-weight: bold;
-  }
-  table {
-    margin-bottom: 0;
-  }
-  .center-input {
-    text-align: center;
-  }
-  .thead-custom {
-    background-color: #28242c;
-    color: white;
-  }
-  .btn-container {
-    text-align: right;
-    padding: 20px;
-  }
-  .btn-custom {
-    background-color: #38303f;
-    color: white; /* Black text */
-  }
-  
-  .btn-custom:hover {
-    background-color: #a0a29e; 
-    color: black; 
-  }
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.table-title {
+  color: black;
+  padding: 20px;
+  font-size: 22px;
+  font-weight: bold;
+}
+table {
+  margin-bottom: 0;
+}
+.center-input {
+  text-align: center;
+}
+.thead-custom {
+  background-color: #28242c;
+  color: white;
+}
+.btn-container {
+  text-align: right;
+  padding: 20px;
+}
+.btn-custom {
+  background-color: #38303f;
+  color: white; /* Black text */
+}
 
-  .header-container {
-    display: flex; /* Use flexbox to align items in a row */
-    align-items: center; /* Vertically center the items */
+.btn-custom:hover {
+  background-color: #a0a29e; 
+  color: black; 
+}
+
+.header-container {
+  display: flex; /* Use flexbox to align items in a row */
+  align-items: center; /* Vertically center the items */
 }
 
 .back-image {
-    border-radius: 30%;
+  border-radius: 30%;
 }
