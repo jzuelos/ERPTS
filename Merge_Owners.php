@@ -33,25 +33,28 @@ $total_pages = ceil($total_records / $records_per_page);
 
 // Modify the original query to fetch paginated records
 $sql = "SELECT 
-  po.pO_id, 
-  po.property_id, 
-  po.owner_id, 
-  o.own_id, 
-  o.own_fname, 
-  o.own_mname, 
-  o.own_surname,
-  p.barangay,
-  p.city,
-  p.district,
-  p.province
-FROM 
-  propertyowner po
-JOIN 
-  owners_tb o ON po.owner_id = o.own_id
-JOIN 
-  p_info p ON po.property_id = p.p_id
-ORDER BY o.own_surname ASC, o.own_fname ASC
-LIMIT $start_from, $records_per_page";
+   po.pO_id, 
+   po.property_id, 
+   po.owner_id, 
+   o.own_id, 
+   o.own_fname, 
+   o.own_mname, 
+   o.own_surname,
+   p.barangay,
+   p.city,
+   p.district,
+   p.province
+ FROM 
+   propertyowner po
+ JOIN 
+   owners_tb o ON po.owner_id = o.own_id
+ JOIN 
+   p_info p ON po.property_id = p.p_id
+ WHERE 
+   po.is_retained = 1  -- Only show retained properties
+ ORDER BY 
+   o.own_surname ASC, o.own_fname ASC
+ LIMIT $start_from, $records_per_page";
 
 // Fetch data for the current page
 $owners = [];
@@ -63,86 +66,61 @@ if ($result->num_rows > 0) {
   }
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retainOwnersButton'])) {
-  echo 'Form is being submitted.<br>';
+$conn->begin_transaction();
+try {
+  if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['retainOwnersButton'])) {
+    // Validate the retained person ID (pO_id)
+    if (!isset($_POST['personChoiceModal'])) {
+        echo 'Error: No person selected to retain ownership.<br>';
+        exit;
+    }
+    $selectedPersonID = $_POST['personChoiceModal'];  // The pO_id (primary key) of the retained owner
+    $selectedProperties = $_POST['showProperties'] ?? [];  // The properties to transfer
 
-  // Get the selected person ID from the radio button
-  if (isset($_POST['personChoiceModal'])) {
-    $selectedPersonID = $_POST['personChoiceModal'];
-    echo 'Selected person ID: ' . $selectedPersonID . '<br>';
-
-    // Get all selected owners' property IDs (showProperties[])
-    $selectedOwners = isset($_POST['showProperties']) ? $_POST['showProperties'] : [];
-    echo 'Selected property IDs: ';
-    print_r($selectedOwners);
-    echo '<br>';
-
-    // Loop through each selected owner and move properties to the selected person
-    foreach ($selectedOwners as $ownerID) {
-      // Exclude the selected person from being deleted
-      if ($ownerID != $selectedPersonID) {
-        // Step 1: Transfer the properties from the current owner to the selected person
-        $stmt = $conn->prepare("UPDATE propertyowner SET owner_id = ? WHERE owner_id = ?");
-
-        if ($stmt === false) {
-          echo "Error preparing UPDATE query: " . $conn->error;
-          exit;
-        }
-
-        $stmt->bind_param("ii", $selectedPersonID, $ownerID);
-
-        if (!$stmt->execute()) {
-          echo "Error executing UPDATE query: " . $stmt->error;
-          exit;
-        }
-
-        // Step 2: Optionally delete the owner if no longer needed
-        $stmt = $conn->prepare("DELETE FROM propertyowner WHERE owner_id = ?");
-
-        if ($stmt === false) {
-          echo "Error preparing DELETE query: " . $conn->error;
-          exit;
-        }
-
-        $stmt->bind_param("i", $ownerID);
-
-        if (!$stmt->execute()) {
-          echo "Error executing DELETE query: " . $stmt->error;
-          exit;
-        }
-      }
+    if (empty($selectedProperties)) {
+        echo 'Error: No properties selected for transfer.<br>';
+        exit;
     }
 
-    // Step 3: Optionally delete the selected person from property_owners if required
-    $stmt = $conn->prepare("DELETE FROM propertyowner WHERE owner_id = ?");
-    if ($stmt === false) {
-      echo "Error preparing DELETE query for selected person: " . $conn->error;
-      exit;
-    }
-    $stmt->bind_param("i", $selectedPersonID);
-    if (!$stmt->execute()) {
-      echo "Error executing DELETE query for selected person: " . $stmt->error;
-      exit;
+    // Step 1: Set is_retained = 0 for all other selected property owners
+    foreach ($selectedProperties as $pO_id) {
+        $isRetained = ($pO_id == $selectedPersonID) ? 1 : 0;  // Retained person gets 1, others get 0
+        $stmtUpdate = $conn->prepare("UPDATE propertyowner SET is_retained = ? WHERE pO_id = ?");
+        if ($stmtUpdate === false) {
+            echo "Error preparing UPDATE query for is_retained: " . $conn->error . '<br>';
+            continue;
+        }
+        $stmtUpdate->bind_param("ii", $isRetained, $pO_id);
+        if (!$stmtUpdate->execute()) {
+            echo "Error executing UPDATE query for pO_id $pO_id: " . $stmtUpdate->error . '<br>';
+            continue;
+        }
+        echo "Set is_retained = $isRetained for property with pO_id: $pO_id<br>";
     }
 
-    // Redirect to the same page to reload the table with updated data
+    // Commit the transaction after all updates
+    echo "Merge process completed successfully.";
+    $conn->commit();  // Commit the transaction
+
+    // Redirect to the same page to refresh the data
     header("Location: " . $_SERVER['PHP_SELF']);
-    exit;
-
-    echo "Properties and owners merged successfully!";
-  } else {
-    echo "No person selected for merging.";
+    exit;  // Ensure no further code is executed after the redirect
   }
-} else {
-  echo "No form submission detected.";
+} catch (Exception $e) {
+    $conn->rollback();  // Rollback transaction on error
+    echo "Transaction failed: " . $e->getMessage();
 }
 
-
-// Fetch the total count of pO_id from the propertyowner table
-$total_sql = "SELECT COUNT(pO_id) AS total_pO FROM propertyowner";
+// Fetch the total count of retained pO_id from the propertyowner table
+$total_sql = "SELECT COUNT(pO_id) AS total_pO FROM propertyowner WHERE is_retained = 1";
 $total_result = $conn->query($total_sql);
-$total_row = $total_result->fetch_assoc();
-$total_pO_count = $total_row['total_pO'];
+
+if ($total_result && $total_result->num_rows > 0) {
+    $total_row = $total_result->fetch_assoc();
+    $total_pO_count = $total_row['total_pO'];
+} else {
+    $total_pO_count = 0; // Default to 0 if no rows found
+}
 ?>
 
 <!doctype html>
@@ -307,32 +285,38 @@ $total_pO_count = $total_row['total_pO'];
         </div>
         <div class="modal-body">
           <form method="post" action="Merge_Owners.php">
-            <section class="container table-container">
-              <div class="table-title">Merge Owners</div>
-              <div class="table-responsive">
-                <table class="table table-striped table-hover text-center">
-                  <thead class="thead-dark">
-                    <tr>
-                      <th scope="col" class="center-input">Choose Person</th>
-                      <th scope="col" class="center-input" style="width:50px;">Show/Hide Properties</th>
-                      <th scope="col">Person ID</th>
-                      <th scope="col">Last Name</th>
-                      <th scope="col">First Name</th>
-                      <th scope="col">Middle Name</th>
-                      <th scope="col" style="width: 300px;">Property Address</th>
-                    </tr>
-                  </thead>
-                  <tbody id="modalBody">
-                    <!-- Dynamic content will be populated here via JavaScript -->
-                  </tbody>
-                </table>
-              </div>
-            </section>
-            <div class="modal-footer">
-              <button type="submit" name="retainOwnersButton" class="btn btn-custom">Retain Owners</button>
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-          </form>
+  <section class="container table-container">
+    <div class="table-title">Choose Owner to Retain</div>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover text-center">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col" class="center-input">Choose Person</th>
+            <th scope="col" class="center-input" style="width:50px;">Show/Hide Properties</th>
+            <th scope="col">Person ID</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Middle Name</th>
+            <th scope="col" style="width: 300px;">Property Address</th>
+          </tr>
+        </thead>
+        <tbody id="modalBody">
+          <!-- Dynamic content will be populated here via JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Hidden Fields for selectedPersonID and selectedProperties -->
+  <input type="hidden" name="selectedPersonID" id="selectedPersonID">
+  <input type="hidden" name="selectedProperties" id="selectedProperties">
+
+  <div class="modal-footer">
+    <button type="submit" name="retainOwnersButton" class="btn btn-custom">Retain Owners</button>
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+  </div>
+</form>
+
         </div>
       </div>
     </div>
