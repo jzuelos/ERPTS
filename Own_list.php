@@ -97,68 +97,69 @@ if ($result->num_rows > 0) {
     <div class="card p-4">
       <h3 class="mb-4">Owner's List</h3>
       <div class="d-flex justify-content-between align-items-center mb-4">
-      <div>
-    <label for="searchInput" class="sr-only">Search</label>
-    <div class="input-group">
-      <input type="text" class="form-control" id="searchInput" placeholder="Search">
-      <div class="input-group-append">
+        <div>
+          <label for="searchInput" class="sr-only">Search</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="searchInput" placeholder="Search">
+            <div class="input-group-append">
 
-        <button type="button" class="btn btn-success btn-hover" onclick="filterTable()">Search</button>
+              <button type="button" class="btn btn-success btn-hover" onclick="filterTable()">Search</button>
+            </div>
+          </div>
         </div>
+        <a href="Merge_Owners.php" class="btn btn-primary">Merge Owners</a>
       </div>
-   </div>
-       <a href="Merge_Owners.php" class="btn btn-primary">Merge Owners</a>
-    </div>
 
-     <!-- Table -->
-<div class="table-responsive">
-  <table class="table table-bordered text-center modern-table" id="propertyTable">
-    <thead class="thead-dark">
-      <tr>
-        <th class="text-center align-middle">ID</th>
-        <th class="text-center align-middle">Name</th>
-        <th class="text-center align-middle">Address <br><small>House No., Street, District</small></th>
-        <th class="text-center align-middle">Information</th>
-        <th class="text-center align-middle">Edit</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php if (!empty($owners)): ?>
-        <?php foreach ($owners as $owner): ?>
-          <tr>
-            <td><?= htmlspecialchars($owner['own_id']) ?></td>
-            <td><?= htmlspecialchars($owner['own_fname'] . ' ' . $owner['own_mname'] . ' ' . $owner['own_surname']) ?></td>
-            <td><?= htmlspecialchars($owner['house_no'] . ', ' . $owner['street'] . ', ' . $owner['barangay'] . ', ' . $owner['city'] . ', ' . $owner['district'] . ', ' . $owner['province']) ?></td>
-            <td><?= htmlspecialchars($owner['own_info']) ?></td>
-            <td>
-            <button class="btn btn-primary" 
-            data-toggle="modal" 
-            data-target="#editModal" 
-            data-id="<?= htmlspecialchars($owner['own_id']) ?>" 
-            data-fname="<?= htmlspecialchars($owner['own_fname']) ?>" 
-            data-mname="<?= htmlspecialchars($owner['own_mname']) ?>" 
-            data-sname="<?= htmlspecialchars($owner['own_surname']) ?>" 
-            data-tin="<?= htmlspecialchars($owner['tin_no'] ?? '') ?>" 
-            data-house="<?= htmlspecialchars($owner['house_no']) ?>" 
-            data-street="<?= htmlspecialchars($owner['street']) ?>" 
-            data-barangay="<?= htmlspecialchars($owner['barangay']) ?>" 
-            data-district="<?= htmlspecialchars($owner['district']) ?>" 
-            data-city="<?= htmlspecialchars($owner['city']) ?>" 
-            data-province="<?= htmlspecialchars($owner['province']) ?>">
-            EDIT</button>
-            </td>
-          </tr>
-        <?php endforeach; ?>
-      <?php else: ?>
-        <tr>
-          <td colspan="5">No records found</td>
-        </tr>
-      <?php endif; ?>
-    </tbody>
-  </table>
-</div>
+      <!-- Table -->
+      <div class="table-responsive">
+        <table class="table table-bordered text-center modern-table" id="propertyTable">
+          <thead class="thead-dark">
+            <tr>
+              <th class="text-center align-middle">ID</th>
+              <th class="text-center align-middle">Name</th>
+              <th class="text-center align-middle">Address <br><small>House No., Street, District</small></th>
+              <th class="text-center align-middle">Information</th>
+              <th class="text-center align-middle">Edit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php if (!empty($owners)): ?>
+              <?php foreach ($owners as $owner): ?>
+                <tr>
+                  <td><?= htmlspecialchars($owner['own_id']) ?></td>
+                  <td><?= htmlspecialchars($owner['own_fname'] . ' ' . $owner['own_mname'] . ' ' . $owner['own_surname']) ?></td>
+                  <td><?= htmlspecialchars($owner['house_no'] . ', ' . $owner['street'] . ', ' . $owner['barangay'] . ', ' . $owner['city'] . ', ' . $owner['district'] . ', ' . $owner['province']) ?></td>
+                  <td><?= htmlspecialchars($owner['own_info']) ?></td>
+                  <td>
+                    <button class="btn btn-primary"
+                      data-toggle="modal"
+                      data-target="#editModal"
+                      data-id="<?= htmlspecialchars($owner['own_id']) ?>"
+                      data-fname="<?= htmlspecialchars($owner['own_fname']) ?>"
+                      data-mname="<?= htmlspecialchars($owner['own_mname']) ?>"
+                      data-sname="<?= htmlspecialchars($owner['own_surname']) ?>"
+                      data-tin="<?= htmlspecialchars($owner['tin_no'] ?? '') ?>"
+                      data-house="<?= htmlspecialchars($owner['house_no']) ?>"
+                      data-street="<?= htmlspecialchars($owner['street']) ?>"
+                      data-barangay="<?= htmlspecialchars($owner['barangay']) ?>"
+                      data-district="<?= htmlspecialchars($owner['district']) ?>"
+                      data-city="<?= htmlspecialchars($owner['city']) ?>"
+                      data-province="<?= htmlspecialchars($owner['province']) ?>">
+                      EDIT</button>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <tr>
+                <td colspan="5">No records found</td>
+              </tr>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
       <div class="d-flex align-items-center mt-3">
-        <a href="javascript:void(0)" id="backBtn" class="mr-2"><<</a>
+        <a href="javascript:void(0)" id="backBtn" class="mr-2">
+          <<< /a>
             <span class="mr-2">Page:</span>
             <select id="pageSelect" class="form-control form-control-sm w-auto mr-2"></select>
             <a href="javascript:void(0)" id="nextBtn" class="ml-2">>></a>
@@ -170,144 +171,144 @@ if ($result->num_rows > 0) {
       </div>
   </section>
 
-  
- <!-- Edit Modal -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editModalLabel">Edit Owner Information</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <!-- Basic Information -->
-        <h5>Basic Information</h5>
-        <form>
-          <div class="form-row">
-            <div class="form-group col-md-4">
-              <label for="firstName">First Name</label>
-              <input type="text" class="form-control" id="firstName" placeholder="Enter first name">
-            </div>
-            <div class="form-group col-md-4">
-              <label for="middleName">Middle Name</label>
-              <input type="text" class="form-control" id="middleName" placeholder="Enter middle name">
-            </div>
-            <div class="form-group col-md-4">
-              <label for="surname">Surname</label>
-              <input type="text" class="form-control" id="surname" placeholder="Enter surname">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="tinNo">TIN No.</label>
-            <input type="text" class="form-control" id="tinNo" placeholder="Enter TIN number">
-          </div>
 
-          <!-- Address Fields -->
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="houseNumber">House Number</label>
-              <input type="text" class="form-control" id="houseNumber" placeholder="Enter house number">
+  <!-- Edit Modal -->
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Edit Owner Information</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Basic Information -->
+          <h5>Basic Information</h5>
+          <form>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="firstName">First Name</label>
+                <input type="text" class="form-control" id="firstName" placeholder="Enter first name">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="middleName">Middle Name</label>
+                <input type="text" class="form-control" id="middleName" placeholder="Enter middle name">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="surname">Surname</label>
+                <input type="text" class="form-control" id="surname" placeholder="Enter surname">
+              </div>
             </div>
-            <div class="form-group col-md-6">
-              <label for="street">Street</label>
-              <input type="text" class="form-control" id="street" placeholder="Enter street">
+            <div class="form-group">
+              <label for="tinNo">TIN No.</label>
+              <input type="text" class="form-control" id="tinNo" placeholder="Enter TIN number">
             </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="barangay">Barangay</label>
-              <input type="text" class="form-control" id="barangay" placeholder="Enter barangay">
-            </div>
-            <div class="form-group col-md-6">
-              <label for="district">District</label>
-              <input type="text" class="form-control" id="district" placeholder="Enter district">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="city">City</label>
-              <input type="text" class="form-control" id="city" placeholder="Enter city">
-            </div>
-            <div class="form-group col-md-6">
-              <label for="province">Province</label>
-              <input type="text" class="form-control" id="province" placeholder="Enter province">
-            </div>
-          </div>
 
-          <!-- Owner Information -->
-          <h5>Owner Information</h5>
-          <div class="form-row">
-            <div class="form-group col-md-4">
-              <label for="telephone">Telephone</label>
-              <input type="text" class="form-control" id="telephone" placeholder="Enter telephone number">
+            <!-- Address Fields -->
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="houseNumber">House Number</label>
+                <input type="text" class="form-control" id="houseNumber" placeholder="Enter house number">
+              </div>
+              <div class="form-group col-md-6">
+                <label for="street">Street</label>
+                <input type="text" class="form-control" id="street" placeholder="Enter street">
+              </div>
             </div>
-            <div class="form-group col-md-4">
-              <label for="fax">Fax</label>
-              <input type="text" class="form-control" id="fax" placeholder="Enter fax number">
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="barangay">Barangay</label>
+                <input type="text" class="form-control" id="barangay" placeholder="Enter barangay">
+              </div>
+              <div class="form-group col-md-6">
+                <label for="district">District</label>
+                <input type="text" class="form-control" id="district" placeholder="Enter district">
+              </div>
             </div>
-            <div class="form-group col-md-4">
-              <label for="email">Email</label>
-              <input type="email" class="form-control" id="email" placeholder="Enter email address">
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="city">City</label>
+                <input type="text" class="form-control" id="city" placeholder="Enter city">
+              </div>
+              <div class="form-group col-md-6">
+                <label for="province">Province</label>
+                <input type="text" class="form-control" id="province" placeholder="Enter province">
+              </div>
             </div>
-          </div>
-          <div class="form-group">
-            <label for="website">Website</label>
-            <input type="text" class="form-control" id="website" placeholder="Enter website">
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- View All Modal -->
-<div class="modal fade" id="viewAllModal" tabindex="-1" aria-labelledby="viewAllModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="viewAllModalLabel">All Owners</h5>
-      </div>
-      <div class="modal-body">
-        <div class="table-responsive">
-          <table class="table table-bordered text-center modern-table">
-            <thead class="thead-dark">
-              <tr>
-                <th class="text-center align-middle">ID</th>
-                <th class="text-center align-middle">Name</th>
-                <th class="text-center align-middle">Address <br><small>House No., Street, District</small></th>
-                <th class="text-center align-middle">Information</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php if (!empty($owners)): ?>
-                <?php foreach ($owners as $owner): ?>
-                  <tr>
-                    <td><?= htmlspecialchars($owner['own_id']) ?></td>
-                    <td><?= htmlspecialchars($owner['own_fname'] . ' ' . $owner['own_mname'] . ' ' . $owner['own_surname']) ?></td>
-                    <td><?= htmlspecialchars($owner['house_no'] . ', ' . $owner['street'] . ', ' . $owner['barangay'] . ', ' . $owner['city'] . ', ' . $owner['district'] . ', ' . $owner['province']) ?></td>
-                    <td><?= htmlspecialchars($owner['own_info']) ?></td>
-                  </tr>
-                <?php endforeach; ?>
-              <?php else: ?>
-                <tr>
-                  <td colspan="4">No records found</td>
-                </tr>
-              <?php endif; ?>
-            </tbody>
-          </table>
+            <!-- Owner Information -->
+            <h5>Owner Information</h5>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="telephone">Telephone</label>
+                <input type="text" class="form-control" id="telephone" placeholder="Enter telephone number">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="fax">Fax</label>
+                <input type="text" class="form-control" id="fax" placeholder="Enter fax number">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" placeholder="Enter email address">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="website">Website</label>
+              <input type="text" class="form-control" id="website" placeholder="Enter website">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    </div>
+  </div>
+
+  <!-- View All Modal -->
+  <div class="modal fade" id="viewAllModal" tabindex="-1" aria-labelledby="viewAllModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="viewAllModalLabel">All Owners</h5>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table table-bordered text-center modern-table">
+              <thead class="thead-dark">
+                <tr>
+                  <th class="text-center align-middle">ID</th>
+                  <th class="text-center align-middle">Name</th>
+                  <th class="text-center align-middle">Address <br><small>House No., Street, District</small></th>
+                  <th class="text-center align-middle">Information</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php if (!empty($owners)): ?>
+                  <?php foreach ($owners as $owner): ?>
+                    <tr>
+                      <td><?= htmlspecialchars($owner['own_id']) ?></td>
+                      <td><?= htmlspecialchars($owner['own_fname'] . ' ' . $owner['own_mname'] . ' ' . $owner['own_surname']) ?></td>
+                      <td><?= htmlspecialchars($owner['house_no'] . ', ' . $owner['street'] . ', ' . $owner['barangay'] . ', ' . $owner['city'] . ', ' . $owner['district'] . ', ' . $owner['province']) ?></td>
+                      <td><?= htmlspecialchars($owner['own_info']) ?></td>
+                    </tr>
+                  <?php endforeach; ?>
+                <?php else: ?>
+                  <tr>
+                    <td colspan="4">No records found</td>
+                  </tr>
+                <?php endif; ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 
   <!-- Footer -->
@@ -318,17 +319,17 @@ if ($result->num_rows > 0) {
     </div>
   </footer>
 
-  <!-- Optional JavaScript -->
+  <!-- jQuery (latest version) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Bootstrap 4.5.2 JS and Popper.js -->
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <!-- Your custom JS files -->
   <script src="http://localhost/ERPTS/main_layout.js"></script>
   <script src="http://localhost/ERPTS/Own_list.js"></script>
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -368,7 +369,7 @@ if ($result->num_rows > 0) {
       });
 
       // Handle modal data population
-      $('#editModal').on('show.bs.modal', function (event) {
+      $('#editModal').on('show.bs.modal', function(event) {
         const button = $(event.relatedTarget); // Button that triggered the modal
 
         // Extract data attributes
