@@ -1,17 +1,17 @@
 <?php
 session_start();
 
-/*// Check if the user is logged in by verifying if 'user_id' exists in the session
-  if (!isset($_SESSION['user_id'])) {
+// Uncomment the following code to enforce login check and cache control
+/*
+if (!isset($_SESSION['user_id'])) {
     header("Location: index.php"); // Redirect to login page if user is not logged in
-    exit; // Stop further execution after redirection
-  }
-
-  // Prevent the browser from caching this page
-  header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
-  header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
-  header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility 
+    exit;
+}
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 */
+
 require_once 'database.php';
 $conn = Database::getInstance();
 
@@ -27,10 +27,11 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 
   // Prepare the SQL statement with a placeholder
   $sql = "SELECT p.p_id, p.house_no, p.block_no, p.barangay, p.province, p.city, p.district, p.land_area, 
-                   CONCAT(o.own_fname, ', ', o.own_mname, ' ', o.own_surname) AS owner_name
-            FROM p_info p
-            LEFT JOIN owners_tb o ON p.ownId_Fk = o.own_id
-            WHERE p.p_id = ?";
+                 CONCAT(o.own_fname, ', ', o.own_mname, ' ', o.own_surname) AS owner_name,
+                 o.own_fname AS first_name, o.own_mname AS middle_name, o.own_surname AS last_name
+          FROM p_info p
+          LEFT JOIN owners_tb o ON p.ownId_Fk = o.own_id
+          WHERE p.p_id = ?";
 
   // Prepare and execute the statement
   $stmt = $conn->prepare($sql);
@@ -154,7 +155,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
   </div>
 </section>
 
- <!-- Modal for Editing Owner's Information -->
+<!-- Modal for Editing Owner's Information -->
 <div class="modal fade" id="editOwnerModal" tabindex="-1" aria-labelledby="editOwnerModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -162,9 +163,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
         <h5 class="modal-title" id="editOwnerModalLabel">Edit Owner's Information</h5>
       </div>
       <div class="modal-body">
-        <!-- Owner's Information Form inside Modal -->
         <form id="editOwnerForm">
-          <!-- Company or Owner Section -->
           <div class="mb-3">
             <label for="ownerNameModal" class="form-label">Company or Owner</label>
             <input type="text" class="form-control" id="ownerNameModal"
@@ -174,7 +173,6 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 
           <hr class="my-4">
 
-          <!-- Name Section -->
           <h6 class="mb-3">Name</h6>
           <div class="mb-3">
             <label for="firstNameModal" class="form-label">First Name</label>
@@ -204,6 +202,31 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     </div>
   </div>
 </div>
+
+<script>
+// Function to capitalize the first letter of each word
+function capitalizeFirstLetter(element) {
+  element.value = element.value.replace(/\b\w/g, function(char) {
+    return char.toUpperCase();
+  });
+}
+
+// Attach the function to the 'input' event of each relevant field
+document.addEventListener("DOMContentLoaded", function() {
+  // Apply to each input field in the owner info section and modal
+  const fieldsToCapitalize = ['ownerName', 'firstName', 'middleName', 'lastName', 
+                              'ownerNameModal', 'firstNameModal', 'middleNameModal', 'lastNameModal'];
+
+  fieldsToCapitalize.forEach(fieldId => {
+    const inputField = document.getElementById(fieldId);
+    if (inputField) {
+      inputField.addEventListener("input", function() {
+        capitalizeFirstLetter(inputField);
+      });
+    }
+  });
+});
+</script>
 
   <!-- Property Information Section -->
   <section class="container my-5" id="property-info-section">
@@ -389,35 +412,35 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
   </div>
 
   <script>
-  // Function to capitalize the first letter of each word in the specified fields
-  function capitalizeFirstLetter(element) {
-    element.value = element.value.replace(/\b\w/g, function(char) { return char.toUpperCase(); });
-  }
+    // Function to capitalize the first letter of each word in the specified fields
+    function capitalizeFirstLetter(element) {
+      element.value = element.value.replace(/\b\w/g, function(char) { return char.toUpperCase(); });
+    }
 
-  // Function to allow only numeric input in ARD Number
-  function restrictToNumbers(element) {
-    element.value = element.value.replace(/[^0-9]/g, ''); // Removes any non-numeric character
-  }
+    // Function to allow only numeric input in ARD Number
+    function restrictToNumbers(element) {
+      element.value = element.value.replace(/[^0-9]/g, ''); // Removes any non-numeric character
+    }
 
-  // Event listeners for the required fields
-  document.getElementById("streetModal").addEventListener("input", function() {
-    capitalizeFirstLetter(this);
-  });
-  document.getElementById("barangayModal").addEventListener("input", function() {
-    capitalizeFirstLetter(this);
-  });
-  document.getElementById("municipalityModal").addEventListener("input", function() {
-    capitalizeFirstLetter(this);
-  });
-  document.getElementById("provinceModal").addEventListener("input", function() {
-    capitalizeFirstLetter(this);
-  });
+    // Event listeners for the required fields
+    document.getElementById("streetModal").addEventListener("input", function() {
+      capitalizeFirstLetter(this);
+    });
+    document.getElementById("barangayModal").addEventListener("input", function() {
+      capitalizeFirstLetter(this);
+    });
+    document.getElementById("municipalityModal").addEventListener("input", function() {
+      capitalizeFirstLetter(this);
+    });
+    document.getElementById("provinceModal").addEventListener("input", function() {
+      capitalizeFirstLetter(this);
+    });
 
-  // Event listener for ARD Number to restrict input to numbers only
-  document.getElementById("ardNumberModal").addEventListener("input", function() {
-    restrictToNumbers(this);
-  });
-</script>
+    // Event listener for ARD Number to restrict input to numbers only
+    document.getElementById("ardNumberModal").addEventListener("input", function() {
+      restrictToNumbers(this);
+    });
+  </script>
 
 
   <!-- LAND Section -->
