@@ -40,11 +40,12 @@ document.addEventListener('DOMContentLoaded', function () {
         // Prepare the modal body container
         modalBody.innerHTML = '';  // Clear any existing rows
 
-        // Loop through the selected checkboxes and populate the modal
+        let selectedPersonID = null; // To store the retained person ID
+        let selectedProperties = [];
+
         selectedCheckboxes.forEach(function (checkbox) {
-            // Find the row corresponding to this checkbox in the main table
             const row = checkbox.closest('tr');
-            const personID = row.cells[0].textContent;
+            const personID = row.cells[0].textContent; // Person ID (owner_id)
             const lastName = row.cells[2].textContent;
             const firstName = row.cells[3].textContent;
             const middleName = row.cells[4].textContent;
@@ -52,7 +53,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Create a new row for the modal
             const newRow = document.createElement('tr');
-
             newRow.innerHTML = `
                 <td class="center-input"><input type="radio" name="personChoiceModal" value="${personID}" checked></td>
                 <td class="center-input"><input type="checkbox" name="showProperties[]" value="${personID}"></td>
@@ -62,9 +62,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 <td>${middleName}</td>
                 <td>${address}</td>
             `;
-            // Append the new row to the modal table
             modalBody.appendChild(newRow);
+
+            // Collect selected personID and properties
+            if (selectedPersonID === null) {
+                selectedPersonID = personID; // Set the first selected person as the one to retain
+            }
+            selectedProperties.push(personID); // Add each selected property
         });
+
+        // Populate the hidden input fields with the selected values
+        document.getElementById('selectedPersonID').value = selectedPersonID;
+        document.getElementById('selectedProperties').value = JSON.stringify(selectedProperties); // Convert array to string
 
         // Show the modal using jQuery
         mergeOwnersModal.modal('show');
