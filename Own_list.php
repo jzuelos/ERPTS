@@ -95,18 +95,13 @@ if ($result->num_rows > 0) {
   <!-- Main Body -->
   <section class="container mt-5">
     <div class="card p-4">
-        <div class="header-container d-flex align-items-center mb-4">
-            <a href="Admin-Page-2.php">
-                <img src="images/backward.png" width="35" height="35" alt="Back" class="back-image">
-            </a>
-            <h3 class="mb-0 ml-2">Owner's List</h3>
-        </div>
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <label for="searchInput" class="sr-only">Search</label>
-                <div class="input-group">
-                    <input type="text" class="form-control" id="searchInput" placeholder="Search">
-                    <div class="input-group-append">
+      <h3 class="mb-4">Owner's List</h3>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <label for="searchInput" class="sr-only">Search</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="searchInput" placeholder="Search">
+            <div class="input-group-append">
 
               <button type="button" class="btn btn-success btn-hover" onclick="filterTable()">Search</button>
             </div>
@@ -172,7 +167,7 @@ if ($result->num_rows > 0) {
       <!-- View All Button -->
       <div class="d-flex justify-content-between mt-3">
         <a href="Add_POwner.php" class="btn btn-success add-owner-button">Add Owner</a>
-        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#viewAllModal">View All</button>
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#viewAllModal">View All</button>
       </div>
   </section>
 
@@ -280,7 +275,7 @@ if ($result->num_rows > 0) {
         </div>
         <div class="modal-body">
           <div class="table-responsive">
-            <table class="table table-bordered text-center modern-table"> 
+            <table class="table table-bordered text-center modern-table">
               <thead class="thead-dark">
                 <tr>
                   <th class="text-center align-middle">ID</th>
@@ -309,7 +304,7 @@ if ($result->num_rows > 0) {
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
