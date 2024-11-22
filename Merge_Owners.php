@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-error_reporting(E_ALL);
+/*error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Prevent caching of this page
@@ -120,7 +120,7 @@ if ($total_result && $total_result->num_rows > 0) {
     $total_pO_count = $total_row['total_pO'];
 } else {
     $total_pO_count = 0; // Default to 0 if no rows found
-}
+}*/
 ?>
 
 <!doctype html>
@@ -186,10 +186,12 @@ if ($total_result && $total_result->num_rows > 0) {
   <!-- Form -->
   <form method="post" action="Merge_Owners.php">
     <section class="container mt-5 table-container">
-      <div class="table-title">Merge Owners</div>
-      <div class="table-responsive">
-        <!-- Row for Search Input on the Left -->
-        <div class="d-flex justify-content-between mb-2">
+    <div class="header-container">
+        <a href="Own_list.php">
+            <img src="images/backward.png" width="35" height="35" alt="Back" class="back-image">
+        </a>
+        <div class="table-title">Merge Owners</div>
+    </div>
           <!-- Search Bar (on the left side) -->
           <div>
             <label for="searchInput" class="sr-only">Search</label>

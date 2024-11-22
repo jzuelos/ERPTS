@@ -32,3 +32,12 @@
     background-color: #a0a29e; 
     color: black; 
   }
+
+  .header-container {
+    display: flex; /* Use flexbox to align items in a row */
+    align-items: center; /* Vertically center the items */
+}
+
+.back-image {
+    border-radius: 30%;
+}
