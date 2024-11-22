@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 20, 2024 at 12:55 PM
+-- Generation Time: Nov 22, 2024 at 03:28 PM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -142,8 +142,7 @@ CREATE TABLE `owners_tb` (
 
 INSERT INTO `owners_tb` (`own_id`, `own_fname`, `own_mname`, `own_surname`, `tin_no`, `house_no`, `street`, `barangay`, `district`, `city`, `province`, `own_info`) VALUES
 (1, 'zuelos', '', 'john lloyd', 0, '', 'luzaragga', 'kalamunding', '2', 'labo', 'camarines norte', ''),
-(7, 'Renz', 'Dionela', 'Dioneda', 4234, '32423', 'asdfasd', 'fasdf', 'asdf', 'fasdf', 'fdasf', 'Telephone: , Fax: , Email: , Website: '),
-(8, 'Senz', 'Dionela', 'Dioneda', 423, '423412', 'fasdfasdf', 'asdgasdg', 'xzfasd', 'fasefw', 'rawdsf', '');
+(7, 'Renz', 'Dionela', 'Dioneda', 4234, '32423', 'asdfasd', 'fasdf', 'asdf', 'fasdf', 'fdasf', 'Telephone: , Fax: , Email: , Website: ');
 
 -- --------------------------------------------------------
 
@@ -154,27 +153,22 @@ INSERT INTO `owners_tb` (`own_id`, `own_fname`, `own_mname`, `own_surname`, `tin
 CREATE TABLE `propertyowner` (
   `pO_id` int(50) NOT NULL,
   `property_id` int(50) NOT NULL,
-  `owner_id` int(50) NOT NULL
+  `owner_id` int(50) NOT NULL,
+  `is_retained` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `propertyowner`
 --
 
-INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`) VALUES
-(14, 108, 1),
-(17, 111, 1),
-(22, 115, 7),
-(23, 115, 1),
-(33, 125, 7),
-(34, 125, 7),
-(35, 126, 7),
-(36, 126, 1),
-(37, 126, 7),
-(38, 126, 1),
-(41, 128, 7),
-(42, 128, 1),
-(43, 115, 8);
+INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`) VALUES
+(1, 126, 7, 0),
+(14, 108, 1, 1),
+(17, 111, 1, 1),
+(23, 115, 1, 1),
+(33, 125, 7, 0),
+(41, 128, 1, 1),
+(42, 128, 7, 1);
 
 -- --------------------------------------------------------
 
@@ -243,7 +237,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `last_name`, `first_name`, `middle_name`, `gender`, `birthdate`, `marital_status`, `tin`, `house_number`, `street`, `barangay`, `district`, `municipality`, `province`, `contact_number`, `email`, `status`, `user_type`) VALUES
-(8, ' username', '$2y$10$mw.E9y7TH5O3hTIwdU.w8.ZF1q9zzwkTtd3lqc5AQZPxXSE/FD2cO', 'Zuelos', 'John Lloyd', 'Villacruel', 'Male', '2003-04-09', 'Single', '131254325234234', '', 'Luzaragga', 'Kalamunding', '1', 'Labo', 'Camarines Norte', '09165217083', '', 0, 'To Be Fixed');
+(6, 'username', '$2y$10$hUAqqmcCIDXnVvR81hmjuO7r.2x3tnlKu6yruJFKjr6LnIoPgnRK.', 'name', 'user', '', 'Male', '2003-11-14', 'Single', '1234', '1', '1', '1', '1', '1', '1', '1', 'testing@testing.com', 0, 'To Be Fixed');
 
 --
 -- Indexes for dumped tables
@@ -311,13 +305,13 @@ ALTER TABLE `faas`
 -- AUTO_INCREMENT for table `owners_tb`
 --
 ALTER TABLE `owners_tb`
-  MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `propertyowner`
 --
 ALTER TABLE `propertyowner`
-  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `p_info`
@@ -329,7 +323,7 @@ ALTER TABLE `p_info`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Constraints for dumped tables
@@ -340,13 +334,6 @@ ALTER TABLE `users`
 --
 ALTER TABLE `faas`
   ADD CONSTRAINT `pro_id` FOREIGN KEY (`pro_id`) REFERENCES `p_info` (`p_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `propertyowner`
---
-ALTER TABLE `propertyowner`
-  ADD CONSTRAINT `owner_id` FOREIGN KEY (`owner_id`) REFERENCES `owners_tb` (`own_id`),
-  ADD CONSTRAINT `property_id` FOREIGN KEY (`property_id`) REFERENCES `p_info` (`p_id`);
 
 --
 -- Constraints for table `p_info`
