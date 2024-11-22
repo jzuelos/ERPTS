@@ -334,11 +334,11 @@ if ($result->num_rows > 0) {
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       // Capitalize first letter of text input fields
-      const capitalizeInput = (event) => {
-        const input = event.target;
-        let value = input.value;
-        input.value = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-      };
+      function capitalizeInput(event) {
+        event.target.value = event.target.value.replace(/\b\w/g, function(char) {
+          return char.toUpperCase();
+        });
+      }
 
       // Add event listeners to text input fields
       const textInputs = document.querySelectorAll(
@@ -350,12 +350,12 @@ if ($result->num_rows > 0) {
       });
 
       // Limit phone number and fax to 11 digits
-      const limitPhoneFax = (event) => {
+      function limitPhoneFax(event) {
         let value = event.target.value;
         if (value.length > 11) {
           event.target.value = value.slice(0, 11); // Limit to 11 characters
         }
-      };
+      }
 
       // Add event listeners to phone and fax input fields
       const phoneFaxInputs = document.querySelectorAll("#telephone, #fax");
@@ -398,9 +398,71 @@ if ($result->num_rows > 0) {
         modal.find('#city').val(city);
         modal.find('#province').val(province);
       });
+
+      $('#editModal').on('show.bs.modal', function(event) {
+        const button = $(event.relatedTarget);
+        const id = button.data('id');
+        const fname = button.data('fname');
+        const mname = button.data('mname');
+        const sname = button.data('sname');
+        const tin = button.data('tin');
+        const house = button.data('house');
+        const street = button.data('street');
+        const barangay = button.data('barangay');
+        const district = button.data('district');
+        const city = button.data('city');
+        const province = button.data('province');
+
+        // Populate the modal with current data
+        $('#firstName').val(fname);
+        $('#middleName').val(mname);
+        $('#surname').val(sname);
+        $('#tinNo').val(tin);
+        $('#houseNumber').val(house);
+        $('#street').val(street);
+        $('#barangay').val(barangay);
+        $('#district').val(district);
+        $('#city').val(city);
+        $('#province').val(province);
+
+        // Add event listener to save changes
+        $('#editModal .btn-primary').on('click', function() {
+          const updatedData = {
+            own_id: id,
+            own_fname: $('#firstName').val(),
+            own_mname: $('#middleName').val(),
+            own_surname: $('#surname').val(),
+            tin_no: $('#tinNo').val(),
+            house_no: $('#houseNumber').val(),
+            street: $('#street').val(),
+            barangay: $('#barangay').val(),
+            district: $('#district').val(),
+            city: $('#city').val(),
+            province: $('#province').val()
+          };
+
+          $.ajax({
+            url: 'ownListUpdate.php',
+            type: 'POST',
+            data: updatedData,
+            success: function(response) {
+              console.log(response); // Log the response for debugging
+              if (response === 'success') {
+                alert('Owner information updated successfully!');
+                location.reload(); // Reload the page to reflect changes
+              } else {
+                alert('Error updating owner information: ' + response); // Show the error message from the response
+              }
+            },
+            error: function(xhr, status, error) {
+              console.log(xhr.responseText); // Log any response errors
+              alert('An error occurred while saving the data: ' + error); // Show the error details
+            }
+          });
+        });
+      });
     });
   </script>
-
 </body>
 
 </html>
