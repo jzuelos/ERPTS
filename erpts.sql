@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 22, 2024 at 03:28 PM
+-- Generation Time: Nov 23, 2024 at 12:34 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -185,6 +185,7 @@ CREATE TABLE `p_info` (
   `city` varchar(30) NOT NULL,
   `district` varchar(30) NOT NULL,
   `barangay` varchar(30) NOT NULL,
+  `street` varchar(50) NOT NULL,
   `house_tag_no` int(10) NOT NULL,
   `land_area` int(50) NOT NULL,
   `desc_land` varchar(50) NOT NULL,
@@ -195,13 +196,13 @@ CREATE TABLE `p_info` (
 -- Dumping data for table `p_info`
 --
 
-INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `house_tag_no`, `land_area`, `desc_land`, `documents`) VALUES
-(108, 1, 3123, 0, 'Province 1', 'Daet', 'District 1', 'Bautista', 3123, 312, '   ', 'affidavit'),
-(111, 1, 412341, 0, 'Province 2', 'Daet', 'District 1', 'Kalamunding', 423, 4324, '   ', 'affidavit, barangay'),
-(115, 7, 4234, 4234, 'Province 1', 'Labo', 'District 1', 'Kalamunding', 123, 3123, '   ', 'affidavit'),
-(125, 7, 4234, 432, 'Province 1', 'Labo', 'District 1', 'Bautista', 0, 4324, '   ', 'barangay'),
-(126, 7, 3123, 31231, 'Province 2', 'Labo', 'District 1', 'Bautista', 3123, 3123, '   ', 'affidavit'),
-(128, 7, 3123, 0, 'Province 2', 'Daet', 'District 1', 'Kalamunding', 312, 312, '   ', 'affidavit');
+INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`) VALUES
+(108, 1, 3123, 0, 'Province 1', 'Daet', 'District 1', 'Bautista', '0', 3123, 312, '   ', 'affidavit'),
+(111, 1, 412341, 0, 'Province 2', 'Daet', 'District 1', 'Kalamunding', '0', 423, 4324, '   ', 'affidavit, barangay'),
+(115, 7, 4234, 4234, 'Province 1', 'Labo', 'District 1', 'Kalamunding', '0', 123, 3123, '   ', 'affidavit'),
+(125, 7, 4234, 432, 'Camarines Sur', 'Daet', 'District 1', 'Kalamunding', '', 0, 4324, '   ', 'barangay'),
+(126, 7, 3123, 31231, 'Province 2', 'Labo', 'District 1', 'Bautista', '0', 3123, 3123, '   ', 'affidavit'),
+(128, 7, 3123, 0, 'Province 2', 'Daet', 'District 1', 'Kalamunding', '0', 312, 312, '   ', 'affidavit');
 
 -- --------------------------------------------------------
 
