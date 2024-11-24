@@ -722,7 +722,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 
       <!-- Print Button at the Bottom Right -->
       <div class="text-right mt-4">
-        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openPrintPage()">Print</button>
       </div>
     </div>
   </section>
