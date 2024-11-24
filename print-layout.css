@@ -1,0 +1,65 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+table {
+    width: 2000px; /* Use full width for tables */
+    margin: 0 auto 20px auto; /* Center the table and add bottom margin */
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid black;
+    padding: 12px; /* Increase padding for better readability */
+    text-align: left;
+    vertical-align: top;
+    font-size: 12px; /* Increase font size */
+}
+th {
+    background-color: #f2f2f2;
+}
+.header {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 20px;
+    font-size: 25px; /* Larger font size for header */
+}
+.section-title {
+    font-weight: bold;
+    background-color: #f2f2f2;
+    font-size: 15px; /* Larger font size for section titles */
+}
+.print-button {
+    margin-bottom: 20px;
+}
+
+/* Print-specific styles */
+@media print {
+    .print-button {
+        display: none;
+    }
+    @page {
+        /* Set page size to legal (8.5 x 14 inches) for long paper */
+        size: 8.5in 14in;
+        margin: 0.5in; /* Adjust margins as needed */
+    }
+    body {
+        margin: 0; /* Ensure no extra margins */
+    }
+    /* Hide browser-specific print headers/footers */
+    @page :left {
+        @top-left {
+            content: none;
+        }
+        @bottom-left {
+            content: none;
+        }
+    }
+    @page :right {
+        @top-right {
+            content: none;
+        }
+        @bottom-right {
+            content: none;
+        }
+    }
+}
