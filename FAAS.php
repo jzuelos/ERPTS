@@ -1017,7 +1017,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
         <!-- Enable "Add Plants/Trees" button -->
         <button type="button" class="btn btn-outline-primary btn-sm" onclick="togglePlantsSection()">Add Plants/Trees</button>
         <!-- Enable Print button -->
-        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openPrintPage()">Print</button>
       </div>
 
       <!-- Remove Button -->
