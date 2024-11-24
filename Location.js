@@ -45,7 +45,7 @@ $('#submitFormBtn').on('click', function(e) {
 
   // Send data to PHP file for database insertion using AJAX
   $.ajax({
-    url: 'submit_barangay.php', // PHP file to handle the database insertion
+    url: 'loc_submit_barangay.php', // PHP file to handle the database insertion
     type: 'POST',
     data: formData,
     success: function(response) {
