@@ -124,7 +124,17 @@
           </div>
         </a>
       </div>
-    </div>
+      <div class="col-md-3 mb-4">
+        <a href="Property.php" class="text-decoration-none">
+          <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+            <div class="card-body d-flex align-items-center justify-content-center">
+              <i class="fas fa-users mr-4" style="font-size: 2rem;"></i>
+              <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">Property</h5>
+            </div>
+          </div>
+        </a>
+      </div>
+            </div>
   </section>
 </main>
 

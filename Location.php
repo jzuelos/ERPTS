@@ -210,26 +210,56 @@
   </div>
 </div>
 
-<!-- Temporary District Modal -->
+<!--District Modal -->
 <div class="modal fade" id="districtModal" tabindex="-1" role="dialog" aria-labelledby="districtModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="districtModalLabel">District Details</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>This is a temporary modal for the District.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save</button>
-      </div>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="districtModalLabel">District Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="municipality">Municipality / City</label>
+                            <select class="form-control" id="municipality">
+                                <option></option>
+                                <!-- Add more Municipality/City -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="code">Code</label>
+                            <input type="text" class="form-control" id="code" value="">
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <input type="text" class="form-control" id="description" value=" ">
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label><br>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="status" id="active" value="active" required>
+                                <label class="form-check-label" for="active">Active</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="status" id="inactive" value="inactive">
+                                <label class="form-check-label" for="inactive">Inactive</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="reset" class="btn btn-warning" id="resetFormBtn">Reset</button>
+        <button type="submit" class="btn btn-primary" id="submitFormBtn">Submit</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
+
+
  <!-- Footer -->
  <footer class="bg-body-tertiary text-center text-lg-start">
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
