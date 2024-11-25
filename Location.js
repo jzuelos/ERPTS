@@ -33,7 +33,7 @@ function openLocationFormModal(locationName) {
 $('#confirmationModal').on('show.bs.modal', openConfirmationModal);
 
 // Handle form submission logic for Barangay form using AJAX
-$('#submitFormBtn').on('click', function(e) {
+$('#submitBarangayFormBtn').on('click', function(e) {
   e.preventDefault(); // Prevent default form submission
 
   // Collect form data
@@ -61,4 +61,37 @@ $('#submitFormBtn').on('click', function(e) {
 // Handle form reset
 $('#resetFormBtn').on('click', function() {
   $('#barangayForm')[0].reset();
+});
+
+// Handle form submission logic for District form using AJAX
+$('#submitDistrictFormBtn').on('click', function(e) {
+  e.preventDefault(); // Prevent default form submission
+
+  // Collect form data
+  let formData = {
+    code: $('#code').val(),
+    description: $('#description').val(),
+    status: $('input[name="status"]:checked').val()
+  };
+
+  // Send data to PHP file for database insertion using AJAX
+  $.ajax({
+    url: 'loc_submit_district.php', // PHP file to handle the database insertion
+    type: 'POST',
+    data: formData,
+    success: function(response) {
+      alert(response); // Display success or error message
+      $('#districtModal').modal('hide'); // Close the modal on success
+      $('#districtForm')[0].reset(); // Reset the form
+    },
+    error: function(xhr, status, error) {
+      console.error("Error:", error); // Log any errors
+      alert("An error occurred. Please try again.");
+    }
+  });
+});
+
+// Separate reset function for District form
+$('#districtModal #resetFormBtn').on('click', function() {
+  $('#districtForm')[0].reset();
 });

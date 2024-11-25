@@ -183,7 +183,7 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
         <button type="reset" class="btn btn-warning" id="resetFormBtn">Reset</button>
-        <button type="submit" class="btn btn-primary" id="submitFormBtn">Submit</button>
+        <button type="submit" class="btn btn-primary" id="submitBarangayFormBtn">Submit</button>
       </div>
     </div>
   </div>
@@ -221,7 +221,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form id="districtForm">
                         <div class="form-group">
                             <label for="municipality">Municipality / City</label>
                             <select class="form-control" id="municipality">
@@ -253,7 +253,7 @@
                 <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
         <button type="reset" class="btn btn-warning" id="resetFormBtn">Reset</button>
-        <button type="submit" class="btn btn-primary" id="submitFormBtn">Submit</button>
+        <button type="submit" class="btn btn-primary" id="submitDistrictFormBtn">Submit</button>
                 </div>
             </div>
         </div>
