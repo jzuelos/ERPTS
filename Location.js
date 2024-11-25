@@ -69,8 +69,8 @@ $('#submitDistrictFormBtn').on('click', function(e) {
 
   // Collect form data
   let formData = {
-    code: $('#code').val(),
-    description: $('#description').val(),
+    code: $('#districtCode').val(),
+    description: $('#districtDescription').val(),
     status: $('input[name="status"]:checked').val()
   };
 
@@ -94,4 +94,41 @@ $('#submitDistrictFormBtn').on('click', function(e) {
 // Separate reset function for District form
 $('#districtModal #resetFormBtn').on('click', function() {
   $('#districtForm')[0].reset();
+});
+
+// Input validation for Barangay Code field (limit to 3 digits, numeric only)
+$('#barangayCode').on('input', function() {
+  var value = this.value;
+  // Allow only numeric input and limit to 3 digits
+  value = value.replace(/\D/g, '');  // Remove non-digit characters
+  if (value.length > 3) {
+    value = value.slice(0, 3); // Limit input to 3 digits
+  }
+  this.value = value;
+});
+
+// Capitalize first letter of Barangay Name input
+$('#barangayName').on('input', function() {
+  var value = this.value;
+  // Capitalize first letter of each word
+  value = value.replace(/\b\w/g, function(char) {
+    return char.toUpperCase();
+  });
+  this.value = value;
+});
+
+// Input validation for District Code - Numbers only (no digit limit)
+$('#districtCode').on('input', function() {
+  var value = this.value;
+  // Allow only numbers, no digit limit
+  value = value.replace(/\D/g, '');  // Remove non-digit characters
+  this.value = value;
+});
+
+// Input validation for District Description - Capitalize the first letter
+$('#districtDescription').on('input', function() {
+  var value = this.value;
+  // Capitalize the first letter and keep the rest lowercase
+  value = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+  this.value = value;
 });

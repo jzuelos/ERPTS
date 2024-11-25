@@ -231,11 +231,11 @@
                         </div>
                         <div class="form-group">
                             <label for="code">Code</label>
-                            <input type="text" class="form-control" id="code" value="">
+                            <input type="text" class="form-control" id="districtCode" placeholder="Enter Code" value="">
                         </div>
                         <div class="form-group">
                             <label for="description">Description</label>
-                            <input type="text" class="form-control" id="description" value=" ">
+                            <input type="text" class="form-control" id="districtDescription" placeholder="Enter Description" value="">
                         </div>
                         <div class="form-group">
                             <label>Status</label><br>
