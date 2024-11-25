@@ -36,6 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     // Set session variables on successful login
                     $_SESSION['user_id'] = $user['user_id'];
                     $_SESSION['username'] = $user['username'];
+                    $_SESSION['user_type'] = $user['user_type'];
                     $_SESSION['logged_in'] = true;
 
                     // Redirect to the home page or dashboard
@@ -49,16 +50,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Username does not exist
                 $_SESSION['error'] = "Username does not exist!";
             }
-
             $stmt->close();
         } else {
             $_SESSION['error'] = "Error preparing statement: " . $conn->error;
         }
     }
 }
-
 $conn->close();
 ?>
+
 <!doctype html>
 <html lang="en">
 
