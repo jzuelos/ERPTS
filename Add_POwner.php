@@ -146,73 +146,73 @@
   }
 ?>
 
-      <!-- Owner's Information -->
-      <div class="form-group">
-        <label for="firstName">First Name</label>
-        <input type="text" class="form-control input-field" id="firstName" name="firstName" placeholder="Enter First Name" required>
-      </div>
-      <div class="form-group">
-        <label for="middleName">Middle Name</label>
-        <input type="text" class="form-control input-field" id="middleName" name="middleName" placeholder="Enter Middle Name">
-      </div>
-      <div class="form-group">
-        <label for="surname">Surname</label>
-        <input type="text" class="form-control input-field" id="surname" name="surname" placeholder="Enter Surname" required>
-      </div>
-      <div class="form-group">
-        <label for="tinNumber">TIN No.</label>
-        <input type="text" class="form-control input-field" id="tinNumber" name="tinNumber" placeholder="Enter TIN Number" required>
-      </div>
+     <!-- Owner's Information -->
+<div class="form-group">
+  <label for="firstName"><span style="color: red;">*</span> First Name</label>
+  <input type="text" class="form-control input-field" id="firstName" name="firstName" placeholder="Enter First Name" required>
+</div>
+<div class="form-group">
+  <label for="middleName">Middle Name</label>
+  <input type="text" class="form-control input-field" id="middleName" name="middleName" placeholder="Enter Middle Name">
+</div>
+<div class="form-group">
+  <label for="surname"><span style="color: red;">*</span> Surname</label>
+  <input type="text" class="form-control input-field" id="surname" name="surname" placeholder="Enter Surname" required>
+</div>
+<div class="form-group">
+  <label for="tinNumber"><span style="color: red;">*</span> TIN No.</label>
+  <input type="text" class="form-control input-field" id="tinNumber" name="tinNumber" placeholder="Enter TIN Number" required>
+</div>
 
-      <!-- Address -->
-      <h5 class="mt-4">Address</h5>
-      <div class="form-group">
-        <label for="houseNumber">House Number</label>
-        <input type="text" class="form-control input-field" id="houseNumber" name="houseNumber" placeholder="Enter House Number" required>
-      </div>
-      <div class="form-group">
-        <label for="street">Street</label>
-        <input type="text" class="form-control input-field" id="street" name="street" placeholder="Enter Street" required>
-      </div>
-      <div class="form-group">
-        <label for="barangay">Barangay</label>
-        <input type="text" class="form-control input-field" id="barangay" name="barangay" placeholder="Enter Barangay" required>
-      </div>
-      <div class="form-group">
-        <label for="district">District</label>
-        <input type="text" class="form-control input-field" id="district" name="district" placeholder="Enter District" required>
-      </div>
-      <div class="form-group">
-        <label for="city">City</label>
-        <input type="text" class="form-control input-field" id="city" name="city" placeholder="Enter City" required>
-      </div>
-      <div class="form-group">
-        <label for="province">Province</label>
-        <input type="text" class="form-control input-field" id="province" name="province" placeholder="Enter Province" required>
-      </div>
+<!-- Address -->
+<h5 class="mt-4">Address</h5>
+<div class="form-group">
+  <label for="houseNumber"><span style="color: red;">*</span> House Number</label>
+  <input type="text" class="form-control input-field" id="houseNumber" name="houseNumber" placeholder="Enter House Number" required>
+</div>
+<div class="form-group">
+  <label for="street"><span style="color: red;">*</span> Street</label>
+  <input type="text" class="form-control input-field" id="street" name="street" placeholder="Enter Street" required>
+</div>
+<div class="form-group">
+  <label for="barangay"><span style="color: red;">*</span> Barangay</label>
+  <input type="text" class="form-control input-field" id="barangay" name="barangay" placeholder="Enter Barangay" required>
+</div>
+<div class="form-group">
+  <label for="district"><span style="color: red;">*</span> District</label>
+  <input type="text" class="form-control input-field" id="district" name="district" placeholder="Enter District" required>
+</div>
+<div class="form-group">
+  <label for="city"><span style="color: red;">*</span> City</label>
+  <input type="text" class="form-control input-field" id="city" name="city" placeholder="Enter City" required>
+</div>
+<div class="form-group">
+  <label for="province"><span style="color: red;">*</span> Province</label>
+  <input type="text" class="form-control input-field" id="province" name="province" placeholder="Enter Province" required>
+</div>
 
-      <!-- Owner Contact Information -->
-      <h5 class="mt-4">Owner Information<small> (Optional)</small></h5>
-      <div class="form-group">
-        <label for="telephone">Telephone</label>
-        <input type="text" class="form-control input-field" id="telephone" name="telephone" placeholder="Enter Telephone Number">
-      </div>
-      <div class="form-group">
-        <label for="fax">Fax</label>
-        <input type="text" class="form-control input-field" id="fax" name="fax" placeholder="Enter Fax Number">
-      </div>
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" class="form-control input-field" id="email" name="email" placeholder="Enter Email Address">
-      </div>
-      <div class="form-group">
-        <label for="website">Website</label>
-        <input type="url" class="form-control input-field" id="website" name="website" placeholder="Enter Website URL">
-      </div>
+<!-- Owner Contact Information -->
+<h5 class="mt-4">Owner Information<small> (Optional)</small></h5>
+<div class="form-group">
+  <label for="telephone">Telephone</label>
+  <input type="text" class="form-control input-field" id="telephone" name="telephone" placeholder="Enter Telephone Number">
+</div>
+<div class="form-group">
+  <label for="fax">Fax</label>
+  <input type="text" class="form-control input-field" id="fax" name="fax" placeholder="Enter Fax Number">
+</div>
+<div class="form-group">
+  <label for="email">Email</label>
+  <input type="email" class="form-control input-field" id="email" name="email" placeholder="Enter Email Address">
+</div>
+<div class="form-group">
+  <label for="website">Website</label>
+  <input type="url" class="form-control input-field" id="website" name="website" placeholder="Enter Website URL">
+</div>
 
-      <button type="submit" class="btn btn-primary submit-btn">Submit</button>
-    </form>
-  </div>
+<button type="submit" class="btn btn-primary submit-btn">Submit</button>
+</form>
+</div>
 </section>
 
   <!-- Footer -->

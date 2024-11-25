@@ -150,142 +150,141 @@
     </nav>
 
 
-    <!-- Main Content -->
-    <div class="container mt-5">
-        <h2 class="text-center mb-4">Create New User</h2>
-        <form action="" method="POST">
+<!-- Main Content -->
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Create New User</h2>
+    <form action="" method="POST">
 
-            <!-- User Credentials Section -->
-            <div class="mb-4">
-                <legend class="font-weight-bold">User Credentials</legend>
-                <div class="form-group">
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" name="username" class="form-control" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">New Password:</label>
-                    <input type="password" id="password" name="password" class="form-control" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="confirm_password">Confirm Password:</label>
-                    <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
-                </div>
+        <!-- User Credentials Section -->
+        <div class="mb-4">
+            <legend class="font-weight-bold">User Credentials</legend>
+            <div class="form-group">
+                <label for="username"><span style="color: red;">*</span> Username:</label>
+                <input type="text" id="username" name="username" class="form-control" required>
             </div>
 
-            <!-- Personal Information Section -->
-            <div class="mb-4">
-                <legend class="font-weight-bold">Personal Information</legend>
-
-                <div class="form-group">
-                    <label for="lastname">Last Name:</label>
-                    <input type="text" id="lastname" name="lastname" class="form-control" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="firstname">First Name:</label>
-                    <input type="text" id="firstname" name="firstname" class="form-control" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="middlename">Middle Name:</label>
-                    <input type="text" id="middlename" name="middlename" class="form-control">
-                </div>
-
-                <div class="form-group">
-                    <label>Gender:</label>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" id="male" name="gender" value="male" required>
-                        <label class="form-check-label" for="male">Male</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" id="female" name="gender" value="female">
-                        <label class="form-check-label" for="female">Female</label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="birthdate">Birthdate:</label>
-                    <input type="date" id="birthdate" name="birthdate" class="form-control" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Marital Status:</label>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" id="single" name="marital_status" value="single"
-                            required>
-                        <label class="form-check-label" for="single">Single</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" id="married" name="marital_status" value="married">
-                        <label class="form-check-label" for="married">Married</label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="tin">Tax Identification Number (TIN):</label>
-                    <input type="text" id="tin" name="tin" class="form-control" required>
-                </div>
+            <div class="form-group">
+                <label for="password"><span style="color: red;">*</span> New Password:</label>
+                <input type="password" id="password" name="password" class="form-control" required>
             </div>
 
-            <!-- Contact Information Section -->
-            <div class="mb-4">
-                <legend class="font-weight-bold">Contact Information</legend>
+            <div class="form-group">
+                <label for="confirm_password"><span style="color: red;">*</span> Confirm Password:</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+            </div>
+        </div>
 
-                <div class="form-group">
-                    <label for="house_number">House Number:</label>
-                    <input type="text" id="house_number" name="house_number" class="form-control" required>
+        <!-- Personal Information Section -->
+        <div class="mb-4">
+            <legend class="font-weight-bold">Personal Information</legend>
+
+            <div class="form-group">
+                <label for="lastname"><span style="color: red;">*</span> Last Name:</label>
+                <input type="text" id="lastname" name="lastname" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="firstname"><span style="color: red;">*</span> First Name:</label>
+                <input type="text" id="firstname" name="firstname" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="middlename">Middle Name:</label>
+                <input type="text" id="middlename" name="middlename" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label><span style="color: red;">*</span> Gender:</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="male" name="gender" value="male" required>
+                    <label class="form-check-label" for="male">Male</label>
                 </div>
-
-                <div class="form-group">
-                    <label for="street">Street:</label>
-                    <input type="text" id="street" name="street" class="form-control" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="barangay">Barangay:</label>
-                    <input type="text" id="barangay" name="barangay" class="form-control" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="district">District:</label>
-                    <input type="text" id="district" name="district" class="form-control" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="municipality">Municipality/City:</label>
-                    <input type="text" id="municipality" name="municipality" class="form-control" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="province">Province:</label>
-                    <input type="text" id="province" name="province" class="form-control" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="contact_number">Contact Number:</label>
-                    <input type="text" id="contact_number" name="contact_number" class="form-control" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" class="form-control" required>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="female" name="gender" value="female">
+                    <label class="form-check-label" for="female">Female</label>
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="userType">User Type:</label>
-                <select id="userType" name="user_type" class="form-control">
-                    <option value="User" selected>User</option>
-                    <option value="Admin">Admin</option>
-                </select>
+                <label for="birthdate"><span style="color: red;">*</span> Birthdate:</label>
+                <input type="date" id="birthdate" name="birthdate" class="form-control" required>
             </div>
 
+            <div class="form-group">
+                <label><span style="color: red;">*</span> Marital Status:</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="single" name="marital_status" value="single"
+                        required>
+                    <label class="form-check-label" for="single">Single</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="married" name="marital_status" value="married">
+                    <label class="form-check-label" for="married">Married</label>
+                </div>
+            </div>
 
-            <button type="submit" class="btn">Create User</button>
-        </form>
-    </div>
+            <div class="form-group">
+                <label for="tin"><span style="color: red;">*</span> Tax Identification Number (TIN):</label>
+                <input type="text" id="tin" name="tin" class="form-control" required>
+            </div>
+        </div>
+
+        <!-- Contact Information Section -->
+        <div class="mb-4">
+            <legend class="font-weight-bold">Contact Information</legend>
+
+            <div class="form-group">
+                <label for="house_number"><span style="color: red;">*</span> House Number:</label>
+                <input type="text" id="house_number" name="house_number" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="street"><span style="color: red;">*</span> Street:</label>
+                <input type="text" id="street" name="street" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="barangay"><span style="color: red;">*</span> Barangay:</label>
+                <input type="text" id="barangay" name="barangay" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="district"><span style="color: red;">*</span> District:</label>
+                <input type="text" id="district" name="district" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="municipality"><span style="color: red;">*</span> Municipality/City:</label>
+                <input type="text" id="municipality" name="municipality" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="province"><span style="color: red;">*</span> Province:</label>
+                <input type="text" id="province" name="province" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="contact_number"><span style="color: red;">*</span> Contact Number:</label>
+                <input type="text" id="contact_number" name="contact_number" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email"><span style="color: red;">*</span> Email:</label>
+                <input type="email" id="email" name="email" class="form-control" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="userType">User Type:</label>
+            <select id="userType" name="user_type" class="form-control">
+                <option value="User" selected>User</option>
+                <option value="Admin">Admin</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn">Create User</button>
+    </form>
+</div>
 
 
     <!-- Footer -->
