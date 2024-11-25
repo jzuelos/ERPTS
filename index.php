@@ -70,6 +70,8 @@ $conn->close();
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="index.css"> <!-- Custom CSS -->
   <title>Electronic Real Property Tax System</title>
@@ -78,31 +80,37 @@ $conn->close();
 <body>
   <!-- Main Content -->
   <div class="container d-flex justify-content-center align-items-center vh-100">
-    <!-- Log In Card -->
-    <div class="card-container d-flex flex-row">
-      <div class="card login-card">
-        <div class="logo-container">
-          <img src="images/coconut_.__1_-removebg-preview1.png" alt="ERPTS Logo" class="logo">
-        </div>
-        <h2 class="text-center">LOG IN</h2>
+<!-- Log In Card -->
+<div class="card-container d-flex flex-row">
+  <div class="card login-card">
+    <div class="logo-container">
+      <img src="images/coconut_.__1_-removebg-preview1.png" alt="ERPTS Logo" class="logo">
+    </div>
+    <h2 class="text-center">LOG IN</h2>
 
-        <!-- Display error message if login fails -->
-        <?php if (isset($_SESSION['error'])): ?>
-          <p style="color: red;"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
-        <?php endif; ?>
+    <!-- Display error message if login fails -->
+    <?php if (isset($_SESSION['error'])): ?>
+      <p style="color: red;"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
+    <?php endif; ?>
 
-        <form method="POST">
-          <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" class="form-control rounded-pill" required>
-          </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" class="form-control rounded-pill" required>
-          </div>
-          <button type="submit" class="btn btn-dark w-100 mt-4">Log In</button>
-        </form>
+    <form method="POST">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" class="form-control rounded-pill" required>
       </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="position-relative">
+          <input type="password" id="password" name="password" class="form-control rounded-pill" required>
+          <button type="button" id="togglePassword" class="btn btn-link" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #000000; cursor: pointer;">
+            <i class="fa fa-eye" id="eyeIcon"></i>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-dark w-100 mt-4">Log In</button>
+    </form>
+  </div>
+
 
       <!-- Welcome Box -->
       <div class="welcome-box">
@@ -134,6 +142,7 @@ $conn->close();
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
     integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
+  <script src="http://localhost/ERPTS/index.js"></script>
 </body>
 
 </html>
