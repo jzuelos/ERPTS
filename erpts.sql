@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 23, 2024 at 12:34 PM
+-- Generation Time: Nov 25, 2024 at 03:05 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -29,66 +29,40 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `brgy` (
   `brgy_id` int(11) NOT NULL,
-  `brgy_name` varchar(20) NOT NULL
+  `brgy_code` varchar(10) NOT NULL,
+  `brgy_name` varchar(20) NOT NULL,
+  `status` enum('Active','Inactive') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `brgy`
 --
 
-INSERT INTO `brgy` (`brgy_id`, `brgy_name`) VALUES
-(1, 'Anameam'),
-(2, 'Awitan'),
-(3, 'Baay'),
-(4, 'Bagacay'),
-(5, 'Bagong Silang I'),
-(6, 'Bagong Silang II'),
-(7, 'Bakiad'),
-(8, 'Bautista'),
-(9, 'Bayabas'),
-(10, 'Bayan-bayan'),
-(11, 'Benit'),
-(12, 'Anahaw'),
-(13, 'Gumamela'),
-(14, 'San Francisco'),
-(15, 'Kalamunding'),
-(16, 'Bulhao'),
-(17, 'Cabatuhan'),
-(18, 'Cabusay'),
-(19, 'Calabasa'),
-(20, 'Canapawan'),
-(21, 'Daguit'),
-(22, 'Dalas'),
-(23, 'Dumagmang'),
-(24, 'Exciban'),
-(25, 'Fundado'),
-(26, 'Guinacutan'),
-(27, 'Guisican'),
-(28, 'Iberica'),
-(29, 'Lugui'),
-(30, 'Mabilo I'),
-(31, 'Mabilo II'),
-(32, 'Macogon'),
-(33, 'Mahawan-hawan'),
-(34, 'Malangcao-Basud'),
-(35, 'Malasugui'),
-(36, 'Malatap'),
-(37, 'Malaya'),
-(38, 'Malibago'),
-(39, 'Maot'),
-(40, 'Masalong'),
-(41, 'Matanlang'),
-(42, 'Napaod'),
-(43, 'Pag-Asa'),
-(44, 'Pangpang'),
-(45, 'Pinya'),
-(46, 'San Antonio'),
-(47, 'Santa Cruz'),
-(48, 'Bagong Silang III'),
-(49, 'Submakin'),
-(50, 'Talobatib'),
-(51, 'Tigbinan'),
-(52, 'Tulay Na Lupa');
+INSERT INTO `brgy` (`brgy_id`, `brgy_code`, `brgy_name`, `status`) VALUES
+(53, '001', 'Bulala', 'Active'),
+(54, '002', 'bautista', 'Active'),
+(55, '004', 'fjsdfpnadf', 'Active'),
+(56, '004', 'tayabas', 'Active');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `district`
+--
+
+CREATE TABLE `district` (
+  `district_id` int(11) NOT NULL,
+  `district_code` varchar(10) NOT NULL,
+  `description` varchar(100) NOT NULL,
+  `status` enum('Active','Inactive') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `district`
+--
+
+INSERT INTO `district` (`district_id`, `district_code`, `description`, `status`) VALUES
+(2, '001', 'District 1', 'Active');
 
 -- --------------------------------------------------------
 
@@ -142,7 +116,7 @@ CREATE TABLE `owners_tb` (
 
 INSERT INTO `owners_tb` (`own_id`, `own_fname`, `own_mname`, `own_surname`, `tin_no`, `house_no`, `street`, `barangay`, `district`, `city`, `province`, `own_info`) VALUES
 (1, 'zuelos', '', 'john lloyd', 0, '', 'luzaragga', 'kalamunding', '2', 'labo', 'camarines norte', ''),
-(7, 'Renz', 'Dionela', 'Dioneda', 4234, '32423', 'asdfasd', 'fasdf', 'asdf', 'fasdf', 'fdasf', 'Telephone: , Fax: , Email: , Website: ');
+(7, 'Renz', 'Dionela', 'Dioneda', 4234, '32423', '5', 'Bautista', 'District One', 'Sta Elena', 'Camarines Norte', 'Telephone: , Fax: , Email: , Website: ');
 
 -- --------------------------------------------------------
 
@@ -185,7 +159,6 @@ CREATE TABLE `p_info` (
   `city` varchar(30) NOT NULL,
   `district` varchar(30) NOT NULL,
   `barangay` varchar(30) NOT NULL,
-  `street` varchar(50) NOT NULL,
   `house_tag_no` int(10) NOT NULL,
   `land_area` int(50) NOT NULL,
   `desc_land` varchar(50) NOT NULL,
@@ -196,13 +169,13 @@ CREATE TABLE `p_info` (
 -- Dumping data for table `p_info`
 --
 
-INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`) VALUES
-(108, 1, 3123, 0, 'Province 1', 'Daet', 'District 1', 'Bautista', '0', 3123, 312, '   ', 'affidavit'),
-(111, 1, 412341, 0, 'Province 2', 'Daet', 'District 1', 'Kalamunding', '0', 423, 4324, '   ', 'affidavit, barangay'),
-(115, 7, 4234, 4234, 'Province 1', 'Labo', 'District 1', 'Kalamunding', '0', 123, 3123, '   ', 'affidavit'),
-(125, 7, 4234, 432, 'Camarines Sur', 'Daet', 'District 1', 'Kalamunding', '', 0, 4324, '   ', 'barangay'),
-(126, 7, 3123, 31231, 'Province 2', 'Labo', 'District 1', 'Bautista', '0', 3123, 3123, '   ', 'affidavit'),
-(128, 7, 3123, 0, 'Province 2', 'Daet', 'District 1', 'Kalamunding', '0', 312, 312, '   ', 'affidavit');
+INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `house_tag_no`, `land_area`, `desc_land`, `documents`) VALUES
+(108, 1, 3123, 0, 'Province 1', 'Daet', 'District 1', 'Bautista', 3123, 312, '   ', 'affidavit'),
+(111, 1, 412341, 0, 'Province 2', 'Daet', 'District 1', 'Kalamunding', 423, 4324, '   ', 'affidavit, barangay'),
+(115, 7, 4234, 4234, 'Province 1', 'Labo', 'District 1', 'Kalamunding', 123, 3123, '   ', 'affidavit'),
+(125, 7, 4234, 432, 'Province 1', 'Labo', 'District 1', 'Bautista', 0, 4324, '   ', 'barangay'),
+(126, 7, 3123, 31231, 'Province 2', 'Labo', 'District 1', 'Bautista', 3123, 3123, '   ', 'affidavit'),
+(128, 7, 3123, 0, 'Province 2', 'Daet', 'District 1', 'Kalamunding', 312, 312, '   ', 'affidavit');
 
 -- --------------------------------------------------------
 
@@ -251,6 +224,12 @@ ALTER TABLE `brgy`
   ADD PRIMARY KEY (`brgy_id`);
 
 --
+-- Indexes for table `district`
+--
+ALTER TABLE `district`
+  ADD PRIMARY KEY (`district_id`);
+
+--
 -- Indexes for table `faas`
 --
 ALTER TABLE `faas`
@@ -294,7 +273,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `brgy`
 --
 ALTER TABLE `brgy`
-  MODIFY `brgy_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `brgy_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+
+--
+-- AUTO_INCREMENT for table `district`
+--
+ALTER TABLE `district`
+  MODIFY `district_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `faas`
