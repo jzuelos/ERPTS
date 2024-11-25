@@ -522,8 +522,9 @@ $conn->close();
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="savePropertyData()">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="reset" class="btn btn-warning" onclick="resetForm()">Reset</button>
+        <button type="button" class="btn btn-primary" onclick="savePropertyData()">Save changes</button>
         </div>
       </div>
     </div>
@@ -679,6 +680,7 @@ $conn->close();
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="reset" class="btn btn-warning" onclick="resetForm()">Reset</button>         
         <button type="button" class="btn btn-primary">Save Changes</button>
       </div>
     </div>
@@ -1264,9 +1266,10 @@ $conn->close();
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save Changes</button>
-        </div>
+  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+  <button type="reset" class="btn btn-warning" onclick="resetForm()">Reset</button>
+  <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save Changes</button>
+</div>
       </div>
     </div>
   </div>
@@ -1513,7 +1516,48 @@ $conn->close();
       }
     });
   </script>
+  <script>
+    function resetForm() {
+  // Target all forms inside modals
+  const modals = document.querySelectorAll('.modal');
+  
+  modals.forEach(modal => {
+    // Find all forms in the modal
+    const forms = modal.querySelectorAll('form');
+    forms.forEach(form => {
+      // Reset the form to its default state
+      form.reset();
 
+      // Clear additional fields if reset does not handle them
+      form.querySelectorAll("input, select, textarea").forEach(field => {
+        if (field.type === "text" || field.type === "textarea" || field.type === "email" || field.type === "date") {
+          field.value = ""; // Clear text, email, textarea, and date inputs
+        } else if (field.type === "checkbox" || field.type === "radio") {
+          field.checked = field.defaultChecked; // Reset checkboxes and radio buttons
+        } else if (field.tagName === "SELECT") {
+          field.selectedIndex = 0; // Reset select dropdowns to the first option
+        }
+      });
+    });
+  });
+
+  // Ensure manual clearing for LAND modal if it's outside a form
+  const landModal = document.getElementById("editLandModal");
+  if (landModal) {
+    const inputs = landModal.querySelectorAll("input, select, textarea");
+    inputs.forEach(input => {
+      if (input.type === "text" || input.type === "textarea" || input.type === "email" || input.type === "date") {
+        input.value = ""; // Clear the value
+      } else if (input.type === "checkbox" || input.type === "radio") {
+        input.checked = input.defaultChecked; // Reset to default checked state
+      } else if (input.tagName === "SELECT") {
+        input.selectedIndex = 0; // Reset select to the first option
+      }
+    });
+  }
+}
+
+  </script>
   <!-- Optional JavaScript -->
   <script src="http://localhost/ERPTS/FAAS.js"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
