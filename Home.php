@@ -1,28 +1,3 @@
-<?php
-  session_start();  // Start session at the top to access session variables
-
-  // Check if the user is logged in by verifying if 'user_id' exists in the session
-  /*if (!isset($_SESSION['user_id'])) {
-      header("Location: index.php"); // Redirect to login page if user is not logged in
-      exit; // Stop further execution after redirection
-  }*/
-
-  // Prevent the browser from caching this page
-  header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Prevent caching
-  header("Cache-Control: post-check=0, pre-check=0", false); // Additional no-cache headers
-  header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility
-
-  error_reporting(E_ALL);
-  ini_set('display_errors', 1);
-
-  require_once 'database.php';
-
-  $conn = Database::getInstance();
-  if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-  }
-?>
-
 <!doctype html>
 <html lang="en">
 
@@ -35,25 +10,13 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEJr+8+6g5K4r53m5s3xmw1Is0J6wBd04YOeFvXOsZTgmYF9flT/qe6LZ9s+0" crossorigin="anonymous">
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="Home.css">
   <title>Electronic Real Property Tax System</title>
 </head>
 
 <body>
-<?php
-    // Fetch total number of owners
-    $query_owners = "SELECT COUNT(*) AS total_owners FROM owners_tb";
-    $result_owners = $conn->query($query_owners);
-    $total_owners = $result_owners->fetch_assoc()['total_owners'];
-
-    // Fetch total number of properties
-    $query_properties = "SELECT COUNT(*) AS total_properties FROM p_info";
-    $result_properties = $conn->query($query_properties);
-    $total_properties = $result_properties->fetch_assoc()['total_properties'];
-?>
-
   <!-- Header Navigation -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
     <a class="navbar-brand">
@@ -99,73 +62,58 @@
     </div>
   </nav>
 
-  <!--Main Body-->
-  <div class="container py-5 my-3">
-    <div class="row justify-content-center">
-        <!-- Large Horizontal Grid on the Left -->
-        <div class="col-lg-8 mb-3">
-            <div class="modern-card">
-                <h3>Assessor's Office</h3>
-                <p>The Assessor's Office is a vital part of local government, tasked with determining the value of properties for taxation purposes. 
-                  By conducting detailed property appraisals and analyzing market trends, the office ensures that property tax assessments are fair and equitable.
-                   This process is crucial for funding essential community services like schools, infrastructure, and public safety. The office also provides 
-                   transparency and assistance to property owners, offering guidance on assessment processes and handling appeals. Through its commitment 
-                   to accuracy and fairness, the Assessor's Office supports the financial health and growth of the community.</p>
-                
-                              <!-- Image Slider -->
-                <div id="imageCarousel" class="carousel slide mt-4" data-bs-ride="carousel" data-bs-interval="3500">
-                    <div class="carousel-inner">
-                        <!-- First Slide -->
-                        <div class="carousel-item active">
-                            <img src="images/Doc2.jpg" class="d-block w-100" alt="Image 1">
-                        </div>
-                        <!-- Second Slide -->
-                        <div class="carousel-item">
-                            <img src="images/Doc3.jpg" class="d-block w-100" alt="Image 2">
-                        </div>
-                        <!-- Third Slide -->
-                        <div class="carousel-item">
-                            <img src="images/Doc4.jpg" class="d-block w-100" alt="Image 3">
-                        </div>
-                    </div>
-                    <!-- Previous Button -->
-                    <button class="carousel-control-prev custom-arrow" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
-                    <!-- Next Button -->
-                    <button class="carousel-control-next custom-arrow" type="button" data-bs-target="#imageCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
+<!-- Main Body -->
+<div class="container-fluid p-0" style="margin-top: 80px;"> <!-- Adjust margin-top based on header height -->
+    <div class="row">
+        <!-- Left Section: Property Listing and Owner Statistics -->
+        <div class="col-lg-7" style="padding-left: 20px;"> <!-- Added padding-left -->
+            <!-- Property Listing -->
+            <div class="modern-card shadow-lg p-5 mb-4 rounded-lg" style="height: 500px; width: 100%;">
+                <h4 class="font-weight-bold custom-text-color">Property Listings</h4>
+                <p class="lead custom-text-color">Up-to-date property listings and market analysis for residential, commercial, and industrial properties in the area.</p>
+                <div class="text-center">
+                    <i class="fas fa-building fa-4x text-warning"></i>
                 </div>
-</div>
-</div>
-<!-- Two Square Grids on the Right -->
-<div class="col-lg-4">
-  <div class="row">
-    <!-- Top Square -->
-    <div class="col-12 mb-3">
-      <a href="Own_list.php" style="text-decoration: none;">
-        <div class="modern-card">
-          <h3>Owner Statistics</h3>
-          <p>Comprehensive data on property ownership trends and demographics.</p>
-          <span id="owner-count" class="badge badge-secondary mt-2">Number of Owners: Fetching data...</span>
+            </div>
+            <!-- Owner Statistics -->
+            <div class="modern-card shadow-lg p-5 mb-4 rounded-lg" style="height: 300px; width: 100%;">
+                <h4 class="font-weight-bold custom-text-color">Owner Statistics</h4>
+                <p class="custom-text-color">Comprehensive data on property ownership trends, demographics, and distribution across the province.</p>
+                <div class="text-center">
+                    <i class="fas fa-users fa-3x text-warning"></i>
+                </div>
+            </div>
         </div>
-      </a>
-    </div>
-    <!-- Bottom Square -->
-    <div class="col-12">
-      <a href="Real-Property-Unit-List.php" style="text-decoration: none;">
-        <div class="modern-card">
-          <h3>Property Listings</h3>
-          <p>Current listings and market analysis for properties in the area.</p>
-          <span id="property-count" class="badge badge-secondary mt-2">Number of Properties: Fetching data...</span>
+
+        <!-- Right Section: Main Content -->
+        <div class="col-lg-4">
+            <div class="modern-card shadow-lg p-4 rounded-lg" style="height: 100%;">
+                <h3 class="font-weight-bold custom-text-color">CITIZEN'S CHARTER OFFICE OF THE PROVINCIAL ASSESSOR</h3>
+                <h5 class="text-secondary mb-4 custom-text-color">Capitol, Daet, Camarines Norte</h5>
+                <p class="lead custom-text-color">The Office of the Provincial Assessor is a key entity in the Provincial Government, operating under Republic Act No. 7160, also known as the Local Government Code of 1991.</p>
+                <p class="custom-text-color">Its primary goal is to perform duties related to real property taxation, adhering to fundamental principles such as:</p>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item custom-text-color"><i class="fas fa-check-circle text-primary"></i> Appraising real property at its current and fair market value.</li>
+                    <li class="list-group-item custom-text-color"><i class="fas fa-check-circle text-primary"></i> Classification of property for assessment based on actual use.</li>
+                    <li class="list-group-item custom-text-color"><i class="fas fa-check-circle text-primary"></i> Ensuring uniform assessment classification within the local government unit.</li>
+                    <li class="list-group-item custom-text-color"><i class="fas fa-check-circle text-primary"></i> Restricting private persons from performing appraisal and assessment tasks.</li>
+                    <li class="list-group-item custom-text-color"><i class="fas fa-check-circle text-primary"></i> Ensuring equitable property appraisal and assessment.</li>
+                </ul>
+                <p class="mt-3 custom-text-color">Under Sec. 472, par (b) of the Code, the Office has the following key responsibilities:</p>
+                <ol class="ml-3">
+                    <li class="custom-text-color">Enforcing laws and policies regarding property appraisal and taxation.</li>
+                    <li class="custom-text-color">Reviewing and recommending improvements to policies and practices in property valuation and assessment.</li>
+                    <li class="custom-text-color">Establishing efficient property assessment systems and maintaining accurate property records.</li>
+                    <li class="custom-text-color">Ensuring proper tax mapping and conducting frequent surveys for verification of listed properties.</li>
+                    <li class="custom-text-color">Coordinating with municipal assessors for better data management and tax mapping operations.</li>
+                </ol>
+                <p class="mt-4 custom-text-color">The office operates under the supervision of the Governor, with technical oversight from the Department of Finance and the Bureau of Local Government Finance.</p>
+                <p class="font-weight-bold custom-text-color mt-4">Currently, the Office is composed of three divisions: Assessment and Appraisal, Tax Mapping and Records, and Administrative.</p>
+            </div>
         </div>
-      </a>
     </div>
-  </div>
 </div>
+
 
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
@@ -189,18 +137,8 @@
     integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-    // Set timeout to simulate fetching data from the server
-    document.addEventListener("DOMContentLoaded", function() {
-      // Get the PHP values and update the page after a delay to simulate data fetching
-      setTimeout(() => {
-        // Replace inner HTML with PHP variables for counts
-        document.getElementById('owner-count').innerHTML = 'Number of Owners: <?php echo $total_owners; ?>';
-        document.getElementById('property-count').innerHTML = 'Number of Properties: <?php echo $total_properties; ?>';
-      }, 500); // Simulate a delay (500 ms) for loading
-    });
-  </script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  
 
 </body>
 

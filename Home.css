@@ -1,103 +1,55 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f4f9;
-    margin: 0;
-    padding: 0;
-}
-
-.container {
-    max-width: 1200px;
-    margin: auto;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f4f7fa;
 }
 
 .modern-card {
     background-color: #ffffff;
-    color: #333;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .modern-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-h3 {
-    margin-bottom: 15px;
-    font-size: 1.5rem;
-    font-weight: 600;
+.text-primary {
+    color: #489474; /* Your primary color */
 }
 
-p {
-    margin: 0;
-    font-size: 1rem;
-    line-height: 1.6;
+.text-secondary {
+    color: #d4ac6e; /* Your secondary color */
 }
 
-.row {
-    display: flex;
-    justify-content: center;
+.text-warning {
+    color: #dbc31d; /* Accent color for icons */
 }
 
-.col-lg-8, .col-lg-4 .col-12 {
-    margin-bottom: 20px;
+.lead {
+    font-size: 1.25rem;
+    font-weight: 400;
 }
 
-
-/* Carousel Styling */
-.carousel-inner {
-    position: relative;
-    overflow: hidden;
-    width: 100%;
+ul.list-group {
+    margin-top: 20px;
 }
 
-.carousel-item {
-    height: 500px; /* Fixed height for carousel */
+ol {
+    margin-top: 20px;
 }
 
-.carousel-item img {
-    object-fit: cover; /* Ensure images scale and crop nicely */
-    height: 100%;
-    width: 100%;
+i {
+    margin-right: 10px;
 }
 
-/* Custom Arrows */
-.custom-arrow {
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: none;
-    transition: transform 0.3s ease, background-color 0.3s ease;
-    position: absolute;
-    top: 50%; /* Center vertically */
-    transform: translateY(-50%); /* Adjust for centering */
-    z-index: 10;
+.shadow-lg {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    width: 20px;
-    height: 20px;
-    background-size: 100%;
-    filter: invert(1); /* Make arrows white */
+.rounded-lg {
+    border-radius: 15px;
 }
 
-.custom-arrow:hover {
-    background-color: rgba(0, 0, 0, 0.8);
-    transform: scale(1.1);
-}
-
-/* Adjust positions for left and right arrows */
-.carousel-control-prev {
-    left: 10px;
-}
-
-.carousel-control-next {
-    right: 10px;
+.container {
+    max-width: 1200px;
 }
