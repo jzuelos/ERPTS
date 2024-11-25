@@ -164,6 +164,9 @@ function savePlantsTreesData() {
   myModal.hide();  // Close the modal
 }
 
+
+
+
 function showEditValuationModal() {
   console.log("Edit button clicked!"); // Debugging message
 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 25, 2024 at 03:47 PM
+-- Generation Time: Nov 25, 2024 at 05:37 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -212,8 +212,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `last_name`, `first_name`, `middle_name`, `gender`, `birthdate`, `marital_status`, `tin`, `house_number`, `street`, `barangay`, `district`, `municipality`, `province`, `contact_number`, `email`, `status`, `user_type`) VALUES
-(6, 'username', '$2y$10$hUAqqmcCIDXnVvR81hmjuO7r.2x3tnlKu6yruJFKjr6LnIoPgnRK.', 'name', 'user', '', 'Male', '2003-11-14', 'Single', '1234', '1', '1', '1', '1', '1', '1', '1', 'testing@testing.com', 0, 'user'),
-(8, 'RIP_FISHY12', '$2y$10$smEhcMQrkEwgF/Whm1BrDeT0ru.898kqGKwEjVl1HhkR7Bpj/vdP.', 'Zuelos', 'Jomel', 'Villacruel', 'Female', '2012-12-19', 'Married', '32423423', '32', 'Luzaragga', 'Kalamunding', '2', 'Labo', 'Camarines Norte', '09923648721', 'sbjomel19@gmail.com', 0, 'admin');
+(8, 'RIP_FISHY12', '$2y$10$smEhcMQrkEwgF/Whm1BrDeT0ru.898kqGKwEjVl1HhkR7Bpj/vdP.', 'Zuelos', 'Jomel', 'Villacruel', 'Female', '2012-12-19', 'Married', '32423423', '32', 'Luzaragga', 'Kalamunding', '2', 'Labo', 'Camarines Norte', '09923648721', 'sbjomel19@gmail.com', 0, 'admin'),
+(9, 'username', '$2y$10$oAnO7x5BUJQAfdyEU9RJ8OfD3qC6KKeWQYOZ6Li5nl4K0Bx8IRx1e', 'Zuelos', 'Jomel', 'Villacruel', 'Male', '2024-11-25', 'Married', '32423423', '32', 'Luzaragga', 'Kalamunding', '2', 'Labo', 'Camarines Norte', '09923648721', 'lloyd@gmail.com', 0, 'user');
 
 --
 -- Indexes for dumped tables
@@ -265,6 +265,7 @@ ALTER TABLE `p_info`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `username` (`username`),
   ADD UNIQUE KEY `email` (`email`);
 
 --
@@ -311,7 +312,7 @@ ALTER TABLE `p_info`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- Constraints for dumped tables

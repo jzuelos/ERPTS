@@ -2,15 +2,17 @@
 session_start();
 
 // Uncomment the following code to enforce login check and cache control
-/*
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php"); // Redirect to login page if user is not logged in
     exit;
 }
+
+$user_role = $_SESSION['user_type'] ?? 'user'; // Default to 'user' if role is not set
+
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
-*/
+
 
 require_once 'database.php';
 $conn = Database::getInstance();
@@ -179,6 +181,10 @@ $conn->close();
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
+
+    <?php if ($user_role === 'admin'): ?>
+      <button onclick="location.href='Admin-Page-2.php'">Admin Dashboard</button>
+    <?php endif; ?>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ml-auto">
@@ -1556,7 +1562,6 @@ $conn->close();
     });
   }
 }
-
   </script>
   <!-- Optional JavaScript -->
   <script src="http://localhost/ERPTS/FAAS.js"></script>

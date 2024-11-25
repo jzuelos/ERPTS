@@ -7,6 +7,8 @@
     exit; // Stop further execution after redirection
   }
 
+  $user_role = $_SESSION['user_type'] ?? 'user'; // Default to 'user' if role is not set
+
   // Prevent the browser from caching this page
   header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
   header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
@@ -40,6 +42,11 @@
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
+
+    <?php if ($user_role === 'admin'): ?>
+      <button onclick="location.href='Admin-Page-2.php'">Admin Dashboard</button>
+    <?php endif; ?>
+
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ml-auto">
         <li class="nav-item"><a class="nav-link" href="Home.php">Home</a></li>

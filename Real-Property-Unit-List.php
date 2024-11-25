@@ -2,10 +2,12 @@
 session_start();  //Start session at the top to access session variables
 
 // Check if the user is logged in by verifying if 'user_id' exists in the session
-/*if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id'])) {
     header("Location: index.php"); // Redirect to login page if user is not logged in
     exit; // Stop further execution after redirection
-}*/
+}
+
+$user_role = $_SESSION['user_type'] ?? 'user'; // Default to 'user' if role is not set
 
 // Prevent the browser from caching this page
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Prevent caching
@@ -84,6 +86,10 @@ if ($barangayResult->num_rows > 0) {
       <span class="navbar-toggler-icon"></span>
     </button>
 
+    <?php if ($user_role === 'admin'): ?>
+      <button onclick="location.href='Admin-Page-2.php'">Admin Dashboard</button>
+    <?php endif; ?>
+
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
@@ -97,7 +103,7 @@ if ($barangayResult->num_rows > 0) {
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <a class="dropdown-item active" href="Real-Property-Unit-List.php">RPU List</a>
             <a class="dropdown-item" href="FAAS.php">FAAS</a>
-            <a class="dropdown-item" href="Tax-Declaration.php">Tax Declaration</a>
+            <a class="dropdown-item" href="Tax-Declaration-List.php">Tax Declaration</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="Track.php">Track Paper</a>
           </div>
