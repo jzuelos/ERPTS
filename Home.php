@@ -1,3 +1,27 @@
+<?php
+session_start(); // Start session at the top
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+require_once 'database.php'; // Include your database connection
+
+$conn = Database::getInstance();
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch total number of owners
+$query_owners = "SELECT COUNT(*) AS total_owners FROM owners_tb";
+$result_owners = $conn->query($query_owners);
+$total_owners = $result_owners->fetch_assoc()['total_owners'];
+
+// Fetch total number of properties
+$query_properties = "SELECT COUNT(*) AS total_properties FROM p_info";
+$result_properties = $conn->query($query_properties);
+$total_properties = $result_properties->fetch_assoc()['total_properties'];
+?>
+
 <!doctype html>
 <html lang="en">
 
@@ -54,7 +78,7 @@
         <li class="nav-item">
           <a class="nav-link" href="Reports.php">Reports</a>
         </li>
-        <li class="nav-item" style = "margin-left: 20px">
+        <li class="nav-item" style="margin-left: 20px">
           <button type="button" class="btn btn-danger" data-toggle="button" aria-pressed="false" autocomplete="off">
             Log Out</button>
         </li>
@@ -74,6 +98,9 @@
                 <div class="text-center">
                     <i class="fas fa-building fa-4x text-warning"></i>
                 </div>
+                <div class="mt-4 text-center">
+                    <h5>Total Properties: <?php echo $total_properties; ?></h5>
+                </div>
             </div>
             <!-- Owner Statistics -->
             <div class="modern-card shadow-lg p-5 mb-4 rounded-lg" style="height: 300px; width: 100%;">
@@ -81,6 +108,9 @@
                 <p class="custom-text-color">Comprehensive data on property ownership trends, demographics, and distribution across the province.</p>
                 <div class="text-center">
                     <i class="fas fa-users fa-3x text-warning"></i>
+                </div>
+                <div class="mt-4 text-center">
+                    <h5>Total Owners: <?php echo $total_owners; ?></h5>
                 </div>
             </div>
         </div>
@@ -114,32 +144,11 @@
     </div>
 </div>
 
-
-  <!-- Footer -->
-  <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
-    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
-      © 2020 Copyright:
-      <a class="text-body" href="https://mdbootstrap.com/">MDBootstrap.com</a>
-    </div>
-  </footer>
-
-
-  <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-  
+<!-- JS Files -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/js/all.js"></script>
 
 </body>
-
 </html>
