@@ -559,6 +559,10 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
           <input type="text" class="form-control" id="previousAssessedValue" placeholder="Enter Assessed Value" disabled>
         </div>
       </div>
+       <!-- Print Button at the Bottom Right -->
+       <div class="text-right mt-4">
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openPrintPage()">Print</button>
+      </div>
     </form>
   </div>
 </section>
@@ -642,6 +646,7 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
     </div>
   </div>
 </div>
+
   <!-- LAND Section -->
   <section class="container my-5" id="land-section">
     <div class="d-flex justify-content-between align-items-center mb-4">
