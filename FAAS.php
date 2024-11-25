@@ -59,56 +59,94 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
   }
 }
 
-  // Step 1: Prepare the SQL statement to get the property details and owner information
-  $sql_editowner = "
-      SELECT 
-          f.propertyowner_id,  -- This will contain JSON data (owner IDs associated with the property in faas table)
-          o.own_id, 
-          CONCAT(o.own_fname, ', ', o.own_mname, ' ', o.own_surname) AS owner_name,
-          o.own_fname AS first_name, 
-          o.own_mname AS middle_name, 
-          o.own_surname AS last_name
-      FROM faas f
-      LEFT JOIN owners_tb o
-          ON JSON_UNQUOTE(JSON_EXTRACT(f.propertyowner_id, CONCAT('$[', o.own_id, ']'))) IS NOT NULL
-      WHERE f.pro_id = ?";  // Use the property_id from the URL
+  // Step 1: Prepare the SQL statement to get the propertyowner_id from the `faas` table
+$sql_editowner = "
+SELECT 
+    f.propertyowner_id  -- This contains the junction table IDs for the owners
+FROM faas f
+WHERE f.pro_id = ?";  // Use the property_id from the URL
 
-  // Step 2: Prepare and execute the query
-  if ($stmt = $conn->prepare($sql_editowner)) {
-    $stmt->bind_param("i", $p_id);  // Bind the property ID from the URL to the query
-    $stmt->execute();
-    $result = $stmt->get_result();
+// Check if property ID (`pro_id`) is provided
+if (isset($_GET['id']) && !empty($_GET['id'])) {
+    $p_id = intval($_GET['id']); // Sanitize input
 
-    // Step 3: Check if there are any results
-    if ($result->num_rows > 0) {
-      while ($row = $result->fetch_assoc()) {
-        // Step 4: Check if propertyowner_id is not empty and decode JSON data
-        if (!empty($row['propertyowner_id'])) {
-          // Decode the JSON data from the faas table's propertyowner_id field
-          $owner_ids = json_decode($row['propertyowner_id'], true);  // Decoding as an array
+    // Step 2: Prepare and execute the query to get the propertyowner_id (junction table IDs)
+    if ($stmt = $conn->prepare($sql_editowner)) {
+        $stmt->bind_param("i", $p_id); // Bind property ID to the query
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-          // Step 5: Check if decoding was successful and if it's an array
-          if (is_array($owner_ids)) {
-            // Step 6: Output the owner details
-            echo "Owner ID: " . $row['own_id'] . "<br>";
-            echo "Owner Name: " . $row['owner_name'] . "<br>";
-            echo "First Name: " . $row['first_name'] . "<br>";
-            echo "Middle Name: " . $row['middle_name'] . "<br>";
-            echo "Last Name: " . $row['last_name'] . "<br><br>";
-          } else {
-            echo "Invalid JSON format in propertyowner_id for property " . $p_id . ".<br>";
-          }
+        // Step 3: Check if the query returned a row
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+
+            // Step 4: Get the propertyowner_id (junction table ID)
+            $propertyowner_id = $row['propertyowner_id'];
+
+            // Step 5: Query the junction table `propertyowner` to get the related owner IDs
+            $sql_propertyowner = "
+                SELECT owner_id 
+                FROM propertyowner 
+                WHERE property_id = ?"; // Use property_id from the URL to get related owner_ids
+
+            if ($stmt2 = $conn->prepare($sql_propertyowner)) {
+                $stmt2->bind_param("i", $p_id); // Bind property ID to the query
+                $stmt2->execute();
+                $result2 = $stmt2->get_result();
+
+                // Step 6: Collect all the owner IDs
+                $owner_ids = [];
+                while ($row2 = $result2->fetch_assoc()) {
+                    $owner_ids[] = $row2['owner_id']; // Store each owner_id from the junction table
+                }
+
+                if (!empty($owner_ids)) {
+                    // Step 7: Build the query to fetch owner details from owners_tb
+                    $ids = implode(',', array_map('intval', $owner_ids)); // Convert IDs to a comma-separated string
+
+                    $sql_owners = "
+                        SELECT 
+                            own_id, 
+                            CONCAT(own_fname, ', ', own_mname, ' ', own_surname) AS owner_name,
+                            own_fname AS first_name, 
+                            own_mname AS middle_name, 
+                            own_surname AS last_name
+                        FROM owners_tb
+                        WHERE own_id IN ($ids)"; // Use IN clause to get all matching owners
+
+                    // Step 8: Execute the query to fetch owner details
+                    $owners_result = $conn->query($sql_owners);
+
+                    // Step 9: Display owner details
+                    if ($owners_result->num_rows > 0) {
+                        while ($owner = $owners_result->fetch_assoc()) {
+                            echo "Owner ID: " . $owner['own_id'] . "<br>";
+                            echo "Owner Name: " . $owner['owner_name'] . "<br>";
+                            echo "First Name: " . $owner['first_name'] . "<br>";
+                            echo "Middle Name: " . $owner['middle_name'] . "<br>";
+                            echo "Last Name: " . $owner['last_name'] . "<br><br>";
+                        }
+                    } else {
+                        echo "No owner details found for the given property.<br>";
+                    }
+                } else {
+                    echo "No owners found for the given property.<br>";
+                }
+            } else {
+                echo "Error preparing query for junction table.<br>";
+            }
         } else {
-          echo "No propertyowner_ids found in faas table for property " . $p_id . ".<br>";
+            echo "No data found for the given property ID.<br>";
         }
-      }
+        $stmt->close();
     } else {
-      echo "No owners found for this property.";
+        echo "Error preparing the statement.<br>";
     }
-    $stmt->close();
-  } else {
-    echo "Error preparing the statement.";
-  }
+} else {
+    echo "Property ID not provided.<br>";
+}
+
+$conn->close();
 
 ?>
 
