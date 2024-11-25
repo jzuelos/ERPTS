@@ -54,10 +54,62 @@ $ownersResult = $conn->query($sql_owners);
 // Fetch owner data
 $owners = [];
 if ($ownersResult && $ownersResult->num_rows > 0) {
-    while ($row = $ownersResult->fetch_assoc()) {
-        $owners[] = $row; // Append each owner to the owners array
-    }
+  while ($row = $ownersResult->fetch_assoc()) {
+    $owners[] = $row; // Append each owner to the owners array
+  }
 }
+
+  // Step 1: Prepare the SQL statement to get the property details and owner information
+  $sql_editowner = "
+      SELECT 
+          f.propertyowner_id,  -- This will contain JSON data (owner IDs associated with the property in faas table)
+          o.own_id, 
+          CONCAT(o.own_fname, ', ', o.own_mname, ' ', o.own_surname) AS owner_name,
+          o.own_fname AS first_name, 
+          o.own_mname AS middle_name, 
+          o.own_surname AS last_name
+      FROM faas f
+      LEFT JOIN owners_tb o
+          ON JSON_UNQUOTE(JSON_EXTRACT(f.propertyowner_id, CONCAT('$[', o.own_id, ']'))) IS NOT NULL
+      WHERE f.pro_id = ?";  // Use the property_id from the URL
+
+  // Step 2: Prepare and execute the query
+  if ($stmt = $conn->prepare($sql_editowner)) {
+    $stmt->bind_param("i", $p_id);  // Bind the property ID from the URL to the query
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // Step 3: Check if there are any results
+    if ($result->num_rows > 0) {
+      while ($row = $result->fetch_assoc()) {
+        // Step 4: Check if propertyowner_id is not empty and decode JSON data
+        if (!empty($row['propertyowner_id'])) {
+          // Decode the JSON data from the faas table's propertyowner_id field
+          $owner_ids = json_decode($row['propertyowner_id'], true);  // Decoding as an array
+
+          // Step 5: Check if decoding was successful and if it's an array
+          if (is_array($owner_ids)) {
+            // Step 6: Output the owner details
+            echo "Owner ID: " . $row['own_id'] . "<br>";
+            echo "Owner Name: " . $row['owner_name'] . "<br>";
+            echo "First Name: " . $row['first_name'] . "<br>";
+            echo "Middle Name: " . $row['middle_name'] . "<br>";
+            echo "Last Name: " . $row['last_name'] . "<br><br>";
+          } else {
+            echo "Invalid JSON format in propertyowner_id for property " . $p_id . ".<br>";
+          }
+        } else {
+          echo "No propertyowner_ids found in faas table for property " . $p_id . ".<br>";
+        }
+      }
+    } else {
+      echo "No owners found for this property.";
+    }
+    $stmt->close();
+  } else {
+    echo "Error preparing the statement.";
+  }
+
 ?>
 
 <!doctype html>
@@ -80,7 +132,8 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
   <!-- Header Navigation -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
     <a class="navbar-brand">
-      <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top" alt="">
+      <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top"
+        alt="">
       Electronic Real Property Tax System
     </a>
 
@@ -122,133 +175,135 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
   </nav>
   <!--Main Body-->
 
-<!-- Owner's Information Section -->
-<section class="container mt-5" id="owner-info-section">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div class="d-flex align-items-center">
-      <a href="Real-Property-Unit-List.php">
-        <img src="images/backward.png" width="35" height="35" alt="Back">
-      </a>
-      <h4 class="ms-3 mb-0">Owner's Information</h4>
+  <!-- Owner's Information Section -->
+  <section class="container mt-5" id="owner-info-section">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="d-flex align-items-center">
+        <a href="Real-Property-Unit-List.php">
+          <img src="images/backward.png" width="35" height="35" alt="Back">
+        </a>
+        <h4 class="ms-3 mb-0">Owner's Information</h4>
+      </div>
+      <button type="button" class="btn btn-outline-primary btn-sm" id="editOwnerBtn"
+        onclick="showOISModal()">Edit</button>
     </div>
-    <button type="button" class="btn btn-outline-primary btn-sm" id="editOwnerBtn" onclick="showOISModal()">Edit</button>
-  </div>
 
-  <div class="card border-0 shadow p-4 rounded-3">
-    <div id="owner-info" class="row">
-      <div class="col-md-12 mb-4">
-        <form>
-          <div class="mb-3 w-50">
-            <label for="ownerName" class="form-label">Company or Owner</label>
-            <input type="text" class="form-control" id="ownerName"
-              value="<?php echo isset($property['owner_name']) ? htmlspecialchars($property['owner_name']) : ''; ?>"
-              placeholder="Enter Company or Owner" disabled>
-          </div>
-        </form>
-      </div>
-      <div class="col-md-12">
-        <h6 class="mb-3">Name</h6>
-        <form class="row">
-          <div class="col-md-4 mb-3">
-            <label for="firstName" class="form-label">First Name</label>
-            <input type="text" class="form-control" id="firstName"
-              value="<?php echo isset($property['first_name']) ? htmlspecialchars($property['first_name']) : ''; ?>"
-              placeholder="Enter First Name" disabled>
-          </div>
-          <div class="col-md-4 mb-3">
-            <label for="middleName" class="form-label">Middle Name</label>
-            <input type="text" class="form-control" id="middleName"
-              value="<?php echo isset($property['middle_name']) ? htmlspecialchars($property['middle_name']) : ''; ?>"
-              placeholder="Enter Middle Name" disabled>
-          </div>
-          <div class="col-md-4 mb-3">
-            <label for="lastName" class="form-label">Last Name</label>
-            <input type="text" class="form-control" id="lastName"
-              value="<?php echo isset($property['last_name']) ? htmlspecialchars($property['last_name']) : ''; ?>"
-              placeholder="Enter Last Name" disabled>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Modal for Editing Owner's Information -->
-<div class="modal fade" id="editOwnerModal" tabindex="-1" aria-labelledby="editOwnerModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editOwnerModalLabel">Edit Owner's Information</h5>
-      </div>
-      <div class="modal-body">
-        <form id="editOwnerForm">
-          <div class="mb-3">
-            <label for="ownerNameModal" class="form-label">Company or Owner</label>
-            <input type="text" class="form-control" id="ownerNameModal"
-              value="<?php echo isset($property['owner_name']) ? htmlspecialchars($property['owner_name']) : ''; ?>"
-              placeholder="Enter Company or Owner">
-          </div>
-          <hr class="my-4">
+    <div class="card border-0 shadow p-4 rounded-3">
+      <div id="owner-info" class="row">
+        <div class="col-md-12 mb-4">
+          <form>
+            <div class="mb-3 w-50">
+              <label for="ownerName" class="form-label">Company or Owner</label>
+              <input type="text" class="form-control" id="ownerName"
+                value="<?php echo isset($property['owner_name']) ? htmlspecialchars($property['owner_name']) : ''; ?>"
+                placeholder="Enter Company or Owner" disabled>
+            </div>
+          </form>
+        </div>
+        <div class="col-md-12">
           <h6 class="mb-3">Name</h6>
-          <div class="mb-3">
-            <label for="firstNameModal" class="form-label">First Name</label>
-            <input type="text" class="form-control" id="firstNameModal"
-              value="<?php echo isset($property['first_name']) ? htmlspecialchars($property['first_name']) : ''; ?>"
-              placeholder="Enter First Name">
-          </div>
-          <div class="mb-3">
-            <label for="middleNameModal" class="form-label">Middle Name</label>
-            <input type="text" class="form-control" id="middleNameModal"
-              value="<?php echo isset($property['middle_name']) ? htmlspecialchars($property['middle_name']) : ''; ?>"
-              placeholder="Enter Middle Name">
-          </div>
-          <div class="mb-3">
-            <label for="lastNameModal" class="form-label">Last Name</label>
-            <input type="text" class="form-control" id="lastNameModal"
-              value="<?php echo isset($property['last_name']) ? htmlspecialchars($property['last_name']) : ''; ?>"
-              placeholder="Enter Last Name">
-          </div>
-        </form>
-        <hr class="my-4">
-        <table class="table table-bordered table-striped table-sm">
-  <thead class="table-dark">
-    <tr>
-      <th class="text-center">ID</th>
-      <th class="text-center">Selection</th>
-      <th class="text-center">Owner Name</th>
-      <th class="text-center">Address</th>
-    </tr>
-  </thead>
-  <tbody>
-    <?php if (!empty($owners)): ?>
-      <?php foreach ($owners as $owner): ?>
-        <tr>
-          <td class="text-center"><?php echo htmlspecialchars($owner['own_id']); ?></td>
-          <td class="text-center">
-            <input type="checkbox" name="owner_selection[]" value="<?php echo htmlspecialchars($owner['own_id']); ?>">
-          </td>
-          <td class="text-center"><?php echo htmlspecialchars($owner['owner_name']); ?></td>
-          <td class="text-center"><?php echo htmlspecialchars($owner['address']); ?></td>
-        </tr>
-      <?php endforeach; ?>
-    <?php else: ?>
-      <tr>
-        <td colspan="4" class="text-center">No owner data found.</td>
-      </tr>
-    <?php endif; ?>
-  </tbody>
-</table>
-
-
+          <form class="row">
+            <div class="col-md-4 mb-3">
+              <label for="firstName" class="form-label">First Name</label>
+              <input type="text" class="form-control" id="firstName"
+                value="<?php echo isset($property['first_name']) ? htmlspecialchars($property['first_name']) : ''; ?>"
+                placeholder="Enter First Name" disabled>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="middleName" class="form-label">Middle Name</label>
+              <input type="text" class="form-control" id="middleName"
+                value="<?php echo isset($property['middle_name']) ? htmlspecialchars($property['middle_name']) : ''; ?>"
+                placeholder="Enter Middle Name" disabled>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="lastName" class="form-label">Last Name</label>
+              <input type="text" class="form-control" id="lastName"
+                value="<?php echo isset($property['last_name']) ? htmlspecialchars($property['last_name']) : ''; ?>"
+                placeholder="Enter Last Name" disabled>
+            </div>
+          </form>
+        </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" onclick="saveOwnerData()">Save changes</button>
-        <button type="button" class="btn btn-success" onclick="addOwnerData()">Add</button>
+    </div>
+  </section>
+
+  <!-- Modal for Editing Owner's Information -->
+  <div class="modal fade" id="editOwnerModal" tabindex="-1" aria-labelledby="editOwnerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editOwnerModalLabel">Edit Owner's Information</h5>
+        </div>
+        <div class="modal-body">
+          <form id="editOwnerForm">
+            <div class="mb-3">
+              <label for="ownerNameModal" class="form-label">Company or Owner</label>
+              <input type="text" class="form-control" id="ownerNameModal"
+                value="<?php echo isset($property['owner_name']) ? htmlspecialchars($property['owner_name']) : ''; ?>"
+                placeholder="Enter Company or Owner">
+            </div>
+            <hr class="my-4">
+            <h6 class="mb-3">Name</h6>
+            <div class="mb-3">
+              <label for="firstNameModal" class="form-label">First Name</label>
+              <input type="text" class="form-control" id="firstNameModal"
+                value="<?php echo isset($property['first_name']) ? htmlspecialchars($property['first_name']) : ''; ?>"
+                placeholder="Enter First Name">
+            </div>
+            <div class="mb-3">
+              <label for="middleNameModal" class="form-label">Middle Name</label>
+              <input type="text" class="form-control" id="middleNameModal"
+                value="<?php echo isset($property['middle_name']) ? htmlspecialchars($property['middle_name']) : ''; ?>"
+                placeholder="Enter Middle Name">
+            </div>
+            <div class="mb-3">
+              <label for="lastNameModal" class="form-label">Last Name</label>
+              <input type="text" class="form-control" id="lastNameModal"
+                value="<?php echo isset($property['last_name']) ? htmlspecialchars($property['last_name']) : ''; ?>"
+                placeholder="Enter Last Name">
+            </div>
+          </form>
+          <hr class="my-4">
+          <table class="table table-bordered table-striped table-sm">
+            <thead class="table-dark">
+              <tr>
+                <th class="text-center">ID</th>
+                <th class="text-center">Selection</th>
+                <th class="text-center">Owner Name</th>
+                <th class="text-center">Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php if (!empty($owners)): ?>
+                <?php foreach ($owners as $owner): ?>
+                  <tr>
+                    <td class="text-center"><?php echo htmlspecialchars($owner['own_id']); ?></td>
+                    <td class="text-center">
+                      <input type="checkbox" name="owner_selection[]"
+                        value="<?php echo htmlspecialchars($owner['own_id']); ?>">
+                    </td>
+                    <td class="text-center"><?php echo htmlspecialchars($owner['owner_name']); ?></td>
+                    <td class="text-center"><?php echo htmlspecialchars($owner['address']); ?></td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="4" class="text-center">No owner data found.</td>
+                </tr>
+              <?php endif; ?>
+            </tbody>
+          </table>
+
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="saveOwnerData()">Save changes</button>
+          <button type="button" class="btn btn-success" onclick="addOwnerData()">Add</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
   <!-- Property Information Section -->
   <section class="container my-5" id="property-info-section">
@@ -259,7 +314,8 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
     <div class="card border-0 shadow p-4 rounded-3">
       <form id="property-info">
         <div class="row">
-        <input type="hidden" id="propertyIdModal" value="<?php echo isset($property['p_id']) ? htmlspecialchars($property['p_id']) : ''; ?>"> 
+          <input type="hidden" id="propertyIdModal"
+            value="<?php echo isset($property['p_id']) ? htmlspecialchars($property['p_id']) : ''; ?>">
           <!-- Location Fields -->
           <div class="col-md-6 mb-4">
             <div class="mb-3">
@@ -348,7 +404,8 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
   </section>
 
   <!-- Modal for Editing Property Information -->
-  <div class="modal fade" id="editPropertyModal" tabindex="-1" aria-labelledby="editPropertyModalLabel" aria-hidden="true">
+  <div class="modal fade" id="editPropertyModal" tabindex="-1" aria-labelledby="editPropertyModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -360,7 +417,8 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
           <form id="editPropertyForm">
             <div class="row">
               <!-- Location Fields -->
-              <input type="hidden" id="propertyIdModal" value="<?php echo isset($property['p_id']) ? htmlspecialchars($property['p_id']) : ''; ?>">
+              <input type="hidden" id="propertyIdModal"
+                value="<?php echo isset($property['p_id']) ? htmlspecialchars($property['p_id']) : ''; ?>">
               <div class="col-12 mb-3">
                 <label for="streetModal" class="form-label">Street</label>
                 <input type="text" class="form-control" id="streetModal"
@@ -437,7 +495,8 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
   <section class="container my-5" id="land-section">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h4 class="section-title">Land</h4>
-      <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editLandModal">Edit</button>
+      <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+        data-bs-target="#editLandModal">Edit</button>
     </div>
     <div class="card border-0 shadow p-4 rounded-3">
       <!-- Land Details Section -->
@@ -491,7 +550,8 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
 
       <!-- Boundary Description -->
       <h6 class="section-subtitle mt-4">Boundary Description</h6>
-      <textarea class="form-control mb-4" id="boundaryDescriptionModal" rows="2" placeholder="Enter boundary description" disabled></textarea>
+      <textarea class="form-control mb-4" id="boundaryDescriptionModal" rows="2"
+        placeholder="Enter boundary description" disabled></textarea>
 
       <!-- Administrator Information Section -->
       <h5 class="section-title mt-5">Administrator Information</h5>
@@ -562,7 +622,8 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
         <div class="col-md-6 mb-4">
           <div class="mb-3">
             <label for="adminAddressMunicipality" class="form-label">Municipality/City</label>
-            <input type="text" id="adminAddressMunicipality" class="form-control" placeholder="Enter municipality or city" disabled>
+            <input type="text" id="adminAddressMunicipality" class="form-control"
+              placeholder="Enter municipality or city" disabled>
           </div>
         </div>
         <div class="col-md-6 mb-4">
@@ -626,7 +687,8 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
         <div class="col-md-4 mb-4">
           <div class="mb-3">
             <label for="adjustmentFactor" class="form-label">Adjustment Factor</label>
-            <input type="text" id="adjustmentFactor" class="form-control" placeholder="Enter adjustment factor" disabled>
+            <input type="text" id="adjustmentFactor" class="form-control" placeholder="Enter adjustment factor"
+              disabled>
           </div>
         </div>
         <div class="col-md-4 mb-4">
@@ -649,7 +711,8 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
         <div class="col-md-4 mb-4">
           <div class="mb-3">
             <label for="adjustedMarketValue" class="form-label">Adjusted Market Value</label>
-            <input type="text" id="adjustedMarketValue" class="form-control" placeholder="Enter adjusted market value" disabled>
+            <input type="text" id="adjustedMarketValue" class="form-control" placeholder="Enter adjusted market value"
+              disabled>
           </div>
         </div>
         <div class="col-md-4 mb-4">
@@ -720,7 +783,8 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
         <div class="col-md-6 mb-4">
           <div class="mb-3">
             <label for="recommendingApproval" class="form-label">Recommending Approval</label>
-            <input type="text" id="recommendingApproval" class="form-control" placeholder="Enter recommender's name" disabled>
+            <input type="text" id="recommendingApproval" class="form-control" placeholder="Enter recommender's name"
+              disabled>
           </div>
         </div>
         <div class="col-md-6 mb-4">
@@ -769,7 +833,7 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
 
       <!-- Print Button at the Bottom Right -->
       <div class="text-right mt-4">
-          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openPrintPage()">Print</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openPrintPage()">Print</button>
       </div>
     </div>
   </section>
@@ -819,7 +883,8 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
           <!-- Boundary Description -->
           <div class="mb-4">
             <label for="boundaryDescriptionModal" class="form-label">Boundary Description</label>
-            <textarea class="form-control" id="boundaryDescriptionModal" rows="2" placeholder="Enter boundary description"></textarea>
+            <textarea class="form-control" id="boundaryDescriptionModal" rows="2"
+              placeholder="Enter boundary description"></textarea>
           </div>
 
           <!-- Administrator Information -->
@@ -891,7 +956,8 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
             <div class="col-md-6 mb-4">
               <div class="mb-3">
                 <label for="adminAddressMunicipalityModal" class="form-label">Municipality/City</label>
-                <input type="text" id="adminAddressMunicipalityModal" class="form-control" placeholder="Enter municipality or city">
+                <input type="text" id="adminAddressMunicipalityModal" class="form-control"
+                  placeholder="Enter municipality or city">
               </div>
             </div>
             <div class="col-md-6 mb-4">
@@ -957,7 +1023,8 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
           <div class="row">
             <div class="col-md-4 mb-4">
               <label for="adjustedMarketValueModal" class="form-label">Adjusted Market Value</label>
-              <input type="text" id="adjustedMarketValueModal" class="form-control" placeholder="Enter adjusted market value">
+              <input type="text" id="adjustedMarketValueModal" class="form-control"
+                placeholder="Enter adjusted market value">
             </div>
             <div class="col-md-4 mb-4">
               <label for="assessmentLevelModal" class="form-label">Assessment Level (%)</label>
@@ -1014,7 +1081,8 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
   <section class="container my-5">
     <h5 class="mb-3">Memoranda</h5>
     <div class="form-group">
-      <div style="border: 1px solid #ddd; padding: 15px; width: 100%; max-width: 800px; margin: 0 auto; text-align: justify;">
+      <div
+        style="border: 1px solid #ddd; padding: 15px; width: 100%; max-width: 800px; margin: 0 auto; text-align: justify;">
         <p class="form-control-plaintext" style="font-weight: bold;">
           Records Updating: TRANSFERRED BY VIRTUE OF TRANSFER CERTIFICATE OF TITLE <br>NO. 079-2023001223,
           DEED OF ABSOLUTE SALE NOTARIZED BY ATTY. RONALD A. RAMOS,<br>
@@ -1062,15 +1130,17 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
       <!-- Add and Print Buttons Inside the Form -->
       <div class="d-flex justify-content-between mb-3">
         <!-- Enable "Add Plants/Trees" button -->
-        <button type="button" class="btn btn-outline-primary btn-sm" onclick="togglePlantsSection()">Add Plants/Trees</button>
+        <button type="button" class="btn btn-outline-primary btn-sm" onclick="togglePlantsSection()">Add
+          Plants/Trees</button>
         <!-- Enable Print button -->
-          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openPrintPage()">Print</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openPrintPage()">Print</button>
       </div>
 
       <!-- Remove Button -->
       <div class="form-group mt-3">
         <!-- Enable Remove button -->
-        <button type="button" class="btn btn-outline-danger btn-sm" id="removeButton" style="margin-left: 0.5rem;">Remove</button>
+        <button type="button" class="btn btn-outline-danger btn-sm" id="removeButton"
+          style="margin-left: 0.5rem;">Remove</button>
       </div>
 
       <!-- Hidden Plants/Trees Section (Initially Hidden) -->
@@ -1081,7 +1151,8 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
   </section>
 
   <!-- Modal for Editing Plants and Trees -->
-  <div class="modal fade" id="editPlantsTreesModal" tabindex="-1" aria-labelledby="editPlantsTreesModalLabel" aria-hidden="true">
+  <div class="modal fade" id="editPlantsTreesModal" tabindex="-1" aria-labelledby="editPlantsTreesModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -1160,7 +1231,8 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
   </section>
 
   <!-- Modal for Editing Valuation -->
-  <div class="modal fade" id="editValuationModal" tabindex="-1" aria-labelledby="editValuationModalLabel" aria-hidden="true">
+  <div class="modal fade" id="editValuationModal" tabindex="-1" aria-labelledby="editValuationModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -1171,19 +1243,23 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
           <form id="editValuationForm">
             <div class="mb-3">
               <label for="landMarketValueModal" class="form-label">Land Market Value</label>
-              <input type="text" class="form-control" id="landMarketValueModal" placeholder="Enter market value for Land">
+              <input type="text" class="form-control" id="landMarketValueModal"
+                placeholder="Enter market value for Land">
             </div>
             <div class="mb-3">
               <label for="landAssessedValueModal" class="form-label">Land Assessed Value</label>
-              <input type="text" class="form-control" id="landAssessedValueModal" placeholder="Enter assessed value for Land">
+              <input type="text" class="form-control" id="landAssessedValueModal"
+                placeholder="Enter assessed value for Land">
             </div>
             <div class="mb-3">
               <label for="plantsMarketValueModal" class="form-label">Plants/Trees Market Value</label>
-              <input type="text" class="form-control" id="plantsMarketValueModal" placeholder="Enter market value for Plants/Trees">
+              <input type="text" class="form-control" id="plantsMarketValueModal"
+                placeholder="Enter market value for Plants/Trees">
             </div>
             <div class="mb-3">
               <label for="plantsAssessedValueModal" class="form-label">Plants/Trees Assessed Value</label>
-              <input type="text" class="form-control" id="plantsAssessedValueModal" placeholder="Enter assessed value for Plants/Trees">
+              <input type="text" class="form-control" id="plantsAssessedValueModal"
+                placeholder="Enter assessed value for Plants/Trees">
             </div>
           </form>
         </div>
@@ -1204,53 +1280,58 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
   </footer>
 
   <script>
-  // Function to capitalize the first letter of each word
-  function capitalizeFirstLetter(element) {
-    element.value = element.value.replace(/\b\w/g, function(char) {
-      return char.toUpperCase();
-    });
-  }
+    // Function to capitalize the first letter of each word
+    function capitalizeFirstLetter(element) {
+      element.value = element.value.replace(/\b\w/g, function (char) {
+        return char.toUpperCase();
+      });
+    }
 
-  // Function to allow only numeric input in ARD Number
-  function restrictToNumbers(element) {
-    element.value = element.value.replace(/[^0-9]/g, ''); // Removes any non-numeric character
-  }
+    // Function to allow only numeric input in ARD Number
+    function restrictToNumbers(element) {
+      element.value = element.value.replace(/[^0-9]/g, ''); // Removes any non-numeric character
+    }
 
-  // Attach the function to the 'input' event of each relevant field after DOM is fully loaded
-  document.addEventListener("DOMContentLoaded", function() {
-    // Apply capitalization to specific input fields in the owner info section and modal
-    const fieldsToCapitalize = [
-      'ownerName', 'firstName', 'middleName', 'lastName',
-      'ownerNameModal', 'firstNameModal', 'middleNameModal', 'lastNameModal',
-      'streetModal', 'barangayModal', 'municipalityModal', 'provinceModal'
-    ];
+    // Attach the function to the 'input' event of each relevant field after DOM is fully loaded
+    document.addEventListener("DOMContentLoaded", function () {
+      // Apply capitalization to specific input fields in the owner info section and modal
+      const fieldsToCapitalize = [
+        'ownerName', 'firstName', 'middleName', 'lastName',
+        'ownerNameModal', 'firstNameModal', 'middleNameModal', 'lastNameModal',
+        'streetModal', 'barangayModal', 'municipalityModal', 'provinceModal'
+      ];
 
-    fieldsToCapitalize.forEach(fieldId => {
-      const inputField = document.getElementById(fieldId);
-      if (inputField) {
-        inputField.addEventListener("input", function() {
-          capitalizeFirstLetter(inputField);
+      fieldsToCapitalize.forEach(fieldId => {
+        const inputField = document.getElementById(fieldId);
+        if (inputField) {
+          inputField.addEventListener("input", function () {
+            capitalizeFirstLetter(inputField);
+          });
+        }
+      });
+
+      // Event listener for ARD Number to restrict input to numbers only
+      const ardNumberField = document.getElementById("ardNumberModal");
+      if (ardNumberField) {
+        ardNumberField.addEventListener("input", function () {
+          restrictToNumbers(ardNumberField);
         });
       }
     });
-
-    // Event listener for ARD Number to restrict input to numbers only
-    const ardNumberField = document.getElementById("ardNumberModal");
-    if (ardNumberField) {
-      ardNumberField.addEventListener("input", function() {
-        restrictToNumbers(ardNumberField);
-      });
-    }
-  });
   </script>
 
   <!-- Optional JavaScript -->
-  <script src="http://localhost/ERPTS/main_layout.js"></script>
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="http://localhost/ERPTS/FAAS.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
+    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
+    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
