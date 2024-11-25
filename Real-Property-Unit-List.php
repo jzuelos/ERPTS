@@ -123,7 +123,7 @@ if ($barangayResult->num_rows > 0) {
         <div class="col-auto">
           <label for="searchInput" class="sr-only">Search</label>
           <div class="input-group">
-            <input type="text" class="form-control" id="searchInput" placeholder="Search"> <!-- Search input -->
+          <input type="text" class="form-control" id="searchInput" placeholder="Search" onkeyup="handleEnter(event)">
             <select class="custom-select" id="barangayDropdown" name="barangay"> <!-- Dropdown for barangay selection -->
               <option selected value="">All Barangay</option>
               <?php echo $barangayOptions; ?> <!-- PHP-generated barangay options -->
@@ -188,8 +188,17 @@ if ($barangayResult->num_rows > 0) {
         <h5 class="modal-title" id="viewAllModalLabel">All Properties</h5>
       </div>
       <div class="modal-body">
+        <!-- Search Bar inside the modal -->
+        <div class="mb-3 d-flex">
+        <input type="text" class="form-control" id="modalSearchInput" placeholder="Search properties..." style="width: 50%; margin-right: 10px;" onkeyup="handleEnter(event)">
+          <button 
+            class="btn btn-primary" 
+            onclick="viewAllSearch()">Search</button>
+        </div>
+
+        <!-- Modal Table -->
         <div class="table-responsive">
-          <table class="table table-bordered text-center modern-table">
+          <table class="table table-bordered text-center modern-table" id="propertyTable">
             <thead>
               <tr>
                 <th>OD ID</th>
@@ -221,6 +230,7 @@ if ($barangayResult->num_rows > 0) {
   </div>
 </div>
 
+
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
@@ -229,7 +239,6 @@ if ($barangayResult->num_rows > 0) {
     </div>
   </footer>
 
-  <!-- Optional JavaScript -->
   <script src="http://localhost/ERPTS/Real-Property-Unit-List.js"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"

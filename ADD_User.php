@@ -15,65 +15,10 @@
 </head>
 
 <body>
-<!-- Header Navigation -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-custom">
-    <a class="navbar-brand" href="#">
-        <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top" alt="">
-        Electronic Real Property Tax System
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="Home.php">Home<span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item dropdown active">
-                <a class="nav-link dropdown-toggle" href="RPU-Management.php" id="navbarDropdown" role="button"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    RPU Management
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="Real-Property-Unit-List.php">RPU List</a>
-                    <a class="dropdown-item" href="FAAS.php">FAAS</a>
-                    <a class="dropdown-item" href="Tax-Declaration-List.php">Tax Declaration</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="Track.php">Track Paper</a>
-                </div>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="Transaction.php">Transaction</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="Reports.php">Reports</a>
-            </li>
-            <li class="nav-item">
-                <a href="logout.php" class="btn btn-danger">Log Out</a>
-            </li>
-        </ul>
-    </div>
-</nav>
 
-<!-- Main Content -->
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Create New User</h2>
-    <form action="" method="POST">
-    <?php
+<?php
     session_start(); // Start session at the top
-
-    // Check if the user is logged in by verifying if 'user_id' exists in the session
-    if (!isset($_SESSION['user_id'])) {
-        header("Location: index.php"); // Redirect to login page if user is not logged in
-        exit; // Stop further execution after redirection
-    }
-
-    // Prevent the browser from caching this page
-    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
-    header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
-    header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility
-        
+    
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
 
@@ -158,6 +103,54 @@
         unset($_SESSION['message']);
     }
 ?>
+
+<!-- Header Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-custom">
+    <a class="navbar-brand" href="#">
+        <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top" alt="">
+        Electronic Real Property Tax System
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="Home.php">Home<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item dropdown active">
+                <a class="nav-link dropdown-toggle" href="RPU-Management.php" id="navbarDropdown" role="button"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    RPU Management
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="Real-Property-Unit-List.php">RPU List</a>
+                    <a class="dropdown-item" href="FAAS.php">FAAS</a>
+                    <a class="dropdown-item" href="Tax-Declaration-List.php">Tax Declaration</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="Track.php">Track Paper</a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="Transaction.php">Transaction</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="Reports.php">Reports</a>
+            </li>
+            <li class="nav-item">
+                <button type="button" class="btn btn-danger">Log Out</button>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
+<!-- Main Content -->
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Create New User</h2>
+    <form action="" method="POST">
+
         <!-- User Credentials Section -->
         <div class="mb-4">
             <legend class="font-weight-bold">User Credentials</legend>
@@ -231,50 +224,60 @@
             </div>
         </div>
 
-        <!-- Contact Information Section -->
-        <div class="mb-4">
-            <legend class="font-weight-bold">Contact Information</legend>
+       <!-- Contact Information Section -->
+<div class="mb-4">
+    <legend class="font-weight-bold">Contact Information</legend>
 
-            <div class="form-group">
-                <label for="house_number">House Number:</label>
-                <input type="text" id="house_number" name="house_number" class="form-control">
-            </div>
+    <div class="form-group">
+        <label for="house_number">House Number:</label>
+        <input type="text" id="house_number" name="house_number" class="form-control" required>
+    </div>
 
-            <div class="form-group">
-                <label for="street">Street:</label>
-                <input type="text" id="street" name="street" class="form-control" required>
-            </div>
+    <div class="form-group">
+        <label for="street">Street:</label>
+        <input type="text" id="street" name="street" class="form-control" required>
+    </div>
 
-            <div class="form-group">
-                <label for="barangay">Barangay:</label>
-                <input type="text" id="barangay" name="barangay" class="form-control" required>
-            </div>
+    <div class="form-group">
+        <label for="barangay">Barangay:</label>
+        <input type="text" id="barangay" name="barangay" class="form-control" required>
+    </div>
 
-            <div class="form-group">
-                <label for="district">District:</label>
-                <input type="text" id="district" name="district" class="form-control" required>
-            </div>
+    <div class="form-group">
+        <label for="district">District:</label>
+        <input type="text" id="district" name="district" class="form-control" required>
+    </div>
 
-            <div class="form-group">
-                <label for="municipality">Municipality/City:</label>
-                <input type="text" id="municipality" name="municipality" class="form-control" required>
-            </div>
+    <div class="form-group">
+        <label for="municipality">Municipality/City:</label>
+        <input type="text" id="municipality" name="municipality" class="form-control" required>
+    </div>
 
-            <div class="form-group">
-                <label for="province">Province:</label>
-                <input type="text" id="province" name="province" class="form-control" required>
-            </div>
+    <div class="form-group">
+        <label for="province">Province:</label>
+        <input type="text" id="province" name="province" class="form-control" required>
+    </div>
 
-            <div class="form-group">
-                <label for="contact_number">Contact Number:</label>
-                <input type="text" id="contact_number" name="contact_number" class="form-control" required>
-            </div>
+    <div class="form-group">
+        <label for="contact_number">Contact Number:</label>
+        <input type="text" id="contact_number" name="contact_number" class="form-control" required>
+    </div>
 
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" class="form-control">
-            </div>
-        </div>
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" class="form-control" required>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="userType">User Type:</label>
+    <select id="userType" name="userType" class="form-control">
+        <option value="" selected disabled>Select Role</option>
+        <option value="Admin">Admin</option>
+        <option value="User">User</option>
+    </select>
+</div>
+
 
         <button type="submit" class="btn">Create User</button>
     </form>
@@ -302,44 +305,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
         integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
         crossorigin="anonymous"></script>
-        <script>
-            // Capitalize input fields
-            function capitalizeInput(event) {
-                event.target.value = event.target.value.replace(/\b\w/g, function (char) {
-                    return char.toUpperCase();
-                });
-            }
-
-            // Ensure TIN contains only numbers
-            function validateTIN(event) {
-                let value = event.target.value;
-                event.target.value = value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
-            }
-
-            // Function to restrict contact number to 11 digits
-            document.getElementById('contact_number').addEventListener('input', function(event) {
-                let value = event.target.value.replace(/\D/g, ''); // Remove non-numeric characters
-                if (value.length > 11) {
-                    value = value.substring(0, 11); // Limit to 11 digits
-                }
-                event.target.value = value;
-            });
-
-            // Attach event listeners to input fields
-            document.addEventListener('DOMContentLoaded', function () {
-                // Capitalize fields
-                const capitalizeFields = document.querySelectorAll('#lastname, #firstname, #middlename, #street, #barangay, #district, #municipality, #province');
-                capitalizeFields.forEach(function (field) {
-                    field.addEventListener('input', capitalizeInput);
-                });
-
-                // Validate TIN to allow only numbers
-                document.getElementById('tin').addEventListener('input', validateTIN);
-
-                // Validate Contact Number to allow only 11 digits
-                document.getElementById('contact_number').addEventListener('input', validateContactNumber);
-            });
-        </script>
 
 </body>
+
 </html>

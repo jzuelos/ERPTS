@@ -15,11 +15,11 @@
 <?php
     session_start(); // Start session at the top
 
-    // Check if the user is logged in by verifying if 'user_id' exists in the session
+    /* Check if the user is logged in by verifying if 'user_id' exists in the session
     if (!isset($_SESSION['user_id'])) {
         header("Location: index.php"); // Redirect to login page if user is not logged in
         exit; // Stop further execution after redirection
-    }
+    } */   
 
     // Prevent the browser from caching this page
     header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
@@ -50,7 +50,7 @@
         echo "<p>Error fetching users: " . $conn->error . "</p>";
     }
 
-    $conn->close();
+    $conn->close(); 
 ?>
 
 <!-- Header Navigation -->
@@ -133,9 +133,9 @@
                         <td><?php echo $user['status'] == 1 ? 'Enabled' : 'Disabled'; ?></td>
                         <td class="text-center"><input type="checkbox" <?php echo $user['status'] == 1 ? 'checked' : ''; ?> disabled></td>
                         <td class="text-center">
-                            <a href="edit-user.php?id=<?php echo htmlspecialchars($user['user_id']); ?>">
-                                <img src="images/pencil.png" alt="Edit" class="edit-icon">
-                            </a>
+                        <a href="javascript:void(0);" onclick="openEditModal(<?php echo htmlspecialchars($user['user_id']); ?>)">
+    <img src="images/pencil.png" alt="Edit" class="edit-icon">
+</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -144,6 +144,122 @@
         </div>
     </div>
 </section>
+
+<!-- Modal -->
+<div class="modal" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="editUserForm" action="edit-user.php" method="POST">
+                <div class="modal-body">
+                    <!-- User Details Form Fields -->
+                    <div class="form-group">
+                        <label for="userId">User ID</label>
+                        <input type="text" class="form-control" id="userId" name="userId" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required pattern="^[a-zA-Z0-9_]+$" title="Only alphanumeric characters and underscores are allowed.">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required minlength="8" title="Password must be at least 8 characters long.">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" class="form-control" id="firstName" name="firstName" required pattern="^[A-Za-z]+$" title="Only letters are allowed.">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" class="form-control" id="lastName" name="lastName" required pattern="^[A-Za-z]+$" title="Only letters are allowed.">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="middleName">Middle Name</label>
+                        <input type="text" class="form-control" id="middleName" name="middleName" pattern="^[A-Za-z]+$" title="Only letters are allowed.">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select class="form-control" id="gender" name="gender" required>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="birthdate">Birthdate</label>
+                        <input type="date" class="form-control" id="birthdate" name="birthdate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="maritalStatus">Marital Status</label>
+                        <select class="form-control" id="maritalStatus" name="maritalStatus" required>
+                            <option value="Single">Single</option>
+                            <option value="Married">Married</option>
+                            <option value="Divorced">Divorced</option>
+                            <option value="Widowed">Widowed</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tin">TIN</label>
+                        <input type="text" class="form-control" id="tin" name="tin" required pattern="^\d{12}$" title="TIN must be exactly 12 digits.">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="houseNumber">House Number</label>
+                        <input type="text" class="form-control" id="houseNumber" name="houseNumber" required pattern="^[0-9]+$" title="Only numbers are allowed.">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="street">Street</label>
+                        <input type="text" class="form-control" id="street" name="street" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="barangay">Barangay</label>
+                        <input type="text" class="form-control" id="barangay" name="barangay" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="district">District</label>
+                        <input type="text" class="form-control" id="district" name="district" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="municipality">Municipality</label>
+                        <input type="text" class="form-control" id="municipality" name="municipality" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="province">Province</label>
+                        <input type="text" class="form-control" id="province" name="province" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contactNumber">Contact Number</label>
+                        <input type="tel" class="form-control" id="contactNumber" name="contactNumber" required pattern="^\d{10}$" title="Contact number must be exactly 10 digits.">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="reset" class="btn btn-warning">Reset</button>
+                 <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <!-- Footer -->
 <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
@@ -154,6 +270,7 @@
 </footer>
 
 <!-- Bootstrap JS -->
+<script src="http://localhost/ERPTS/User-Control.js"></script> 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Your original JS files -->
 <script src="jquery.js" defer></script>

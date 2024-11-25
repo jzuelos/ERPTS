@@ -92,78 +92,78 @@ if ($result->num_rows > 0) {
     </div>
   </nav>
 
-  <!-- Main Body -->
-  <section class="container mt-5">
-    <div class="card p-4">
-      <h3 class="mb-4">Owner's List</h3>
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <label for="searchInput" class="sr-only">Search</label>
-          <div class="input-group">
-            <input type="text" class="form-control" id="searchInput" placeholder="Search">
-            <div class="input-group-append">
-
-              <button type="button" class="btn btn-success btn-hover" onclick="filterTable()">Search</button>
-            </div>
+<!-- Main Body -->
+<section class="container mt-5">
+  <div class="card p-4">
+    <h3 class="mb-4">Owner's List</h3>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <label for="searchInput" class="sr-only">Search</label>
+        <div class="input-group">
+          <input type="text" class="form-control" id="searchInput" placeholder="Search" onkeydown="handleEnter(event)">
+          <div class="input-group-append">
+            <button type="button" class="btn btn-success btn-hover" onclick="filterTable()">Search</button>
           </div>
         </div>
-        <a href="Merge_Owners.php" class="btn btn-primary">Merge Owners</a>
       </div>
+      <a href="Merge_Owners.php" class="btn btn-primary">Merge Owners</a>
+    </div>
 
-      <!-- Table -->
-      <div class="table-responsive">
-        <table class="table table-bordered text-center modern-table" id="propertyTable">
-          <thead class="thead-dark">
-            <tr>
-              <th class="text-center align-middle">ID</th>
-              <th class="text-center align-middle">Name</th>
-              <th class="text-center align-middle">Address <br><small>House No., Street, District</small></th>
-              <th class="text-center align-middle">Information</th>
-              <th class="text-center align-middle">Edit</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php if (!empty($owners)): ?>
-              <?php foreach ($owners as $owner): ?>
-                <tr>
-                  <td><?= htmlspecialchars($owner['own_id']) ?></td>
-                  <td><?= htmlspecialchars($owner['own_fname'] . ' ' . $owner['own_mname'] . ' ' . $owner['own_surname']) ?></td>
-                  <td><?= htmlspecialchars($owner['house_no'] . ', ' . $owner['street'] . ', ' . $owner['barangay'] . ', ' . $owner['city'] . ', ' . $owner['district'] . ', ' . $owner['province']) ?></td>
-                  <td><?= htmlspecialchars($owner['own_info']) ?></td>
-                  <td>
-                    <button class="btn btn-primary"
-                      data-toggle="modal"
-                      data-target="#editModal"
-                      data-id="<?= htmlspecialchars($owner['own_id']) ?>"
-                      data-fname="<?= htmlspecialchars($owner['own_fname']) ?>"
-                      data-mname="<?= htmlspecialchars($owner['own_mname']) ?>"
-                      data-sname="<?= htmlspecialchars($owner['own_surname']) ?>"
-                      data-tin="<?= htmlspecialchars($owner['tin_no'] ?? '') ?>"
-                      data-house="<?= htmlspecialchars($owner['house_no']) ?>"
-                      data-street="<?= htmlspecialchars($owner['street']) ?>"
-                      data-barangay="<?= htmlspecialchars($owner['barangay']) ?>"
-                      data-district="<?= htmlspecialchars($owner['district']) ?>"
-                      data-city="<?= htmlspecialchars($owner['city']) ?>"
-                      data-province="<?= htmlspecialchars($owner['province']) ?>">
-                      EDIT</button>
-                  </td>
-                </tr>
-              <?php endforeach; ?>
-            <?php else: ?>
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table table-bordered text-center modern-table" id="propertyTable">
+        <thead class="thead-dark">
+          <tr>
+            <th class="text-center align-middle">ID</th>
+            <th class="text-center align-middle">Name</th>
+            <th class="text-center align-middle">Address <br><small>House No., Street, District</small></th>
+            <th class="text-center align-middle">Information</th>
+            <th class="text-center align-middle">Edit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php if (!empty($owners)): ?>
+            <?php foreach ($owners as $owner): ?>
               <tr>
-                <td colspan="5">No records found</td>
+                <td><?= htmlspecialchars($owner['own_id']) ?></td>
+                <td><?= htmlspecialchars($owner['own_fname'] . ' ' . $owner['own_mname'] . ' ' . $owner['own_surname']) ?></td>
+                <td><?= htmlspecialchars($owner['house_no'] . ', ' . $owner['street'] . ', ' . $owner['barangay'] . ', ' . $owner['city'] . ', ' . $owner['district'] . ', ' . $owner['province']) ?></td>
+                <td><?= htmlspecialchars($owner['own_info']) ?></td>
+                <td>
+                  <button class="btn btn-primary"
+                    data-toggle="modal"
+                    data-target="#editModal"
+                    data-id="<?= htmlspecialchars($owner['own_id']) ?>"
+                    data-fname="<?= htmlspecialchars($owner['own_fname']) ?>"
+                    data-mname="<?= htmlspecialchars($owner['own_mname']) ?>"
+                    data-sname="<?= htmlspecialchars($owner['own_surname']) ?>"
+                    data-tin="<?= htmlspecialchars($owner['tin_no'] ?? '') ?>"
+                    data-house="<?= htmlspecialchars($owner['house_no']) ?>"
+                    data-street="<?= htmlspecialchars($owner['street']) ?>"
+                    data-barangay="<?= htmlspecialchars($owner['barangay']) ?>"
+                    data-district="<?= htmlspecialchars($owner['district']) ?>"
+                    data-city="<?= htmlspecialchars($owner['city']) ?>"
+                    data-province="<?= htmlspecialchars($owner['province']) ?>">
+                    EDIT
+                  </button>
+                </td>
               </tr>
-            <?php endif; ?>
-          </tbody>
-        </table>
-      </div>
-      <div class="d-flex align-items-center mt-3">
-        <a href="javascript:void(0)" id="backBtn" class="mr-2">
-          <<< /a>
-            <span class="mr-2">Page:</span>
-            <select id="pageSelect" class="form-control form-control-sm w-auto mr-2"></select>
-            <a href="javascript:void(0)" id="nextBtn" class="ml-2">>></a>
-      </div>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <tr>
+              <td colspan="5">No records found</td>
+            </tr>
+          <?php endif; ?>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-flex align-items-center mt-3">
+      <a href="javascript:void(0)" id="backBtn" class="mr-2"><<<</a>
+      <span class="mr-2">Page:</span>
+      <select id="pageSelect" class="form-control form-control-sm w-auto mr-2"></select>
+      <a href="javascript:void(0)" id="nextBtn" class="ml-2">>></a>
+    </div>
       <!-- View All Button -->
       <div class="d-flex justify-content-between mt-3">
         <a href="Add_POwner.php" class="btn btn-success add-owner-button">Add Owner</a>
@@ -266,49 +266,59 @@ if ($result->num_rows > 0) {
     </div>
   </div>
 
-  <!-- View All Modal -->
-  <div class="modal fade" id="viewAllModal" tabindex="-1" aria-labelledby="viewAllModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="viewAllModalLabel">All Owners</h5>
-        </div>
-        <div class="modal-body">
-          <div class="table-responsive">
-            <table class="table table-bordered text-center modern-table">
-              <thead class="thead-dark">
-                <tr>
-                  <th class="text-center align-middle">ID</th>
-                  <th class="text-center align-middle">Name</th>
-                  <th class="text-center align-middle">Address <br><small>House No., Street, District</small></th>
-                  <th class="text-center align-middle">Information</th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php if (!empty($owners)): ?>
-                  <?php foreach ($owners as $owner): ?>
-                    <tr>
-                      <td><?= htmlspecialchars($owner['own_id']) ?></td>
-                      <td><?= htmlspecialchars($owner['own_fname'] . ' ' . $owner['own_mname'] . ' ' . $owner['own_surname']) ?></td>
-                      <td><?= htmlspecialchars($owner['house_no'] . ', ' . $owner['street'] . ', ' . $owner['barangay'] . ', ' . $owner['city'] . ', ' . $owner['district'] . ', ' . $owner['province']) ?></td>
-                      <td><?= htmlspecialchars($owner['own_info']) ?></td>
-                    </tr>
-                  <?php endforeach; ?>
-                <?php else: ?>
-                  <tr>
-                    <td colspan="4">No records found</td>
-                  </tr>
-                <?php endif; ?>
-              </tbody>
-            </table>
+<!-- View All Modal -->
+<div class="modal fade" id="viewAllModal" tabindex="-1" aria-labelledby="viewAllModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewAllModalLabel">All Owners</h5>
+      </div>
+      <div class="modal-body">
+        <!-- Search Bar and Button Below the Title -->
+        <div class="input-group mb-3" style="max-width: 300px;">
+          <input type="text" class="form-control" id="modalSearchInput" placeholder="Search by Name or Address" onkeyup="handleModalSearch(event)">
+          <div class="input-group-append">
+            <button class="btn btn-success" type="button" onclick="viewAllSearch()">Search</button>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+        <!-- Table -->
+        <div class="table-responsive">
+          <table class="table table-bordered text-center modern-table" id="modalTable">
+            <thead class="thead-dark">
+              <tr>
+                <th class="text-center align-middle">ID</th>
+                <th class="text-center align-middle">Name</th>
+                <th class="text-center align-middle">Address <br><small>House No., Street, District</small></th>
+                <th class="text-center align-middle">Information</th>
+              </tr>
+            </thead>
+            <tbody id="modalTableBody">
+              <?php if (!empty($owners)): ?>
+                <?php foreach ($owners as $owner): ?>
+                  <tr>
+                    <td><?= htmlspecialchars($owner['own_id']) ?></td>
+                    <td><?= htmlspecialchars($owner['own_fname'] . ' ' . $owner['own_mname'] . ' ' . $owner['own_surname']) ?></td>
+                    <td><?= htmlspecialchars($owner['house_no'] . ', ' . $owner['street'] . ', ' . $owner['barangay'] . ', ' . $owner['city'] . ', ' . $owner['district'] . ', ' . $owner['province']) ?></td>
+                    <td><?= htmlspecialchars($owner['own_info']) ?></td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="4">No records found</td>
+                </tr>
+              <?php endif; ?>
+            </tbody>
+          </table>
         </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
+</div>
+
 
 
   <!-- Footer -->

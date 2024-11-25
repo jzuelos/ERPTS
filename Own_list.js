@@ -1,29 +1,97 @@
 let currentPage = 1; // Global current page variable
 const rowsPerPage = 5; // Rows displayed per page
 
-function filterTable() {
-  const input = document.getElementById("searchInput").value.toLowerCase();
-  const table = document.getElementById("propertyTable");
-  const tr = Array.from(table.getElementsByTagName("tr")).slice(1); // Exclude header row
+// Function to handle Enter key press (for both modal and main table)
+function handleEnter(event) {
+  if (event.key === "Enter") {
+    event.preventDefault(); 
+    filterTable(); 
+  }
+}
 
-  let filteredRows = []; // Array to hold rows that match filter criteria
+// Function to handle Enter key press in the modal search
+function handleModalSearch(event) {
+  if (event.key === "Enter") {
+    event.preventDefault(); 
+    viewAllSearch(); 
+  }
+}
+
+// Function to search the modal table based on the input
+function viewAllSearch() {
+  const input = document.getElementById("modalSearchInput").value.toLowerCase(); 
+  const table = document.getElementById("modalTable");
+  const rows = table.getElementsByTagName("tr"); 
+  const modalTableBody = document.getElementById("modalTableBody"); 
+
+
+  if (input === "") {
+    for (let row of rows) {
+      row.style.display = ""; 
+    }
+    return; 
+  }
+
+
+  for (let i = 1; i < rows.length; i++) { 
+    const cells = rows[i].getElementsByTagName("td");
+    let matchSearch = false;
+
+
+    for (let j = 0; j < cells.length; j++) { 
+      const cellText = cells[j].textContent.toLowerCase(); 
+      if (cellText.includes(input)) { 
+        matchSearch = true;
+        break; 
+      }
+    }
+
+
+    rows[i].style.display = matchSearch ? "" : "none"; 
+}
+}
+
+function filterTable() {
+  const input = document.getElementById("searchInput").value.toLowerCase(); 
+  const table = document.getElementById("propertyTable");
+  const tr = Array.from(table.getElementsByTagName("tr")).slice(1); 
+
+  let filteredRows = []; 
+
   console.log("Starting filterTable function with search term:", input);
+
+
+  if (input === "") {
+    for (let row of tr) {
+      row.style.display = ""; 
+    }
+    return; 
+  }
 
   for (let row of tr) {
     const td = row.getElementsByTagName("td");
-    let matchSearch = td[1].textContent.toLowerCase().includes(input); // Searching in "Name" column specifically
+
+   
+    let matchSearch = false;
+    for (let i = 0; i < td.length - 1; i++) { 
+      const cellText = td[i].textContent.toLowerCase(); 
+      if (cellText.includes(input)) { 
+        matchSearch = true;
+        break; 
+      }
+    }
 
     if (matchSearch) {
       filteredRows.push(row);
-      row.style.display = ""; // Show matching row
-      console.log(`Row matches search: ${td[1].textContent}`);
+      row.style.display = "";
+      console.log(`Row matches search: ${row.innerHTML}`);
     } else {
-      row.style.display = "none"; // Hide non-matching row
+      row.style.display = "none";
     }
   }
 
-  updatePagination(filteredRows);
-  displayPage(1, filteredRows); // Reset to the first page
+  updatePagination(filteredRows); // Update pagination for the filtered rows
+  displayPage(1, filteredRows); // Reset to the first page for filtered results
   console.log("Filtered Rows:", filteredRows.length);
 }
 

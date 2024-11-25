@@ -1,43 +1,93 @@
+/* Container styles */
 .table-container {
   border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
+
+/* Table title styles */
 .table-title {
   color: black;
   padding: 20px;
   font-size: 22px;
   font-weight: bold;
 }
+
+/* Remove extra margin from the table */
 table {
   margin-bottom: 0;
 }
+
+/* Center alignment for input */
 .center-input {
   text-align: center;
 }
+
+/* Custom header styling */
 .thead-custom {
   background-color: #28242c;
   color: white;
 }
+
+/* Button container styles */
 .btn-container {
   text-align: right;
   padding: 20px;
 }
+
+/* Custom button styles */
 .btn-custom {
   background-color: #38303f;
   color: white; /* Black text */
 }
 
 .btn-custom:hover {
-  background-color: #a0a29e; 
-  color: black; 
+  background-color: #a0a29e;
+  color: black;
 }
 
+/* Header container styles */
 .header-container {
   display: flex; /* Use flexbox to align items in a row */
   align-items: center; /* Vertically center the items */
 }
 
+/* Back button image styles */
 .back-image {
   border-radius: 30%;
+}
+
+/* Search input styles */
+.search-input {
+  width: 250px;
+}
+
+/* Pagination styles */
+.pagination a {
+  text-decoration: none;
+  color: #007bff;
+  margin-right: 5px;
+}
+
+.pagination a:hover {
+  text-decoration: underline;
+}
+
+.pagination {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.pagination {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+/* Additional button style for search button */
+.btn-hover {
+  background-color: #28a745;
+}
+
+.btn-hover:hover {
+  background-color: #218838;
 }

@@ -1,145 +1,91 @@
-let currentPage = 1;  // To keep track of the current page
-const rowsPerPage = 5; // Number of rows to display per page
-let filteredRows = []; // Array to store filtered rows
-let rows = []; // All rows from the table
+// Function to handle Enter key press (for both modal and main table)
+function handleEnter(event) {
+  if (event.key === "Enter") {
+    event.preventDefault(); // Prevent form submission or other default behaviors
 
-// Get table and pagination elements
-const table = document.getElementById("propertyTable");
-const pageSelect = document.getElementById("pageSelect");
-const viewAllButton = document.querySelector(".view-all-container button");
+    // Check if the search is within the modal
+    const modalInput = document.getElementById("modalSearchInput"); // Modal search input field
+    const mainInput = document.getElementById("searchInput"); // Main table search input field
 
+    // If modal search input is focused, trigger the modal search function
+    if (document.activeElement === modalInput) {
+      viewAllSearch(); // Trigger modal search
+    }
+    // If main table search input is focused, trigger the main table search function
+    else if (document.activeElement === mainInput) {
+      filterTable(); // Trigger main table search
+    }
+  }
+}
+
+
+// Function to filter the main table based on the search input and barangay selection
 function filterTable() {
-  const input = document.getElementById("searchInput").value.toLowerCase();
-  const selectedBarangay = document.getElementById("barangayDropdown").value.toLowerCase();
+  const input = document.getElementById("searchInput"); // Get the search input field for the main table
+  const filter = input.value.toLowerCase(); // Convert to lowercase for case-insensitive comparison
+  
+  const dropdown = document.getElementById("barangayDropdown"); // Get the barangay dropdown
+  const selectedBarangay = dropdown.value.toLowerCase(); // Get selected barangay value
+  
+  const table = document.getElementById("propertyTable"); // Get the property table
+  const tr = table.getElementsByTagName("tr"); // Get all rows in the table
 
-  filteredRows = []; // Reset filtered rows
+  // Loop through each row in the table
+  for (let i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
+    const td = tr[i].getElementsByTagName("td"); // Get all td (table data) elements for the row
+    const locationText = td[2].textContent.toLowerCase(); // Get the location text (barangay, city, etc.)
+    
+    let matchSearch = false; // To track if the search term matches any row
+    let matchBarangay = selectedBarangay === "" || locationText.includes(selectedBarangay); // Check if barangay matches or "All Barangay" is selected
 
-  // Loop through all rows to apply the filter logic
-  for (let i = 1; i < rows.length; i++) { // Start from 1 to skip the header row
-    const cells = rows[i].getElementsByTagName("td");
-    const ownerText = cells[1].textContent.toLowerCase(); // Assuming "Owner" is in the first column
-    const locationText = cells[2].textContent.toLowerCase(); // Assuming "Location" is in the third column
-    let matchSearch = false;
-    let matchBarangay = !selectedBarangay || locationText.includes(selectedBarangay); // Check barangay match
-
-    // Check if the owner matches the search input
-    if (ownerText.includes(input)) {
-      matchSearch = true;
+    // Loop through each column in the row to check if the search term matches any of the columns (except last two: edit and land area)
+    for (let j = 0; j < td.length - 2; j++) { // Exclude last two columns (Edit button and Land Area)
+      if (td[j]) {
+        const txtValue = td[j].textContent || td[j].innerText;
+        if (txtValue.toLowerCase().indexOf(filter) > -1) { // If the search term is found in the column
+          matchSearch = true;
+          break;
+        }
+      }
     }
 
-    // If both search and barangay filters match, add row to filtered rows
-    if (matchSearch && matchBarangay) {
-      filteredRows.push(rows[i]);
-    }
+    // Show or hide row based on the search and barangay match
+    tr[i].style.display = matchSearch && matchBarangay ? "" : "none";
   }
-
-  // Update pagination controls based on the filtered rows
-  updatePagination(filteredRows.length);
-
-  // Display the appropriate rows based on the current page
-  displayPage(currentPage);
 }
 
-function updatePagination(totalRows) {
-  const totalPages = Math.ceil(totalRows / rowsPerPage);  // Calculate total number of pages
+// Function to filter the modal table based on the search input
+function viewAllSearch() {
+  const input = document.getElementById("modalSearchInput"); // Target modal search input
+  const filter = input.value.toLowerCase();
 
-  // Clear existing options
-  pageSelect.innerHTML = "";
+  // Get the table body inside the modal and all rows
+  const tableBody = document.getElementById("modalTableBody");
+  const rows = tableBody.getElementsByTagName("tr");
 
-  // Create options for each page
-  for (let i = 1; i <= totalPages; i++) {
-    const option = document.createElement("option");
-    option.value = i;
-    option.textContent = `${i}`;
-    pageSelect.appendChild(option);
-  }
-
-  // Enable/disable "View All" button based on filtered rows
-  if (totalRows > rowsPerPage) {
-    viewAllButton.disabled = false;
-  } else {
-    viewAllButton.disabled = true;
-  }
-
-  // Ensure current page is still valid
-  if (currentPage > totalPages) {
-    currentPage = totalPages; // If we're on a page that no longer exists after filtering, move to last page
-  }
-
-  pageSelect.value = currentPage; // Update page select dropdown
-}
-
-function displayPage(page) {
-  const startIndex = (page - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-
-  // Hide all rows first
-  for (let i = 1; i < rows.length; i++) {
-    rows[i].style.display = "none";
-  }
-
-  // Show the rows for the current page
-  const pageRows = filteredRows.slice(startIndex, endIndex);
-  pageRows.forEach(row => {
-    row.style.display = "";
-  });
-
-  // Show a message if no rows match the filter
-  const noResultsMessage = document.getElementById("noResultsMessage");
-  if (filteredRows.length === 0) {
-    if (!noResultsMessage) {
-      const messageRow = table.insertRow();
-      const messageCell = messageRow.insertCell(0);
-      messageCell.colSpan = table.rows[0].cells.length;
-      messageCell.id = "noResultsMessage";
-      messageCell.textContent = "No records found.";
-      messageCell.style.textAlign = "center";
+  // Check if the search input is empty
+  if (filter === "") {
+    // If search input is empty, show all rows
+    for (let i = 0; i < rows.length; i++) {
+      rows[i].style.display = ""; // Show the row
     }
   } else {
-    const message = document.getElementById("noResultsMessage");
-    if (message) {
-      message.remove();
+    // Loop through each row in the modal table and apply filter
+    for (let i = 0; i < rows.length; i++) {
+      const td = rows[i].getElementsByTagName("td");
+      let matchSearch = false;
+
+      // Loop through each column in the row to check for the search term
+      for (let j = 0; j < td.length; j++) {
+        const txtValue = td[j].textContent || td[j].innerText;
+        if (txtValue.toLowerCase().indexOf(filter) > -1) {
+          matchSearch = true;
+          break;
+        }
+      }
+
+      // Show or hide row based on whether it matches the search term
+      rows[i].style.display = matchSearch ? "" : "none";
     }
   }
 }
-
-function changePage() {
-  const page = parseInt(pageSelect.value);
-  currentPage = page;
-  displayPage(currentPage); // Reapply the display logic when page changes
-}
-
-// Optional: Reset pagination and table when the "View All" button is clicked
-viewAllButton.addEventListener("click", () => {
-  currentPage = 1;  // Reset to the first page
-  pageSelect.value = 1;  // Reset dropdown to first page
-  filterTable(); // Apply filter again to reset the table
-});
-
-// Event listener for when the page is loaded and DOM is ready
-document.addEventListener("DOMContentLoaded", function () {
-  // Cache rows and initialize table
-  rows = Array.from(table.rows); // Store all rows (including the header)
-
-  // Initial filter and page setup
-  filterTable(); // Apply filters and display the table
-
-  // Add event listener for page selection change
-  pageSelect.addEventListener("change", changePage);
-
-  // Add event listener for the search button click
-  document.getElementById("searchButton").addEventListener("click", filterTable);
-
-  // Add event listener for the Enter key to trigger the search
-  document.getElementById("searchInput").addEventListener("keypress", (event) => {
-    if (event.key === "Enter") {
-      filterTable();
-    }
-  });
-
-  // Add event listener to the barangay dropdown (but don't trigger filter here)
-  document.getElementById("barangayDropdown").addEventListener("change", () => {
-    // Do not call filterTable directly here
-    // We will handle this when the user clicks the search button or presses Enter
-  });
-});

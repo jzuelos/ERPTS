@@ -180,40 +180,43 @@ if ($total_result && $total_result->num_rows > 0) {
       </ul>
     </div>
   </nav>
-
-  <!--Main Body-->
-
-  <!-- Form -->
-  <form method="post" action="Merge_Owners.php">
-    <section class="container mt-5 table-container">
-    <div class="header-container">
-        <a href="Own_list.php">
-            <img src="images/backward.png" width="35" height="35" alt="Back" class="back-image">
-        </a>
-        <div class="table-title">Merge Owners</div>
+<!-- Main Body -->
+<form method="post" action="Merge_Owners.php">
+  <section class="container mt-5">
+    <div class="header-container d-flex justify-content-between align-items-center">
+      <a href="Own_list.php">
+        <img src="images/backward.png" width="35" height="35" alt="Back" class="back-button">
+      </a>
+      <div class="table-title">Merge Owners</div>
     </div>
-          <!-- Search Bar -->
-  <div class="input-group" style="width: 300px;">
-    <input 
-      type="text" 
-      class="form-control" 
-      id="searchInput" 
-      placeholder="Search" 
-      aria-label="Search">
-    <div class="input-group-append">
-      <button 
-        type="button" 
-        class="btn btn-success btn-hover" 
-        onclick="filterTable()">Search</button>
+
+    <!-- Search Bar and Button -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <!-- Search input and button container -->
+      <div class="search-container d-flex align-items-center">
+        <input
+          type="text"
+          class="form-control search-input"
+          id="searchInput"
+          placeholder="Search Owners"
+          aria-label="Search"
+          onkeyup="handleSearch(event)"
+        />
+        <button
+          type="button"
+          class="btn btn-primary ml-2"
+          onclick="searchTable()">
+          Search
+        </button>
+      </div>
+      <div class="total-count text-right">
+        <strong>Total Count:</strong> <?= $total_pO_count ?>
+      </div>
     </div>
-  </div>
 
-  <!-- Total Count -->
-  <div class="total-count text-right">
-    <strong>Total Count:</strong> <?= $total_pO_count ?>
-  </div>
-
-      <table class="table table-striped table-hover text-center">
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table table-striped table-hover modern-table text-center">
         <thead class="thead-dark">
           <tr>
             <th scope="col">Person ID</th>
@@ -224,7 +227,7 @@ if ($total_result && $total_result->num_rows > 0) {
             <th scope="col" style="width: 300px;">Property Address</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="ownerTableBody">
           <?php
           // When the form is submitted, store the selected owner IDs in the session
           if (isset($_POST['personChoice'])) {
@@ -235,7 +238,6 @@ if ($total_result && $total_result->num_rows > 0) {
           $selectedOwners = isset($_SESSION['selected_owners']) ? $_SESSION['selected_owners'] : [];
           ?>
           <!-- Inside the HTML table, check if an owner is selected from the session -->
-        <tbody>
           <?php foreach ($owners as $owner): ?>
             <?php
             // Check if the owner_id is in the session (which means it's selected)
@@ -251,32 +253,30 @@ if ($total_result && $total_result->num_rows > 0) {
               <td><?= $owner['own_mname']; ?></td>
               <td><?= $owner['barangay'] . ' ' . $owner['city'] . ', ' . $owner['district'] . ', ' . $owner['province']; ?></td>
             </tr>
-
           <?php endforeach; ?>
         </tbody>
-
       </table>
-      </div>
+    </div>
 
-      <div class="pagination">
-        <!-- Pagination controls -->
-        <?php if ($page > 1): ?>
-          <a href="Merge_Owners.php?page=1">First</a>&nbsp;&nbsp;
-          <a href="Merge_Owners.php?page=<?= $page - 1 ?>">
-            << </a>&nbsp;&nbsp;
-            <?php endif; ?>
-            <span>Page <?= $page ?> of <?= $total_pages ?></span>&nbsp;&nbsp;
-            <?php if ($page < $total_pages): ?>
-              <a href="Merge_Owners.php?page=<?= $page + 1 ?>"> >> </a>&nbsp;&nbsp;
-              <a href="Merge_Owners.php?page=<?= $total_pages ?>">Last</a>
-            <?php endif; ?>
-      </div>
+    <!-- Pagination -->
+    <div class="pagination mt-3">
+      <?php if ($page > 1): ?>
+        <a href="Merge_Owners.php?page=1" class="pagination-link">First</a>&nbsp;&nbsp;
+        <a href="Merge_Owners.php?page=<?= $page - 1 ?>" class="pagination-link"><<</a>&nbsp;&nbsp;
+      <?php endif; ?>
+      <span>Page <?= $page ?> of <?= $total_pages ?></span>&nbsp;&nbsp;
+      <?php if ($page < $total_pages): ?>
+        <a href="Merge_Owners.php?page=<?= $page + 1 ?>" class="pagination-link">>></a>&nbsp;&nbsp;
+        <a href="Merge_Owners.php?page=<?= $total_pages ?>" class="pagination-link">Last</a>
+      <?php endif; ?>
+    </div>
 
-      <div class="btn-container">
-        <button type="button" id="mergeOwnersButton" class="btn btn-custom">Merge Owners</button>
-      </div>
-    </section>
-  </form>
+    <!-- Merge Button -->
+    <div class="btn-container text-right mt-4">
+      <button type="submit" id="mergeOwnersButton" class="btn btn-custom">Merge Owners</button>
+    </div>
+  </section>
+</form>
 
   <!-- Modal -->
   <div class="modal fade" id="mergeOwnersModal" tabindex="-1" role="dialog" aria-labelledby="mergeOwnersModalLabel" aria-hidden="true">
