@@ -189,7 +189,7 @@
   </div>
 </div>
 
-<!-- Temporary Municipality Modal -->
+<!-- Municipality Modal -->
 <div class="modal fade" id="municipalityModal" tabindex="-1" role="dialog" aria-labelledby="municipalityModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -204,8 +204,7 @@
                     <div class="form-group">
                         <label for="region">Region</label>
                         <select class="form-control" id="region">
-                            <option></option>
-                            <!-- Add more Regions -->
+                            <option value="">Select Region</option>
                         </select>
                     </div>
                     <div class="form-group">

@@ -96,6 +96,26 @@ $('#districtModal #resetFormBtn').on('click', function() {
   $('#districtForm')[0].reset();
 });
 
+document.addEventListener("DOMContentLoaded", function() {
+  fetch("loc_getRegions.php")
+      .then(response => response.json())
+      .then(data => {
+          const regionSelect = document.getElementById("region");
+
+          // Clear any existing options
+          regionSelect.innerHTML = '<option value="">Select Region</option>';
+
+          // Populate options with r_no
+          data.forEach(region => {
+              const option = document.createElement("option");
+              option.value = region.r_id;           // Set r_id as the value
+              option.textContent = region.r_no;      // Display r_no as the visible text
+              regionSelect.appendChild(option);
+          });
+      })
+      .catch(error => console.error("Error fetching regions:", error));
+});
+
 // Input validation for Barangay Code field (limit to 3 digits, numeric only)
 $('#barangayCode').on('input', function() {
   var value = this.value;
