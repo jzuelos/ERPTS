@@ -554,84 +554,94 @@ $conn->close();
 
   <!--Declaration of Property-->
   <section class="container mt-5" id="property-info-section">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h4 class="mb-0">Declaration of Property</h4>
-      <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
-        data-bs-target="#editDeclarationProperty">Edit</button>
-    </div>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Declaration of Property</h4>
+    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+      data-bs-target="#editDeclarationProperty">Edit</button>
+  </div>
 
-    <div class="card border-0 shadow p-4 rounded-3">
-      <form>
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label for="taxDeclarationNumber" class="form-label">Identification Numbers (Tax Declaration Number)</label>
-            <input type="text" class="form-control" id="taxDeclarationNumber" placeholder="Enter Tax Declaration Number"
-              disabled>
-          </div>
-          <div class="col-12 mb-3">
-            <h6 class="mt-4 mb-3">Approval</h6>
-          </div>
-
-          <div class="col-md-6 mb-3">
-            <label for="provincialAssessor" class="form-label">Provincial Assessor</label>
-            <input type="text" class="form-control" id="provincialAssessor" placeholder="Enter Provincial Assessor"
-              disabled>
-          </div>
-          <div class="col-md-6 mb-3">
-            <label for="provincialDate" class="form-label">Date</label>
-            <input type="date" class="form-control" id="provincialDate" placeholder="Select Date" disabled>
-          </div>
-
-          <div class="col-md-6 mb-3">
-            <label for="municipalAssessor" class="form-label">City/Municipal Assessor</label>
-            <input type="text" class="form-control" id="municipalAssessor" placeholder="Enter City/Municipal Assessor"
-              disabled>
-          </div>
-          <div class="col-md-6 mb-3">
-            <label for="municipalDate" class="form-label">Date</label>
-            <input type="date" class="form-control" id="municipalDate" placeholder="Select Date" disabled>
-          </div>
-
-          <div class="col-md-6 mb-3">
-            <label for="cancelsTD" class="form-label">Cancels TD Number</label>
-            <input type="text" class="form-control" id="cancelsTD" placeholder="Enter Cancels TD Number" disabled>
-          </div>
-          <div class="col-md-6 mb-3">
-            <label for="previousPin" class="form-label">Previous Pin</label>
-            <input type="text" class="form-control" id="previousPin" placeholder="Enter Previous Pin" disabled>
-          </div>
-
-          <div class="col-md-6 mb-3">
-            <label for="taxYear" class="form-label">Tax Begin With Year</label>
-            <input type="number" class="form-control" id="taxYear" placeholder="Enter Year" disabled>
-          </div>
-
-          <div class="col-md-6 mb-3">
-            <label for="enteredInRPAREForBy" class="form-label">enteredInRPAREForBy</label>
-            <input type="text" class="form-control" id="enteredInRPAREForBy" placeholder="Enter Value" disabled>
-          </div>
-          <div class="col-md-6 mb-3">
-            <label for="enteredInRPAREForYear" class="form-label">enteredInRPAREForYear</label>
-            <input type="number" class="form-control" id="enteredInRPAREForYear" placeholder="Enter Year" disabled>
-          </div>
-
-          <div class="col-md-6 mb-3">
-            <label for="previousOwner" class="form-label">Previous Owner</label>
-            <input type="text" class="form-control" id="previousOwner" placeholder="Enter Previous Owner" disabled>
-          </div>
-          <div class="col-md-6 mb-3">
-            <label for="previousAssessedValue" class="form-label">Previous Assessed Value</label>
-            <input type="text" class="form-control" id="previousAssessedValue" placeholder="Enter Assessed Value"
-              disabled>
-          </div>
+  <div class="card border-0 shadow p-4 rounded-3">
+    <form>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="editID" class="form-label">Edit ID</label>
+          <input type="text" class="form-control" id="editID" placeholder="Enter Edit ID" disabled>
         </div>
-        <!-- Print Button at the Bottom Right -->
-        <div class="text-right mt-4">
-          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openPrintPage()">Print</button>
+        <div class="col-md-6 d-flex align-items-end">
+          <button type="button" class="btn btn-outline-secondary btn-sm ms-2" id="editButton" onclick="toggleEdit()">Edit</button>
         </div>
-      </form>
-    </div>
-  </section>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="taxDeclarationNumber" class="form-label">Identification Numbers (Tax Declaration Number)</label>
+          <input type="text" class="form-control" id="taxDeclarationNumber" placeholder="Enter Tax Declaration Number" disabled>
+        </div>
+
+        <div class="col-12 mb-3">
+          <h6 class="mt-4 mb-3">Approval</h6>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="provincialAssessor" class="form-label">Provincial Assessor</label>
+          <input type="text" class="form-control" id="provincialAssessor" placeholder="Enter Provincial Assessor" disabled>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="provincialDate" class="form-label">Date</label>
+          <input type="date" class="form-control" id="provincialDate" placeholder="Select Date" disabled>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="municipalAssessor" class="form-label">City/Municipal Assessor</label>
+          <input type="text" class="form-control" id="municipalAssessor" placeholder="Enter City/Municipal Assessor" disabled>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="municipalDate" class="form-label">Date</label>
+          <input type="date" class="form-control" id="municipalDate" placeholder="Select Date" disabled>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="cancelsTD" class="form-label">Cancels TD Number</label>
+          <input type="text" class="form-control" id="cancelsTD" placeholder="Enter Cancels TD Number" disabled>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="previousPin" class="form-label">Previous Pin</label>
+          <input type="text" class="form-control" id="previousPin" placeholder="Enter Previous Pin" disabled>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="taxYear" class="form-label">Tax Begin With Year</label>
+          <input type="number" class="form-control" id="taxYear" placeholder="Enter Year" disabled>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="enteredInRPAREForBy" class="form-label">enteredInRPAREForBy</label>
+          <input type="text" class="form-control" id="enteredInRPAREForBy" placeholder="Enter Value" disabled>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="enteredInRPAREForYear" class="form-label">enteredInRPAREForYear</label>
+          <input type="number" class="form-control" id="enteredInRPAREForYear" placeholder="Enter Year" disabled>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="previousOwner" class="form-label">Previous Owner</label>
+          <input type="text" class="form-control" id="previousOwner" placeholder="Enter Previous Owner" disabled>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="previousAssessedValue" class="form-label">Previous Assessed Value</label>
+          <input type="text" class="form-control" id="previousAssessedValue" placeholder="Enter Assessed Value" disabled>
+        </div>
+      </div>
+
+      <!-- Print Button at the Bottom Right -->
+      <div class="text-right mt-4">
+      <button type="button" class="btn btn-outline-secondary btn-sm" onclick="DRPprint()">Print</button>
+      </div>
+    </form>
+  </div>
+</section>
 
 
   <!--Modal for Declaration of Property-->
@@ -1589,9 +1599,23 @@ $conn->close();
         });
       }
     }
+
+    function DRPprint() {
+    const printWindow = window.open('DRP.html', '_blank');  // '_blank' ensures the content opens in a new tab
+
+
+    printWindow.onload = function() {
+
+        printWindow.print();
+    };
+}
+
+
   </script>
   <!-- Optional JavaScript -->
   <script src="http://localhost/ERPTS/FAAS.js"></script>
+  <script src="http://localhost/ERPTS/print-layout.js"></script>
+  <script src="http://localhost/ERPTS/printdata.js"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
