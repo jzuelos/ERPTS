@@ -1,0 +1,47 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+    margin: 20px;
+}
+.center {
+    text-align: center;
+}
+.section {
+    margin-bottom: 20px;
+}
+.underline {
+    text-decoration: underline;
+}
+.bold {
+    font-weight: bold;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+}
+td {
+    padding: 5px;
+}
+.border {
+    border: 1px solid black;
+}
+.footer {
+    font-size: 12px;
+    text-align: center;
+}
+.location {
+    display: flex;
+    justify-content: space-between;
+}
+.label {
+    font-size: 12px;
+    text-align: center;
+    margin-top: -5px; 
+}
+.location div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
