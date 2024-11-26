@@ -53,39 +53,3 @@ function filterTable() {
     tr[i].style.display = matchSearch && matchBarangay ? "" : "none";
   }
 }
-
-// Function to filter the modal table based on the search input
-function viewAllSearch() {
-  const input = document.getElementById("modalSearchInput"); // Target modal search input
-  const filter = input.value.toLowerCase();
-
-  // Get the table body inside the modal and all rows
-  const tableBody = document.getElementById("modalTableBody");
-  const rows = tableBody.getElementsByTagName("tr");
-
-  // Check if the search input is empty
-  if (filter === "") {
-    // If search input is empty, show all rows
-    for (let i = 0; i < rows.length; i++) {
-      rows[i].style.display = ""; // Show the row
-    }
-  } else {
-    // Loop through each row in the modal table and apply filter
-    for (let i = 0; i < rows.length; i++) {
-      const td = rows[i].getElementsByTagName("td");
-      let matchSearch = false;
-
-      // Loop through each column in the row to check for the search term
-      for (let j = 0; j < td.length; j++) {
-        const txtValue = td[j].textContent || td[j].innerText;
-        if (txtValue.toLowerCase().indexOf(filter) > -1) {
-          matchSearch = true;
-          break;
-        }
-      }
-
-      // Show or hide row based on whether it matches the search term
-      rows[i].style.display = matchSearch ? "" : "none";
-    }
-  }
-}
