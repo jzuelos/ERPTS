@@ -245,6 +245,9 @@
                 <label for="barangay"><span style="color: red;">*</span> Barangay:</label>
                 <select id="barangay" name="barangay" class="form-control" required>
                     <option value="" disabled selected>Select Barangay</option>
+                    <option value="Barangay1">Barangay 1</option>
+                    <option value="Barangay2">Barangay 2</option>
+                    <option value="Barangay3">Barangay 3</option>
                 </select>
             </div>
 
@@ -252,6 +255,7 @@
                 <label for="district"><span style="color: red;">*</span> District:</label>
                 <select id="district" name="district" class="form-control" required>
                     <option value="" disabled selected>Select District</option>
+                    <option value="District1">District 1</option>
                 </select>
             </div>
 
@@ -259,13 +263,15 @@
                 <label for="municipality"><span style="color: red;">*</span> Municipality/City:</label>
                 <select id="municipality" name="municipality" class="form-control" required>
                     <option value="" disabled selected>Select Municipality</option>
+                    <option value="City1">City 1</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="province"><span style="color: red;">*</span> Province:</label>
                 <select id="province" name="province" class="form-control" required>
-                    <option value="Camarines Norte" selected>Camarines Norte</option>
+                    <option value="" disabled selected>Select Province</option>
+                    <option value="Province1">Province 1</option>
                 </select>
             </div>
 
