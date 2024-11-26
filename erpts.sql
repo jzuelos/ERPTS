@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 25, 2024 at 05:37 PM
+-- Generation Time: Nov 26, 2024 at 09:43 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -31,18 +31,21 @@ CREATE TABLE `brgy` (
   `brgy_id` int(11) NOT NULL,
   `brgy_code` varchar(10) NOT NULL,
   `brgy_name` varchar(20) NOT NULL,
-  `status` enum('Active','Inactive') NOT NULL
+  `status` enum('Active','Inactive') NOT NULL,
+  `m_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `brgy`
 --
 
-INSERT INTO `brgy` (`brgy_id`, `brgy_code`, `brgy_name`, `status`) VALUES
-(53, '001', 'Bulala', 'Active'),
-(54, '002', 'bautista', 'Active'),
-(55, '004', 'fjsdfpnadf', 'Active'),
-(56, '004', 'tayabas', 'Active');
+INSERT INTO `brgy` (`brgy_id`, `brgy_code`, `brgy_name`, `status`, `m_id`) VALUES
+(53, '001', 'Bulala', 'Active', 0),
+(54, '002', 'bautista', 'Active', 0),
+(55, '004', 'fjsdfpnadf', 'Active', 0),
+(56, '004', 'tayabas', 'Active', 0),
+(57, '001', 'Bulala', 'Active', 0),
+(58, '001', 'Bulala', 'Active', 0);
 
 -- --------------------------------------------------------
 
@@ -54,15 +57,17 @@ CREATE TABLE `district` (
   `district_id` int(11) NOT NULL,
   `district_code` varchar(10) NOT NULL,
   `description` varchar(100) NOT NULL,
-  `status` enum('Active','Inactive') NOT NULL
+  `status` enum('Active','Inactive') NOT NULL,
+  `m_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `district`
 --
 
-INSERT INTO `district` (`district_id`, `district_code`, `description`, `status`) VALUES
-(2, '001', 'District 1', 'Active');
+INSERT INTO `district` (`district_id`, `district_code`, `description`, `status`, `m_id`) VALUES
+(11, '1234', 'District 2', 'Active', 2),
+(12, '13123', 'District 2', 'Active', 2);
 
 -- --------------------------------------------------------
 
@@ -88,6 +93,28 @@ INSERT INTO `faas` (`faas_id`, `propertyowner_id`, `pro_id`, `land_id`, `plants_
 (14, '37', 126, NULL, NULL, NULL),
 (15, '38', 126, NULL, NULL, NULL),
 (16, '[41,42]', 128, NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `municipality`
+--
+
+CREATE TABLE `municipality` (
+  `m_id` int(11) NOT NULL,
+  `m_code` int(11) NOT NULL,
+  `m_description` varchar(50) NOT NULL,
+  `m_status` enum('Active','Inactive') NOT NULL,
+  `r_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `municipality`
+--
+
+INSERT INTO `municipality` (`m_id`, `m_code`, `m_description`, `m_status`, `r_id`) VALUES
+(1, 4611, 'Sta. Elena', 'Active', 5),
+(2, 4600, 'Daet', 'Active', 5);
 
 -- --------------------------------------------------------
 
@@ -181,6 +208,24 @@ INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `c
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `region`
+--
+
+CREATE TABLE `region` (
+  `r_id` int(11) NOT NULL,
+  `r_no` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `region`
+--
+
+INSERT INTO `region` (`r_id`, `r_no`) VALUES
+(5, 'Region V');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -212,8 +257,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `last_name`, `first_name`, `middle_name`, `gender`, `birthdate`, `marital_status`, `tin`, `house_number`, `street`, `barangay`, `district`, `municipality`, `province`, `contact_number`, `email`, `status`, `user_type`) VALUES
-(8, 'RIP_FISHY12', '$2y$10$smEhcMQrkEwgF/Whm1BrDeT0ru.898kqGKwEjVl1HhkR7Bpj/vdP.', 'Zuelos', 'Jomel', 'Villacruel', 'Female', '2012-12-19', 'Married', '32423423', '32', 'Luzaragga', 'Kalamunding', '2', 'Labo', 'Camarines Norte', '09923648721', 'sbjomel19@gmail.com', 0, 'admin'),
-(9, 'username', '$2y$10$oAnO7x5BUJQAfdyEU9RJ8OfD3qC6KKeWQYOZ6Li5nl4K0Bx8IRx1e', 'Zuelos', 'Jomel', 'Villacruel', 'Male', '2024-11-25', 'Married', '32423423', '32', 'Luzaragga', 'Kalamunding', '2', 'Labo', 'Camarines Norte', '09923648721', 'lloyd@gmail.com', 0, 'user');
+(6, 'username', '$2y$10$hUAqqmcCIDXnVvR81hmjuO7r.2x3tnlKu6yruJFKjr6LnIoPgnRK.', 'name', 'user', '', 'Male', '2003-11-14', 'Single', '1234', '1', '1', '1', '1', '1', '1', '1', 'testing@testing.com', 0, 'user'),
+(8, 'RIP_FISHY12', '$2y$10$smEhcMQrkEwgF/Whm1BrDeT0ru.898kqGKwEjVl1HhkR7Bpj/vdP.', 'Zuelos', 'Jomel', 'Villacruel', 'Female', '2012-12-19', 'Married', '32423423', '32', 'Luzaragga', 'Kalamunding', '2', 'Labo', 'Camarines Norte', '09923648721', 'sbjomel19@gmail.com', 0, 'admin');
 
 --
 -- Indexes for dumped tables
@@ -229,7 +274,8 @@ ALTER TABLE `brgy`
 -- Indexes for table `district`
 --
 ALTER TABLE `district`
-  ADD PRIMARY KEY (`district_id`);
+  ADD PRIMARY KEY (`district_id`),
+  ADD KEY `m_id` (`m_id`);
 
 --
 -- Indexes for table `faas`
@@ -238,6 +284,13 @@ ALTER TABLE `faas`
   ADD PRIMARY KEY (`faas_id`),
   ADD KEY `propertyowner_id` (`propertyowner_id`(768)),
   ADD KEY `pro_id` (`pro_id`);
+
+--
+-- Indexes for table `municipality`
+--
+ALTER TABLE `municipality`
+  ADD PRIMARY KEY (`m_id`),
+  ADD KEY `r_id` (`r_id`);
 
 --
 -- Indexes for table `owners_tb`
@@ -261,11 +314,16 @@ ALTER TABLE `p_info`
   ADD KEY `ownID_FK` (`ownID_Fk`);
 
 --
+-- Indexes for table `region`
+--
+ALTER TABLE `region`
+  ADD PRIMARY KEY (`r_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`user_id`),
-  ADD UNIQUE KEY `username` (`username`),
   ADD UNIQUE KEY `email` (`email`);
 
 --
@@ -276,19 +334,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `brgy`
 --
 ALTER TABLE `brgy`
-  MODIFY `brgy_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `brgy_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT for table `district`
 --
 ALTER TABLE `district`
-  MODIFY `district_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `district_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `faas`
 --
 ALTER TABLE `faas`
   MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT for table `municipality`
+--
+ALTER TABLE `municipality`
+  MODIFY `m_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `owners_tb`
@@ -309,20 +373,38 @@ ALTER TABLE `p_info`
   MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=129;
 
 --
+-- AUTO_INCREMENT for table `region`
+--
+ALTER TABLE `region`
+  MODIFY `r_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Constraints for dumped tables
 --
 
 --
+-- Constraints for table `district`
+--
+ALTER TABLE `district`
+  ADD CONSTRAINT `m_id` FOREIGN KEY (`m_id`) REFERENCES `municipality` (`m_id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `faas`
 --
 ALTER TABLE `faas`
   ADD CONSTRAINT `pro_id` FOREIGN KEY (`pro_id`) REFERENCES `p_info` (`p_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `municipality`
+--
+ALTER TABLE `municipality`
+  ADD CONSTRAINT `municipality_ibfk_1` FOREIGN KEY (`r_id`) REFERENCES `region` (`r_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `propertyowner`
