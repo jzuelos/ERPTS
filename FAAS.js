@@ -72,9 +72,6 @@ function showEditPropertyModal() {
   document.getElementById('houseNumberModal').value = document.getElementById('houseNumber').value;
   document.getElementById('landAreaModal').value = document.getElementById('landArea').value;
   document.getElementById('zoneNumberModal').value = document.getElementById('zoneNumber').value;
-  document.getElementById('ardNumberModal').value = document.getElementById('ardNumber').value;
-  document.getElementById('taxabilityModal').value = document.getElementById('taxability').value;
-  document.getElementById('effectivityModal').value = document.getElementById('effectivity').value;
 
   // Show the modal
   var myModal = new bootstrap.Modal(document.getElementById('editPropertyModal'), {
@@ -94,9 +91,6 @@ function savePropertyData() {
   var houseNumber = document.getElementById('houseNumberModal').value;
   var landArea = document.getElementById('landAreaModal').value;
   var zoneNumber = document.getElementById('zoneNumberModal').value;
-  var ardNumber = document.getElementById('ardNumberModal').value;
-  var taxability = document.getElementById('taxabilityModal').value;
-  var effectivity = document.getElementById('effectivityModal').value;
 
   // Log to check if values are being captured
   console.log("Saving property with ID:", propertyId);
@@ -124,10 +118,7 @@ function savePropertyData() {
            "&province=" + encodeURIComponent(province) +
            "&houseNumber=" + encodeURIComponent(houseNumber) +
            "&landArea=" + encodeURIComponent(landArea) +
-           "&zoneNumber=" + encodeURIComponent(zoneNumber) +
-           "&ardNumber=" + encodeURIComponent(ardNumber) +
-           "&taxability=" + encodeURIComponent(taxability) +
-           "&effectivity=" + encodeURIComponent(effectivity));
+           "&zoneNumber=" + encodeURIComponent(zoneNumber));
 }
 
 //Function to show Plant and Trees modal

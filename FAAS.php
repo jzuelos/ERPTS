@@ -377,7 +377,7 @@ $conn->close();
   <section class="container my-5" id="property-info-section">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h4 class="section-title">Property Information</h4>
-      <button type="button" class="btn btn-outline-primary btn-sm" onclick="showEditPropertyModal()">Edit</button>
+      <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPropertyModal"> Edit</button>
     </div>
     <div class="card border-0 shadow p-4 rounded-3">
       <form id="property-info">
@@ -446,94 +446,57 @@ $conn->close();
     </div>
   </section>
 
-  <!-- Modal for Editing Property Information -->
-  <div class="modal fade" id="editPropertyModal" tabindex="-1" aria-labelledby="editPropertyModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editPropertyModalLabel">Edit Property Information</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Property Information Form inside Modal -->
-          <form id="editPropertyForm">
-            <div class="row">
-              <!-- Location Fields -->
-              <input type="hidden" id="propertyIdModal"
-                value="<?php echo isset($property['p_id']) ? htmlspecialchars($property['p_id']) : ''; ?>">
-              <div class="col-12 mb-3">
-                <label for="streetModal" class="form-label">Street</label>
-                <input type="text" class="form-control" id="streetModal"
-                  value="<?php echo isset($property['street']) ? htmlspecialchars($property['street']) : ''; ?>"
-                  placeholder="Enter Street">
-              </div>
-              <div class="col-12 mb-3">
-                <label for="barangayModal" class="form-label">Barangay</label>
-                <input type="text" class="form-control" id="barangayModal"
-                  value="<?php echo isset($property['barangay']) ? htmlspecialchars($property['barangay']) : ''; ?>"
-                  placeholder="Enter Barangay">
-              </div>
-              <div class="col-12 mb-3">
-                <label for="municipalityModal" class="form-label">Municipality</label>
-                <input type="text" class="form-control" id="municipalityModal"
-                  value="<?php echo isset($property['city']) ? htmlspecialchars($property['city']) : ''; ?>"
-                  placeholder="Enter Municipality">
-              </div>
-              <div class="col-12 mb-3">
-                <label for="provinceModal" class="form-label">Province</label>
-                <input type="text" class="form-control" id="provinceModal"
-                  value="<?php echo isset($property['province']) ? htmlspecialchars($property['province']) : ''; ?>"
-                  placeholder="Enter Province">
-              </div>
-              <div class="col-12 mb-3">
-                <label for="houseNumberModal" class="form-label">House Number</label>
-                <input type="text" class="form-control" id="houseNumberModal"
-                  value="<?php echo isset($property['house_no']) ? htmlspecialchars($property['house_no']) : ''; ?>"
-                  placeholder="Enter House Number">
-              </div>
-              <div class="col-12 mb-3">
-                <label for="landAreaModal" class="form-label">Land Area</label>
-                <input type="text" class="form-control" id="landAreaModal"
-                  value="<?php echo isset($property['land_area']) ? htmlspecialchars($property['land_area']) : ''; ?>"
-                  placeholder="Enter Land Area">
-              </div>
-              <div class="col-12 mb-3">
-                <label for="zoneNumberModal" class="form-label">Zone Number</label>
-                <input type="text" class="form-control" id="zoneNumberModal"
-                  value="<?php echo isset($property['zone_no']) ? htmlspecialchars($property['zone_no']) : ''; ?>"
-                  placeholder="Enter Zone Number">
-              </div>
-              <div class="col-12 mb-3">
-                <label for="ardNumberModal" class="form-label">ARD Number</label>
-                <input type="text" class="form-control" id="ardNumberModal"
-                  value="<?php echo isset($property['ard_no']) ? htmlspecialchars($property['ard_no']) : ''; ?>"
-                  placeholder="Enter ARD Number">
-              </div>
-              <div class="col-12 mb-3">
-                <label for="taxabilityModal" class="form-label">Taxability</label>
-                <select class="form-control" id="taxabilityModal">
-                  <option value="Taxable" <?php echo (isset($property['taxability']) && $property['taxability'] == 'Taxable') ? 'selected' : ''; ?>>Taxable</option>
-                  <option value="Non-Taxable" <?php echo (isset($property['taxability']) && $property['taxability'] == 'Non-Taxable') ? 'selected' : ''; ?>>Non-Taxable</option>
-                </select>
-              </div>
-              <div class="col-12 mb-3">
-                <label for="effectivityModal" class="form-label">Effectivity</label>
-                <input type="text" class="form-control" id="effectivityModal"
-                  value="<?php echo isset($property['effectivity']) ? htmlspecialchars($property['effectivity']) : ''; ?>"
-                  placeholder="Enter Effectivity Date">
-              </div>
+  <!--Modal for Property Information-->
+  <div class="modal fade" id="editPropertyModal" tabindex="-1" aria-labelledby="editPropertyModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editPropertyModalLabel">Edit Property Information</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editPropertyForm">
+          <div class="row">
+            <input type="hidden" id="propertyIdModal">
+            <div class="col-12 mb-3">
+              <label for="streetModal" class="form-label">Street</label>
+              <input type="text" class="form-control" id="streetModal" placeholder="Enter Street">
             </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="reset" class="btn btn-warning" onclick="resetForm()">Reset</button>
-          <button type="button" class="btn btn-primary" onclick="savePropertyData()">Save changes</button>
-        </div>
+            <div class="col-12 mb-3">
+              <label for="barangayModal" class="form-label">Barangay</label>
+              <input type="text" class="form-control" id="barangayModal" placeholder="Enter Barangay">
+            </div>
+            <div class="col-12 mb-3">
+              <label for="municipalityModal" class="form-label">Municipality</label>
+              <input type="text" class="form-control" id="municipalityModal" placeholder="Enter Municipality">
+            </div>
+            <div class="col-12 mb-3">
+              <label for="provinceModal" class="form-label">Province</label>
+              <input type="text" class="form-control" id="provinceModal" placeholder="Enter Province">
+            </div>
+            <div class="col-12 mb-3">
+              <label for="houseNumberModal" class="form-label">House Number</label>
+              <input type="text" class="form-control" id="houseNumberModal" placeholder="Enter House Number">
+            </div>
+            <div class="col-12 mb-3">
+              <label for="landAreaModal" class="form-label">Land Area</label>
+              <input type="text" class="form-control" id="landAreaModal" placeholder="Enter Land Area">
+            </div>
+            <div class="col-12 mb-3">
+              <label for="zoneNumberModal" class="form-label">Zone Number</label>
+              <input type="text" class="form-control" id="zoneNumberModal" placeholder="Enter Zone Number">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="reset" class="btn btn-warning" onclick="resetForm()">Reset</button>
+        <button type="button" class="btn btn-primary" onclick="savePropertyData()">Save changes</button>
       </div>
     </div>
   </div>
+</div>
 
   <!--RPU Identification Numbers-->
   <section class="container mt-5" id="rpu-identification-section">

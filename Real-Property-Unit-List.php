@@ -125,70 +125,72 @@ if ($barangayResult->num_rows > 0) {
     </div>
   </nav>
 
-  <!-- Main Body -->
-  <section class="container mt-5">
-    <div class="card p-4">
-      <h3 class="mb-4">Real Property Units List</h3>
-      <div class="form-row mb-4">
-        <div class="col-auto">
-          <label for="searchInput" class="sr-only">Search</label>
-          <div class="input-group">
-          <input type="text" class="form-control" id="searchInput" placeholder="Search" onkeyup="handleEnter(event)">
-            <select class="custom-select" id="barangayDropdown" name="barangay"> <!-- Dropdown for barangay selection -->
-              <option selected value="">All Barangay</option>
-              <?php echo $barangayOptions; ?> <!-- PHP-generated barangay options -->
-            </select>
-          </div>
-        </div>
-
-        <div class="col-auto">
-          <button type="button" class="btn btn-success btn-hover" onclick="filterTable()">Search</button>
-          <a href="Add-New-Real-Property-Unit.php" class="btn btn-success btn-hover">Add new RPU</a>
+<!-- Main Body -->
+<section class="container mt-5">
+  <div class="card p-4">
+    <h3 class="mb-4">Real Property Units List</h3>
+    <div class="form-row mb-4">
+      <div class="col-auto">
+        <label for="searchInput" class="sr-only">Search</label>
+        <div class="input-group">
+          <input type="text" class="form-control" id="searchInput" placeholder="Search" onkeyup="filterTable()">
+          <select class="custom-select" id="barangayDropdown" name="barangay"> <!-- Dropdown for barangay selection -->
+            <option selected value="">All Barangay</option>
+            <?php echo $barangayOptions; ?> <!-- PHP-generated barangay options -->
+          </select>
         </div>
       </div>
 
-      <!-- Table -->
-      <div class="table-responsive">
-        <table class="table table-bordered text-center modern-table" id="propertyTable"> <!-- Responsive table -->
-          <thead>
-            <tr>
-              <th>OD ID</th>
-              <th>Owner</th>
-              <th>Location <br><small>(Barangay, City, Province)</small></th>
-              <th>Land Area</th>
-              <th>Edit</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            <?php
-            // Display the fetched data in table rows
-            foreach ($propertyUnits as $unit) {
-              echo "<tr>
-                    <td>{$unit['p_id']}</td>
-                    <td>{$unit['owner']}</td>
-                    <td>{$unit['house_no']}, {$unit['barangay']}, {$unit['city']}, {$unit['province']}</td>
-                    <td>{$unit['land_area']}</td>
-                    <td><a href='FAAS.php?id={$unit['p_id']}' class='btn btn-primary'>EDIT</a></td>
-                  </tr>";
-            }
-            ?>
-          </tbody>
-        </table>
+      <div class="col-auto">
+        <button type="button" class="btn btn-success btn-hover" onclick="filterTable()">Search</button>
+        <a href="Add-New-Real-Property-Unit.php" class="btn btn-success btn-hover">Add new RPU</a>
       </div>
+    </div>
 
-<!-- Pagination Controls -->
-<div class="pagination-controls mta-3">
-  <label for="pageSelect">Page: </label>
-  <select id="pageSelect" onchange="changePage()"></select>
-</div>
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table table-bordered text-center modern-table" id="propertyTable"> <!-- Responsive table -->
+        <thead>
+          <tr>
+            <th>OD ID</th>
+            <th>Owner</th>
+            <th>Location <br><small>(Barangay, City, Province)</small></th>
+            <th>Land Area</th>
+            <th>Edit</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <?php
+          // Display the fetched data in table rows
+          foreach ($propertyUnits as $unit) {
+            echo "<tr>
+                  <td>{$unit['p_id']}</td>
+                  <td>{$unit['owner']}</td>
+                  <td>{$unit['house_no']}, {$unit['barangay']}, {$unit['city']}, {$unit['province']}</td>
+                  <td>{$unit['land_area']}</td>
+                  <td><a href='FAAS.php?id={$unit['p_id']}' class='btn btn-primary'>EDIT</a></td>
+                </tr>";
+          }
+          ?>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-controls mt-3">
+      <label for="pageSelect">Page: </label>
+      <select id="pageSelect" onchange="changePage()"></select>
+    </div>
 
     <!-- View All Button -->
-<div class="view-all-container d-flex mt-3">
-  <div class="ml-auto">
-    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#viewAllModal">View All</button>
+    <div class="view-all-container d-flex mt-3">
+      <div class="ml-auto">
+        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#viewAllModal">View All</button>
+      </div>
+    </div>
   </div>
-</div>
-  </section>
+</section>
+
 
 <!-- View All Modal -->
 <div class="modal fade" id="viewAllModal" tabindex="-1" aria-labelledby="viewAllModalLabel" aria-hidden="true">
@@ -234,7 +236,7 @@ if ($barangayResult->num_rows > 0) {
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="resetModal()">Close</button>
       </div>
     </div>
   </div>
@@ -248,7 +250,103 @@ if ($barangayResult->num_rows > 0) {
       <a class="text-body" href="https://mdbootstrap.com/">MDBootstrap.com</a>
     </div>
   </footer>
+  <script>
+    let currentPage = 1;
+const rowsPerPage = 5;
 
+// Function to initialize the table and pagination
+function initializeTable() {
+  const tableRows = document.querySelectorAll("#tableBody tr");
+  const totalRows = tableRows.length;
+
+  const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+
+  const pageSelect = document.getElementById("pageSelect");
+  pageSelect.innerHTML = ''; 
+  for (let i = 1; i <= totalPages; i++) {
+    const option = document.createElement("option");
+    option.value = i;
+    option.textContent = i;
+    pageSelect.appendChild(option);
+  }
+
+  displayRowsForPage(currentPage);
+
+  pageSelect.value = currentPage;
+}
+
+
+function displayRowsForPage(page) {
+  const tableRows = document.querySelectorAll("#tableBody tr");
+  const totalRows = tableRows.length;
+  const startIndex = (page - 1) * rowsPerPage;
+  const endIndex = Math.min(startIndex + rowsPerPage, totalRows);
+
+  tableRows.forEach((row, index) => {
+    row.style.display = "none";
+  });
+
+
+  for (let i = startIndex; i < endIndex; i++) {
+    tableRows[i].style.display = "";
+  }
+}
+
+function changePage() {
+  const pageSelect = document.getElementById("pageSelect");
+  currentPage = parseInt(pageSelect.value);
+  displayRowsForPage(currentPage);
+}
+
+document.addEventListener("DOMContentLoaded", initializeTable);
+
+  </script>
+  <script>
+    // Function to reset the modal when the close button is clicked
+function resetModal() {
+  document.getElementById("modalSearchInput").value = "";
+  resetTable();
+}
+
+
+function resetTable() {
+  var tableBody = document.getElementById("modalTableBody");
+
+  tableBody.innerHTML = '';
+  var propertyUnits = <?php echo json_encode($propertyUnits); ?>;
+
+  propertyUnits.forEach(function(unit) {
+    var row = `<tr>
+                <td>${unit.p_id}</td>
+                <td>${unit.owner}</td>
+                <td>${unit.house_no}, ${unit.barangay}, ${unit.city}, ${unit.province}</td>
+                <td>${unit.land_area}</td>
+               </tr>`;
+    tableBody.innerHTML += row;
+  });
+
+}
+
+
+function viewAllSearch() {
+  var searchQuery = document.getElementById("modalSearchInput").value.toLowerCase();
+  var tableRows = document.getElementById("modalTableBody").getElementsByTagName("tr");
+
+  Array.from(tableRows).forEach(function(row) {
+    var cells = row.getElementsByTagName("td");
+    var matchFound = false;
+
+    Array.from(cells).forEach(function(cell) {
+      if (cell.innerText.toLowerCase().includes(searchQuery)) {
+        matchFound = true;
+      }
+    });
+    row.style.display = matchFound ? "" : "none";
+  });
+}
+
+  </script>
   <script src="http://localhost/ERPTS/Real-Property-Unit-List.js"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
