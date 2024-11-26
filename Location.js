@@ -152,3 +152,19 @@ $('#districtDescription').on('input', function() {
   value = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
   this.value = value;
 });
+
+// Input validation for Municipality Code - Numbers only (no digit limit)
+$('#municipalityCode').on('input', function() {
+  var value = this.value;
+  // Allow only numbers, no digit limit
+  value = value.replace(/\D/g, '');  // Remove non-digit characters
+  this.value = value;
+});
+
+// Input validation for Municipality Description - Capitalize the first letter
+$('#municipalityDescription').on('input', function() {
+  var value = this.value;
+  // Capitalize the first letter and keep the rest lowercase
+  value = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+  this.value = value;
+});
