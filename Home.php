@@ -4,23 +4,29 @@ session_start(); // Start session at the top
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once 'database.php'; // Include your database connection
+require_once 'database.php'; 
 
 $conn = Database::getInstance();
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Fetch owner data from `owners_tb` table
+$query_owner_data = "SELECT own_id, own_fname, own_mname, own_surname FROM owners_tb LIMIT 3";
+$result_owner_data = $conn->query($query_owner_data);
+
 // Fetch total number of owners
-$query_owners = "SELECT COUNT(*) AS total_owners FROM owners_tb";
-$result_owners = $conn->query($query_owners);
-$total_owners = $result_owners->fetch_assoc()['total_owners'];
+$query_total_owners = "SELECT COUNT(*) AS total_owners FROM owners_tb";
+$result_total_owners = $conn->query($query_total_owners);
+$total_owners = $result_total_owners->fetch_assoc()['total_owners'];
+
 
 // Fetch total number of properties
 $query_properties = "SELECT COUNT(*) AS total_properties FROM p_info";
 $result_properties = $conn->query($query_properties);
 $total_properties = $result_properties->fetch_assoc()['total_properties'];
 ?>
+
 
 <!doctype html>
 <html lang="en">
@@ -90,33 +96,71 @@ $total_properties = $result_properties->fetch_assoc()['total_properties'];
 <div class="container-fluid p-0" style="margin-top: 80px;"> <!-- Adjust margin-top based on header height -->
     <div class="row">
         <!-- Left Section: Property Listing and Owner Statistics -->
-        <div class="col-lg-7" style="padding-left: 20px;"> <!-- Added padding-left -->
-            <!-- Property Listing -->
-            <div class="modern-card shadow-lg p-5 mb-4 rounded-lg" style="height: 500px; width: 100%;">
-                <h4 class="font-weight-bold custom-text-color">Property Listings</h4>
-                <p class="lead custom-text-color">Up-to-date property listings and market analysis for residential, commercial, and industrial properties in the area.</p>
-                <div class="text-center">
-                    <i class="fas fa-building fa-4x text-warning"></i>
-                </div>
-                <div class="mt-4 text-center">
-                    <h5>Total Properties: <?php echo $total_properties; ?></h5>
-                </div>
-            </div>
+        <div class="col-lg-7 col-md-12" style="padding-left: 10px;"> <!-- Left section occupies 7 columns on large screens -->
+            
+<!-- Property Listing -->
+<div class="modern-card shadow-lg p-5 mb-4 rounded-lg" style="height: auto; width: 100%; position: relative;"> <!-- Adjusted height -->
+    <h4 class="font-weight-bold custom-text-color">Property Listings</h4>
+    <p class="lead custom-text-color">Property listings and market analysis for residential, commercial, and industrial properties in the area.</p>
+    <div class="text-center">
+        <i class="fas fa-building fa-4x text-warning"></i>
+    </div>
+    <div class="mt-4 text-center">
+        <h5>Total Properties: <?php echo $total_properties; ?></h5>
+    </div>
+
+    <!-- Button to Go to RPU List -->
+    <div class="mt-3 d-flex justify-content-end" style="position: absolute; bottom: 20px; right: 20px;">
+    <a href="Real-Property-Unit-List.php" class="btn" style="background-color: #489474; border-color: #489474; color: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">Go to RPU List</a>
+</div>
+</div>
+
+            
             <!-- Owner Statistics -->
-            <div class="modern-card shadow-lg p-5 mb-4 rounded-lg" style="height: 300px; width: 100%;">
+            <div class="modern-card shadow-lg p-5 mb-4 rounded-lg" style="height: auto; width: 100%; position: relative;"> <!-- Adjusted height -->
                 <h4 class="font-weight-bold custom-text-color">Owner Statistics</h4>
-                <p class="custom-text-color">Comprehensive data on property ownership trends, demographics, and distribution across the province.</p>
+                <p class="lead custom-text-color">Summary of current users.</p>
                 <div class="text-center">
                     <i class="fas fa-users fa-3x text-warning"></i>
-                </div>
-                <div class="mt-4 text-center">
                     <h5>Total Owners: <?php echo $total_owners; ?></h5>
                 </div>
+                <div class="mt-4">
+                    <!-- Owner Data Table -->
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>First Name</th>
+                                <th>Middle Name</th>
+                                <th>Surname</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            if ($result_owner_data->num_rows > 0) {
+                                while ($row = $result_owner_data->fetch_assoc()) {
+                                    echo "<tr>";
+
+                                    echo "<td>" . htmlspecialchars($row['own_fname']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['own_mname']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['own_surname']) . "</td>";
+                                    echo "</tr>";
+                                }
+                            } else {
+                                echo "<tr><td colspan='4'>No owners available.</td></tr>";
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Button to Go to Owner's List -->
+<div class="mt-3 d-flex justify-content-end">
+    <a href="Own_list.php" class="btn" style="background-color: #489474; border-color: #489474; color: white; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">Go to Owner's List</a>
+</div>
             </div>
         </div>
 
         <!-- Right Section: Main Content -->
-        <div class="col-lg-4">
+        <div class="col-lg-5 col-md-12"> 
             <div class="modern-card shadow-lg p-4 rounded-lg" style="height: 100%;">
                 <h3 class="font-weight-bold custom-text-color">CITIZEN'S CHARTER OFFICE OF THE PROVINCIAL ASSESSOR</h3>
                 <h5 class="text-secondary mb-4 custom-text-color">Capitol, Daet, Camarines Norte</h5>
@@ -143,6 +187,17 @@ $total_properties = $result_properties->fetch_assoc()['total_properties'];
         </div>
     </div>
 </div>
+
+
+
+<!-- Footer -->
+<footer class="bg-body-tertiary text-center text-lg-start mt-auto">
+    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+      © 2020 Copyright:
+      <a class="text-body" href="https://mdbootstrap.com/">MDBootstrap.com</a>
+    </div>
+  </footer>
+
 
 <!-- JS Files -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
