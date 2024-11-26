@@ -11,6 +11,8 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+$user_role = $_SESSION['user_type'] ?? 'user'; // Default to 'user' if role is not set
+
 // Fetch owner data from `owners_tb` table
 $query_owner_data = "SELECT own_id, own_fname, own_mname, own_surname FROM owners_tb LIMIT 3";
 $result_owner_data = $conn->query($query_owner_data);
@@ -47,8 +49,8 @@ $total_properties = $result_properties->fetch_assoc()['total_properties'];
 </head>
 
 <body>
-  <!-- Header Navigation -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
+ <!-- Header Navigation -->
+ <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
     <a class="navbar-brand">
       <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top"
         alt="">
@@ -60,18 +62,26 @@ $total_properties = $result_properties->fetch_assoc()['total_properties'];
       <span class="navbar-toggler-icon"></span>
     </button>
 
+    <?php if ($user_role === 'admin'): ?>
+  <button onclick="location.href='Admin-Page-2.php'" style="background-color: #d6c21c; color: #000; border-radius: 5px; padding: 5px 15px; border: none; cursor: pointer;">
+    Admin Dashboard
+  </button>
+<?php endif; ?>
+
+
+
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto"> <!-- Use ml-auto to align items to the right -->
-        <li class="nav-item active">
-          <a class="nav-link" href="Home.php">Home<span class="sr-only">(current)</span></a>
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="Home.php">Home</a>
         </li>
-        <li class="nav-item dropdown">
+        <li class="nav-item dropdown active">
           <a class="nav-link dropdown-toggle" href="RPU-Management.php" id="navbarDropdown" role="button"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             RPU Management
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="Real-Property-Unit-List.php">RPU List</a>
+            <a class="dropdown-item active" href="Real-Property-Unit-List.php">RPU List</a>
             <a class="dropdown-item" href="FAAS.php">FAAS</a>
             <a class="dropdown-item" href="Tax-Declaration-List.php">Tax Declaration</a>
             <div class="dropdown-divider"></div>
@@ -84,9 +94,8 @@ $total_properties = $result_properties->fetch_assoc()['total_properties'];
         <li class="nav-item">
           <a class="nav-link" href="Reports.php">Reports</a>
         </li>
-        <li class="nav-item" style="margin-left: 20px">
-          <button type="button" class="btn btn-danger" data-toggle="button" aria-pressed="false" autocomplete="off">
-            Log Out</button>
+        <li class="nav-item ml-3">
+          <a href="logout.php" class="btn btn-danger">Log Out</a>
         </li>
       </ul>
     </div>
@@ -101,7 +110,7 @@ $total_properties = $result_properties->fetch_assoc()['total_properties'];
 <!-- Property Listing -->
 <div class="modern-card shadow-lg p-5 mb-4 rounded-lg" style="height: auto; width: 100%; position: relative;"> <!-- Adjusted height -->
     <h4 class="font-weight-bold custom-text-color">Property Listings</h4>
-    <p class="lead custom-text-color">Property listings and market analysis for residential, commercial, and industrial properties in the area.</p>
+    <p class="lead custom-text-color">Current number of Properties</p>
     <div class="text-center">
         <i class="fas fa-building fa-4x text-warning"></i>
     </div>

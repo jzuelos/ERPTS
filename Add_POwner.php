@@ -16,48 +16,49 @@
 
 <body>
   <!-- Header Navigation -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-custom"> 
+  <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
     <a class="navbar-brand">
-      <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top" alt=""> 
+      <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top"
+        alt="">
       Electronic Real Property Tax System
     </a>
 
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span> 
+      <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent"> 
-      <ul class="navbar-nav ml-auto"> 
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto">
         <li class="nav-item">
-          <a class="nav-link" href="Home.php">Home</a> 
+          <a class="nav-link" href="Home.php">Home</a>
         </li>
-        <li class="nav-item dropdown active"> 
+        <li class="nav-item dropdown active">
           <a class="nav-link dropdown-toggle" href="RPU-Management.php" id="navbarDropdown" role="button"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             RPU Management
           </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown"> 
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <a class="dropdown-item active" href="Real-Property-Unit-List.php">RPU List</a>
             <a class="dropdown-item" href="FAAS.php">FAAS</a>
-            <a class="dropdown-item" href="Tax-Declaration-List.php">Tax Declaration</a>
+            <a class="dropdown-item" href="Tax-Declaration.php">Tax Declaration</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="Track.php">Track Paper</a>
           </div>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="Transaction.php">Transaction</a> 
+          <a class="nav-link" href="Transaction.php">Transaction</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="Reports.php">Reports</a> 
+          <a class="nav-link" href="Reports.php">Reports</a>
         </li>
         <li class="nav-item ml-3">
-          <a href="logout.php" class="btn btn-danger">Log Out</a> 
+          <a href="logout.php" class="btn btn-danger">Log Out</a>
         </li>
       </ul>
     </div>
   </nav>
-
+  
   <!-- Main Body -->
 <section class="container mt-5">
   <div class="card p-4 shadow-sm form-container">
@@ -242,10 +243,12 @@
 </div>
 </section>
 
-  <!-- Footer -->
-  <footer class="footer mt-auto py-3 bg-custom"> 
-    <div class="container"> 
-      <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span> 
+
+<!-- Footer -->
+<footer class="bg-body-tertiary text-center text-lg-start mt-auto">
+    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+      © 2020 Copyright:
+      <a class="text-body" href="https://mdbootstrap.com/">MDBootstrap.com</a>
     </div>
   </footer>
 
