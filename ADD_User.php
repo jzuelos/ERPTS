@@ -149,7 +149,6 @@
         </div>
     </nav>
 
-
 <!-- Main Content -->
 <div class="container mt-5">
     <h2 class="text-center mb-4">Create New User</h2>
@@ -160,17 +159,17 @@
             <legend class="font-weight-bold">User Credentials</legend>
             <div class="form-group">
                 <label for="username"><span style="color: red;">*</span> Username:</label>
-                <input type="text" id="username" name="username" class="form-control" required>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Enter username" required>
             </div>
 
             <div class="form-group">
                 <label for="password"><span style="color: red;">*</span> New Password:</label>
-                <input type="password" id="password" name="password" class="form-control" required>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Enter password" required>
             </div>
 
             <div class="form-group">
                 <label for="confirm_password"><span style="color: red;">*</span> Confirm Password:</label>
-                <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Confirm password" required>
             </div>
         </div>
 
@@ -180,17 +179,17 @@
 
             <div class="form-group">
                 <label for="lastname"><span style="color: red;">*</span> Last Name:</label>
-                <input type="text" id="lastname" name="lastname" class="form-control" required>
+                <input type="text" id="lastname" name="lastname" class="form-control" placeholder="Enter last name" required>
             </div>
 
             <div class="form-group">
                 <label for="firstname"><span style="color: red;">*</span> First Name:</label>
-                <input type="text" id="firstname" name="firstname" class="form-control" required>
+                <input type="text" id="firstname" name="firstname" class="form-control" placeholder="Enter first name" required>
             </div>
 
             <div class="form-group">
                 <label for="middlename">Middle Name:</label>
-                <input type="text" id="middlename" name="middlename" class="form-control">
+                <input type="text" id="middlename" name="middlename" class="form-control" placeholder="Enter middle name (optional)">
             </div>
 
             <div class="form-group">
@@ -213,8 +212,7 @@
             <div class="form-group">
                 <label><span style="color: red;">*</span> Marital Status:</label>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" id="single" name="marital_status" value="single"
-                        required>
+                    <input class="form-check-input" type="radio" id="single" name="marital_status" value="single" required>
                     <label class="form-check-label" for="single">Single</label>
                 </div>
                 <div class="form-check form-check-inline">
@@ -225,7 +223,7 @@
 
             <div class="form-group">
                 <label for="tin"><span style="color: red;">*</span> Tax Identification Number (TIN):</label>
-                <input type="text" id="tin" name="tin" class="form-control" required>
+                <input type="text" id="tin" name="tin" class="form-control" placeholder="Enter TIN" required>
             </div>
         </div>
 
@@ -235,42 +233,50 @@
 
             <div class="form-group">
                 <label for="house_number"><span style="color: red;">*</span> House Number:</label>
-                <input type="text" id="house_number" name="house_number" class="form-control" required>
+                <input type="text" id="house_number" name="house_number" class="form-control" placeholder="Enter house number" required>
             </div>
 
             <div class="form-group">
                 <label for="street"><span style="color: red;">*</span> Street:</label>
-                <input type="text" id="street" name="street" class="form-control" required>
+                <input type="text" id="street" name="street" class="form-control" placeholder="Enter street name" required>
             </div>
 
             <div class="form-group">
                 <label for="barangay"><span style="color: red;">*</span> Barangay:</label>
-                <input type="text" id="barangay" name="barangay" class="form-control" required>
+                <select id="barangay" name="barangay" class="form-control" required>
+                    <option value="" disabled selected>Select Barangay</option>
+                </select>
             </div>
 
             <div class="form-group">
                 <label for="district"><span style="color: red;">*</span> District:</label>
-                <input type="text" id="district" name="district" class="form-control" required>
+                <select id="district" name="district" class="form-control" required>
+                    <option value="" disabled selected>Select District</option>
+                </select>
             </div>
 
             <div class="form-group">
                 <label for="municipality"><span style="color: red;">*</span> Municipality/City:</label>
-                <input type="text" id="municipality" name="municipality" class="form-control" required>
+                <select id="municipality" name="municipality" class="form-control" required>
+                    <option value="" disabled selected>Select Municipality</option>
+                </select>
             </div>
 
             <div class="form-group">
                 <label for="province"><span style="color: red;">*</span> Province:</label>
-                <input type="text" id="province" name="province" class="form-control" required>
+                <select id="province" name="province" class="form-control" required>
+                    <option value="Camarines Norte" selected>Camarines Norte</option>
+                </select>
             </div>
 
             <div class="form-group">
                 <label for="contact_number"><span style="color: red;">*</span> Contact Number:</label>
-                <input type="text" id="contact_number" name="contact_number" class="form-control" required>
+                <input type="text" id="contact_number" name="contact_number" class="form-control" placeholder="Enter contact number" required>
             </div>
 
             <div class="form-group">
                 <label for="email"><span style="color: red;">*</span> Email:</label>
-                <input type="email" id="email" name="email" class="form-control" required>
+                <input type="email" id="email" name="email" class="form-control" placeholder="Enter email address" required>
             </div>
         </div>
 
@@ -285,7 +291,6 @@
         <button type="submit" class="btn">Create User</button>
     </form>
 </div>
-
 
     <!-- Footer -->
     <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
@@ -308,6 +313,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
         integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
         crossorigin="anonymous"></script>
+    <script src="ADD_User.js"></script>
 
 </body>
 
