@@ -49,45 +49,74 @@ $('#submitBarangayFormBtn').on('click', function(e) {
     type: 'POST',
     data: formData,
     success: function(response) {
-      alert(response); // Display success or error message
+      showToastMessage(response); // Display success or error message
       $('#barangayModal').modal('hide'); // Close the modal on success
     },
     error: function(xhr, status, error) {
       console.error("Error:", error); // Log any errors
+      showToastMessage("An error occurred. Please try again.");
     }
   });
 });
 
-// Handle form reset
+// Handle form reset for Barangay
 $('#resetFormBtn').on('click', function() {
   $('#barangayForm')[0].reset();
 });
 
 // Handle form submission logic for District form using AJAX
-$('#submitDistrictFormBtn').on('click', function(e) {
-  e.preventDefault(); // Prevent default form submission
+// JavaScript function to insert district data
+$(document).ready(function () {
+  // Fetch municipalities when the modal is opened (if not already populated)
+  $('#districtModal').on('show.bs.modal', function () {
+    $.ajax({
+      url: 'getMunicipalities.php', // PHP script to fetch municipalities
+      method: 'GET',
+      success: function (data) {
+        $('#municipality').html(data); // Populate the municipality dropdown
+      }
+    });
+  });
 
-  // Collect form data
-  let formData = {
-    code: $('#districtCode').val(),
-    description: $('#districtDescription').val(),
-    status: $('input[name="status"]:checked').val()
-  };
+  // Submit the district form
+  $('#submitDistrictFormBtn').click(function (e) {
+    e.preventDefault(); // Prevent the default form submission
 
-  // Send data to PHP file for database insertion using AJAX
-  $.ajax({
-    url: 'loc_submit_district.php', // PHP file to handle the database insertion
-    type: 'POST',
-    data: formData,
-    success: function(response) {
-      alert(response); // Display success or error message
-      $('#districtModal').modal('hide'); // Close the modal on success
-      $('#districtForm')[0].reset(); // Reset the form
-    },
-    error: function(xhr, status, error) {
-      console.error("Error:", error); // Log any errors
-      alert("An error occurred. Please try again.");
+    // Get the form data
+    const districtCode = $('#districtCode').val();
+    const districtDescription = $('#districtDescription').val();
+    const status = $("input[name='status']:checked").val(); // Get selected status
+    const municipalityId = $('#municipality').val(); // Get selected municipality ID
+
+    // Validate inputs
+    if (!districtCode || !districtDescription || !status || !municipalityId) {
+      alert('Please fill all fields.');
+      return;
     }
+
+    // Send the data to the server using AJAX
+    $.ajax({
+      url: 'loc_submit_district.php', // PHP script to handle insertion
+      method: 'POST',
+      data: {
+        district_code: districtCode,
+        description: districtDescription,
+        status: status,
+        m_id: municipalityId
+      },
+      success: function (response) {
+        if (response === 'success') {
+          alert('District added successfully!');
+          $('#districtForm')[0].reset(); // Reset the form
+          $('#districtModal').modal('hide'); // Close the modal
+        } else {
+          alert('Failed to add district. Please try again.');
+        }
+      },
+      error: function () {
+        alert('An error occurred while processing your request.');
+      }
+    });
   });
 });
 
@@ -98,23 +127,51 @@ $('#districtModal #resetFormBtn').on('click', function() {
 
 // script to populate region drop down options
 document.addEventListener("DOMContentLoaded", function() {
+  // Fetch regions
   fetch("loc_getRegions.php")
-      .then(response => response.json())
-      .then(data => {
-          const regionSelect = document.getElementById("region");
+    .then(response => response.json())
+    .then(data => {
+      const regionSelect = document.getElementById("region");
 
-          // Clear any existing options
-          regionSelect.innerHTML = '<option value="">Select Region</option>';
+      // Clear any existing options
+      regionSelect.innerHTML = '';
 
-          // Populate options with r_no
-          data.forEach(region => {
-              const option = document.createElement("option");
-              option.value = region.r_id;           // Set r_id as the value
-              option.textContent = region.r_no;      // Display r_no as the visible text
-              regionSelect.appendChild(option);
-          });
-      })
-      .catch(error => console.error("Error fetching regions:", error));
+      // Populate options with r_no
+      data.forEach(region => {
+        const option = document.createElement("option");
+        option.value = region.r_id;           // Set r_id as the value
+        option.textContent = region.r_no;      // Display r_no as the visible text
+        regionSelect.appendChild(option);
+      });
+    })
+    .catch(error => console.error("Error fetching regions:", error));
+
+  // Fetch municipalities and populate the dropdown
+  fetch("loc_getMunicipalities.php")
+   .then(response => response.json())
+   .then(data => {
+       const municipalitySelect = document.getElementById("municipality");
+
+       // Clear existing options and add a default "Select Municipality"
+       municipalitySelect.innerHTML = '<option value="" selected disabled>Select Municipality</option>';
+
+       // Populate the dropdown
+       if (data.length > 0) {
+           data.forEach(municipality => {
+               const option = document.createElement("option");
+               option.value = municipality.m_id;  // m_id is used as the value
+               option.textContent = municipality.m_description;  // m_description is displayed
+               municipalitySelect.appendChild(option);
+           });
+       } else {
+           const noDataOption = document.createElement("option");
+           noDataOption.textContent = "No municipalities available";
+           municipalitySelect.appendChild(noDataOption);
+       }
+   })
+   .catch(error => {
+       console.error("Error fetching municipalities:", error);
+   });
 });
 
 // Handle form submission logic for Municipality form using AJAX
@@ -124,31 +181,31 @@ $('#submitMunicipalityFormBtn').on('click', function(e) {
   // Collect form data
   let regionId = $('#region').val();  // Get the region value
   if (!regionId) {
-    alert("Please select a region");  // Show an error if no region is selected
+    showToastMessage("Please select a region");  // Show an error if no region is selected
     return;  // Stop the form submission
   }
 
   let formData = {
-      region_id: regionId,  // Use region_id from dropdown
-      municipality_code: $('#municipalityCode').val(),
-      municipality_description: $('#municipalityDescription').val(),
-      status: $('input[name="status"]:checked').val()
+    region_id: regionId,  // Use region_id from dropdown
+    municipality_code: $('#municipalityCode').val(),
+    municipality_description: $('#municipalityDescription').val(),
+    status: $('input[name="status"]:checked').val()
   };
 
   // Send data to PHP file for database insertion using AJAX
   $.ajax({
-      url: 'loc_submit_municipality.php', // PHP file to handle the database insertion
-      type: 'POST',
-      data: formData,
-      success: function(response) {
-          alert(response); // Display success or error message
-          $('#municipalityModal').modal('hide'); // Close the modal on success
-          $('#municipalityForm')[0].reset(); // Reset the form
-      },
-      error: function(xhr, status, error) {
-          console.error("Error:", error); // Log any errors
-          alert("An error occurred. Please try again.");
-      }
+    url: 'loc_submit_municipality.php', // PHP file to handle the database insertion
+    type: 'POST',
+    data: formData,
+    success: function(response) {
+      showToastMessage(response); // Display success or error message
+      $('#municipalityModal').modal('hide'); // Close the modal on success
+      $('#municipalityForm')[0].reset(); // Reset the form
+    },
+    error: function(xhr, status, error) {
+      console.error("Error:", error); // Log any errors
+      showToastMessage("An error occurred. Please try again.");
+    }
   });
 });
 
@@ -185,7 +242,7 @@ $('#districtCode').on('input', function() {
 $('#districtDescription').on('input', function() {
   var value = this.value;
   // Capitalize the first letter and keep the rest lowercase
-  value = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+  value = value.charAt(0).toUpperCase() + value.slice(1);
   this.value = value;
 });
 
@@ -197,12 +254,23 @@ $('#municipalityCode').on('input', function() {
   this.value = value;
 });
 
-// Input validation for Municipality Description - Capitalize the first letter of each word
+// Input validation for Municipality Description - Capitalize the first letter
 $('#municipalityDescription').on('input', function() {
   var value = this.value;
-  // Capitalize the first letter of each word and preserve the rest of the characters
-  value = value.replace(/\b\w/g, function(char) {
-    return char.toUpperCase();
-  });
+  // Capitalize the first letter and keep the rest lowercase
+  value = value.charAt(0).toUpperCase() + value.slice(1);
   this.value = value;
 });
+
+// Prevent form submission on Enter key press for all forms
+$('#barangayForm, #districtForm, #municipalityForm').on('keypress', function(e) {
+  if (e.which == 13) {
+    e.preventDefault(); // Prevent the form from submitting
+  }
+});
+
+// Function to display toast messages (success/error)
+function showToastMessage(message) {
+  // You can replace this with any toast or notification library you prefer
+  alert(message); // For simplicity, using alert here
+}

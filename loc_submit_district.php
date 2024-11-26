@@ -1,27 +1,30 @@
 <?php
-// Include the database connection file
-include 'database.php';
+// Include database connection
+include('database.php');
 
 $conn = Database::getInstance();
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Get form data
-    $code = $_POST['code'];
-    $description = $_POST['description'];
-    $status = $_POST['status'];
+// Get POST data
+$district_code = $_POST['district_code'];
+$description = $_POST['description'];
+$status = $_POST['status'];
+$m_id = $_POST['m_id'];
 
-    // Insert into database
-    $query = "INSERT INTO district (district_code, description, status) VALUES (?, ?, ?)";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("sss", $code, $description, $status);
+// Prepare the SQL statement
+$sql = "INSERT INTO district (district_code, description, status, m_id) VALUES (?, ?, ?, ?)";
 
-    if ($stmt->execute()) {
-        echo "District details added successfully!";
-    } else {
-        echo "Error: " . $stmt->error;
-    }
+// Prepare and bind the statement
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("sssi", $district_code, $description, $status, $m_id);
 
-    $stmt->close();
-    $conn->close();
+// Execute the query
+if ($stmt->execute()) {
+    echo 'success';
+} else {
+    echo 'failure';
 }
+
+// Close the statement and connection
+$stmt->close();
+$conn->close();
 ?>
