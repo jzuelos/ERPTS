@@ -58,19 +58,22 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
   }
 }
 
-// Step 1: Prepare the SQL statement to get the propertyowner_id from the `faas` table
+// Step 1: Prepare the SQL statement to get the faas_id and propertyowner_id from the `faas` table
 $sql_editowner = "
 SELECT 
-    f.propertyowner_id  -- This contains the junction table IDs for the owners
+    f.faas_id,            -- Fetch the faas_id
+    f.propertyowner_id    -- Fetch the propertyowner_id
 FROM faas f
-WHERE f.pro_id = ?";  // Use the property_id from the URL
+WHERE f.pro_id = ?";    // Use the property_id from the URL
 
 // Check if property ID (`pro_id`) is provided
 if (isset($_GET['id']) && !empty($_GET['id'])) {
   $p_id = intval($_GET['id']); // Sanitize input
-  echo "Property ID: " . $p_id . "<br>"; // Echo property ID for debugging
+  // Echo property ID with a top margin for debugging
+  echo "<div style='margin-top: 10px;'>&nbsp;&nbsp;&nbsp;&nbsp;Property ID: " . $p_id . "<br></div>";
 
-  // Step 2: Prepare and execute the query to get the propertyowner_id (junction table IDs)
+
+  // Step 2: Prepare and execute the query to get both faas_id and propertyowner_id (junction table IDs)
   if ($stmt = $conn->prepare($sql_editowner)) {
     $stmt->bind_param("i", $p_id); // Bind property ID to the query
     $stmt->execute();
@@ -79,10 +82,15 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     // Step 3: Check if the query returned a row
     if ($result->num_rows > 0) {
       $row = $result->fetch_assoc();
-      echo "Propertyowner ID: " . $row['propertyowner_id'] . "<br>"; // Echo propertyowner_id for debugging
 
-      // Step 4: Get the propertyowner_id (junction table ID)
+      // Step 4: Get the faas_id and propertyowner_id
+      $faas_id = $row['faas_id'];
       $propertyowner_id = $row['propertyowner_id'];
+
+      // Echo both faas_id and propertyowner_id for debugging with indentation
+      echo "&nbsp;&nbsp;&nbsp;&nbsp;Faas ID: " . $faas_id . "<br>"; // Indentation using non-breaking spaces
+      echo "&nbsp;&nbsp;&nbsp;&nbsp;Property Owner ID: " . $propertyowner_id . "<br>"; // Indentation using non-breaking spaces
+
 
       // Step 5: Query the junction table `propertyowner` to get the related owner IDs
       $sql_propertyowner = "
@@ -102,7 +110,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
         }
 
         // Echo all the collected owner IDs for debugging
-        echo "Owner IDs: " . implode(", ", $owner_ids) . "<br>";
+        echo "&nbsp;&nbsp;&nbsp;&nbsp;Owner IDs: " . implode(", ", $owner_ids) . "<br>";
 
         if (!empty($owner_ids)) {
           // Step 7: Build the query to fetch owner details from owners_tb
@@ -131,7 +139,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
           // Step 9: Check if we got owner details
           if ($owners_result->num_rows > 0) {
             // Echo the number of owners found for debugging
-            echo "Found owners: " . $owners_result->num_rows . "<br>";
+            echo "&nbsp;&nbsp;&nbsp;&nbsp;Found owners: " . $owners_result->num_rows . "<br>";
 
             while ($owner = $owners_result->fetch_assoc()) {
               // Echo the details of each owner for debugging
@@ -291,7 +299,7 @@ $conn->close();
             <div class="mb-3">
               <label for="ownerNameModal" class="form-label">Company or Owner</label>
               <input type="text" class="form-control" id="ownerNameModal"
-                value="<?php echo isset($property['owner_name']) ? htmlspecialchars($property['owner_name']) : ''; ?>"
+                value="<?php echo isset($owners_details[0]['owner_name']) ? htmlspecialchars($owners_details[0]['owner_name']) : ''; ?>"
                 placeholder="Enter Company or Owner">
             </div>
             <hr class="my-4">
@@ -299,54 +307,58 @@ $conn->close();
             <div class="mb-3">
               <label for="firstNameModal" class="form-label">First Name</label>
               <input type="text" class="form-control" id="firstNameModal"
-                value="<?php echo isset($property['first_name']) ? htmlspecialchars($property['first_name']) : ''; ?>"
+                value="<?php echo isset($owners_details[0]['first_name']) ? htmlspecialchars($owners_details[0]['first_name']) : ''; ?>"
                 placeholder="Enter First Name">
             </div>
             <div class="mb-3">
               <label for="middleNameModal" class="form-label">Middle Name</label>
               <input type="text" class="form-control" id="middleNameModal"
-                value="<?php echo isset($property['middle_name']) ? htmlspecialchars($property['middle_name']) : ''; ?>"
+                value="<?php echo isset($owners_details[0]['middle_name']) ? htmlspecialchars($owners_details[0]['middle_name']) : ''; ?>"
                 placeholder="Enter Middle Name">
             </div>
             <div class="mb-3">
               <label for="lastNameModal" class="form-label">Last Name</label>
               <input type="text" class="form-control" id="lastNameModal"
-                value="<?php echo isset($property['last_name']) ? htmlspecialchars($property['last_name']) : ''; ?>"
+                value="<?php echo isset($owners_details[0]['last_name']) ? htmlspecialchars($owners_details[0]['last_name']) : ''; ?>"
                 placeholder="Enter Last Name">
             </div>
           </form>
           <hr class="my-4">
           <table class="table table-bordered table-striped table-sm">
-            <thead class="table-dark">
-              <tr>
-                <th class="text-center">ID</th>
-                <th class="text-center">Selection</th>
-                <th class="text-center">Owner Name</th>
-                <th class="text-center">Address</th>
-              </tr>
-            </thead>
             <tbody>
-              <?php if (!empty($owners)): ?>
-                <?php foreach ($owners as $owner): ?>
+              <!-- Modal table to display owner data -->
+              <table class="table table-bordered table-striped table-sm">
+                <thead class="table-dark">
                   <tr>
-                    <td class="text-center"><?php echo htmlspecialchars($owner['own_id']); ?></td>
-                    <td class="text-center">
-                      <input type="checkbox" name="owner_selection[]"
-                        value="<?php echo htmlspecialchars($owner['own_id']); ?>">
-                    </td>
-                    <td class="text-center"><?php echo htmlspecialchars($owner['owner_name']); ?></td>
-                    <td class="text-center"><?php echo htmlspecialchars($owner['address']); ?></td>
+                    <th class="text-center">ID</th>
+                    <th class="text-center">Selection</th>
+                    <th class="text-center">Owner Name</th>
+                    <th class="text-center">Address</th>
                   </tr>
-                <?php endforeach; ?>
-              <?php else: ?>
-                <tr>
-                  <td colspan="4" class="text-center">No owner data found.</td>
-                </tr>
-              <?php endif; ?>
+                </thead>
+                <tbody>
+                  <?php if (!empty($owners)): ?> <!-- Corrected variable name from $owners_details to $owners -->
+                    <?php foreach ($owners as $owner): ?> <!-- Loop through $owners array -->
+                      <tr>
+                        <td class="text-center"><?php echo htmlspecialchars($owner['own_id']); ?></td>
+                        <td class="text-center">
+                          <input type="checkbox" name="owner_selection[]"
+                            value="<?php echo htmlspecialchars($owner['own_id']); ?>">
+                        </td>
+                        <td class="text-center"><?php echo htmlspecialchars($owner['owner_name']); ?></td>
+                        <td class="text-center"><?php echo htmlspecialchars($owner['address']); ?></td>
+                      </tr>
+                    <?php endforeach; ?>
+                  <?php else: ?>
+                    <tr>
+                      <td colspan="4" class="text-center">No owner data found.</td>
+                    </tr>
+                  <?php endif; ?>
+                </tbody>
+              </table>
+
             </tbody>
           </table>
-
-
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
