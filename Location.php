@@ -191,24 +191,53 @@
 
 <!-- Temporary Municipality Modal -->
 <div class="modal fade" id="municipalityModal" tabindex="-1" role="dialog" aria-labelledby="municipalityModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="municipalityModalLabel">Municipality Details</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>This is a temporary modal for the Municipality.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save</button>
-      </div>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="municipalityModalLabel">Municipality Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="municipalityForm">
+                    <div class="form-group">
+                        <label for="region">Region</label>
+                        <select class="form-control" id="region">
+                            <option></option>
+                            <!-- Add more Regions -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="municipalityCode">Code</label>
+                        <input type="text" class="form-control" id="municipalityCode" placeholder="Enter Code" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="municipalityDescription">Description</label>
+                        <input type="text" class="form-control" id="municipalityDescription" placeholder="Enter Description" value="">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label><br>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="status" id="municipalityActive" value="active" required>
+                            <label class="form-check-label" for="municipalityActive">Active</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="status" id="municipalityInactive" value="inactive">
+                            <label class="form-check-label" for="municipalityInactive">Inactive</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="reset" class="btn btn-warning" id="resetMunicipalityFormBtn">Reset</button>
+                <button type="submit" class="btn btn-primary" id="submitMunicipalityFormBtn">Submit</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
+
 
 <!--District Modal -->
 <div class="modal fade" id="districtModal" tabindex="-1" role="dialog" aria-labelledby="districtModalLabel" aria-hidden="true">
