@@ -2,17 +2,15 @@
 session_start();
 
 // Uncomment the following code to enforce login check and cache control
+/*
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php"); // Redirect to login page if user is not logged in
     exit;
 }
-
-$user_role = $_SESSION['user_type'] ?? 'user'; // Default to 'user' if role is not set
-
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
-
+*/
 
 require_once 'database.php';
 $conn = Database::getInstance();
@@ -61,7 +59,7 @@ if ($ownersResult && $ownersResult->num_rows > 0) {
   }
 }
 
-  // Step 1: Prepare the SQL statement to get the propertyowner_id from the `faas` table
+// Step 1: Prepare the SQL statement to get the propertyowner_id from the `faas` table
 $sql_editowner = "
 SELECT 
     f.propertyowner_id  -- This contains the junction table IDs for the owners
@@ -70,43 +68,43 @@ WHERE f.pro_id = ?";  // Use the property_id from the URL
 
 // Check if property ID (`pro_id`) is provided
 if (isset($_GET['id']) && !empty($_GET['id'])) {
-    $p_id = intval($_GET['id']); // Sanitize input
+  $p_id = intval($_GET['id']); // Sanitize input
 
-    // Step 2: Prepare and execute the query to get the propertyowner_id (junction table IDs)
-    if ($stmt = $conn->prepare($sql_editowner)) {
-        $stmt->bind_param("i", $p_id); // Bind property ID to the query
-        $stmt->execute();
-        $result = $stmt->get_result();
+  // Step 2: Prepare and execute the query to get the propertyowner_id (junction table IDs)
+  if ($stmt = $conn->prepare($sql_editowner)) {
+    $stmt->bind_param("i", $p_id); // Bind property ID to the query
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-        // Step 3: Check if the query returned a row
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
+    // Step 3: Check if the query returned a row
+    if ($result->num_rows > 0) {
+      $row = $result->fetch_assoc();
 
-            // Step 4: Get the propertyowner_id (junction table ID)
-            $propertyowner_id = $row['propertyowner_id'];
+      // Step 4: Get the propertyowner_id (junction table ID)
+      $propertyowner_id = $row['propertyowner_id'];
 
-            // Step 5: Query the junction table `propertyowner` to get the related owner IDs
-            $sql_propertyowner = "
+      // Step 5: Query the junction table `propertyowner` to get the related owner IDs
+      $sql_propertyowner = "
                 SELECT owner_id 
                 FROM propertyowner 
                 WHERE property_id = ?"; // Use property_id from the URL to get related owner_ids
 
-            if ($stmt2 = $conn->prepare($sql_propertyowner)) {
-                $stmt2->bind_param("i", $p_id); // Bind property ID to the query
-                $stmt2->execute();
-                $result2 = $stmt2->get_result();
+      if ($stmt2 = $conn->prepare($sql_propertyowner)) {
+        $stmt2->bind_param("i", $p_id); // Bind property ID to the query
+        $stmt2->execute();
+        $result2 = $stmt2->get_result();
 
-                // Step 6: Collect all the owner IDs
-                $owner_ids = [];
-                while ($row2 = $result2->fetch_assoc()) {
-                    $owner_ids[] = $row2['owner_id']; // Store each owner_id from the junction table
-                }
+        // Step 6: Collect all the owner IDs
+        $owner_ids = [];
+        while ($row2 = $result2->fetch_assoc()) {
+          $owner_ids[] = $row2['owner_id']; // Store each owner_id from the junction table
+        }
 
-                if (!empty($owner_ids)) {
-                    // Step 7: Build the query to fetch owner details from owners_tb
-                    $ids = implode(',', array_map('intval', $owner_ids)); // Convert IDs to a comma-separated string
+        if (!empty($owner_ids)) {
+          // Step 7: Build the query to fetch owner details from owners_tb
+          $ids = implode(',', array_map('intval', $owner_ids)); // Convert IDs to a comma-separated string
 
-                    $sql_owners = "
+          $sql_owners = "
                         SELECT 
                             own_id, 
                             CONCAT(own_fname, ', ', own_mname, ' ', own_surname) AS owner_name,
@@ -116,40 +114,38 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
                         FROM owners_tb
                         WHERE own_id IN ($ids)"; // Use IN clause to get all matching owners
 
-                    // Step 8: Execute the query to fetch owner details
-                    $owners_result = $conn->query($sql_owners);
+          // Step 8: Execute the query to fetch owner details
+          $owners_result = $conn->query($sql_owners);
 
-                    // Step 9: Display owner details
-                    if ($owners_result->num_rows > 0) {
-                        while ($owner = $owners_result->fetch_assoc()) {
-                            echo "Owner ID: " . $owner['own_id'] . "<br>";
-                            echo "Owner Name: " . $owner['owner_name'] . "<br>";
-                            echo "First Name: " . $owner['first_name'] . "<br>";
-                            echo "Middle Name: " . $owner['middle_name'] . "<br>";
-                            echo "Last Name: " . $owner['last_name'] . "<br><br>";
-                        }
-                    } else {
-                        echo "No owner details found for the given property.<br>";
-                    }
-                } else {
-                    echo "No owners found for the given property.<br>";
-                }
-            } else {
-                echo "Error preparing query for junction table.<br>";
+          // Step 9: Display owner details
+          if ($owners_result->num_rows > 0) {
+            while ($owner = $owners_result->fetch_assoc()) {
+              echo "Owner ID: " . $owner['own_id'] . "<br>";
+              echo "Owner Name: " . $owner['owner_name'] . "<br>";
+              echo "First Name: " . $owner['first_name'] . "<br>";
+              echo "Middle Name: " . $owner['middle_name'] . "<br>";
+              echo "Last Name: " . $owner['last_name'] . "<br><br>";
             }
+          } else {
+            echo "No owner details found for the given property.<br>";
+          }
         } else {
-            echo "No data found for the given property ID.<br>";
+          echo "No owners found for the given property.<br>";
         }
-        $stmt->close();
+      } else {
+        echo "Error preparing query for junction table.<br>";
+      }
     } else {
-        echo "Error preparing the statement.<br>";
+      echo "No data found for the given property ID.<br>";
     }
+    $stmt->close();
+  } else {
+    echo "Error preparing the statement.<br>";
+  }
 } else {
-    echo "Property ID not provided.<br>";
+  echo "Property ID not provided.<br>";
 }
-
 $conn->close();
-
 ?>
 
 <!doctype html>
@@ -181,10 +177,6 @@ $conn->close();
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-
-    <?php if ($user_role === 'admin'): ?>
-      <button onclick="location.href='Admin-Page-2.php'">Admin Dashboard</button>
-    <?php endif; ?>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ml-auto">
@@ -528,170 +520,181 @@ $conn->close();
           </form>
         </div>
         <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="reset" class="btn btn-warning" onclick="resetForm()">Reset</button>
-        <button type="button" class="btn btn-primary" onclick="savePropertyData()">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="reset" class="btn btn-warning" onclick="resetForm()">Reset</button>
+          <button type="button" class="btn btn-primary" onclick="savePropertyData()">Save changes</button>
         </div>
       </div>
     </div>
   </div>
 
- <!--Declaration of Property--> 
-<section class="container mt-5" id="property-info-section">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="mb-0">Declaration of Property</h4>
-    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editDeclarationProperty">Edit</button>
-  </div>
+  <!--Declaration of Property-->
+  <section class="container mt-5" id="property-info-section">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="mb-0">Declaration of Property</h4>
+      <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+        data-bs-target="#editDeclarationProperty">Edit</button>
+    </div>
 
-  <div class="card border-0 shadow p-4 rounded-3">
-    <form>
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label for="taxDeclarationNumber" class="form-label">Identification Numbers (Tax Declaration Number)</label>
-          <input type="text" class="form-control" id="taxDeclarationNumber" placeholder="Enter Tax Declaration Number" disabled>
-        </div>
-        <div class="col-12 mb-3">
-          <h6 class="mt-4 mb-3">Approval</h6>
-        </div>
-
-        <div class="col-md-6 mb-3">
-          <label for="provincialAssessor" class="form-label">Provincial Assessor</label>
-          <input type="text" class="form-control" id="provincialAssessor" placeholder="Enter Provincial Assessor" disabled>
-        </div>
-        <div class="col-md-6 mb-3">
-          <label for="provincialDate" class="form-label">Date</label>
-          <input type="date" class="form-control" id="provincialDate" placeholder="Select Date" disabled>
-        </div>
-
-        <div class="col-md-6 mb-3">
-          <label for="municipalAssessor" class="form-label">City/Municipal Assessor</label>
-          <input type="text" class="form-control" id="municipalAssessor" placeholder="Enter City/Municipal Assessor" disabled>
-        </div>
-        <div class="col-md-6 mb-3">
-          <label for="municipalDate" class="form-label">Date</label>
-          <input type="date" class="form-control" id="municipalDate" placeholder="Select Date" disabled>
-        </div>
-
-        <div class="col-md-6 mb-3">
-          <label for="cancelsTD" class="form-label">Cancels TD Number</label>
-          <input type="text" class="form-control" id="cancelsTD" placeholder="Enter Cancels TD Number" disabled>
-        </div>
-        <div class="col-md-6 mb-3">
-          <label for="previousPin" class="form-label">Previous Pin</label>
-          <input type="text" class="form-control" id="previousPin" placeholder="Enter Previous Pin" disabled>
-        </div>
-
-        <div class="col-md-6 mb-3">
-          <label for="taxYear" class="form-label">Tax Begin With Year</label>
-          <input type="number" class="form-control" id="taxYear" placeholder="Enter Year" disabled>
-        </div>
-
-        <div class="col-md-6 mb-3">
-          <label for="enteredInRPAREForBy" class="form-label">enteredInRPAREForBy</label>
-          <input type="text" class="form-control" id="enteredInRPAREForBy" placeholder="Enter Value" disabled>
-        </div>
-        <div class="col-md-6 mb-3">
-          <label for="enteredInRPAREForYear" class="form-label">enteredInRPAREForYear</label>
-          <input type="number" class="form-control" id="enteredInRPAREForYear" placeholder="Enter Year" disabled>
-        </div>
-
-        <div class="col-md-6 mb-3">
-          <label for="previousOwner" class="form-label">Previous Owner</label>
-          <input type="text" class="form-control" id="previousOwner" placeholder="Enter Previous Owner" disabled>
-        </div>
-        <div class="col-md-6 mb-3">
-          <label for="previousAssessedValue" class="form-label">Previous Assessed Value</label>
-          <input type="text" class="form-control" id="previousAssessedValue" placeholder="Enter Assessed Value" disabled>
-        </div>
-      </div>
-       <!-- Print Button at the Bottom Right -->
-       <div class="text-right mt-4">
-          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openPrintPage()">Print</button>
-      </div>
-    </form>
-  </div>
-</section>
-
-
-<!--Modal for Declaration of Property-->
-<div class="modal fade" id="editDeclarationProperty" tabindex="-1" aria-labelledby="editDeclarationPropertyLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editDeclarationPropertyLabel">Edit Declaration of Property</h5>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="taxDeclarationNumberModal" class="form-label">Identification Numbers (Tax Declaration Number)</label>
-              <input type="text" class="form-control" id="taxDeclarationNumberModal" placeholder="Enter Tax Declaration Number">
-            </div>
-
-            <div class="col-12 mb-3">
-              <h6 class="mt-4 mb-3">Approval</h6>
-            </div>
-
-            <div class="col-md-6 mb-3">
-              <label for="provincialAssessorModal" class="form-label">Provincial Assessor</label>
-              <input type="text" class="form-control" id="provincialAssessorModal" placeholder="Enter Provincial Assessor">
-            </div>
-            <div class="col-md-6 mb-3">
-              <label for="provincialDateModal" class="form-label">Date</label>
-              <input type="date" class="form-control" id="provincialDateModal">
-            </div>
-
-            <div class="col-md-6 mb-3">
-              <label for="municipalAssessorModal" class="form-label">City/Municipal Assessor</label>
-              <input type="text" class="form-control" id="municipalAssessorModal" placeholder="Enter City/Municipal Assessor">
-            </div>
-            <div class="col-md-6 mb-3">
-              <label for="municipalDateModal" class="form-label">Date</label>
-              <input type="date" class="form-control" id="municipalDateModal">
-            </div>
-
-            <div class="col-md-6 mb-3">
-              <label for="cancelsTDModal" class="form-label">Cancels TD Number</label>
-              <input type="text" class="form-control" id="cancelsTDModal" placeholder="Enter Cancels TD Number">
-            </div>
-            <div class="col-md-6 mb-3">
-              <label for="previousPinModal" class="form-label">Previous Pin</label>
-              <input type="text" class="form-control" id="previousPinModal" placeholder="Enter Previous Pin">
-            </div>
-
-            <div class="col-md-6 mb-3">
-              <label for="taxYearModal" class="form-label">Tax Begin With Year</label>
-              <input type="number" class="form-control" id="taxYearModal" placeholder="Enter Year">
-            </div>
-
-            <div class="col-md-6 mb-3">
-              <label for="enteredInRPAREForByModal" class="form-label">Entered in RPARE For By</label>
-              <input type="text" class="form-control" id="enteredInRPAREForByModal" placeholder="Enter Value">
-            </div>
-            <div class="col-md-6 mb-3">
-              <label for="enteredInRPAREForYearModal" class="form-label">Entered in RPARE For Year</label>
-              <input type="number" class="form-control" id="enteredInRPAREForYearModal" placeholder="Enter Year">
-            </div>
-
-            <div class="col-md-6 mb-3">
-              <label for="previousOwnerModal" class="form-label">Previous Owner</label>
-              <input type="text" class="form-control" id="previousOwnerModal" placeholder="Enter Previous Owner">
-            </div>
-            <div class="col-md-6 mb-3">
-              <label for="previousAssessedValueModal" class="form-label">Previous Assessed Value</label>
-              <input type="text" class="form-control" id="previousAssessedValueModal" placeholder="Enter Assessed Value">
-            </div>
+    <div class="card border-0 shadow p-4 rounded-3">
+      <form>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="taxDeclarationNumber" class="form-label">Identification Numbers (Tax Declaration Number)</label>
+            <input type="text" class="form-control" id="taxDeclarationNumber" placeholder="Enter Tax Declaration Number"
+              disabled>
           </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="reset" class="btn btn-warning" onclick="resetForm()">Reset</button>         
-        <button type="button" class="btn btn-primary">Save Changes</button>
+          <div class="col-12 mb-3">
+            <h6 class="mt-4 mb-3">Approval</h6>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="provincialAssessor" class="form-label">Provincial Assessor</label>
+            <input type="text" class="form-control" id="provincialAssessor" placeholder="Enter Provincial Assessor"
+              disabled>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="provincialDate" class="form-label">Date</label>
+            <input type="date" class="form-control" id="provincialDate" placeholder="Select Date" disabled>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="municipalAssessor" class="form-label">City/Municipal Assessor</label>
+            <input type="text" class="form-control" id="municipalAssessor" placeholder="Enter City/Municipal Assessor"
+              disabled>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="municipalDate" class="form-label">Date</label>
+            <input type="date" class="form-control" id="municipalDate" placeholder="Select Date" disabled>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="cancelsTD" class="form-label">Cancels TD Number</label>
+            <input type="text" class="form-control" id="cancelsTD" placeholder="Enter Cancels TD Number" disabled>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="previousPin" class="form-label">Previous Pin</label>
+            <input type="text" class="form-control" id="previousPin" placeholder="Enter Previous Pin" disabled>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="taxYear" class="form-label">Tax Begin With Year</label>
+            <input type="number" class="form-control" id="taxYear" placeholder="Enter Year" disabled>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="enteredInRPAREForBy" class="form-label">enteredInRPAREForBy</label>
+            <input type="text" class="form-control" id="enteredInRPAREForBy" placeholder="Enter Value" disabled>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="enteredInRPAREForYear" class="form-label">enteredInRPAREForYear</label>
+            <input type="number" class="form-control" id="enteredInRPAREForYear" placeholder="Enter Year" disabled>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="previousOwner" class="form-label">Previous Owner</label>
+            <input type="text" class="form-control" id="previousOwner" placeholder="Enter Previous Owner" disabled>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="previousAssessedValue" class="form-label">Previous Assessed Value</label>
+            <input type="text" class="form-control" id="previousAssessedValue" placeholder="Enter Assessed Value"
+              disabled>
+          </div>
+        </div>
+        <!-- Print Button at the Bottom Right -->
+        <div class="text-right mt-4">
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openPrintPage()">Print</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+
+  <!--Modal for Declaration of Property-->
+  <div class="modal fade" id="editDeclarationProperty" tabindex="-1" aria-labelledby="editDeclarationPropertyLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editDeclarationPropertyLabel">Edit Declaration of Property</h5>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="taxDeclarationNumberModal" class="form-label">Identification Numbers (Tax Declaration
+                  Number)</label>
+                <input type="text" class="form-control" id="taxDeclarationNumberModal"
+                  placeholder="Enter Tax Declaration Number">
+              </div>
+
+              <div class="col-12 mb-3">
+                <h6 class="mt-4 mb-3">Approval</h6>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="provincialAssessorModal" class="form-label">Provincial Assessor</label>
+                <input type="text" class="form-control" id="provincialAssessorModal"
+                  placeholder="Enter Provincial Assessor">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="provincialDateModal" class="form-label">Date</label>
+                <input type="date" class="form-control" id="provincialDateModal">
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="municipalAssessorModal" class="form-label">City/Municipal Assessor</label>
+                <input type="text" class="form-control" id="municipalAssessorModal"
+                  placeholder="Enter City/Municipal Assessor">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="municipalDateModal" class="form-label">Date</label>
+                <input type="date" class="form-control" id="municipalDateModal">
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="cancelsTDModal" class="form-label">Cancels TD Number</label>
+                <input type="text" class="form-control" id="cancelsTDModal" placeholder="Enter Cancels TD Number">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="previousPinModal" class="form-label">Previous Pin</label>
+                <input type="text" class="form-control" id="previousPinModal" placeholder="Enter Previous Pin">
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="taxYearModal" class="form-label">Tax Begin With Year</label>
+                <input type="number" class="form-control" id="taxYearModal" placeholder="Enter Year">
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="enteredInRPAREForByModal" class="form-label">Entered in RPARE For By</label>
+                <input type="text" class="form-control" id="enteredInRPAREForByModal" placeholder="Enter Value">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="enteredInRPAREForYearModal" class="form-label">Entered in RPARE For Year</label>
+                <input type="number" class="form-control" id="enteredInRPAREForYearModal" placeholder="Enter Year">
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="previousOwnerModal" class="form-label">Previous Owner</label>
+                <input type="text" class="form-control" id="previousOwnerModal" placeholder="Enter Previous Owner">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="previousAssessedValueModal" class="form-label">Previous Assessed Value</label>
+                <input type="text" class="form-control" id="previousAssessedValueModal"
+                  placeholder="Enter Assessed Value">
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="reset" class="btn btn-warning" onclick="resetForm()">Reset</button>
+          <button type="button" class="btn btn-primary">Save Changes</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
   <!-- LAND Section -->
   <section class="container my-5" id="land-section">
@@ -1272,10 +1275,10 @@ $conn->close();
         </div>
 
         <div class="modal-footer">
-  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-  <button type="reset" class="btn btn-warning" onclick="resetForm()">Reset</button>
-  <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save Changes</button>
-</div>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="reset" class="btn btn-warning" onclick="resetForm()">Reset</button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save Changes</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1524,44 +1527,44 @@ $conn->close();
   </script>
   <script>
     function resetForm() {
-  // Target all forms inside modals
-  const modals = document.querySelectorAll('.modal');
-  
-  modals.forEach(modal => {
-    // Find all forms in the modal
-    const forms = modal.querySelectorAll('form');
-    forms.forEach(form => {
-      // Reset the form to its default state
-      form.reset();
+      // Target all forms inside modals
+      const modals = document.querySelectorAll('.modal');
 
-      // Clear additional fields if reset does not handle them
-      form.querySelectorAll("input, select, textarea").forEach(field => {
-        if (field.type === "text" || field.type === "textarea" || field.type === "email" || field.type === "date") {
-          field.value = ""; // Clear text, email, textarea, and date inputs
-        } else if (field.type === "checkbox" || field.type === "radio") {
-          field.checked = field.defaultChecked; // Reset checkboxes and radio buttons
-        } else if (field.tagName === "SELECT") {
-          field.selectedIndex = 0; // Reset select dropdowns to the first option
-        }
+      modals.forEach(modal => {
+        // Find all forms in the modal
+        const forms = modal.querySelectorAll('form');
+        forms.forEach(form => {
+          // Reset the form to its default state
+          form.reset();
+
+          // Clear additional fields if reset does not handle them
+          form.querySelectorAll("input, select, textarea").forEach(field => {
+            if (field.type === "text" || field.type === "textarea" || field.type === "email" || field.type === "date") {
+              field.value = ""; // Clear text, email, textarea, and date inputs
+            } else if (field.type === "checkbox" || field.type === "radio") {
+              field.checked = field.defaultChecked; // Reset checkboxes and radio buttons
+            } else if (field.tagName === "SELECT") {
+              field.selectedIndex = 0; // Reset select dropdowns to the first option
+            }
+          });
+        });
       });
-    });
-  });
 
-  // Ensure manual clearing for LAND modal if it's outside a form
-  const landModal = document.getElementById("editLandModal");
-  if (landModal) {
-    const inputs = landModal.querySelectorAll("input, select, textarea");
-    inputs.forEach(input => {
-      if (input.type === "text" || input.type === "textarea" || input.type === "email" || input.type === "date") {
-        input.value = ""; // Clear the value
-      } else if (input.type === "checkbox" || input.type === "radio") {
-        input.checked = input.defaultChecked; // Reset to default checked state
-      } else if (input.tagName === "SELECT") {
-        input.selectedIndex = 0; // Reset select to the first option
+      // Ensure manual clearing for LAND modal if it's outside a form
+      const landModal = document.getElementById("editLandModal");
+      if (landModal) {
+        const inputs = landModal.querySelectorAll("input, select, textarea");
+        inputs.forEach(input => {
+          if (input.type === "text" || input.type === "textarea" || input.type === "email" || input.type === "date") {
+            input.value = ""; // Clear the value
+          } else if (input.type === "checkbox" || input.type === "radio") {
+            input.checked = input.defaultChecked; // Reset to default checked state
+          } else if (input.tagName === "SELECT") {
+            input.selectedIndex = 0; // Reset select to the first option
+          }
+        });
       }
-    });
-  }
-}
+    }
   </script>
   <!-- Optional JavaScript -->
   <script src="http://localhost/ERPTS/FAAS.js"></script>
