@@ -324,39 +324,34 @@ $conn->close();
             </div>
           </form>
           <hr class="my-4">
+          <h6 class="mb-3">Owner List</h6>
           <table class="table table-bordered table-striped table-sm">
+            <thead class="table-dark">
+              <tr>
+                <th class="text-center">ID</th>
+                <th class="text-center">Selection</th>
+                <th class="text-center">Owner Name</th>
+                <th class="text-center">Address</th>
+              </tr>
+            </thead>
             <tbody>
-              <!-- Modal table to display owner data -->
-              <table class="table table-bordered table-striped table-sm">
-                <thead class="table-dark">
+              <?php if (!empty($owners)): ?> <!-- Corrected variable name from $owners_details to $owners -->
+                <?php foreach ($owners as $owner): ?> <!-- Loop through $owners array -->
                   <tr>
-                    <th class="text-center">ID</th>
-                    <th class="text-center">Selection</th>
-                    <th class="text-center">Owner Name</th>
-                    <th class="text-center">Address</th>
+                    <td class="text-center"><?php echo htmlspecialchars($owner['own_id']); ?></td>
+                    <td class="text-center">
+                      <input type="checkbox" name="owner_selection[]"
+                        value="<?php echo htmlspecialchars($owner['own_id']); ?>">
+                    </td>
+                    <td class="text-center"><?php echo htmlspecialchars($owner['owner_name']); ?></td>
+                    <td class="text-center"><?php echo htmlspecialchars($owner['address']); ?></td>
                   </tr>
-                </thead>
-                <tbody>
-                  <?php if (!empty($owners)): ?> <!-- Corrected variable name from $owners_details to $owners -->
-                    <?php foreach ($owners as $owner): ?> <!-- Loop through $owners array -->
-                      <tr>
-                        <td class="text-center"><?php echo htmlspecialchars($owner['own_id']); ?></td>
-                        <td class="text-center">
-                          <input type="checkbox" name="owner_selection[]"
-                            value="<?php echo htmlspecialchars($owner['own_id']); ?>">
-                        </td>
-                        <td class="text-center"><?php echo htmlspecialchars($owner['owner_name']); ?></td>
-                        <td class="text-center"><?php echo htmlspecialchars($owner['address']); ?></td>
-                      </tr>
-                    <?php endforeach; ?>
-                  <?php else: ?>
-                    <tr>
-                      <td colspan="4" class="text-center">No owner data found.</td>
-                    </tr>
-                  <?php endif; ?>
-                </tbody>
-              </table>
-
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="4" class="text-center">No owner data found.</td>
+                </tr>
+              <?php endif; ?>
             </tbody>
           </table>
         </div>
@@ -367,6 +362,7 @@ $conn->close();
         </div>
       </div>
     </div>
+  </div>
   </div>
 
   <!-- Property Information Section -->
