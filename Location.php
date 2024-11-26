@@ -204,7 +204,7 @@
                     <div class="form-group">
                         <label for="region">Region</label>
                         <select class="form-control" id="region">
-                            <option value="">Select Region</option>
+                            <option value=""></option>
                         </select>
                     </div>
                     <div class="form-group">

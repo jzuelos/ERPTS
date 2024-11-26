@@ -96,6 +96,7 @@ $('#districtModal #resetFormBtn').on('click', function() {
   $('#districtForm')[0].reset();
 });
 
+// script to populate region drop down options
 document.addEventListener("DOMContentLoaded", function() {
   fetch("loc_getRegions.php")
       .then(response => response.json())
@@ -114,6 +115,41 @@ document.addEventListener("DOMContentLoaded", function() {
           });
       })
       .catch(error => console.error("Error fetching regions:", error));
+});
+
+// Handle form submission logic for Municipality form using AJAX
+$('#submitMunicipalityFormBtn').on('click', function(e) {
+  e.preventDefault(); // Prevent default form submission
+
+  // Collect form data
+  let regionId = $('#region').val();  // Get the region value
+  if (!regionId) {
+    alert("Please select a region");  // Show an error if no region is selected
+    return;  // Stop the form submission
+  }
+
+  let formData = {
+      region_id: regionId,  // Use region_id from dropdown
+      municipality_code: $('#municipalityCode').val(),
+      municipality_description: $('#municipalityDescription').val(),
+      status: $('input[name="status"]:checked').val()
+  };
+
+  // Send data to PHP file for database insertion using AJAX
+  $.ajax({
+      url: 'loc_submit_municipality.php', // PHP file to handle the database insertion
+      type: 'POST',
+      data: formData,
+      success: function(response) {
+          alert(response); // Display success or error message
+          $('#municipalityModal').modal('hide'); // Close the modal on success
+          $('#municipalityForm')[0].reset(); // Reset the form
+      },
+      error: function(xhr, status, error) {
+          console.error("Error:", error); // Log any errors
+          alert("An error occurred. Please try again.");
+      }
+  });
 });
 
 // Input validation for Barangay Code field (limit to 3 digits, numeric only)
@@ -161,10 +197,12 @@ $('#municipalityCode').on('input', function() {
   this.value = value;
 });
 
-// Input validation for Municipality Description - Capitalize the first letter
+// Input validation for Municipality Description - Capitalize the first letter of each word
 $('#municipalityDescription').on('input', function() {
   var value = this.value;
-  // Capitalize the first letter and keep the rest lowercase
-  value = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+  // Capitalize the first letter of each word and preserve the rest of the characters
+  value = value.replace(/\b\w/g, function(char) {
+    return char.toUpperCase();
+  });
   this.value = value;
 });
