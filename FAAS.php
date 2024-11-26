@@ -433,31 +433,6 @@ $conn->close();
                 placeholder="Enter Zone Number" disabled>
             </div>
           </div>
-          <div class="col-md-6 mb-4">
-            <div class="mb-3">
-              <label for="ardNumber" class="form-label">ARD Number</label>
-              <input type="text" class="form-control" id="ardNumber"
-                value="<?php echo isset($property['ard_no']) ? htmlspecialchars($property['ard_no']) : ''; ?>"
-                placeholder="Enter ARD Number" disabled>
-            </div>
-          </div>
-          <div class="col-md-6 mb-4">
-            <div class="mb-3">
-              <label for="taxability" class="form-label">Taxability</label>
-              <select class="form-control" id="taxability" disabled>
-                <option value="Taxable" <?php echo (isset($property['taxability']) && $property['taxability'] == 'Taxable') ? 'selected' : ''; ?>>Taxable</option>
-                <option value="Non-Taxable" <?php echo (isset($property['taxability']) && $property['taxability'] == 'Non-Taxable') ? 'selected' : ''; ?>>Non-Taxable</option>
-              </select>
-            </div>
-          </div>
-          <div class="col-md-6 mb-4">
-            <div class="mb-3">
-              <label for="effectivity" class="form-label">Effectivity</label>
-              <input type="text" class="form-control" id="effectivity"
-                value="<?php echo isset($property['effectivity']) ? htmlspecialchars($property['effectivity']) : ''; ?>"
-                placeholder="Enter Effectivity Date" disabled>
-            </div>
-          </div>
         </div>
       </form>
     </div>
@@ -551,6 +526,50 @@ $conn->close();
       </div>
     </div>
   </div>
+
+  <!--RPU Identification Numbers-->
+  <section class="container mt-5" id="rpu-identification-section">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Title and Edit Button -->
+        <h4 class="mb-0">RPU Identification Numbers</h4>
+        <button type="button" class="btn btn-outline-primary btn-sm" id="editRPUButton" onclick="toggleEdit()">Edit</button>
+    </div>
+
+    <div class="card border-0 shadow p-4 rounded-3">
+        <form>
+            <div class="row">
+                <!-- ARP Number Input (Number only) -->
+                <div class="col-md-6 mb-3">
+                    <label for="arpNumber" class="form-label">ARP Number</label>
+                    <input type="number" class="form-control" id="arpNumber" placeholder="Enter ARP Number" disabled>
+                </div>
+
+                <!-- Property Number Input (Number only) -->
+                <div class="col-md-6 mb-3">
+                    <label for="propertyNumber" class="form-label">Property Number</label>
+                    <input type="number" class="form-control" id="propertyNumber" placeholder="Enter Property Number" disabled>
+                </div>
+
+                <!-- Taxability Dropdown -->
+                <div class="col-md-6 mb-3">
+                    <label for="taxability" class="form-label">Taxability</label>
+                    <select class="form-control" id="taxability" disabled>
+                        <option value="" disabled selected>Select Taxability</option>
+                        <option value="taxable">Taxable</option>
+                        <option value="exempt">Exempt</option>
+                        <option value="special">Special</option>
+                    </select>
+                </div>
+
+                <!-- Effectivity Year Input -->
+                <div class="col-md-6 mb-3">
+                    <label for="effectivity" class="form-label">Effectivity (Year)</label>
+                    <input type="number" class="form-control" id="effectivity" placeholder="Enter Effectivity Year" min="1900" max="2100" disabled>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
 
   <!--Declaration of Property-->
   <section class="container mt-5" id="property-info-section">
@@ -1609,7 +1628,49 @@ $conn->close();
         printWindow.print();
     };
 }
+  </script>
+  <script>
+     function toggleEdit() {
+    const editButton = document.getElementById('editRPUButton');
+    const inputs = document.querySelectorAll('#rpu-identification-section input, #rpu-identification-section select');
+    const isEditMode = editButton.textContent === 'Edit';
 
+    if (isEditMode) {
+        // Change button text to "Save"
+        editButton.textContent = 'Save';
+
+        // Enable all inputs
+        inputs.forEach(input => {
+            input.disabled = false;
+        });
+    } else {
+        // Save data
+        saveRPUData();
+
+        // Change button text back to "Edit"
+        editButton.textContent = 'Edit';
+
+        // Disable all inputs
+        inputs.forEach(input => {
+            input.disabled = true;
+        });
+    }
+}
+
+function saveRPUData() {
+    // Get input values
+    const arpNumber = document.getElementById('arpNumber').value;
+    const propertyNumber = document.getElementById('propertyNumber').value;
+    const taxability = document.getElementById('taxability').value;
+    const effectivity = document.getElementById('effectivity').value;
+
+    // Save data to localStorage (or an API call can be made here)
+    localStorage.setItem('arpNumber', arpNumber);
+    localStorage.setItem('propertyNumber', propertyNumber);
+    localStorage.setItem('taxability', taxability);
+    localStorage.setItem('effectivity', effectivity);
+
+}
 
   </script>
   <!-- Optional JavaScript -->
