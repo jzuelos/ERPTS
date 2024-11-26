@@ -63,7 +63,7 @@
   <div class="card p-4 shadow-sm form-container">
     <h3 class="mb-4 text-center">Add Property Owner</h3>
     <form action="" method="POST">
-<?php
+    <?php
   session_start(); // Start session at the top
 
   // Check if the user is logged in by verifying if 'user_id' exists in the session
@@ -174,22 +174,49 @@
   <label for="street"><span style="color: red;">*</span> Street</label>
   <input type="text" class="form-control input-field" id="street" name="street" placeholder="Enter Street" required>
 </div>
+<!-- Barangay Dropdown -->
 <div class="form-group">
-  <label for="barangay"><span style="color: red;">*</span> Barangay</label>
-  <input type="text" class="form-control input-field" id="barangay" name="barangay" placeholder="Enter Barangay" required>
-</div>
-<div class="form-group">
-  <label for="district"><span style="color: red;">*</span> District</label>
-  <input type="text" class="form-control input-field" id="district" name="district" placeholder="Enter District" required>
-</div>
-<div class="form-group">
-  <label for="city"><span style="color: red;">*</span> City</label>
-  <input type="text" class="form-control input-field" id="city" name="city" placeholder="Enter City" required>
-</div>
-<div class="form-group">
-  <label for="province"><span style="color: red;">*</span> Province</label>
-  <input type="text" class="form-control input-field" id="province" name="province" placeholder="Enter Province" required>
-</div>
+        <label for="barangay"><span style="color: red;">*</span> Barangay</label>
+        <select class="form-control input-field" id="barangay" name="barangay" required>
+            <option value="">Select Barangay</option>
+            <?php foreach ($barangays as $barangay): ?>
+                <option value="<?= htmlspecialchars($barangay['brgy_id']) ?>"><?= htmlspecialchars($barangay['brgy_name']) ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+
+    <!-- District Dropdown -->
+    <div class="form-group">
+        <label for="district"><span style="color: red;">*</span> District</label>
+        <select class="form-control input-field" id="district" name="district" required>
+            <option value="">Select District</option>
+            <?php foreach ($districts as $district): ?>
+                <option value="<?= htmlspecialchars($district['d_id']) ?>"><?= htmlspecialchars($district['d_name']) ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+
+    <!-- City Dropdown -->
+    <div class="form-group">
+        <label for="city"><span style="color: red;">*</span> City</label>
+        <select class="form-control input-field" id="city" name="city" required>
+            <option value="">Select City</option>
+            <?php foreach ($cities as $city): ?>
+                <option value="<?= htmlspecialchars($city['c_id']) ?>"><?= htmlspecialchars($city['c_name']) ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+
+    <!-- Province Dropdown -->
+    <div class="form-group">
+        <label for="province"><span style="color: red;">*</span> Province</label>
+        <select class="form-control input-field" id="province" name="province" required>
+            <option value="">Select Province</option>
+            <?php foreach ($provinces as $province): ?>
+                <option value="<?= htmlspecialchars($province['p_id']) ?>"><?= htmlspecialchars($province['p_name']) ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
 
 <!-- Owner Contact Information -->
 <h5 class="mt-4">Owner Information<small> (Optional)</small></h5>
@@ -232,46 +259,6 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
     integrity="sha384-Chfqqxu3y5C8LQXhSh2gN5F6azZ9L2H8eY+mcO8b6Q8R9SQh7PQe0i0K+8zG3p7U"
     crossorigin="anonymous"></script>
-    <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    // List of field IDs to apply capitalization
-    const capitalizeFields = ["firstName", "middleName", "surname", "street", "barangay", "district", "city", "province"];
-
-    // Function to capitalize the first letter
-    function capitalizeFirstLetter(event) {
-      const input = event.target;
-      input.value = input.value.charAt(0).toUpperCase() + input.value.slice(1).toLowerCase();
-    }
-
-    // Add capitalization event listeners
-    capitalizeFields.forEach(id => {
-      const field = document.getElementById(id);
-      if (field) {
-        field.addEventListener("input", capitalizeFirstLetter);
-      }
-    });
-
-    // List of field IDs to restrict to numbers only with a max length of 11
-    const numericFields = ["tinNumber", "telephone", "fax"];
-    const maxLength = 11;
-
-    // Function to restrict input to numbers and enforce max length
-    function restrictToNumbers(event) {
-      const input = event.target;
-      input.value = input.value.replace(/\D/g, ""); // Remove non-numeric characters
-      if (input.value.length > maxLength) {
-        input.value = input.value.slice(0, maxLength); // Enforce max length
-      }
-    }
-
-    // Add numeric restriction event listeners
-    numericFields.forEach(id => {
-      const field = document.getElementById(id);
-      if (field) {
-        field.addEventListener("input", restrictToNumbers);
-      }
-    });
-  });
-</script>
+    <script src="Add_POwner.js"></script>
 </body>
 </html>
