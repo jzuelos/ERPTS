@@ -32,6 +32,23 @@ function openLocationFormModal(locationName) {
 // Bind the function to the modal show event for the confirmation modal
 $('#confirmationModal').on('show.bs.modal', openConfirmationModal);
 
+
+$(document).ready(function () {
+  // Fetch municipalities when the modal is shown
+  $('#barangayModal').on('show.bs.modal', function () {
+    $.ajax({
+      url: 'loc_getMunicipalitiesforBrgy.php', // PHP script to fetch municipalities
+      method: 'GET',
+      success: function (data) {
+        $('#locationDropdown').html(data); // Populate the location dropdown with fetched data
+      },
+      error: function () {
+        $('#locationDropdown').html('<option value="">Failed to load data</option>');
+      }
+    });
+  });
+});
+
 // Handle form submission logic for Barangay form using AJAX
 $('#submitBarangayFormBtn').on('click', function(e) {
   e.preventDefault(); // Prevent default form submission
