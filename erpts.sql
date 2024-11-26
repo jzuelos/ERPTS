@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 26, 2024 at 09:43 PM
+-- Generation Time: Nov 26, 2024 at 10:26 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -78,21 +78,12 @@ INSERT INTO `district` (`district_id`, `district_code`, `description`, `status`,
 CREATE TABLE `faas` (
   `faas_id` int(50) NOT NULL,
   `propertyowner_id` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`propertyowner_id`)),
-  `pro_id` int(50) NOT NULL,
+  `pro_id` int(50) DEFAULT NULL,
+  `rpu_idno` int(20) DEFAULT NULL,
   `land_id` int(50) DEFAULT NULL,
   `plants_id` int(50) DEFAULT NULL,
   `valuation_id` int(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `faas`
---
-
-INSERT INTO `faas` (`faas_id`, `propertyowner_id`, `pro_id`, `land_id`, `plants_id`, `valuation_id`) VALUES
-(13, '34', 125, NULL, NULL, NULL),
-(14, '37', 126, NULL, NULL, NULL),
-(15, '38', 126, NULL, NULL, NULL),
-(16, '[41,42]', 128, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -193,18 +184,6 @@ CREATE TABLE `p_info` (
   `documents` varchar(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `p_info`
---
-
-INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`) VALUES
-(108, 1, 3123, 0, 'Province 1', 'Daet', 'District 1', 'Bautista', '', 3123, 312, '   ', 'affidavit'),
-(111, 1, 412341, 0, 'Province 2', 'Daet', 'District 1', 'Kalamunding', '', 423, 4324, '   ', 'affidavit, barangay'),
-(115, 7, 4234, 4234, 'Province 1', 'Labo', 'District 1', 'Kalamunding', '', 123, 3123, '   ', 'affidavit'),
-(125, 7, 4234, 432, 'Province 1', 'Labo', 'District 1', 'Bautista', '', 0, 4324, '   ', 'barangay'),
-(126, 7, 3123, 31231, 'Province 2', 'Labo', 'District 1', 'Bautista', '', 3123, 3123, '   ', 'affidavit'),
-(128, 7, 3123, 0, 'Province 2', 'Daet', 'District 1', 'Anahaw', '', 312, 312, '   ', 'affidavit');
-
 -- --------------------------------------------------------
 
 --
@@ -222,6 +201,31 @@ CREATE TABLE `region` (
 
 INSERT INTO `region` (`r_id`, `r_no`) VALUES
 (5, 'Region V');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `rpu_idnum`
+--
+
+CREATE TABLE `rpu_idnum` (
+  `rpu_id` int(50) NOT NULL,
+  `arp` int(50) NOT NULL,
+  `pin` int(50) NOT NULL,
+  `taxability` varchar(20) NOT NULL,
+  `effectivity` year(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `rpu_idnum`
+--
+
+INSERT INTO `rpu_idnum` (`rpu_id`, `arp`, `pin`, `taxability`, `effectivity`) VALUES
+(1, 0, 94325234, 'taxable', '2006'),
+(2, 2147483647, 94325234, 'taxable', '2006'),
+(3, 234234, 4234234, 'taxable', '0000'),
+(4, 24234, 4234234, 'taxable', '0000'),
+(5, 24234, 4234234, 'taxable', '0000');
 
 -- --------------------------------------------------------
 
@@ -320,6 +324,12 @@ ALTER TABLE `region`
   ADD PRIMARY KEY (`r_id`);
 
 --
+-- Indexes for table `rpu_idnum`
+--
+ALTER TABLE `rpu_idnum`
+  ADD PRIMARY KEY (`rpu_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -346,7 +356,7 @@ ALTER TABLE `district`
 -- AUTO_INCREMENT for table `faas`
 --
 ALTER TABLE `faas`
-  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `municipality`
@@ -379,6 +389,12 @@ ALTER TABLE `region`
   MODIFY `r_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
+-- AUTO_INCREMENT for table `rpu_idnum`
+--
+ALTER TABLE `rpu_idnum`
+  MODIFY `rpu_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
@@ -398,7 +414,7 @@ ALTER TABLE `district`
 -- Constraints for table `faas`
 --
 ALTER TABLE `faas`
-  ADD CONSTRAINT `pro_id` FOREIGN KEY (`pro_id`) REFERENCES `p_info` (`p_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `pro_id` FOREIGN KEY (`pro_id`) REFERENCES `p_info` (`p_id`);
 
 --
 -- Constraints for table `municipality`
