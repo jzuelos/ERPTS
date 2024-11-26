@@ -251,7 +251,7 @@ $conn->close();
         <?php foreach ($owners_details as $owner): ?>
           <div class="col-md-12 mb-4">
             <form>
-            <hr class="my-4">
+              <hr class="my-4">
               <div class="mb-3 w-50">
                 <label for="ownerName" class="form-label">Company or Owner</label>
                 <input type="text" class="form-control" id="ownerName"
@@ -372,12 +372,11 @@ $conn->close();
     </div>
   </div>
 
-
   <!-- Property Information Section -->
   <section class="container my-5" id="property-info-section">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h4 class="section-title">Property Information</h4>
-      <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPropertyModal"> Edit</button>
+      <button type="button" class="btn btn-outline-primary btn-sm" onclick="showEditPropertyModal()">Edit</button>
     </div>
     <div class="card border-0 shadow p-4 rounded-3">
       <form id="property-info">
@@ -448,55 +447,55 @@ $conn->close();
 
   <!--Modal for Property Information-->
   <div class="modal fade" id="editPropertyModal" tabindex="-1" aria-labelledby="editPropertyModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editPropertyModalLabel">Edit Property Information</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="editPropertyForm">
-          <div class="row">
-            <input type="hidden" id="propertyIdModal">
-            <div class="col-12 mb-3">
-              <label for="streetModal" class="form-label">Street</label>
-              <input type="text" class="form-control" id="streetModal" placeholder="Enter Street">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editPropertyModalLabel">Edit Property Information</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editPropertyForm">
+            <div class="row">
+              <input type="hidden" id="propertyIdModal">
+              <div class="col-12 mb-3">
+                <label for="streetModal" class="form-label">Street</label>
+                <input type="text" class="form-control" id="streetModal" placeholder="Enter Street">
+              </div>
+              <div class="col-12 mb-3">
+                <label for="barangayModal" class="form-label">Barangay</label>
+                <input type="text" class="form-control" id="barangayModal" placeholder="Enter Barangay">
+              </div>
+              <div class="col-12 mb-3">
+                <label for="municipalityModal" class="form-label">Municipality</label>
+                <input type="text" class="form-control" id="municipalityModal" placeholder="Enter Municipality">
+              </div>
+              <div class="col-12 mb-3">
+                <label for="provinceModal" class="form-label">Province</label>
+                <input type="text" class="form-control" id="provinceModal" placeholder="Enter Province">
+              </div>
+              <div class="col-12 mb-3">
+                <label for="houseNumberModal" class="form-label">House Number</label>
+                <input type="text" class="form-control" id="houseNumberModal" placeholder="Enter House Number">
+              </div>
+              <div class="col-12 mb-3">
+                <label for="landAreaModal" class="form-label">Land Area</label>
+                <input type="text" class="form-control" id="landAreaModal" placeholder="Enter Land Area">
+              </div>
+              <div class="col-12 mb-3">
+                <label for="zoneNumberModal" class="form-label">Zone Number</label>
+                <input type="text" class="form-control" id="zoneNumberModal" placeholder="Enter Zone Number">
+              </div>
             </div>
-            <div class="col-12 mb-3">
-              <label for="barangayModal" class="form-label">Barangay</label>
-              <input type="text" class="form-control" id="barangayModal" placeholder="Enter Barangay">
-            </div>
-            <div class="col-12 mb-3">
-              <label for="municipalityModal" class="form-label">Municipality</label>
-              <input type="text" class="form-control" id="municipalityModal" placeholder="Enter Municipality">
-            </div>
-            <div class="col-12 mb-3">
-              <label for="provinceModal" class="form-label">Province</label>
-              <input type="text" class="form-control" id="provinceModal" placeholder="Enter Province">
-            </div>
-            <div class="col-12 mb-3">
-              <label for="houseNumberModal" class="form-label">House Number</label>
-              <input type="text" class="form-control" id="houseNumberModal" placeholder="Enter House Number">
-            </div>
-            <div class="col-12 mb-3">
-              <label for="landAreaModal" class="form-label">Land Area</label>
-              <input type="text" class="form-control" id="landAreaModal" placeholder="Enter Land Area">
-            </div>
-            <div class="col-12 mb-3">
-              <label for="zoneNumberModal" class="form-label">Zone Number</label>
-              <input type="text" class="form-control" id="zoneNumberModal" placeholder="Enter Zone Number">
-            </div>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="reset" class="btn btn-warning" onclick="resetForm()">Reset</button>
-        <button type="button" class="btn btn-primary" onclick="savePropertyData()">Save changes</button>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="reset" class="btn btn-warning" onclick="resetForm()">Reset</button>
+          <button type="button" class="btn btn-primary" onclick="savePropertyData()">Save changes</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
   <!--RPU Identification Numbers-->
   <section class="container mt-5" id="rpu-identification-section">
@@ -1628,19 +1627,47 @@ $conn->close();
       }
     }
 
+    let arpData = {}; // Create a variable (object) to store the data
+
+    // This function will save the data when called
     function saveRPUData() {
-      // Get input values
+      // Get input values from the form fields
       const arpNumber = document.getElementById('arpNumber').value;
       const propertyNumber = document.getElementById('propertyNumber').value;
       const taxability = document.getElementById('taxability').value;
       const effectivity = document.getElementById('effectivity').value;
 
-      // Save data to localStorage (or an API call can be made here)
-      localStorage.setItem('arpNumber', arpNumber);
-      localStorage.setItem('propertyNumber', propertyNumber);
-      localStorage.setItem('taxability', taxability);
-      localStorage.setItem('effectivity', effectivity);
+      // Store data in the arpData object
+      arpData = {
+        arpNumber: arpNumber,
+        propertyNumber: propertyNumber,
+        taxability: taxability,
+        effectivity: effectivity
+      };
 
+      // Send the data to FAASrpuID.php using Fetch API
+      fetch('FAASrpuID.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json' // Indicate we're sending JSON data
+          },
+          body: JSON.stringify(arpData) // Send arpData object as a JSON string
+        })
+        .then(response => response.json()) // Parse the JSON response from PHP
+        .then(data => {
+          // Check if the PHP script responded with a success flag
+          if (data.success) {
+            alert('Data successfully inserted!');
+            // Optionally clear the form fields or update the UI after success
+          } else {
+            alert('Failed to insert data: ' + data.error);
+          }
+        })
+        .catch(error => {
+          // Handle any errors in the fetch request itself
+          console.error('Error:', error);
+          alert('An error occurred while inserting the data.');
+        });
     }
   </script>
   <!-- Optional JavaScript -->
