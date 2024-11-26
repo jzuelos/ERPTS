@@ -2,15 +2,14 @@
 session_start();
 
 // Uncomment the following code to enforce login check and cache control
-/*
+
 if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php"); // Redirect to login page if user is not logged in
-    exit;
+  header("Location: index.php"); // Redirect to login page if user is not logged in
+  exit;
 }
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
-*/
 
 require_once 'database.php';
 $conn = Database::getInstance();
@@ -69,6 +68,7 @@ WHERE f.pro_id = ?";  // Use the property_id from the URL
 // Check if property ID (`pro_id`) is provided
 if (isset($_GET['id']) && !empty($_GET['id'])) {
   $p_id = intval($_GET['id']); // Sanitize input
+  echo "Property ID: " . $p_id . "<br>"; // Echo property ID for debugging
 
   // Step 2: Prepare and execute the query to get the propertyowner_id (junction table IDs)
   if ($stmt = $conn->prepare($sql_editowner)) {
@@ -79,6 +79,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     // Step 3: Check if the query returned a row
     if ($result->num_rows > 0) {
       $row = $result->fetch_assoc();
+      echo "Propertyowner ID: " . $row['propertyowner_id'] . "<br>"; // Echo propertyowner_id for debugging
 
       // Step 4: Get the propertyowner_id (junction table ID)
       $propertyowner_id = $row['propertyowner_id'];
@@ -100,26 +101,40 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
           $owner_ids[] = $row2['owner_id']; // Store each owner_id from the junction table
         }
 
+        // Echo all the collected owner IDs for debugging
+        echo "Owner IDs: " . implode(", ", $owner_ids) . "<br>";
+
         if (!empty($owner_ids)) {
           // Step 7: Build the query to fetch owner details from owners_tb
           $ids = implode(',', array_map('intval', $owner_ids)); // Convert IDs to a comma-separated string
 
           $sql_owners = "
-                        SELECT 
-                            own_id, 
-                            CONCAT(own_fname, ', ', own_mname, ' ', own_surname) AS owner_name,
-                            own_fname AS first_name, 
-                            own_mname AS middle_name, 
-                            own_surname AS last_name
-                        FROM owners_tb
-                        WHERE own_id IN ($ids)"; // Use IN clause to get all matching owners
+  SELECT 
+    own_id, 
+    CONCAT(own_fname, ', ', own_mname, ' ', own_surname) AS owner_name,
+    own_fname AS first_name, 
+    own_mname AS middle_name, 
+    own_surname AS last_name
+  FROM owners_tb
+  WHERE own_id IN ($ids)"; // Use IN clause to get all matching owners
 
           // Step 8: Execute the query to fetch owner details
           $owners_result = $conn->query($sql_owners);
 
-          // Step 9: Display owner details
+          // Store owners' details in an array
+          $owners_details = [];
           if ($owners_result->num_rows > 0) {
             while ($owner = $owners_result->fetch_assoc()) {
+              $owners_details[] = $owner;
+            }
+          }
+          // Step 9: Check if we got owner details
+          if ($owners_result->num_rows > 0) {
+            // Echo the number of owners found for debugging
+            echo "Found owners: " . $owners_result->num_rows . "<br>";
+
+            while ($owner = $owners_result->fetch_assoc()) {
+              // Echo the details of each owner for debugging
               echo "Owner ID: " . $owner['own_id'] . "<br>";
               echo "Owner Name: " . $owner['owner_name'] . "<br>";
               echo "First Name: " . $owner['first_name'] . "<br>";
@@ -210,7 +225,6 @@ $conn->close();
     </div>
   </nav>
   <!--Main Body-->
-
   <!-- Owner's Information Section -->
   <section class="container mt-5" id="owner-info-section">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -220,45 +234,47 @@ $conn->close();
         </a>
         <h4 class="ms-3 mb-0">Owner's Information</h4>
       </div>
-      <button type="button" class="btn btn-outline-primary btn-sm" id="editOwnerBtn"
-        onclick="showOISModal()">Edit</button>
+      <button type="button" class="btn btn-outline-primary btn-sm" id="editOwnerBtn" onclick="showOISModal()">Edit</button>
     </div>
 
     <div class="card border-0 shadow p-4 rounded-3">
       <div id="owner-info" class="row">
-        <div class="col-md-12 mb-4">
-          <form>
-            <div class="mb-3 w-50">
-              <label for="ownerName" class="form-label">Company or Owner</label>
-              <input type="text" class="form-control" id="ownerName"
-                value="<?php echo isset($property['owner_name']) ? htmlspecialchars($property['owner_name']) : ''; ?>"
-                placeholder="Enter Company or Owner" disabled>
-            </div>
-          </form>
-        </div>
-        <div class="col-md-12">
-          <h6 class="mb-3">Name</h6>
-          <form class="row">
-            <div class="col-md-4 mb-3">
-              <label for="firstName" class="form-label">First Name</label>
-              <input type="text" class="form-control" id="firstName"
-                value="<?php echo isset($property['first_name']) ? htmlspecialchars($property['first_name']) : ''; ?>"
-                placeholder="Enter First Name" disabled>
-            </div>
-            <div class="col-md-4 mb-3">
-              <label for="middleName" class="form-label">Middle Name</label>
-              <input type="text" class="form-control" id="middleName"
-                value="<?php echo isset($property['middle_name']) ? htmlspecialchars($property['middle_name']) : ''; ?>"
-                placeholder="Enter Middle Name" disabled>
-            </div>
-            <div class="col-md-4 mb-3">
-              <label for="lastName" class="form-label">Last Name</label>
-              <input type="text" class="form-control" id="lastName"
-                value="<?php echo isset($property['last_name']) ? htmlspecialchars($property['last_name']) : ''; ?>"
-                placeholder="Enter Last Name" disabled>
-            </div>
-          </form>
-        </div>
+        <!-- Loop through each owner and display their info -->
+        <?php foreach ($owners_details as $owner): ?>
+          <div class="col-md-12 mb-4">
+            <form>
+              <div class="mb-3 w-50">
+                <label for="ownerName" class="form-label">Company or Owner</label>
+                <input type="text" class="form-control" id="ownerName"
+                  value="<?php echo htmlspecialchars($owner['owner_name']); ?>"
+                  placeholder="Enter Company or Owner" disabled>
+              </div>
+            </form>
+          </div>
+          <div class="col-md-12">
+            <h6 class="mb-3">Name</h6>
+            <form class="row">
+              <div class="col-md-4 mb-3">
+                <label for="firstName" class="form-label">First Name</label>
+                <input type="text" class="form-control" id="firstName"
+                  value="<?php echo htmlspecialchars($owner['first_name']); ?>"
+                  placeholder="Enter First Name" disabled>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="middleName" class="form-label">Middle Name</label>
+                <input type="text" class="form-control" id="middleName"
+                  value="<?php echo htmlspecialchars($owner['middle_name']); ?>"
+                  placeholder="Enter Middle Name" disabled>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="lastName" class="form-label">Last Name</label>
+                <input type="text" class="form-control" id="lastName"
+                  value="<?php echo htmlspecialchars($owner['last_name']); ?>"
+                  placeholder="Enter Last Name" disabled>
+              </div>
+            </form>
+          </div>
+        <?php endforeach; ?>
       </div>
     </div>
   </section>
@@ -1488,7 +1504,7 @@ $conn->close();
   <script>
     // Function to capitalize the first letter of each word
     function capitalizeFirstLetter(element) {
-      element.value = element.value.replace(/\b\w/g, function (char) {
+      element.value = element.value.replace(/\b\w/g, function(char) {
         return char.toUpperCase();
       });
     }
@@ -1499,7 +1515,7 @@ $conn->close();
     }
 
     // Attach the function to the 'input' event of each relevant field after DOM is fully loaded
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
       // Apply capitalization to specific input fields in the owner info section and modal
       const fieldsToCapitalize = [
         'ownerName', 'firstName', 'middleName', 'lastName',
@@ -1510,7 +1526,7 @@ $conn->close();
       fieldsToCapitalize.forEach(fieldId => {
         const inputField = document.getElementById(fieldId);
         if (inputField) {
-          inputField.addEventListener("input", function () {
+          inputField.addEventListener("input", function() {
             capitalizeFirstLetter(inputField);
           });
         }
@@ -1519,7 +1535,7 @@ $conn->close();
       // Event listener for ARD Number to restrict input to numbers only
       const ardNumberField = document.getElementById("ardNumberModal");
       if (ardNumberField) {
-        ardNumberField.addEventListener("input", function () {
+        ardNumberField.addEventListener("input", function() {
           restrictToNumbers(ardNumberField);
         });
       }
