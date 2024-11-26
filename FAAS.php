@@ -251,6 +251,7 @@ $conn->close();
         <?php foreach ($owners_details as $owner): ?>
           <div class="col-md-12 mb-4">
             <form>
+            <hr class="my-4">
               <div class="mb-3 w-50">
                 <label for="ownerName" class="form-label">Company or Owner</label>
                 <input type="text" class="form-control" id="ownerName"
@@ -295,68 +296,70 @@ $conn->close();
           <h5 class="modal-title" id="editOwnerModalLabel">Edit Owner's Information</h5>
         </div>
         <div class="modal-body">
+          <!-- Owner Info (Editable) -->
           <form id="editOwnerForm">
-            <div class="mb-3">
-              <label for="ownerNameModal" class="form-label">Company or Owner</label>
-              <input type="text" class="form-control" id="ownerNameModal"
-                value="<?php echo isset($owners_details[0]['owner_name']) ? htmlspecialchars($owners_details[0]['owner_name']) : ''; ?>"
-                placeholder="Enter Company or Owner">
-            </div>
-            <hr class="my-4">
-            <h6 class="mb-3">Name</h6>
-            <div class="mb-3">
-              <label for="firstNameModal" class="form-label">First Name</label>
-              <input type="text" class="form-control" id="firstNameModal"
-                value="<?php echo isset($owners_details[0]['first_name']) ? htmlspecialchars($owners_details[0]['first_name']) : ''; ?>"
-                placeholder="Enter First Name">
-            </div>
-            <div class="mb-3">
-              <label for="middleNameModal" class="form-label">Middle Name</label>
-              <input type="text" class="form-control" id="middleNameModal"
-                value="<?php echo isset($owners_details[0]['middle_name']) ? htmlspecialchars($owners_details[0]['middle_name']) : ''; ?>"
-                placeholder="Enter Middle Name">
-            </div>
-            <div class="mb-3">
-              <label for="lastNameModal" class="form-label">Last Name</label>
-              <input type="text" class="form-control" id="lastNameModal"
-                value="<?php echo isset($owners_details[0]['last_name']) ? htmlspecialchars($owners_details[0]['last_name']) : ''; ?>"
-                placeholder="Enter Last Name">
-            </div>
+            <!-- Loop through each owner and display their info for editing -->
+            <?php foreach ($owners_details as $owner): ?>
+              <div class="mb-3">
+                <label for="ownerNameModal" class="form-label">Company or Owner</label>
+                <input type="text" class="form-control" id="ownerNameModal"
+                  value="<?php echo htmlspecialchars($owner['owner_name']); ?>"
+                  placeholder="Enter Company or Owner">
+              </div>
+              <h6 class="mb-3">Name</h6>
+              <div class="mb-3">
+                <label for="firstNameModal" class="form-label">First Name</label>
+                <input type="text" class="form-control" id="firstNameModal"
+                  value="<?php echo htmlspecialchars($owner['first_name']); ?>"
+                  placeholder="Enter First Name">
+              </div>
+              <div class="mb-3">
+                <label for="middleNameModal" class="form-label">Middle Name</label>
+                <input type="text" class="form-control" id="middleNameModal"
+                  value="<?php echo htmlspecialchars($owner['middle_name']); ?>"
+                  placeholder="Enter Middle Name">
+              </div>
+              <div class="mb-3">
+                <label for="lastNameModal" class="form-label">Last Name</label>
+                <input type="text" class="form-control" id="lastNameModal"
+                  value="<?php echo htmlspecialchars($owner['last_name']); ?>"
+                  placeholder="Enter Last Name">
+              </div>
+              <hr class="my-4">
+            <?php endforeach; ?>
           </form>
-          <hr class="my-4">
-          <table class="table table-bordered table-striped table-sm">
-            <tbody>
-              <!-- Modal table to display owner data -->
-              <table class="table table-bordered table-striped table-sm">
-                <thead class="table-dark">
-                  <tr>
-                    <th class="text-center">ID</th>
-                    <th class="text-center">Selection</th>
-                    <th class="text-center">Owner Name</th>
-                    <th class="text-center">Address</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php if (!empty($owners)): ?> <!-- Corrected variable name from $owners_details to $owners -->
-                    <?php foreach ($owners as $owner): ?> <!-- Loop through $owners array -->
-                      <tr>
-                        <td class="text-center"><?php echo htmlspecialchars($owner['own_id']); ?></td>
-                        <td class="text-center">
-                          <input type="checkbox" name="owner_selection[]"
-                            value="<?php echo htmlspecialchars($owner['own_id']); ?>">
-                        </td>
-                        <td class="text-center"><?php echo htmlspecialchars($owner['owner_name']); ?></td>
-                        <td class="text-center"><?php echo htmlspecialchars($owner['address']); ?></td>
-                      </tr>
-                    <?php endforeach; ?>
-                  <?php else: ?>
-                    <tr>
-                      <td colspan="4" class="text-center">No owner data found.</td>
-                    </tr>
-                  <?php endif; ?>
-                </tbody>
-              </table>
 
+          <hr class="my-4">
+
+          <!-- Owner List Table (Selectable) -->
+          <h6 class="mb-3">Owner List</h6>
+          <table class="table table-bordered table-striped table-sm">
+            <thead class="table-dark">
+              <tr>
+                <th class="text-center">ID</th>
+                <th class="text-center">Selection</th>
+                <th class="text-center">Owner Name</th>
+                <th class="text-center">Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php if (!empty($owners)): ?>
+                <?php foreach ($owners as $owner): ?>
+                  <tr>
+                    <td class="text-center"><?php echo htmlspecialchars($owner['own_id']); ?></td>
+                    <td class="text-center">
+                      <input type="checkbox" name="owner_selection[]"
+                        value="<?php echo htmlspecialchars($owner['own_id']); ?>">
+                    </td>
+                    <td class="text-center"><?php echo htmlspecialchars($owner['owner_name']); ?></td>
+                    <td class="text-center"><?php echo htmlspecialchars($owner['address']); ?></td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="4" class="text-center">No owner data found.</td>
+                </tr>
+              <?php endif; ?>
             </tbody>
           </table>
         </div>
@@ -368,6 +371,7 @@ $conn->close();
       </div>
     </div>
   </div>
+
 
   <!-- Property Information Section -->
   <section class="container my-5" id="property-info-section">
@@ -435,31 +439,6 @@ $conn->close();
               <input type="text" class="form-control" id="zoneNumber"
                 value="<?php echo isset($property['zone_no']) ? htmlspecialchars($property['zone_no']) : ''; ?>"
                 placeholder="Enter Zone Number" disabled>
-            </div>
-          </div>
-          <div class="col-md-6 mb-4">
-            <div class="mb-3">
-              <label for="ardNumber" class="form-label">ARD Number</label>
-              <input type="text" class="form-control" id="ardNumber"
-                value="<?php echo isset($property['ard_no']) ? htmlspecialchars($property['ard_no']) : ''; ?>"
-                placeholder="Enter ARD Number" disabled>
-            </div>
-          </div>
-          <div class="col-md-6 mb-4">
-            <div class="mb-3">
-              <label for="taxability" class="form-label">Taxability</label>
-              <select class="form-control" id="taxability" disabled>
-                <option value="Taxable" <?php echo (isset($property['taxability']) && $property['taxability'] == 'Taxable') ? 'selected' : ''; ?>>Taxable</option>
-                <option value="Non-Taxable" <?php echo (isset($property['taxability']) && $property['taxability'] == 'Non-Taxable') ? 'selected' : ''; ?>>Non-Taxable</option>
-              </select>
-            </div>
-          </div>
-          <div class="col-md-6 mb-4">
-            <div class="mb-3">
-              <label for="effectivity" class="form-label">Effectivity</label>
-              <input type="text" class="form-control" id="effectivity"
-                value="<?php echo isset($property['effectivity']) ? htmlspecialchars($property['effectivity']) : ''; ?>"
-                placeholder="Enter Effectivity Date" disabled>
             </div>
           </div>
         </div>
@@ -556,6 +535,50 @@ $conn->close();
     </div>
   </div>
 
+  <!--RPU Identification Numbers-->
+  <section class="container mt-5" id="rpu-identification-section">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <!-- Title and Edit Button -->
+      <h4 class="mb-0">RPU Identification Numbers</h4>
+      <button type="button" class="btn btn-outline-primary btn-sm" id="editRPUButton" onclick="toggleEdit()">Edit</button>
+    </div>
+
+    <div class="card border-0 shadow p-4 rounded-3">
+      <form>
+        <div class="row">
+          <!-- ARP Number Input (Number only) -->
+          <div class="col-md-6 mb-3">
+            <label for="arpNumber" class="form-label">ARP Number</label>
+            <input type="number" class="form-control" id="arpNumber" placeholder="Enter ARP Number" disabled>
+          </div>
+
+          <!-- Property Number Input (Number only) -->
+          <div class="col-md-6 mb-3">
+            <label for="propertyNumber" class="form-label">Property Number</label>
+            <input type="number" class="form-control" id="propertyNumber" placeholder="Enter Property Number" disabled>
+          </div>
+
+          <!-- Taxability Dropdown -->
+          <div class="col-md-6 mb-3">
+            <label for="taxability" class="form-label">Taxability</label>
+            <select class="form-control" id="taxability" disabled>
+              <option value="" disabled selected>Select Taxability</option>
+              <option value="taxable">Taxable</option>
+              <option value="exempt">Exempt</option>
+              <option value="special">Special</option>
+            </select>
+          </div>
+
+          <!-- Effectivity Year Input -->
+          <div class="col-md-6 mb-3">
+            <label for="effectivity" class="form-label">Effectivity (Year)</label>
+            <input type="number" class="form-control" id="effectivity" placeholder="Enter Effectivity Year" min="1900" max="2100" disabled>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
   <!--Declaration of Property-->
   <section class="container mt-5" id="property-info-section">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -566,20 +589,29 @@ $conn->close();
 
     <div class="card border-0 shadow p-4 rounded-3">
       <form>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="editID" class="form-label">Edit ID</label>
+            <input type="text" class="form-control" id="editID" placeholder="Enter Edit ID" disabled>
+          </div>
+          <div class="col-md-6 d-flex align-items-end">
+            <button type="button" class="btn btn-outline-secondary btn-sm ms-2" id="editButton" onclick="toggleEdit()">Edit</button>
+          </div>
+        </div>
+
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="taxDeclarationNumber" class="form-label">Identification Numbers (Tax Declaration Number)</label>
-            <input type="text" class="form-control" id="taxDeclarationNumber" placeholder="Enter Tax Declaration Number"
-              disabled>
+            <input type="text" class="form-control" id="taxDeclarationNumber" placeholder="Enter Tax Declaration Number" disabled>
           </div>
+
           <div class="col-12 mb-3">
             <h6 class="mt-4 mb-3">Approval</h6>
           </div>
 
           <div class="col-md-6 mb-3">
             <label for="provincialAssessor" class="form-label">Provincial Assessor</label>
-            <input type="text" class="form-control" id="provincialAssessor" placeholder="Enter Provincial Assessor"
-              disabled>
+            <input type="text" class="form-control" id="provincialAssessor" placeholder="Enter Provincial Assessor" disabled>
           </div>
           <div class="col-md-6 mb-3">
             <label for="provincialDate" class="form-label">Date</label>
@@ -588,9 +620,9 @@ $conn->close();
 
           <div class="col-md-6 mb-3">
             <label for="municipalAssessor" class="form-label">City/Municipal Assessor</label>
-            <input type="text" class="form-control" id="municipalAssessor" placeholder="Enter City/Municipal Assessor"
-              disabled>
+            <input type="text" class="form-control" id="municipalAssessor" placeholder="Enter City/Municipal Assessor" disabled>
           </div>
+
           <div class="col-md-6 mb-3">
             <label for="municipalDate" class="form-label">Date</label>
             <input type="date" class="form-control" id="municipalDate" placeholder="Select Date" disabled>
@@ -623,15 +655,16 @@ $conn->close();
             <label for="previousOwner" class="form-label">Previous Owner</label>
             <input type="text" class="form-control" id="previousOwner" placeholder="Enter Previous Owner" disabled>
           </div>
+
           <div class="col-md-6 mb-3">
             <label for="previousAssessedValue" class="form-label">Previous Assessed Value</label>
-            <input type="text" class="form-control" id="previousAssessedValue" placeholder="Enter Assessed Value"
-              disabled>
+            <input type="text" class="form-control" id="previousAssessedValue" placeholder="Enter Assessed Value" disabled>
           </div>
         </div>
+
         <!-- Print Button at the Bottom Right -->
         <div class="text-right mt-4">
-          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openPrintPage()">Print</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="DRPprint()">Print</button>
         </div>
       </form>
     </div>
@@ -1593,9 +1626,64 @@ $conn->close();
         });
       }
     }
+
+    function DRPprint() {
+      const printWindow = window.open('DRP.html', '_blank'); // '_blank' ensures the content opens in a new tab
+
+
+      printWindow.onload = function() {
+
+        printWindow.print();
+      };
+    }
+  </script>
+  <script>
+    function toggleEdit() {
+      const editButton = document.getElementById('editRPUButton');
+      const inputs = document.querySelectorAll('#rpu-identification-section input, #rpu-identification-section select');
+      const isEditMode = editButton.textContent === 'Edit';
+
+      if (isEditMode) {
+        // Change button text to "Save"
+        editButton.textContent = 'Save';
+
+        // Enable all inputs
+        inputs.forEach(input => {
+          input.disabled = false;
+        });
+      } else {
+        // Save data
+        saveRPUData();
+
+        // Change button text back to "Edit"
+        editButton.textContent = 'Edit';
+
+        // Disable all inputs
+        inputs.forEach(input => {
+          input.disabled = true;
+        });
+      }
+    }
+
+    function saveRPUData() {
+      // Get input values
+      const arpNumber = document.getElementById('arpNumber').value;
+      const propertyNumber = document.getElementById('propertyNumber').value;
+      const taxability = document.getElementById('taxability').value;
+      const effectivity = document.getElementById('effectivity').value;
+
+      // Save data to localStorage (or an API call can be made here)
+      localStorage.setItem('arpNumber', arpNumber);
+      localStorage.setItem('propertyNumber', propertyNumber);
+      localStorage.setItem('taxability', taxability);
+      localStorage.setItem('effectivity', effectivity);
+
+    }
   </script>
   <!-- Optional JavaScript -->
   <script src="http://localhost/ERPTS/FAAS.js"></script>
+  <script src="http://localhost/ERPTS/print-layout.js"></script>
+  <script src="http://localhost/ERPTS/printdata.js"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>

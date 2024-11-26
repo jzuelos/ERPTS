@@ -20,52 +20,46 @@ function showOISModal() {
 }
 
 function saveOwnerData() {
-  // Get data from modal fields
+  // Retrieve data from the modal form
   var ownerName = document.getElementById('ownerNameModal').value;
   var firstName = document.getElementById('firstNameModal').value;
   var middleName = document.getElementById('middleNameModal').value;
   var lastName = document.getElementById('lastNameModal').value;
 
-  // Save the data back to the form fields
-  document.getElementById('ownerName').value = ownerName;
-  document.getElementById('firstName').value = firstName;
-  document.getElementById('middleName').value = middleName;
-  document.getElementById('lastName').value = lastName;
+  // Process the data (e.g., send it via AJAX or form submission)
+  var ownerData = {
+      owner_name: ownerName,
+      first_name: firstName,
+      middle_name: middleName,
+      last_name: lastName
+  };
 
-  // Disable the modal fields after saving
-  document.getElementById('ownerNameModal').disabled = true;
-  document.getElementById('firstNameModal').disabled = true;
-  document.getElementById('middleNameModal').disabled = true;
-  document.getElementById('lastNameModal').disabled = true;
-
-  // Close the modal
-  var myModal = bootstrap.Modal.getInstance(document.getElementById('editOwnerModal'));
-  myModal.hide();
+  // For demonstration, log the data
+  console.log(ownerData);
+  // You would send this data to the server (e.g., via AJAX)
 }
 
 function addOwnerData() {
-  // Get data from modal fields
-  var ownerName = document.getElementById('ownerNameModal').value;
-  var firstName = document.getElementById('firstNameModal').value;
-  var middleName = document.getElementById('middleNameModal').value;
-  var lastName = document.getElementById('lastNameModal').value;
+    // Get the data from the form fields
+    var ownerName = document.getElementById('ownerNameModal').value;
+    var firstName = document.getElementById('firstNameModal').value;
+    var middleName = document.getElementById('middleNameModal').value;
+    var lastName = document.getElementById('lastNameModal').value;
 
-  //Console log only
-  console.log("Adding new owner data:");
-  console.log("Company or Owner: " + ownerName);
-  console.log("First Name: " + firstName);
-  console.log("Middle Name: " + middleName);
-  console.log("Last Name: " + lastName);
+    // Create a new row in the table
+    var table = document.querySelector('#editOwnerModal table tbody');
+    var newRow = table.insertRow();
+    
+    // Insert the new owner's data into the new row
+    newRow.innerHTML = `
+        <td class="text-center">New ID</td>
+        <td class="text-center"><input type="checkbox" name="owner_selection[]" value="New ID"></td>
+        <td class="text-center">${ownerName}</td>
+        <td class="text-center">${firstName} ${middleName} ${lastName}</td>
+    `;
 
-  // Optionally, clear the modal fields after adding
-  document.getElementById('ownerNameModal').value = '';
-  document.getElementById('firstNameModal').value = '';
-  document.getElementById('middleNameModal').value = '';
-  document.getElementById('lastNameModal').value = '';
-
-  // Close the modal if desired
-  var myModal = bootstrap.Modal.getInstance(document.getElementById('editOwnerModal'));
-  myModal.hide();
+    // Optionally, reset the form fields after adding the owner
+    document.getElementById('editOwnerForm').reset();
 }
 
 // Function to show the modal for editing Property Information
