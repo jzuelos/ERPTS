@@ -16,55 +16,54 @@
 
 <body>
   <!-- Header Navigation -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-custom"> 
     <a class="navbar-brand">
-      <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top"
-        alt="">
+      <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top" alt=""> 
       Electronic Real Property Tax System
     </a>
 
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+      <span class="navbar-toggler-icon"></span> 
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto">
+    <div class="collapse navbar-collapse" id="navbarSupportedContent"> 
+      <ul class="navbar-nav ml-auto"> 
         <li class="nav-item">
-          <a class="nav-link" href="Home.php">Home</a>
+          <a class="nav-link" href="Home.php">Home</a> 
         </li>
-        <li class="nav-item dropdown active">
+        <li class="nav-item dropdown active"> 
           <a class="nav-link dropdown-toggle" href="RPU-Management.php" id="navbarDropdown" role="button"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             RPU Management
           </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown"> 
             <a class="dropdown-item active" href="Real-Property-Unit-List.php">RPU List</a>
             <a class="dropdown-item" href="FAAS.php">FAAS</a>
-            <a class="dropdown-item" href="Tax-Declaration.php">Tax Declaration</a>
+            <a class="dropdown-item" href="Tax-Declaration-List.php">Tax Declaration</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="Track.php">Track Paper</a>
           </div>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="Transaction.php">Transaction</a>
+          <a class="nav-link" href="Transaction.php">Transaction</a> 
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="Reports.php">Reports</a>
+          <a class="nav-link" href="Reports.php">Reports</a> 
         </li>
         <li class="nav-item ml-3">
-          <a href="logout.php" class="btn btn-danger">Log Out</a>
+          <a href="logout.php" class="btn btn-danger">Log Out</a> 
         </li>
       </ul>
     </div>
   </nav>
-  
+
   <!-- Main Body -->
 <section class="container mt-5">
   <div class="card p-4 shadow-sm form-container">
     <h3 class="mb-4 text-center">Add Property Owner</h3>
     <form action="" method="POST">
-    <?php
+<?php
   session_start(); // Start session at the top
 
   // Check if the user is logged in by verifying if 'user_id' exists in the session
@@ -175,49 +174,22 @@
   <label for="street"><span style="color: red;">*</span> Street</label>
   <input type="text" class="form-control input-field" id="street" name="street" placeholder="Enter Street" required>
 </div>
-<!-- Barangay Dropdown -->
 <div class="form-group">
-        <label for="barangay"><span style="color: red;">*</span> Barangay</label>
-        <select class="form-control input-field" id="barangay" name="barangay" required>
-            <option value="">Select Barangay</option>
-            <?php foreach ($barangays as $barangay): ?>
-                <option value="<?= htmlspecialchars($barangay['brgy_id']) ?>"><?= htmlspecialchars($barangay['brgy_name']) ?></option>
-            <?php endforeach; ?>
-        </select>
-    </div>
-
-    <!-- District Dropdown -->
-    <div class="form-group">
-        <label for="district"><span style="color: red;">*</span> District</label>
-        <select class="form-control input-field" id="district" name="district" required>
-            <option value="">Select District</option>
-            <?php foreach ($districts as $district): ?>
-                <option value="<?= htmlspecialchars($district['d_id']) ?>"><?= htmlspecialchars($district['d_name']) ?></option>
-            <?php endforeach; ?>
-        </select>
-    </div>
-
-    <!-- City Dropdown -->
-    <div class="form-group">
-        <label for="city"><span style="color: red;">*</span> City</label>
-        <select class="form-control input-field" id="city" name="city" required>
-            <option value="">Select City</option>
-            <?php foreach ($cities as $city): ?>
-                <option value="<?= htmlspecialchars($city['c_id']) ?>"><?= htmlspecialchars($city['c_name']) ?></option>
-            <?php endforeach; ?>
-        </select>
-    </div>
-
-    <!-- Province Dropdown -->
-    <div class="form-group">
-        <label for="province"><span style="color: red;">*</span> Province</label>
-        <select class="form-control input-field" id="province" name="province" required>
-            <option value="">Select Province</option>
-            <?php foreach ($provinces as $province): ?>
-                <option value="<?= htmlspecialchars($province['p_id']) ?>"><?= htmlspecialchars($province['p_name']) ?></option>
-            <?php endforeach; ?>
-        </select>
-    </div>
+  <label for="barangay"><span style="color: red;">*</span> Barangay</label>
+  <input type="text" class="form-control input-field" id="barangay" name="barangay" placeholder="Enter Barangay" required>
+</div>
+<div class="form-group">
+  <label for="district"><span style="color: red;">*</span> District</label>
+  <input type="text" class="form-control input-field" id="district" name="district" placeholder="Enter District" required>
+</div>
+<div class="form-group">
+  <label for="city"><span style="color: red;">*</span> City</label>
+  <input type="text" class="form-control input-field" id="city" name="city" placeholder="Enter City" required>
+</div>
+<div class="form-group">
+  <label for="province"><span style="color: red;">*</span> Province</label>
+  <input type="text" class="form-control input-field" id="province" name="province" placeholder="Enter Province" required>
+</div>
 
 <!-- Owner Contact Information -->
 <h5 class="mt-4">Owner Information<small> (Optional)</small></h5>
@@ -243,12 +215,10 @@
 </div>
 </section>
 
-
-<!-- Footer -->
-<footer class="bg-body-tertiary text-center text-lg-start mt-auto">
-    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
-      © 2020 Copyright:
-      <a class="text-body" href="https://mdbootstrap.com/">MDBootstrap.com</a>
+  <!-- Footer -->
+  <footer class="footer mt-auto py-3 bg-custom"> 
+    <div class="container"> 
+      <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span> 
     </div>
   </footer>
 
@@ -262,6 +232,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
     integrity="sha384-Chfqqxu3y5C8LQXhSh2gN5F6azZ9L2H8eY+mcO8b6Q8R9SQh7PQe0i0K+8zG3p7U"
     crossorigin="anonymous"></script>
-    <script src="Add_POwner.js"></script>
+    <script>
+</script>
 </body>
 </html>
