@@ -87,8 +87,12 @@ if ($barangayResult->num_rows > 0) {
     </button>
 
     <?php if ($user_role === 'admin'): ?>
-      <button onclick="location.href='Admin-Page-2.php'">Admin Dashboard</button>
-    <?php endif; ?>
+  <button onclick="location.href='Admin-Page-2.php'" style="background-color: #d6c21c; color: #000; border-radius: 5px; padding: 5px 15px; border: none; cursor: pointer;">
+    Admin Dashboard
+  </button>
+<?php endif; ?>
+
+
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ml-auto">
