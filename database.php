@@ -7,7 +7,7 @@ class Database {
         $servername = "localhost";
         $username = "root"; // Your database username
         $password = ""; // Your database password
-        $dbname = "erpts"; // Your database name
+        $dbname = "magx"; // Your database name
         
         // Create connection
         $this->connection = new mysqli($servername, $username, $password, $dbname);
