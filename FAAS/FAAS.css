@@ -1,0 +1,132 @@
+/* Main Container */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Card Styling */
+.form-card {
+  background: linear-gradient(145deg, #f5f7fa, #e2e6ec);
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  margin-bottom: 30px;
+  border: 1px solid #d1d9e0;
+}
+
+/* Header and Title */
+.form-card h4 {
+  font-size: 1.5em;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.form-card .d-flex h4 {
+  color: #4a5568;
+}
+
+/* Input Fields */
+.form-control {
+  border-radius: 10px;
+  border: 1px solid #c4d3df;
+  background-color: #ffffff;
+  padding: 15px;
+  font-size: 0.95em;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #6699cc;
+  box-shadow: 0 0 8px rgba(102, 153, 204, 0.3);
+}
+
+/* Label Styling */
+.form-group label {
+  font-weight: 500;
+  color: #2d3748;
+  margin-bottom: 6px;
+  font-size: 0.9em;
+}
+
+/* Primary Button Styling */
+.btn-outline-primary {
+  color: #6699cc;
+  border-color: #6699cc;
+  border-radius: 18px;
+  font-weight: 600;
+  padding: 8px 20px;
+  font-size: 0.9em;
+  transition: background-color 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+  background-color: #6699cc;
+  color: #fff;
+}
+
+/* Secondary Button Styling */
+.btn-outline-secondary {
+  color: #7d8791;
+  border: 1px solid #d1d9e0;
+  background-color: #f8fafc;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 500;
+  padding: 8px 14px;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:disabled {
+  color: #b3bac3;
+  border-color: #d1d9e0;
+}
+
+.btn-link {
+  color: #6699cc;
+  font-weight: 500;
+  font-size: 0.9em;
+}
+
+.btn-link:hover {
+  color: #3a7abf;
+  text-decoration: none;
+}
+
+/* Flex for Button Group */
+.button-group {
+  display: flex;
+  gap: 10px;
+}
+
+/* Form Layout Styling */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.container {
+  max-width: 900px;
+}
+
+.form-card {
+  background: linear-gradient(145deg, #f5f7fa, #e2e6ec);
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #d1d9e0;
+}
+
+.d-flex.align-items-center.mb-3 h4 {
+  margin-left: 10px;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+#owner-info-section .form-control {
+  margin-right: 15px; /* Add space between inputs */
+}
+
+#owner-info-section .w-50 {
+  max-width: 50%; 
+}
