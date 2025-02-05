@@ -2,7 +2,7 @@
 session_start();
 
 //Check if the user is logged in
-/*if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id'])) {
     header("Location: index.php"); // Redirect to login page if not logged in
     exit;
 }
@@ -11,7 +11,7 @@ session_start();
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
-*/
+
 require_once 'database.php';
 
 $conn = Database::getInstance();

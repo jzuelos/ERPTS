@@ -1,18 +1,18 @@
 <?php
-  session_start();
+session_start();
 
-  // Check if the user is logged in by verifying if 'user_id' exists in the session
-  if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php"); // Redirect to login page if user is not logged in
-    exit; // Stop further execution after redirection
-  }
+// Check if the user is logged in by verifying if 'user_id' exists in the session
+if (!isset($_SESSION['user_id'])) {
+  header("Location: index.php"); // Redirect to login page if user is not logged in
+  exit; // Stop further execution after redirection
+}
 
-  $user_role = $_SESSION['user_type'] ?? 'user'; // Default to 'user' if role is not set
+$user_role = $_SESSION['user_type'] ?? 'user'; // Default to 'user' if role is not set
 
-  // Prevent the browser from caching this page
-  header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
-  header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
-  header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility
+// Prevent the browser from caching this page
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
+header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
+header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility
 ?>
 
 <!doctype html>
@@ -33,42 +33,7 @@
 
 <body>
   <!-- Header Navigation -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
-    <a class="navbar-brand" href="#">
-      <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" alt="">
-      Electronic Real Property Tax System
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <?php if ($user_role === 'admin'): ?>
-      <button onclick="location.href='Admin-Page-2.php'">Admin Dashboard</button>
-    <?php endif; ?>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item"><a class="nav-link" href="Home.php">Home</a></li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">RPU Management</a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="Real-Property-Unit-List.php">RPU List</a>
-            <a class="dropdown-item" href="FAAS.php">FAAS</a>
-            <a class="dropdown-item" href="Tax-Declaration-List.php">Tax Declaration</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="Track.php">Track Paper</a>
-          </div>
-        </li>
-        <li class="nav-item"><a class="nav-link" href="Transaction.php">Transaction</a></li>
-        <li class="nav-item"><a class="nav-link active" href="Reports.php">Reports</a></li>
-        <li class="nav-item" style="margin-left: 20px">
-        <a href="logout.php" class="btn btn-danger">Log Out</a>
-        </li>
-      </ul>
-    </div>
-  </nav>
+  <?php include 'header.php'; ?>
 
   <!-- Main Body -->
   <section class="container mt-4">

@@ -3,8 +3,8 @@ session_start();  //Start session at the top to access session variables
 
 // Check if the user is logged in by verifying if 'user_id' exists in the session
 if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php"); // Redirect to login page if user is not logged in
-    exit; // Stop further execution after redirection
+  header("Location: index.php"); // Redirect to login page if user is not logged in
+  exit; // Stop further execution after redirection
 }
 
 $user_role = $_SESSION['user_type'] ?? 'user'; // Default to 'user' if role is not set
@@ -48,13 +48,13 @@ $barangayQuery = "SELECT brgy_id, brgy_name FROM brgy";
 $barangayResult = $conn->query($barangayQuery);
 
 if ($barangayResult->num_rows > 0) {
-    while ($barangayRow = $barangayResult->fetch_assoc()) {
-        $barangayOptions .= '<option value="' . $barangayRow['brgy_id'] . '">' . $barangayRow['brgy_name'] . '</option>';
-    }
+  while ($barangayRow = $barangayResult->fetch_assoc()) {
+    $barangayOptions .= '<option value="' . $barangayRow['brgy_id'] . '">' . $barangayRow['brgy_name'] . '</option>';
+  }
 } else {
-    $barangayOptions = '<option value="">No Barangays Available</option>';
-} 
-?> 
+  $barangayOptions = '<option value="">No Barangays Available</option>';
+}
+?>
 
 <!doctype html>
 <html lang="en">
@@ -74,173 +74,125 @@ if ($barangayResult->num_rows > 0) {
 
 <body>
   <!-- Header Navigation -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
-    <a class="navbar-brand">
-      <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="d-inline-block align-top"
-        alt="">
-      Electronic Real Property Tax System
-    </a>
+  <?php include 'header.php'; ?>
 
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <?php if ($user_role === 'admin'): ?>
-  <button onclick="location.href='Admin-Page-2.php'" style="background-color: #d6c21c; color: #000; border-radius: 5px; padding: 5px 15px; border: none; cursor: pointer;">
-    Admin Dashboard
-  </button>
-<?php endif; ?>
-
-
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="Home.php">Home</a>
-        </li>
-        <li class="nav-item dropdown active">
-          <a class="nav-link dropdown-toggle" href="RPU-Management.php" id="navbarDropdown" role="button"
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            RPU Management
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item active" href="Real-Property-Unit-List.php">RPU List</a>
-            <a class="dropdown-item" href="FAAS.php">FAAS</a>
-            <a class="dropdown-item" href="Tax-Declaration-List.php">Tax Declaration</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="Track.php">Track Paper</a>
+  <!-- Main Body -->
+  <section class="container mt-5">
+    <div class="card p-4">
+      <h3 class="mb-4">Real Property Units List</h3>
+      <div class="form-row mb-4">
+        <div class="col-auto">
+          <label for="searchInput" class="sr-only">Search</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="searchInput" placeholder="Search" onkeyup="filterTable()">
+            <select class="custom-select" id="barangayDropdown" name="barangay">
+              <!-- Dropdown for barangay selection -->
+              <option selected value="">All Barangay</option>
+              <?php echo $barangayOptions; ?> <!-- PHP-generated barangay options -->
+            </select>
           </div>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="Transaction.php">Transaction</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="Reports.php">Reports</a>
-        </li>
-        <li class="nav-item ml-3">
-          <a href="logout.php" class="btn btn-danger">Log Out</a>
-        </li>
-      </ul>
-    </div>
-  </nav>
+        </div>
 
-<!-- Main Body -->
-<section class="container mt-5">
-  <div class="card p-4">
-    <h3 class="mb-4">Real Property Units List</h3>
-    <div class="form-row mb-4">
-      <div class="col-auto">
-        <label for="searchInput" class="sr-only">Search</label>
-        <div class="input-group">
-          <input type="text" class="form-control" id="searchInput" placeholder="Search" onkeyup="filterTable()">
-          <select class="custom-select" id="barangayDropdown" name="barangay"> <!-- Dropdown for barangay selection -->
-            <option selected value="">All Barangay</option>
-            <?php echo $barangayOptions; ?> <!-- PHP-generated barangay options -->
-          </select>
+        <div class="col-auto">
+          <button type="button" class="btn btn-success btn-hover" onclick="filterTable()">Search</button>
+          <a href="Add-New-Real-Property-Unit.php" class="btn btn-success btn-hover">Add new RPU</a>
         </div>
       </div>
 
-      <div class="col-auto">
-        <button type="button" class="btn btn-success btn-hover" onclick="filterTable()">Search</button>
-        <a href="Add-New-Real-Property-Unit.php" class="btn btn-success btn-hover">Add new RPU</a>
-      </div>
-    </div>
-
-    <!-- Table -->
-    <div class="table-responsive">
-      <table class="table table-bordered text-center modern-table" id="propertyTable"> <!-- Responsive table -->
-        <thead>
-          <tr>
-            <th>OD ID</th>
-            <th>Owner</th>
-            <th>Location <br><small>(Barangay, City, Province)</small></th>
-            <th>Land Area</th>
-            <th>Edit</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody">
-          <?php
-          // Display the fetched data in table rows
-          foreach ($propertyUnits as $unit) {
-            echo "<tr>
+      <!-- Table -->
+      <div class="table-responsive">
+        <table class="table table-bordered text-center modern-table" id="propertyTable"> <!-- Responsive table -->
+          <thead>
+            <tr>
+              <th>OD ID</th>
+              <th>Owner</th>
+              <th>Location <br><small>(Barangay, City, Province)</small></th>
+              <th>Land Area</th>
+              <th>Edit</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <?php
+            // Display the fetched data in table rows
+            foreach ($propertyUnits as $unit) {
+              echo "<tr>
                   <td>{$unit['p_id']}</td>
                   <td>{$unit['owner']}</td>
                   <td>{$unit['house_no']}, {$unit['barangay']}, {$unit['city']}, {$unit['province']}</td>
                   <td>{$unit['land_area']}</td>
                   <td><a href='FAAS.php?id={$unit['p_id']}' class='btn btn-primary'>EDIT</a></td>
                 </tr>";
-          }
-          ?>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Pagination Controls -->
-    <div class="pagination-controls mt-3">
-      <label for="pageSelect">Page: </label>
-      <select id="pageSelect" onchange="changePage()"></select>
-    </div>
-
-    <!-- View All Button -->
-    <div class="view-all-container d-flex mt-3">
-      <div class="ml-auto">
-        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#viewAllModal">View All</button>
+            }
+            ?>
+          </tbody>
+        </table>
       </div>
-    </div>
-  </div>
-</section>
 
-
-<!-- View All Modal -->
-<div class="modal fade" id="viewAllModal" tabindex="-1" aria-labelledby="viewAllModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="viewAllModalLabel">All Properties</h5>
+      <!-- Pagination Controls -->
+      <div class="pagination-controls mt-3">
+        <label for="pageSelect">Page: </label>
+        <select id="pageSelect" onchange="changePage()"></select>
       </div>
-      <div class="modal-body">
-        <!-- Search Bar inside the modal -->
-        <div class="mb-3 d-flex">
-        <input type="text" class="form-control" id="modalSearchInput" placeholder="Search properties..." style="width: 50%; margin-right: 10px;" onkeyup="handleEnter(event)">
-          <button 
-            class="btn btn-primary" 
-            onclick="viewAllSearch()">Search</button>
+
+      <!-- View All Button -->
+      <div class="view-all-container d-flex mt-3">
+        <div class="ml-auto">
+          <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#viewAllModal">View
+            All</button>
         </div>
+      </div>
+    </div>
+  </section>
 
-        <!-- Modal Table -->
-        <div class="table-responsive">
-          <table class="table table-bordered text-center modern-table" id="propertyTable">
-            <thead>
-              <tr>
-                <th>OD ID</th>
-                <th>Owner</th>
-                <th>Location <br><small>(Barangay, City, Province)</small></th>
-                <th>Land Area</th>
-              </tr>
-            </thead>
-            <tbody id="modalTableBody">
-              <?php
-              // Display the fetched data in modal table rows
-              foreach ($propertyUnits as $unit) {
-                echo "<tr>
+
+  <!-- View All Modal -->
+  <div class="modal fade" id="viewAllModal" tabindex="-1" aria-labelledby="viewAllModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="viewAllModalLabel">All Properties</h5>
+        </div>
+        <div class="modal-body">
+          <!-- Search Bar inside the modal -->
+          <div class="mb-3 d-flex">
+            <input type="text" class="form-control" id="modalSearchInput" placeholder="Search properties..."
+              style="width: 50%; margin-right: 10px;" onkeyup="handleEnter(event)">
+            <button class="btn btn-primary" onclick="viewAllSearch()">Search</button>
+          </div>
+
+          <!-- Modal Table -->
+          <div class="table-responsive">
+            <table class="table table-bordered text-center modern-table" id="propertyTable">
+              <thead>
+                <tr>
+                  <th>OD ID</th>
+                  <th>Owner</th>
+                  <th>Location <br><small>(Barangay, City, Province)</small></th>
+                  <th>Land Area</th>
+                </tr>
+              </thead>
+              <tbody id="modalTableBody">
+                <?php
+                // Display the fetched data in modal table rows
+                foreach ($propertyUnits as $unit) {
+                  echo "<tr>
                       <td>{$unit['p_id']}</td>
                       <td>{$unit['owner']}</td>
                       <td>{$unit['house_no']}, {$unit['barangay']}, {$unit['city']}, {$unit['province']}</td>
                       <td>{$unit['land_area']}</td>
                     </tr>";
-              }
-              ?>
-            </tbody>
-          </table>
+                }
+                ?>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-      <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="resetModal()">Close</button>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="resetModal()">Close</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 
   <!-- Footer -->
@@ -252,99 +204,99 @@ if ($barangayResult->num_rows > 0) {
   </footer>
   <script>
     let currentPage = 1;
-const rowsPerPage = 5;
+    const rowsPerPage = 5;
 
-// Function to initialize the table and pagination
-function initializeTable() {
-  const tableRows = document.querySelectorAll("#tableBody tr");
-  const totalRows = tableRows.length;
+    // Function to initialize the table and pagination
+    function initializeTable() {
+      const tableRows = document.querySelectorAll("#tableBody tr");
+      const totalRows = tableRows.length;
 
-  const totalPages = Math.ceil(totalRows / rowsPerPage);
-
-
-  const pageSelect = document.getElementById("pageSelect");
-  pageSelect.innerHTML = ''; 
-  for (let i = 1; i <= totalPages; i++) {
-    const option = document.createElement("option");
-    option.value = i;
-    option.textContent = i;
-    pageSelect.appendChild(option);
-  }
-
-  displayRowsForPage(currentPage);
-
-  pageSelect.value = currentPage;
-}
+      const totalPages = Math.ceil(totalRows / rowsPerPage);
 
 
-function displayRowsForPage(page) {
-  const tableRows = document.querySelectorAll("#tableBody tr");
-  const totalRows = tableRows.length;
-  const startIndex = (page - 1) * rowsPerPage;
-  const endIndex = Math.min(startIndex + rowsPerPage, totalRows);
+      const pageSelect = document.getElementById("pageSelect");
+      pageSelect.innerHTML = '';
+      for (let i = 1; i <= totalPages; i++) {
+        const option = document.createElement("option");
+        option.value = i;
+        option.textContent = i;
+        pageSelect.appendChild(option);
+      }
 
-  tableRows.forEach((row, index) => {
-    row.style.display = "none";
-  });
+      displayRowsForPage(currentPage);
+
+      pageSelect.value = currentPage;
+    }
 
 
-  for (let i = startIndex; i < endIndex; i++) {
-    tableRows[i].style.display = "";
-  }
-}
+    function displayRowsForPage(page) {
+      const tableRows = document.querySelectorAll("#tableBody tr");
+      const totalRows = tableRows.length;
+      const startIndex = (page - 1) * rowsPerPage;
+      const endIndex = Math.min(startIndex + rowsPerPage, totalRows);
 
-function changePage() {
-  const pageSelect = document.getElementById("pageSelect");
-  currentPage = parseInt(pageSelect.value);
-  displayRowsForPage(currentPage);
-}
+      tableRows.forEach((row, index) => {
+        row.style.display = "none";
+      });
 
-document.addEventListener("DOMContentLoaded", initializeTable);
+
+      for (let i = startIndex; i < endIndex; i++) {
+        tableRows[i].style.display = "";
+      }
+    }
+
+    function changePage() {
+      const pageSelect = document.getElementById("pageSelect");
+      currentPage = parseInt(pageSelect.value);
+      displayRowsForPage(currentPage);
+    }
+
+    document.addEventListener("DOMContentLoaded", initializeTable);
 
   </script>
   <script>
     // Function to reset the modal when the close button is clicked
-function resetModal() {
-  document.getElementById("modalSearchInput").value = "";
-  resetTable();
-}
+    function resetModal() {
+      document.getElementById("modalSearchInput").value = "";
+      resetTable();
+    }
 
 
-function resetTable() {
-  var tableBody = document.getElementById("modalTableBody");
+    function resetTable() {
+      var tableBody = document.getElementById("modalTableBody");
 
-  tableBody.innerHTML = '';
-  var propertyUnits = <?php echo json_encode($propertyUnits); ?>;
+      tableBody.innerHTML = '';
+      var propertyUnits = <?php echo json_encode($propertyUnits); ?>;
 
-  propertyUnits.forEach(function(unit) {
-    var row = `<tr>
+      propertyUnits.forEach(function (unit) {
+        var row = `<tr>
                 <td>${unit.p_id}</td>
                 <td>${unit.owner}</td>
                 <td>${unit.house_no}, ${unit.barangay}, ${unit.city}, ${unit.province}</td>
                 <td>${unit.land_area}</td>
                </tr>`;
-    tableBody.innerHTML += row;
-  });
+        tableBody.innerHTML += row;
+      });
 
-}
+    }
 
 
-function viewAllSearch() {
-  var searchQuery = document.getElementById("modalSearchInput").value.toLowerCase();
-  var tableRows = document.getElementById("modalTableBody").getElementsByTagName("tr");
+    function viewAllSearch() {
+      var searchQuery = document.getElementById("modalSearchInput").value.toLowerCase();
+      var tableRows = document.getElementById("modalTableBody").getElementsByTagName("tr");
 
-  Array.from(tableRows).forEach(function(row) {
-    var cells = row.getElementsByTagName("td");
-    var matchFound = false;
+      Array.from(tableRows).forEach(function (row) {
+        var cells = row.getElementsByTagName("td");
+        var matchFound = false;
 
-    Array.from(cells).forEach(function(cell) {
-      if (cell.innerText.toLowerCase().includes(searchQuery)) {
-        matchFound = true;
-      }
-    });
-    row.style.display = matchFound ? "" : "none";
-  });
-}
+        Array.from(cells).forEach(function (cell) {
+          if (cell.innerText.toLowerCase().includes(searchQuery)) {
+            matchFound = true;
+          }
+        });
+        row.style.display = matchFound ? "" : "none";
+      });
+    }
 
   </script>
   <script src="http://localhost/ERPTS/Real-Property-Unit-List.js"></script>
@@ -358,7 +310,7 @@ function viewAllSearch() {
     integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
