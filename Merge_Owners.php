@@ -330,8 +330,7 @@ if ($total_result && $total_result->num_rows > 0) {
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
-      © 2020 Copyright:
-      <a class="text-body" href="https://mdbootstrap.com/">MDBootstrap.com</a>
+    <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span> 
     </div>
   </footer>
 

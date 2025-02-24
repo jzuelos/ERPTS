@@ -70,12 +70,12 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer class="bg-light text-center py-3">
-    <div class="container">
-      <p class="mb-0">&copy; 2024 Electronic Real Property Tax System</p>
-    </div>
-  </footer>
+ <!-- Footer -->
+ <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
+        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+        <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span> 
+        </div>
+    </footer>
 
   <!-- Optional JavaScript -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
