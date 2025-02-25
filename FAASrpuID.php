@@ -15,61 +15,60 @@ if ($conn->connect_error) {
 // Read the incoming raw JSON data
 $data = file_get_contents('php://input');
 
+// Log the raw JSON data to a file
+file_put_contents('request_log.txt', $data . PHP_EOL, FILE_APPEND);
+
 // Decode the JSON data into an associative array
 $arpData = json_decode($data, true);
 
 // Check if required data is present
 if (isset($arpData['arpNumber'], $arpData['propertyNumber'], $arpData['taxability'], $arpData['effectivity'])) {
-    // Extract the values from the JSON data
     $arpNumber = $arpData['arpNumber'];
     $propertyNumber = $arpData['propertyNumber'];
     $taxability = $arpData['taxability'];
     $effectivity = $arpData['effectivity'];
 
-    // Prepare SQL query to insert or update data
-    // If editing, you can also add an "id" field to identify the record to update
-
-    // Assuming you have a primary key like 'id' to update, and it is sent with the request
     if (isset($arpData['id']) && !empty($arpData['id'])) {
-        // Update existing record if 'id' is present
-        $id = $arpData['id'];  // Unique identifier (primary key)
-
-        // Prepare SQL query to update record
+        // 🟢 Update existing record in rpu_idnum
+        $id = $arpData['id'];
         $sql = "UPDATE rpu_idnum SET arp = ?, pin = ?, taxability = ?, effectivity = ? WHERE id = ?";
 
         if ($stmt = $conn->prepare($sql)) {
-            // Bind parameters
             $stmt->bind_param("iissi", $arpNumber, $propertyNumber, $taxability, $effectivity, $id);
-
-            // Execute the query
             if ($stmt->execute()) {
                 echo json_encode(['success' => true, 'message' => 'Data updated successfully.']);
             } else {
                 echo json_encode(['success' => false, 'error' => 'Failed to update data.']);
             }
-
             $stmt->close();
-        } else {
-            echo json_encode(['success' => false, 'error' => 'Failed to prepare SQL query.']);
         }
     } else {
-        // Insert new record if no 'id' is provided
+        // 🟢 Insert new record into rpu_idnum
         $sql = "INSERT INTO rpu_idnum (arp, pin, taxability, effectivity) VALUES (?, ?, ?, ?)";
-
         if ($stmt = $conn->prepare($sql)) {
-            // Bind parameters
             $stmt->bind_param("iiss", $arpNumber, $propertyNumber, $taxability, $effectivity);
-
-            // Execute the query
             if ($stmt->execute()) {
-                echo json_encode(['success' => true, 'message' => 'Data inserted successfully.']);
-            } else {
-                echo json_encode(['success' => false, 'error' => 'Failed to insert data.']);
-            }
+                $newRpuId = $conn->insert_id; // Get the last inserted ID
 
+                // 🟢 Insert new record into faas table linking to rpu_idnum
+                $faasSql = "INSERT INTO faas (rpu_id) VALUES (?)";
+                if ($faasStmt = $conn->prepare($faasSql)) {
+                    $faasStmt->bind_param("i", $newRpuId);
+                    if ($faasStmt->execute()) {
+                        echo json_encode([
+                            'success' => true,
+                            'message' => 'Data inserted and linked to FAAS successfully.',
+                            'new_rpu_id' => $newRpuId
+                        ]);
+                    } else {
+                        echo json_encode(['success' => false, 'error' => 'Failed to insert into FAAS.']);
+                    }
+                    $faasStmt->close();
+                }
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Failed to insert data into rpu_idnum.']);
+            }
             $stmt->close();
-        } else {
-            echo json_encode(['success' => false, 'error' => 'Failed to prepare SQL query.']);
         }
     }
 } else {
