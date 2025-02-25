@@ -119,6 +119,13 @@ $total_properties = $result_properties->fetch_assoc()['total_properties'];
     </div>
   </div>
 
+  <!-- Footer -->
+  <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
+        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+        <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span> 
+        </div>
+    </footer>
+
   <!-- JS Files -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" crossorigin="anonymous"></script>
