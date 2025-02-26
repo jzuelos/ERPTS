@@ -1,6 +1,0 @@
-{"arpNumber":"","propertyNumber":"","taxability":"","effectivity":""}
-{"arpNumber":"","propertyNumber":"","taxability":"","effectivity":""}
-{"arpNumber":"","propertyNumber":"","taxability":"","effectivity":""}
-{"arpNumber":"234","propertyNumber":"123","taxability":"taxable","effectivity":"42356"}
-{"arpNumber":"1234","propertyNumber":"123","taxability":"taxable","effectivity":"42356"}
-{"arpNumber":"424356","propertyNumber":"52345","taxability":"special","effectivity":"523423"}
