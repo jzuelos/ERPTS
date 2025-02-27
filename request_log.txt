@@ -1,3 +1,0 @@
-{"arpNumber":"12345","propertyNumber":"12345","taxability":"exempt","effectivity":"1234"}
-{"arpNumber":"123451","propertyNumber":"23145","taxability":"special","effectivity":"1235"}
-{"arpNumber":"12314514","propertyNumber":"12312412","taxability":"special","effectivity":"1234"}
