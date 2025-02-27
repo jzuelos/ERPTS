@@ -1,6 +1,3 @@
-{"arpNumber":"","propertyNumber":"","taxability":"","effectivity":""}
-{"arpNumber":"","propertyNumber":"","taxability":"","effectivity":""}
-{"arpNumber":"","propertyNumber":"","taxability":"","effectivity":""}
-{"arpNumber":"234","propertyNumber":"123","taxability":"taxable","effectivity":"42356"}
-{"arpNumber":"1234","propertyNumber":"123","taxability":"taxable","effectivity":"42356"}
-{"arpNumber":"424356","propertyNumber":"52345","taxability":"special","effectivity":"523423"}
+{"arpNumber":"12345","propertyNumber":"12345","taxability":"exempt","effectivity":"1234"}
+{"arpNumber":"123451","propertyNumber":"23145","taxability":"special","effectivity":"1235"}
+{"arpNumber":"12314514","propertyNumber":"12312412","taxability":"special","effectivity":"1234"}

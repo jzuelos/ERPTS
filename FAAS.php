@@ -492,7 +492,7 @@ $conn->close();
           <!-- Effectivity Year Input -->
           <div class="col-md-6 mb-3">
             <label for="effectivity" class="form-label">Effectivity (Year)</label>
-            <input type="number" class="form-control" id="effectivity" placeholder="Enter Effectivity Year" min="1900" max="2100" disabled>
+            <input type="number" class="form-control" id="effectivity" min="1900" max="2100" step="1" placeholder="Enter Effectivity Year" disabled>
           </div>
         </div>
       </form>
@@ -1549,8 +1549,6 @@ $conn->close();
 
     function DRPprint() {
       const printWindow = window.open('DRP.html', '_blank'); // '_blank' ensures the content opens in a new tab
-
-
       printWindow.onload = function() {
 
         printWindow.print();
