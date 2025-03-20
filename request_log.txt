@@ -1,0 +1,13 @@
+{"arpNumber":"","propertyNumber":"","taxability":"","effectivity":""}
+{"arpNumber":"","propertyNumber":"","taxability":"","effectivity":""}
+{"arpNumber":"213423","propertyNumber":"","taxability":"","effectivity":""}
+{"arpNumber":"213423","propertyNumber":"25234","taxability":"exempt","effectivity":"23453"}
+{"arpNumber":"","propertyNumber":"","taxability":"","effectivity":""}
+{"arpNumber":"","propertyNumber":"","taxability":"","effectivity":""}
+{"arpNumber":"234234","propertyNumber":"","taxability":"","effectivity":""}
+{"faasId":"129","arpNumber":"234","propertyNumber":"","taxability":"","effectivity":""}
+{"faasId":"129","arpNumber":"23445","propertyNumber":"235256","taxability":"special","effectivity":"1231"}
+{"faasId":"129","arpNumber":"23544","propertyNumber":"23523","taxability":"exempt","effectivity":"4235"}
+{"faasId":"18","arpNumber":"12355","propertyNumber":"123423","taxability":"special","effectivity":"2435"}
+{"faasId":"18","arpNumber":"23455","propertyNumber":"324235","taxability":"special","effectivity":"4235532"}
+{"faasId":"18","arpNumber":"1234567","propertyNumber":"12345678","taxability":"special","effectivity":"4235532"}

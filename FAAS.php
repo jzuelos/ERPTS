@@ -200,7 +200,8 @@ $conn->close();
         </a>
         <h4 class="ms-3 mb-0">Owner's Information</h4>
       </div>
-      <button type="button" class="btn btn-outline-primary btn-sm" id="editOwnerBtn" onclick="showOISModal()">Edit</button>
+      <button type="button" class="btn btn-outline-primary btn-sm" id="editOwnerBtn"
+        onclick="showOISModal()">Edit</button>
     </div>
 
     <div class="card border-0 shadow p-4 rounded-3">
@@ -213,8 +214,8 @@ $conn->close();
               <div class="mb-3 w-50">
                 <label for="ownerName" class="form-label">Company or Owner</label>
                 <input type="text" class="form-control" id="ownerName"
-                  value="<?php echo htmlspecialchars($owner['owner_name']); ?>"
-                  placeholder="Enter Company or Owner" disabled>
+                  value="<?php echo htmlspecialchars($owner['owner_name']); ?>" placeholder="Enter Company or Owner"
+                  disabled>
               </div>
             </form>
           </div>
@@ -224,20 +225,17 @@ $conn->close();
               <div class="col-md-4 mb-3">
                 <label for="firstName" class="form-label">First Name</label>
                 <input type="text" class="form-control" id="firstName"
-                  value="<?php echo htmlspecialchars($owner['first_name']); ?>"
-                  placeholder="Enter First Name" disabled>
+                  value="<?php echo htmlspecialchars($owner['first_name']); ?>" placeholder="Enter First Name" disabled>
               </div>
               <div class="col-md-4 mb-3">
                 <label for="middleName" class="form-label">Middle Name</label>
                 <input type="text" class="form-control" id="middleName"
-                  value="<?php echo htmlspecialchars($owner['middle_name']); ?>"
-                  placeholder="Enter Middle Name" disabled>
+                  value="<?php echo htmlspecialchars($owner['middle_name']); ?>" placeholder="Enter Middle Name" disabled>
               </div>
               <div class="col-md-4 mb-3">
                 <label for="lastName" class="form-label">Last Name</label>
                 <input type="text" class="form-control" id="lastName"
-                  value="<?php echo htmlspecialchars($owner['last_name']); ?>"
-                  placeholder="Enter Last Name" disabled>
+                  value="<?php echo htmlspecialchars($owner['last_name']); ?>" placeholder="Enter Last Name" disabled>
               </div>
             </form>
           </div>
@@ -261,27 +259,23 @@ $conn->close();
               <div class="mb-3">
                 <label for="ownerNameModal" class="form-label">Company or Owner</label>
                 <input type="text" class="form-control" id="ownerNameModal"
-                  value="<?php echo htmlspecialchars($owner['owner_name']); ?>"
-                  placeholder="Enter Company or Owner">
+                  value="<?php echo htmlspecialchars($owner['owner_name']); ?>" placeholder="Enter Company or Owner">
               </div>
               <h6 class="mb-3">Name</h6>
               <div class="mb-3">
                 <label for="firstNameModal" class="form-label">First Name</label>
                 <input type="text" class="form-control" id="firstNameModal"
-                  value="<?php echo htmlspecialchars($owner['first_name']); ?>"
-                  placeholder="Enter First Name">
+                  value="<?php echo htmlspecialchars($owner['first_name']); ?>" placeholder="Enter First Name">
               </div>
               <div class="mb-3">
                 <label for="middleNameModal" class="form-label">Middle Name</label>
                 <input type="text" class="form-control" id="middleNameModal"
-                  value="<?php echo htmlspecialchars($owner['middle_name']); ?>"
-                  placeholder="Enter Middle Name">
+                  value="<?php echo htmlspecialchars($owner['middle_name']); ?>" placeholder="Enter Middle Name">
               </div>
               <div class="mb-3">
                 <label for="lastNameModal" class="form-label">Last Name</label>
                 <input type="text" class="form-control" id="lastNameModal"
-                  value="<?php echo htmlspecialchars($owner['last_name']); ?>"
-                  placeholder="Enter Last Name">
+                  value="<?php echo htmlspecialchars($owner['last_name']); ?>" placeholder="Enter Last Name">
               </div>
               <hr class="my-4">
             <?php endforeach; ?>
@@ -404,7 +398,8 @@ $conn->close();
   </section>
 
   <!--Modal for Property Information-->
-  <div class="modal fade" id="editPropertyModal" tabindex="-1" aria-labelledby="editPropertyModalLabel" aria-hidden="true">
+  <div class="modal fade" id="editPropertyModal" tabindex="-1" aria-labelledby="editPropertyModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -460,7 +455,8 @@ $conn->close();
     <div class="d-flex justify-content-between align-items-center mb-3">
       <!-- Title and Edit Button -->
       <h4 class="mb-0">RPU Identification Numbers</h4>
-      <button type="button" class="btn btn-outline-primary btn-sm" id="editRPUButton" onclick="toggleEdit()">Edit</button>
+      <button type="button" class="btn btn-outline-primary btn-sm" id="editRPUButton"
+        onclick="toggleEdit()">Edit</button>
     </div>
 
     <div class="card border-0 shadow p-4 rounded-3">
@@ -492,7 +488,8 @@ $conn->close();
           <!-- Effectivity Year Input -->
           <div class="col-md-6 mb-3">
             <label for="effectivity" class="form-label">Effectivity (Year)</label>
-            <input type="number" class="form-control" id="effectivity" min="1900" max="2100" step="1" placeholder="Enter Effectivity Year" disabled>
+            <input type="number" class="form-control" id="effectivity" min="1900" max="2100" step="1"
+              placeholder="Enter Effectivity Year" disabled>
           </div>
         </div>
       </form>
@@ -515,14 +512,16 @@ $conn->close();
             <input type="text" class="form-control" id="editID" placeholder="Enter Edit ID" disabled>
           </div>
           <div class="col-md-6 d-flex align-items-end">
-            <button type="button" class="btn btn-outline-secondary btn-sm ms-2" id="editButton" onclick="toggleEdit()">Edit</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm ms-2" id="editButton"
+              onclick="toggleEdit()">Edit</button>
           </div>
         </div>
 
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="taxDeclarationNumber" class="form-label">Identification Numbers (Tax Declaration Number)</label>
-            <input type="text" class="form-control" id="taxDeclarationNumber" placeholder="Enter Tax Declaration Number" disabled>
+            <input type="text" class="form-control" id="taxDeclarationNumber" placeholder="Enter Tax Declaration Number"
+              disabled>
           </div>
 
           <div class="col-12 mb-3">
@@ -531,7 +530,8 @@ $conn->close();
 
           <div class="col-md-6 mb-3">
             <label for="provincialAssessor" class="form-label">Provincial Assessor</label>
-            <input type="text" class="form-control" id="provincialAssessor" placeholder="Enter Provincial Assessor" disabled>
+            <input type="text" class="form-control" id="provincialAssessor" placeholder="Enter Provincial Assessor"
+              disabled>
           </div>
           <div class="col-md-6 mb-3">
             <label for="provincialDate" class="form-label">Date</label>
@@ -540,7 +540,8 @@ $conn->close();
 
           <div class="col-md-6 mb-3">
             <label for="municipalAssessor" class="form-label">City/Municipal Assessor</label>
-            <input type="text" class="form-control" id="municipalAssessor" placeholder="Enter City/Municipal Assessor" disabled>
+            <input type="text" class="form-control" id="municipalAssessor" placeholder="Enter City/Municipal Assessor"
+              disabled>
           </div>
 
           <div class="col-md-6 mb-3">
@@ -578,7 +579,8 @@ $conn->close();
 
           <div class="col-md-6 mb-3">
             <label for="previousAssessedValue" class="form-label">Previous Assessed Value</label>
-            <input type="text" class="form-control" id="previousAssessedValue" placeholder="Enter Assessed Value" disabled>
+            <input type="text" class="form-control" id="previousAssessedValue" placeholder="Enter Assessed Value"
+              disabled>
           </div>
         </div>
 
@@ -1469,7 +1471,7 @@ $conn->close();
   <script>
     // Function to capitalize the first letter of each word
     function capitalizeFirstLetter(element) {
-      element.value = element.value.replace(/\b\w/g, function(char) {
+      element.value = element.value.replace(/\b\w/g, function (char) {
         return char.toUpperCase();
       });
     }
@@ -1480,7 +1482,7 @@ $conn->close();
     }
 
     // Attach the function to the 'input' event of each relevant field after DOM is fully loaded
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       // Apply capitalization to specific input fields in the owner info section and modal
       const fieldsToCapitalize = [
         'ownerName', 'firstName', 'middleName', 'lastName',
@@ -1491,7 +1493,7 @@ $conn->close();
       fieldsToCapitalize.forEach(fieldId => {
         const inputField = document.getElementById(fieldId);
         if (inputField) {
-          inputField.addEventListener("input", function() {
+          inputField.addEventListener("input", function () {
             capitalizeFirstLetter(inputField);
           });
         }
@@ -1500,7 +1502,7 @@ $conn->close();
       // Event listener for ARD Number to restrict input to numbers only
       const ardNumberField = document.getElementById("ardNumberModal");
       if (ardNumberField) {
-        ardNumberField.addEventListener("input", function() {
+        ardNumberField.addEventListener("input", function () {
           restrictToNumbers(ardNumberField);
         });
       }
@@ -1549,7 +1551,7 @@ $conn->close();
 
     function DRPprint() {
       const printWindow = window.open('DRP.html', '_blank'); // '_blank' ensures the content opens in a new tab
-      printWindow.onload = function() {
+      printWindow.onload = function () {
 
         printWindow.print();
       };
@@ -1583,48 +1585,58 @@ $conn->close();
       }
     }
 
-    let arpData = {}; // Create a variable (object) to store the data
+    let arpData = {}; // Object to store data
 
-    // This function will save the data when called
     function saveRPUData() {
-      // Get input values from the form fields
+      // Get Property ID (`pro_id`) from the URL
+      const propertyId = new URLSearchParams(window.location.search).get('id');
+
+      // Find the FAAS ID from the page (assuming it is inside a <div> or similar element)
+      const faasIdText = document.body.innerHTML.match(/Faas ID:\s*(\d+)/);
+      const faasId = faasIdText ? faasIdText[1] : null; // Extract FAAS ID
+
+      if (!faasId) {
+        alert("Error: FAAS ID not found on the page.");
+        return;
+      }
+
+      // Get input values
       const arpNumber = document.getElementById('arpNumber').value;
       const propertyNumber = document.getElementById('propertyNumber').value;
       const taxability = document.getElementById('taxability').value;
       const effectivity = document.getElementById('effectivity').value;
 
-      // Store data in the arpData object
+      // Store data including FAAS ID
       arpData = {
+        faasId: faasId, // Correct FAAS ID extracted from page
         arpNumber: arpNumber,
         propertyNumber: propertyNumber,
         taxability: taxability,
         effectivity: effectivity
       };
 
-      // Send the data to FAASrpuID.php using Fetch API
+      // Send data to FAASrpuID.php
       fetch('FAASrpuID.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json' // Indicate we're sending JSON data
-          },
-          body: JSON.stringify(arpData) // Send arpData object as a JSON string
-        })
-        .then(response => response.json()) // Parse the JSON response from PHP
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(arpData)
+      })
+        .then(response => response.json())
         .then(data => {
-          // Check if the PHP script responded with a success flag
           if (data.success) {
             alert('Data successfully inserted!');
-            // Optionally clear the form fields or update the UI after success
           } else {
             alert('Failed to insert data: ' + data.error);
           }
         })
         .catch(error => {
-          // Handle any errors in the fetch request itself
           console.error('Error:', error);
           alert('An error occurred while inserting the data.');
         });
     }
+    
   </script>
   <!-- Optional JavaScript -->
   <script src="http://localhost/ERPTS/FAAS.js"></script>
