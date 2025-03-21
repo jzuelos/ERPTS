@@ -168,6 +168,32 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 } else {
   echo "Property ID not provided.<br>";
 }
+
+// Fetching the RPU ID Section
+//get the faas_id
+$sql_rpu = "SELECT rpu_idno FROM faas WHERE pro_id = ?";
+$stmt_rpu = $conn->prepare($sql_rpu);
+$stmt_rpu->bind_param("i", $p_id);
+$stmt_rpu->execute();
+$result_rpu = $stmt_rpu->get_result();
+$rpu_idno = null;
+
+if ($row_rpu = $result_rpu->fetch_assoc()) {
+  $rpu_idno = $row_rpu['rpu_idno'];
+}
+
+$rpu_details = null;
+if (!empty($rpu_idno)) {
+  $sql_rpu_details = "SELECT arp, pin, taxability, effectivity FROM rpu_idnum WHERE rpu_id = ?";
+  $stmt_rpu_details = $conn->prepare($sql_rpu_details);
+  $stmt_rpu_details->bind_param("i", $rpu_idno);
+  $stmt_rpu_details->execute();
+  $result_rpu_details = $stmt_rpu_details->get_result();
+
+  if ($row_rpu_details = $result_rpu_details->fetch_assoc()) {
+    $rpu_details = $row_rpu_details; // Store RPU details
+  }
+}
 $conn->close();
 ?>
 
@@ -465,23 +491,26 @@ $conn->close();
           <!-- ARP Number Input (Number only) -->
           <div class="col-md-6 mb-3">
             <label for="arpNumber" class="form-label">ARP Number</label>
-            <input type="number" class="form-control" id="arpNumber" placeholder="Enter ARP Number" disabled>
+            <input type="number" class="form-control" id="arpNumber" placeholder="Enter ARP Number"
+              value="<?= isset($rpu_details['arp']) ? htmlspecialchars($rpu_details['arp']) : ''; ?>" disabled>
           </div>
 
           <!-- Property Number Input (Number only) -->
           <div class="col-md-6 mb-3">
             <label for="propertyNumber" class="form-label">Property Number</label>
-            <input type="number" class="form-control" id="propertyNumber" placeholder="Enter Property Number" disabled>
+            <input type="number" class="form-control" id="propertyNumber" placeholder="Enter Property Number"
+              value="<?= isset($rpu_idno) ? htmlspecialchars($rpu_idno) : ''; ?>" disabled>
           </div>
 
           <!-- Taxability Dropdown -->
           <div class="col-md-6 mb-3">
             <label for="taxability" class="form-label">Taxability</label>
             <select class="form-control" id="taxability" disabled>
-              <option value="" disabled selected>Select Taxability</option>
-              <option value="taxable">Taxable</option>
-              <option value="exempt">Exempt</option>
-              <option value="special">Special</option>
+              <option value="" disabled <?= empty($rpu_details['taxability']) ? 'selected' : ''; ?>>Select Taxability
+              </option>
+              <option value="taxable" <?= (isset($rpu_details['taxability']) && $rpu_details['taxability'] === 'taxable') ? 'selected' : ''; ?>>Taxable</option>
+              <option value="exempt" <?= (isset($rpu_details['taxability']) && $rpu_details['taxability'] === 'exempt') ? 'selected' : ''; ?>>Exempt</option>
+              <option value="special" <?= (isset($rpu_details['taxability']) && $rpu_details['taxability'] === 'special') ? 'selected' : ''; ?>>Special</option>
             </select>
           </div>
 
@@ -489,7 +518,9 @@ $conn->close();
           <div class="col-md-6 mb-3">
             <label for="effectivity" class="form-label">Effectivity (Year)</label>
             <input type="number" class="form-control" id="effectivity" min="1900" max="2100" step="1"
-              placeholder="Enter Effectivity Year" disabled>
+              placeholder="Enter Effectivity Year"
+              value="<?= isset($rpu_details['effectivity']) ? htmlspecialchars($rpu_details['effectivity']) : ''; ?>"
+              disabled>
           </div>
         </div>
       </form>
@@ -1626,7 +1657,7 @@ $conn->close();
         .then(response => response.json())
         .then(data => {
           if (data.success) {
-            alert('Data successfully inserted!');
+            alert('Success');
           } else {
             alert('Failed to insert data: ' + data.error);
           }
@@ -1636,7 +1667,7 @@ $conn->close();
           alert('An error occurred while inserting the data.');
         });
     }
-    
+
   </script>
   <!-- Optional JavaScript -->
   <script src="http://localhost/ERPTS/FAAS.js"></script>
