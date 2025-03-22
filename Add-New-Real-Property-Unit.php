@@ -17,17 +17,11 @@
   <div id="selectedOwnerDisplay"></div> <!-- Display area for selected owner IDs -->
   <?php
   session_start(); // Start session at the top
-
-  // Check if the user is logged in by verifying if 'user_id' exists in the session
-  /*if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php"); // Redirect to login page if user is not logged in
-    exit; // Stop further execution after redirection
-  }*/
-
+  
   // Prevent the browser from caching this page
-  header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
-  header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
-  header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility
+  header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+  header("Cache-Control: post-check=0, pre-check=0", false);
+  header("Pragma: no-cache");
 
   error_reporting(E_ALL);
   ini_set('display_errors', 1);
@@ -74,8 +68,9 @@
           $stmt->bind_param("iissssiissi", $house_number, $block_number, $province, $city, $district, $barangay, $house_tag, $land_area, $desc_land, $documents, $owner_id);
 
           if ($stmt->execute()) {
-            $property_id = $stmt->insert_id;
-
+            $property_id = $stmt->insert_id; // Get last inserted ID
+            $_SESSION['last_property_id'] = $property_id; // Store it in session
+  
             // Insert owners into propertyowner table and collect propertyowner_ids
             $propertyowner_ids = [];
             if (!empty($selected_owner_ids)) {
@@ -153,10 +148,10 @@
   if (isset($_SESSION['property_added']) && $_SESSION['property_added'] === true) {
     unset($_SESSION['property_added']);
     echo "<script>
-  window.onload = function() {
-    $('#confirmationModal').modal('show');
-  };
-</script>";
+        window.onload = function() {
+            $('#confirmationModal').modal('show');
+        };
+    </script>";
   }
 
   // Display session message
@@ -164,11 +159,11 @@
     echo "<p>" . $_SESSION['message'] . "</p>";
     unset($_SESSION['message']);
   }
-
   ?>
 
   <!-- Bootstrap Modal for Confirmation -->
-  <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -180,8 +175,10 @@
         <div class="modal-body">
           Property added <br> Do you want to continue to the FAAS sheet?
         </div>
+        <!-- Modal Footer with Dynamic Link -->
         <div class="modal-footer">
-          <a href="FAAS.php" class="btn btn-primary">Yes</a>
+          <a href="FAAS.php<?php echo isset($_SESSION['last_property_id']) ? '?id=' . $_SESSION['last_property_id'] : ''; ?>"
+            class="btn btn-primary">Yes</a>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
         </div>
       </div>
@@ -200,176 +197,183 @@
     <h2 class="text-black">Property Information</h2>
   </section>
 
-<!-- Form Section -->
-<section class="container my-4">
-  <div class="card">
-    <div class="card-body">
-      <!-- Owner Search Section -->
-      <div class="mb-3">
-        <form action="" method="POST" id="ownerSearchForm">
-          <label for="owner_search" class="form-label"><span style="color: red;">*</span> Search for Owner</label>
-          <div class="input-group">
-            <input type="text" id="owner_search" name="search" class="form-control" placeholder="Search Owner" required>
-            <button type="submit" class="btn btn-primary">Search</button>
-            <button type="button" class="btn btn-secondary clear-button" onclick="clearOwnerSearchForm()">Clear</button>
+  <!-- Form Section -->
+  <section class="container my-4">
+    <div class="card">
+      <div class="card-body">
+        <!-- Owner Search Section -->
+        <div class="mb-3">
+          <form action="" method="POST" id="ownerSearchForm">
+            <label for="owner_search" class="form-label"><span style="color: red;">*</span> Search for Owner</label>
+            <div class="input-group">
+              <input type="text" id="owner_search" name="search" class="form-control" placeholder="Search Owner"
+                required>
+              <button type="submit" class="btn btn-primary">Search</button>
+              <button type="button" class="btn btn-secondary clear-button"
+                onclick="clearOwnerSearchForm()">Clear</button>
+            </div>
+          </form>
+        </div>
+
+        <table class="table table-bordered mb-3">
+          <thead class="table-light">
+            <tr>
+              <th class="text-center align-middle">ID</th>
+              <th class="text-center align-middle">Owner Name<br><small>(Surname, Firstname)</small></th>
+              <th class="text-center align-middle">Address<br><small>(Street, Barangay, City, Province)</small></th>
+              <th class="text-center align-middle">Select</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody">
+            <?php
+            // Include the database connection
+            require_once 'database.php';
+
+            // Get the database connection
+            $conn = Database::getInstance();
+
+            // Fetch initial data
+            $stmt = $conn->prepare("SELECT * FROM owners_tb ORDER BY own_surname ASC, own_fname ASC LIMIT 5");
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result && $result->num_rows > 0) {
+              while ($row = $result->fetch_assoc()) {
+                $ownerId = htmlspecialchars($row['own_id'], ENT_QUOTES);
+                $fullName = htmlspecialchars($row['own_fname'] . ', ' . $row['own_surname'], ENT_QUOTES);
+                $address = htmlspecialchars($row['street'] . ', ' . $row['barangay'] . ', ' . $row['city'] . ', ' . $row['province'], ENT_QUOTES);
+
+                // Output each row
+                echo "<tr>";
+                echo "<td class='text-center align-middle'>" . $ownerId . "</td>";
+                echo "<td class='text-center align-middle'>" . $fullName . "</td>";
+                echo "<td class='text-center align-middle'>" . $address . "</td>";
+                echo "<td class='text-center align-middle'><input type='checkbox' name='selected_ids[]' value='" . $ownerId . "'></td>";
+                echo "</tr>";
+              }
+            } else {
+              echo "<tr><td colspan='4' class='text-center'>No data found</td></tr>";
+            }
+
+            $stmt->close();
+            ?>
+          </tbody>
+        </table>
+
+        <form action="" id="propertyForm" method="POST" onsubmit="return validateForm();">
+          <input type="hidden" name="selected_owner_ids" id="selected_owner_ids" />
+
+          <!-- Location of Property -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="house_number" class="form-label"><span style="color: red;">*</span> Location of
+                Property</label>
+              <input type="number" id="house_number" name="house_number" class="form-control" placeholder="House Number"
+                required>
+            </div>
+            <div class="col-md-6">
+              <label for="block_number" class="form-label">Block Number</label>
+              <input type="number" id="block_number" name="block_number" class="form-control"
+                placeholder="Block Number">
+            </div>
+          </div>
+
+          <!-- Province, City, District, Barangay -->
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <label for="province" class="form-label"><span style="color: red;">*</span> Province</label>
+              <select id="province" name="province" class="form-select" required>
+                <option value="" disabled selected>Select Province</option>
+                <option value="Province 1">Province 1</option>
+                <option value="Province 2">Province 2</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="city" class="form-label"><span style="color: red;">*</span> City</label>
+              <select id="city" name="city" class="form-select" required>
+                <option value="" disabled selected>Select City</option>
+                <option value="Labo">Labo</option>
+                <option value="Daet">Daet</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="district" class="form-label"><span style="color: red;">*</span> District</label>
+              <select id="district" name="district" class="form-select" required>
+                <option value="" disabled selected>Select District</option>
+                <option value="District 1">District 1</option>
+                <option value="District 2">District 2</option>
+              </select>
+            </div>
+
+            <div class="col-md-3">
+              <label for="barangay" class="form-label"><span style="color: red;">*</span> Barangay</label>
+              <select id="barangay" name="barangay" class="form-select" required>
+                <option value="" disabled selected>Select Barangay</option>
+                <option value="Kalamunding">Kalamunding</option>
+                <option value="Bautista">Bautista</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- House Tag Number and Land Area -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="house_tag_number" class="form-label">House Tag Number</label>
+              <input type="number" id="house_tag_number" name="house_tag_number" class="form-control"
+                placeholder="House Tag Number">
+            </div>
+            <div class="col-md-6">
+              <label for="land_area" class="form-label"><span style="color: red;">*</span> Land Area (sq. m)</label>
+              <input type="number" id="land_area" name="land_area" class="form-control" placeholder="Land Area"
+                required>
+            </div>
+          </div>
+
+          <!-- Description of Land -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="lot_no" class="form-label">Lot Number</label>
+              <input type="number" id="lot_no" name="lot_no" class="form-control" placeholder="Lot Number">
+            </div>
+            <div class="col-md-6">
+              <label for="zone_no" class="form-label">Zone Number</label>
+              <input type="number" id="zone_no" name="zone_no" class="form-control" placeholder="Zone Number">
+            </div>
+          </div>
+
+          <!-- Documents -->
+          <fieldset class="border p-3 mb-3">
+            <legend class="w-auto">Documents</legend>
+            <div class="form-check">
+              <input type="checkbox" id="cb_affidavit" name="documents[]" value="affidavit" class="form-check-input">
+              <label for="cb_affidavit" class="form-check-label">Affidavit of Ownership</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" id="cb_barangay" name="documents[]" value="barangay" class="form-check-input">
+              <label for="cb_barangay" class="form-check-label">Barangay Certificate</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" id="cb_tag" name="documents[]" value="land_tagging" class="form-check-input">
+              <label for="cb_tag" class="form-check-label">Land Tagging</label>
+            </div>
+          </fieldset>
+
+          <!-- Button Group -->
+          <div class="d-flex justify-content-end mt-4">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" class="btn btn-secondary ml-2" onclick="clearMainForm()">Clear Form</button>
+            <a href="Real-Property-Unit-List.php" class="btn btn-danger ml-2">Cancel</a>
           </div>
         </form>
       </div>
-
-      <table class="table table-bordered mb-3">
-        <thead class="table-light">
-          <tr>
-            <th class="text-center align-middle">ID</th>
-            <th class="text-center align-middle">Owner Name<br><small>(Surname, Firstname)</small></th>
-            <th class="text-center align-middle">Address<br><small>(Street, Barangay, City, Province)</small></th>
-            <th class="text-center align-middle">Select</th>
-          </tr>
-        </thead>
-        <tbody id="resultsBody">
-          <?php
-          // Include the database connection
-          require_once 'database.php';
-
-          // Get the database connection
-          $conn = Database::getInstance();
-
-          // Fetch initial data
-          $stmt = $conn->prepare("SELECT * FROM owners_tb ORDER BY own_surname ASC, own_fname ASC LIMIT 5");
-          $stmt->execute();
-          $result = $stmt->get_result();
-
-          if ($result && $result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-              $ownerId = htmlspecialchars($row['own_id'], ENT_QUOTES);
-              $fullName = htmlspecialchars($row['own_fname'] . ', ' . $row['own_surname'], ENT_QUOTES);
-              $address = htmlspecialchars($row['street'] . ', ' . $row['barangay'] . ', ' . $row['city'] . ', ' . $row['province'], ENT_QUOTES);
-
-              // Output each row
-              echo "<tr>";
-              echo "<td class='text-center align-middle'>" . $ownerId . "</td>";
-              echo "<td class='text-center align-middle'>" . $fullName . "</td>";
-              echo "<td class='text-center align-middle'>" . $address . "</td>";
-              echo "<td class='text-center align-middle'><input type='checkbox' name='selected_ids[]' value='" . $ownerId . "'></td>";
-              echo "</tr>";
-            }
-          } else {
-            echo "<tr><td colspan='4' class='text-center'>No data found</td></tr>";
-          }
-
-          $stmt->close();
-          ?>
-        </tbody>
-      </table>
-
-      <form action="" id="propertyForm" method="POST" onsubmit="return validateForm();">
-        <input type="hidden" name="selected_owner_ids" id="selected_owner_ids" />
-
-        <!-- Location of Property -->
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="house_number" class="form-label"><span style="color: red;">*</span> Location of Property</label>
-            <input type="number" id="house_number" name="house_number" class="form-control" placeholder="House Number" required>
-          </div>
-          <div class="col-md-6">
-            <label for="block_number" class="form-label">Block Number</label>
-            <input type="number" id="block_number" name="block_number" class="form-control" placeholder="Block Number">
-          </div>
-        </div>
-
-        <!-- Province, City, District, Barangay -->
-        <div class="row mb-3">
-          <div class="col-md-3">
-            <label for="province" class="form-label"><span style="color: red;">*</span> Province</label>
-            <select id="province" name="province" class="form-select" required>
-              <option value="" disabled selected>Select Province</option>
-              <option value="Province 1">Province 1</option>
-              <option value="Province 2">Province 2</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <label for="city" class="form-label"><span style="color: red;">*</span> City</label>
-            <select id="city" name="city" class="form-select" required>
-              <option value="" disabled selected>Select City</option>
-              <option value="Labo">Labo</option>
-              <option value="Daet">Daet</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <label for="district" class="form-label"><span style="color: red;">*</span> District</label>
-            <select id="district" name="district" class="form-select" required>
-              <option value="" disabled selected>Select District</option>
-              <option value="District 1">District 1</option>
-              <option value="District 2">District 2</option>
-            </select>
-          </div>
-
-          <div class="col-md-3">
-            <label for="barangay" class="form-label"><span style="color: red;">*</span> Barangay</label>
-            <select id="barangay" name="barangay" class="form-select" required>
-              <option value="" disabled selected>Select Barangay</option>
-              <option value="Kalamunding">Kalamunding</option>
-              <option value="Bautista">Bautista</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- House Tag Number and Land Area -->
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="house_tag_number" class="form-label">House Tag Number</label>
-            <input type="number" id="house_tag_number" name="house_tag_number" class="form-control" placeholder="House Tag Number">
-          </div>
-          <div class="col-md-6">
-            <label for="land_area" class="form-label"><span style="color: red;">*</span> Land Area (sq. m)</label>
-            <input type="number" id="land_area" name="land_area" class="form-control" placeholder="Land Area" required>
-          </div>
-        </div>
-
-        <!-- Description of Land -->
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="lot_no" class="form-label">Lot Number</label>
-            <input type="number" id="lot_no" name="lot_no" class="form-control" placeholder="Lot Number">
-          </div>
-          <div class="col-md-6">
-            <label for="zone_no" class="form-label">Zone Number</label>
-            <input type="number" id="zone_no" name="zone_no" class="form-control" placeholder="Zone Number">
-          </div>
-        </div>
-
-        <!-- Documents -->
-        <fieldset class="border p-3 mb-3">
-          <legend class="w-auto">Documents</legend>
-          <div class="form-check">
-            <input type="checkbox" id="cb_affidavit" name="documents[]" value="affidavit" class="form-check-input">
-            <label for="cb_affidavit" class="form-check-label">Affidavit of Ownership</label>
-          </div>
-          <div class="form-check">
-            <input type="checkbox" id="cb_barangay" name="documents[]" value="barangay" class="form-check-input">
-            <label for="cb_barangay" class="form-check-label">Barangay Certificate</label>
-          </div>
-          <div class="form-check">
-            <input type="checkbox" id="cb_tag" name="documents[]" value="land_tagging" class="form-check-input">
-            <label for="cb_tag" class="form-check-label">Land Tagging</label>
-          </div>
-        </fieldset>
-
-        <!-- Button Group -->
-        <div class="d-flex justify-content-end mt-4">
-          <button type="submit" class="btn btn-primary">Submit</button>
-          <button type="button" class="btn btn-secondary ml-2" onclick="clearMainForm()">Clear Form</button>
-          <a href="Real-Property-Unit-List.php" class="btn btn-danger ml-2">Cancel</a>
-        </div>
-      </form>
     </div>
-  </div>
-</section>
+  </section>
 
 
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
-    <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span> 
+      <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span>
     </div>
   </footer>
 
