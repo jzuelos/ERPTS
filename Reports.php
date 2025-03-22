@@ -47,9 +47,13 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
         <div class="form-group">
           <label for="classificationSelect">Classification</label>
           <select class="form-control w-25" id="classificationSelect">
+            <option>Residential</option>
+            <option>Credential</option>
+            <option>Industrial</option>
             <option>Agricultural</option>
-            <option>Item 2</option>
-            <option>Item 3</option>
+            <option>Timberland</option>
+            <option>Mineral Lands</option>
+            <option>Special Property</option>
           </select>
         </div>
         <hr>
