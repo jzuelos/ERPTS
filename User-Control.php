@@ -33,21 +33,28 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
-    // Fetch users from the database
-    $query = "SELECT user_id, username, CONCAT(first_name, ' ', middle_name, ' ', last_name) AS full_name, user_type, status FROM users";
+    $query = "SELECT 
+            user_id, username, password, first_name, middle_name, last_name, 
+            gender, birthdate, marital_status, tin, house_number, street, 
+            barangay, district, municipality, province, contact_number, 
+            email, status, user_type 
+          FROM users";
+
     $result = $conn->query($query);
+
     $users = [];
 
     if ($result) {
         while ($row = $result->fetch_assoc()) {
-            $users[] = $row;
+            $users[] = $row; // Store all user details
         }
         $result->free();
     } else {
-        echo "<p>Error fetching users: " . $conn->error . "</p>";
+        die("Query Failed: " . $conn->error); // Debugging SQL errors
     }
 
     $conn->close();
+
     ?>
 
     <!-- Header Navigation -->
@@ -70,8 +77,17 @@
             <h3 class="mb-4">Users</h3>
             <div class="button-group mb-4">
                 <a href="ADD_User.php" class="btn btn-outline-primary">Add User</a>
-                <button class="btn btn-outline-primary">Show Disabled User</button>
-                <button class="btn btn-outline-primary">Hide Disabled User</button>
+
+                <div class="form-check form-check-inline ml-3">
+                    <input class="form-check-input" type="radio" name="userStatusFilter" id="showDisabled" value="show"
+                        checked>
+                    <label class="form-check-label" for="showDisabled">Show Disabled User</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="userStatusFilter" id="hideDisabled" value="hide">
+                    <label class="form-check-label" for="hideDisabled">Hide Disabled User</label>
+                </div>
             </div>
 
             <div class="table-responsive">
@@ -83,21 +99,17 @@
                             <th>Full Name</th>
                             <th>User Type</th>
                             <th>Status</th>
-                            <th class="text-center">Update Status</th>
                             <th>Edit</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($users as $user): ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($user['user_id']); ?></td>
-                                <td><a href="#"><?php echo htmlspecialchars($user['username']); ?></a></td>
-                                <td><?php echo htmlspecialchars($user['full_name']); ?></td>
-                                <td><?php echo htmlspecialchars($user['user_type']); ?></td>
-                                <td><?php echo $user['status'] == 1 ? 'Enabled' : 'Disabled'; ?></td>
-                                <td class="text-center">
-                                    <input type="checkbox" <?php echo $user['status'] == 1 ? 'checked' : ''; ?> disabled>
-                                </td>
+                                <td><?php echo htmlspecialchars($user['user_id'] ?? ''); ?></td>
+                                <td><a href="#"><?php echo htmlspecialchars($user['username'] ?? ''); ?></a></td>
+                                <td><?php echo htmlspecialchars($user['full_name'] ?? ''); ?></td>
+                                <td><?php echo htmlspecialchars($user['user_type'] ?? ''); ?></td>
+                                <td><?php echo ($user['status'] == 1) ? 'Enabled' : 'Disabled'; ?></td>
                                 <td class="text-center">
                                     <a href="#" data-toggle="modal"
                                         data-target="#editUserModal-<?php echo $user['user_id']; ?>">
@@ -109,31 +121,129 @@
                             <!-- User Edit Modal -->
                             <div class="modal fade" id="editUserModal-<?php echo $user['user_id']; ?>" tabindex="-1"
                                 aria-labelledby="editUserModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
+                                <div class="modal-dialog modal-lg"> <!-- Large modal -->
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+                                            <h5 class="modal-title">Edit User</h5>
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
                                         <form action="edit-user.php" method="POST">
                                             <div class="modal-body">
-                                                <div class="form-group">
-                                                    <label for="userId">User ID</label>
-                                                    <input type="text" class="form-control" name="userId"
-                                                        value="<?php echo htmlspecialchars($user['user_id']); ?>" readonly>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="username">Username</label>
-                                                    <input type="text" class="form-control" name="username"
-                                                        value="<?php echo htmlspecialchars($user['username']); ?>" required>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="password">Password</label>
-                                                    <input type="password" class="form-control" name="password" required>
-                                                </div>
+                                                <div class="container">
+                                                    <div class="row">
+                                                        <!-- Left Column -->
+                                                        <div class="col-md-6">
+                                                            <h5 class="text-primary">User Credentials</h5>
+                                                            <hr>
+                                                            <div class="form-group">
+                                                                <label for="userId">User ID</label>
+                                                                <input type="text" class="form-control" name="userId"
+                                                                    value="<?php echo htmlspecialchars($user['user_id'] ?? ''); ?>"
+                                                                    readonly>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="username">Username</label>
+                                                                <input type="text" class="form-control" name="username"
+                                                                    value="<?php echo htmlspecialchars($user['username'] ?? ''); ?>"
+                                                                    required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="password">Password</label>
+                                                                <input type="password" class="form-control" name="password"
+                                                                    required>
+                                                            </div>
+
+                                                            <h5 class="text-primary mt-4">Personal Information</h5>
+                                                            <hr>
+                                                            <div class="form-group">
+                                                                <label for="last_name">Last Name</label>
+                                                                <input type="text" class="form-control" name="last_name"
+                                                                    value="<?php echo htmlspecialchars($user['last_name'] ?? ''); ?>"
+                                                                    required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="first_name">First Name</label>
+                                                                <input type="text" class="form-control" name="first_name"
+                                                                    value="<?php echo htmlspecialchars($user['first_name'] ?? ''); ?>"
+                                                                    required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="middle_name">Middle Name</label>
+                                                                <input type="text" class="form-control" name="middle_name"
+                                                                    value="<?php echo htmlspecialchars($user['middle_name'] ?? ''); ?>">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="gender">Gender</label>
+                                                                <select class="form-control" name="gender">
+                                                                    <option value="Male" <?php echo ($user['gender'] ?? '') == 'Male' ? 'selected' : ''; ?>>Male</option>
+                                                                    <option value="Female" <?php echo ($user['gender'] ?? '') == 'Female' ? 'selected' : ''; ?>>Female</option>
+                                                                </select>
+
+                                                            </div>
+
+                                                            <h5 class="text-primary mt-4">User Settings</h5>
+                                                            <hr>
+                                                            <div class="form-group">
+                                                                <label for="user_type">User Type</label>
+                                                                <select class="form-control" name="user_type">
+                                                                    <option value="Admin" <?php echo ($user['user_type'] == 'Admin') ? 'selected' : ''; ?>>
+                                                                        Admin</option>
+                                                                    <option value="User" <?php echo ($user['user_type'] == 'User') ? 'selected' : ''; ?>>
+                                                                        User</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="status">Status</label>
+                                                                <select class="form-control" name="status">
+                                                                    <option value="1" <?php echo ($user['status'] == 1) ? 'selected' : ''; ?>>Enabled</option>
+                                                                    <option value="0" <?php echo ($user['status'] == 0) ? 'selected' : ''; ?>>Disabled</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Right Column -->
+                                                        <div class="col-md-6">
+                                                            <h5 class="text-primary">Additional Details</h5>
+                                                            <hr>
+                                                            <div class="form-group">
+                                                                <label for="birthdate">Birthdate</label>
+                                                                <input type="date" class="form-control" name="birthdate"
+                                                                    value="<?php echo htmlspecialchars($user['birthdate'] ?? ''); ?>">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="marital_status">Marital Status</label>
+                                                                <input type="text" class="form-control"
+                                                                    name="marital_status"
+                                                                    value="<?php echo htmlspecialchars($user['marital_status'] ?? ''); ?>">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="tin">TIN</label>
+                                                                <input type="text" class="form-control" name="tin"
+                                                                    value="<?php echo htmlspecialchars($user['tin'] ?? ''); ?>">
+                                                            </div>
+
+                                                            <h5 class="text-primary mt-4">Contact Information</h5>
+                                                            <hr>
+                                                            <div class="form-group">
+                                                                <label for="contact_number">Contact Number</label>
+                                                                <input type="text" class="form-control"
+                                                                    name="contact_number"
+                                                                    value="<?php echo htmlspecialchars($user['contact_number'] ?? ''); ?>"
+                                                                    required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="email">Email</label>
+                                                                <input type="email" class="form-control" name="email"
+                                                                    value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>"
+                                                                    required>
+                                                            </div>
+                                                        </div>
+                                                    </div> <!-- End Row -->
+                                                </div> <!-- End Container -->
                                             </div>
+
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary"
                                                     data-dismiss="modal">Close</button>
@@ -145,6 +255,7 @@
                                 </div>
                             </div>
                         <?php endforeach; ?>
+
                     </tbody>
                 </table>
             </div>
@@ -161,6 +272,20 @@
 
     <!-- Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("input[name='userStatusFilter']").change(function () {
+                var showDisabled = $("#showDisabled").is(":checked");
+
+                $("tbody tr").each(function () {
+                    var statusText = $(this).find("td:eq(4)").text().trim();
+                    if (statusText === "Disabled") {
+                        $(this).toggle(showDisabled);
+                    }
+                });
+            });
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
