@@ -1,3 +1,110 @@
+<?php
+session_start();
+require_once 'database.php';
+
+$conn = Database::getInstance();
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Function to update user details with input filtering
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
+    // Server-side filtering & sanitization
+    $userId = filter_input(INPUT_POST, 'userId', FILTER_SANITIZE_NUMBER_INT);
+    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+    $first_name = filter_input(INPUT_POST, 'first_name', FILTER_SANITIZE_STRING);
+    $middle_name = filter_input(INPUT_POST, 'middle_name', FILTER_SANITIZE_STRING);
+    $last_name = filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_STRING);
+    $gender = filter_input(INPUT_POST, 'gender', FILTER_SANITIZE_STRING);
+    $birthdate = filter_input(INPUT_POST, 'birthdate', FILTER_SANITIZE_STRING); // use string or date validator if needed
+    $marital_status = filter_input(INPUT_POST, 'marital_status', FILTER_SANITIZE_STRING);
+    $tin = filter_input(INPUT_POST, 'tin', FILTER_SANITIZE_STRING);
+    $contact_number = filter_input(INPUT_POST, 'contact_number', FILTER_SANITIZE_STRING);
+    $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+    $user_type = filter_input(INPUT_POST, 'user_type', FILTER_SANITIZE_STRING);
+    $status = filter_input(INPUT_POST, 'status', FILTER_SANITIZE_NUMBER_INT);
+
+    // Check for required valid email
+    if (!$email) {
+        echo "<script>alert('Invalid email address'); window.location.href='User-Control.php';</script>";
+        exit();
+    }
+
+    // Check if a new password is provided
+    if (!empty($_POST["password"])) {
+        $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
+        $query = "UPDATE users SET 
+                        username = ?, password = ?, first_name = ?, middle_name = ?, last_name = ?, 
+                        gender = ?, birthdate = ?, marital_status = ?, tin = ?, 
+                        contact_number = ?, email = ?, user_type = ?, status = ? 
+                      WHERE user_id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param(
+            "sssssssssssssi",
+            $username,
+            $password,
+            $first_name,
+            $middle_name,
+            $last_name,
+            $gender,
+            $birthdate,
+            $marital_status,
+            $tin,
+            $contact_number,
+            $email,
+            $user_type,
+            $status,
+            $userId
+        );
+    } else {
+        // Don't update the password if not provided
+        $query = "UPDATE users SET 
+                        username = ?, first_name = ?, middle_name = ?, last_name = ?, 
+                        gender = ?, birthdate = ?, marital_status = ?, tin = ?, 
+                        contact_number = ?, email = ?, user_type = ?, status = ? 
+                      WHERE user_id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param(
+            "sssssssssssii",
+            $username,
+            $first_name,
+            $middle_name,
+            $last_name,
+            $gender,
+            $birthdate,
+            $marital_status,
+            $tin,
+            $contact_number,
+            $email,
+            $user_type,
+            $status,
+            $userId
+        );
+    }
+
+    if ($stmt->execute()) {
+        echo "<script>alert('User updated successfully!'); window.location.href='User-Control.php';</script>";
+    } else {
+        echo "<script>alert('Error updating user: " . $stmt->error . "');</script>";
+    }
+    $stmt->close();
+}
+
+$query = "SELECT * FROM users";
+$result = $conn->query($query);
+$users = [];
+
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $users[] = $row;
+    }
+    $result->free();
+}
+
+$conn->close();
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,49 +121,6 @@
 </head>
 
 <body>
-
-    <?php
-    session_start(); // Start session at the top
-    
-    // Prevent the browser from caching this page
-    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-    header("Cache-Control: post-check=0, pre-check=0", false);
-    header("Pragma: no-cache");
-
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
-
-    require_once 'database.php';
-
-    $conn = Database::getInstance();
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    $query = "SELECT 
-            user_id, username, password, first_name, middle_name, last_name, 
-            gender, birthdate, marital_status, tin, house_number, street, 
-            barangay, district, municipality, province, contact_number, 
-            email, status, user_type 
-          FROM users";
-
-    $result = $conn->query($query);
-
-    $users = [];
-
-    if ($result) {
-        while ($row = $result->fetch_assoc()) {
-            $users[] = $row; // Store all user details
-        }
-        $result->free();
-    } else {
-        die("Query Failed: " . $conn->error); // Debugging SQL errors
-    }
-
-    $conn->close();
-
-    ?>
-
     <!-- Header Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
         <a class="navbar-brand">
@@ -64,6 +128,42 @@
                 class="d-inline-block align-top" alt="">
             Electronic Real Property Tax System
         </a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="Home.php">Home</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="RPU-Management.php" id="navbarDropdown" role="button"
+                        aria-haspopup="true" aria-expanded="false">
+                        RPU Management
+                    </a>
+                    <!-- Dropdown menu -->
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="Real-Property-Unit-List.php">RPU List</a>
+                        <a class="dropdown-item" href="FAAS.php">FAAS</a>
+                        <a class="dropdown-item" href="Tax-Declaration.php">Tax Declaration</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="Track.php">Track Paper</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="Transaction.php">Transaction</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="Reports.php">Reports</a>
+                </li>
+                <li class="nav-item ml-3">
+                    <a href="logout.php" class="btn btn-danger">Log Out</a>
+                </li>
+            </ul>
+        </div>
     </nav>
 
     <!-- Main Content -->
@@ -107,7 +207,8 @@
                             <tr>
                                 <td><?php echo htmlspecialchars($user['user_id'] ?? ''); ?></td>
                                 <td><a href="#"><?php echo htmlspecialchars($user['username'] ?? ''); ?></a></td>
-                                <td><?php echo htmlspecialchars($user['full_name'] ?? ''); ?></td>
+                                <td><?php echo htmlspecialchars(trim("{$user['first_name']} {$user['middle_name']} {$user['last_name']}")); ?>
+                                </td>
                                 <td><?php echo htmlspecialchars($user['user_type'] ?? ''); ?></td>
                                 <td><?php echo ($user['status'] == 1) ? 'Enabled' : 'Disabled'; ?></td>
                                 <td class="text-center">
@@ -121,7 +222,7 @@
                             <!-- User Edit Modal -->
                             <div class="modal fade" id="editUserModal-<?php echo $user['user_id']; ?>" tabindex="-1"
                                 aria-labelledby="editUserModalLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-lg"> <!-- Large modal -->
+                                <div class="modal-dialog modal-lg">
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <h5 class="modal-title">Edit User</h5>
@@ -129,7 +230,10 @@
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
-                                        <form action="edit-user.php" method="POST">
+                                        <!-- Submitting to the same file -->
+                                        <form action="" method="POST">
+                                            <!-- Hidden field to trigger update -->
+                                            <input type="hidden" name="update_user" value="1">
                                             <div class="modal-body">
                                                 <div class="container">
                                                     <div class="row">
@@ -152,7 +256,7 @@
                                                             <div class="form-group">
                                                                 <label for="password">Password</label>
                                                                 <input type="password" class="form-control" name="password"
-                                                                    required>
+                                                                    placeholder="Enter new password (leave blank to keep current)">
                                                             </div>
 
                                                             <h5 class="text-primary mt-4">Personal Information</h5>
@@ -180,7 +284,6 @@
                                                                     <option value="Male" <?php echo ($user['gender'] ?? '') == 'Male' ? 'selected' : ''; ?>>Male</option>
                                                                     <option value="Female" <?php echo ($user['gender'] ?? '') == 'Female' ? 'selected' : ''; ?>>Female</option>
                                                                 </select>
-
                                                             </div>
 
                                                             <h5 class="text-primary mt-4">User Settings</h5>
@@ -262,7 +365,6 @@
         </div>
     </section>
 
-
     <!-- Footer -->
     <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
         <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
@@ -276,7 +378,6 @@
         $(document).ready(function () {
             $("input[name='userStatusFilter']").change(function () {
                 var showDisabled = $("#showDisabled").is(":checked");
-
                 $("tbody tr").each(function () {
                     var statusText = $(this).find("td:eq(4)").text().trim();
                     if (statusText === "Disabled") {
