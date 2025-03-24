@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 21, 2025 at 02:15 PM
+-- Generation Time: Mar 24, 2025 at 02:53 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -98,7 +98,12 @@ INSERT INTO `faas` (`faas_id`, `propertyowner_id`, `pro_id`, `rpu_idno`, `land_i
 (23, '[49]', 134, NULL, NULL, NULL, NULL),
 (24, '[50]', 135, NULL, NULL, NULL, NULL),
 (25, '[51]', 136, NULL, NULL, NULL, NULL),
-(26, '[52,53]', 137, NULL, NULL, NULL, NULL);
+(26, '[52,53]', 137, NULL, NULL, NULL, NULL),
+(27, '[54,55]', 138, NULL, NULL, NULL, NULL),
+(28, '[56]', 139, NULL, NULL, NULL, NULL),
+(29, '[57]', 140, NULL, NULL, NULL, NULL),
+(30, '[58]', 141, NULL, NULL, NULL, NULL),
+(31, '[59,60]', 142, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -186,7 +191,14 @@ INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`) 
 (50, 135, 7, 1),
 (51, 136, 1, 1),
 (52, 137, 7, 1),
-(53, 137, 1, 1);
+(53, 137, 1, 1),
+(54, 138, 7, 1),
+(55, 138, 1, 1),
+(56, 139, 7, 1),
+(57, 140, 7, 1),
+(58, 141, 7, 1),
+(59, 142, 7, 1),
+(60, 142, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -223,7 +235,12 @@ INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `c
 (134, 7, 423, 0, 'Province 1', 'Labo', 'District 2', 'Kalamunding', '', 0, 4324, '   ', 'barangay'),
 (135, 7, 4234, 0, 'Province 1', 'Daet', 'District 2', 'Kalamunding', '', 0, 4234, '   ', 'barangay'),
 (136, 1, 324, 0, 'Province 1', 'Labo', 'District 2', 'Kalamunding', '', 0, 4234, '   ', 'land_tagging'),
-(137, 7, 34534, 0, 'Province 1', 'Daet', 'District 1', 'Kalamunding', '', 0, 4234, '   ', 'affidavit, barangay');
+(137, 7, 34534, 0, 'Province 1', 'Daet', 'District 1', 'Kalamunding', '', 0, 4234, '   ', 'affidavit, barangay'),
+(138, 7, 42342, 0, 'Province 2', 'Labo', 'District 1', 'Kalamunding', '', 0, 5234234, '   ', 'affidavit, barangay'),
+(139, 7, 4234, 0, 'Province 1', 'Labo', 'District 1', 'Kalamunding', '', 0, 23423, '   ', 'affidavit, barangay'),
+(140, 7, 4234, 0, 'Province 1', 'Daet', 'District 1', 'Kalamunding', '', 0, 4234, '   ', 'affidavit, barangay'),
+(141, 7, 23432, 0, 'Province 1', 'Labo', 'District 1', 'Kalamunding', '', 0, 423423, '   ', 'affidavit, barangay'),
+(142, 7, 123124, 0, 'Province 1', 'Labo', 'District 1', 'Kalamunding', '', 0, 12345, '   ', 'affidavit, barangay, land_tagg');
 
 -- --------------------------------------------------------
 
@@ -304,7 +321,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `last_name`, `first_name`, `middle_name`, `gender`, `birthdate`, `marital_status`, `tin`, `house_number`, `street`, `barangay`, `district`, `municipality`, `province`, `contact_number`, `email`, `status`, `user_type`) VALUES
-(6, 'username', '$2y$10$hUAqqmcCIDXnVvR81hmjuO7r.2x3tnlKu6yruJFKjr6LnIoPgnRK.', 'name', 'user', '', 'Male', '2003-11-14', 'Single', '1234', '1', '1', '1', '1', '1', '1', '1', 'testing@testing.com', 0, 'user'),
+(6, 'username', '$2y$10$hUAqqmcCIDXnVvR81hmjuO7r.2x3tnlKu6yruJFKjr6LnIoPgnRK.', 'name', 'user', 'hatdog', 'Male', '2003-11-14', 'Single', '1234', '1', '1', '1', '1', '1', '1', '1', 'testing@testing.com', 1, 'user'),
 (8, 'RIP_FISHY12', '$2y$10$smEhcMQrkEwgF/Whm1BrDeT0ru.898kqGKwEjVl1HhkR7Bpj/vdP.', 'Zuelos', 'Jomel', 'Villacruel', 'Female', '2012-12-19', 'Married', '32423423', '32', 'Luzaragga', 'Kalamunding', '2', 'Labo', 'Camarines Norte', '09923648721', 'sbjomel19@gmail.com', 0, 'admin');
 
 --
@@ -399,7 +416,7 @@ ALTER TABLE `district`
 -- AUTO_INCREMENT for table `faas`
 --
 ALTER TABLE `faas`
-  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `municipality`
@@ -417,13 +434,13 @@ ALTER TABLE `owners_tb`
 -- AUTO_INCREMENT for table `propertyowner`
 --
 ALTER TABLE `propertyowner`
-  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
 
 --
 -- AUTO_INCREMENT for table `p_info`
 --
 ALTER TABLE `p_info`
-  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=138;
+  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=143;
 
 --
 -- AUTO_INCREMENT for table `region`
