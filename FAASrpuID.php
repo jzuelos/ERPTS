@@ -53,8 +53,6 @@ if ($check_result->num_rows > 0) {
         } else {
             exit(json_encode(['success' => false, 'error' => 'Failed to update rpu_idnum.']));
         }
-
-        $update_stmt->close();
     }
 }
 
