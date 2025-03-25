@@ -1,3 +1,30 @@
+<?php
+session_start();  //Start session at the top to access session variables
+
+// Check if the user is logged in by verifying if 'user_id' exists in the session
+if (!isset($_SESSION['user_id'])) {
+  header("Location: index.php"); // Redirect to login page if user is not logged in
+  exit; // Stop further execution after redirection
+}
+
+$user_role = $_SESSION['user_type'] ?? 'user'; // Default to 'user' if role is not set
+
+// Prevent the browser from caching this page
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Prevent caching
+header("Cache-Control: post-check=0, pre-check=0", false); // Additional no-cache headers
+header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+require_once 'database.php';
+
+$conn = Database::getInstance();
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+?>
+
 <!doctype html>
 <html lang="en">
 

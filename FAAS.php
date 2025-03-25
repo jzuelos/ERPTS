@@ -710,53 +710,62 @@ $conn->close();
     </div>
   </div>
 
-<!-- LAND Section -->
-<section class="container my-5" id="land-section">
+  <!-- LAND Section -->
+  <section class="container my-5" id="land-section">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="section-title">
-            </a>
-            LAND
-        </h4>
+      <h4 class="section-title">
+        </a>
+        LAND
+      </h4>
     </div>
 
     <div class="card border-0 shadow p-4 rounded-3">
-        <!-- Quick Actions Row -->
-        <div class="row mb-4">
-            <div class="col-md-6 mb-3">
-                <a href="Land.php" class="btn w-100 py-2 text-white text-decoration-none" 
-                   style="background-color: #379777; border-color: #2e8266;">
-                    <i class="fas fa-plus-circle me-2"></i>Add Land
-                </a>
-            </div>
+      <!-- Quick Actions Row -->
+      <div class="row mb-4">
+        <?php
+        // Get the property ID from the current URL (e.g., FAAS.php?id=140)
+        $p_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
+        ?>
+        <div class="col-md-6 mb-3">
+          <?php if ($p_id): ?>
+            <p>Debug: p_id = <?= $p_id ?></p>
+          <?php else: ?>
+            <p>Debug: p_id is not set!</p>
+          <?php endif; ?>
+          <a href="Land.php?p_id=<?= $p_id; ?>" class="btn w-100 py-2 text-white text-decoration-none"
+            style="background-color: #379777; border-color: #2e8266;">
+            <i class="fas fa-plus-circle me-2"></i>Add Land
+          </a>
         </div>
+      </div>
 
-        <!-- Toggle Section -->
-        <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded">
-            <span class="fw-bold me-3">Show/Hide</span>
-            <div class="form-check form-switch m-0">
-                <input class="form-check-input" type="checkbox" id="showToggle" checked style="margin-left: 0;">
-            </div>
+      <!-- Toggle Section -->
+      <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded">
+        <span class="fw-bold me-3">Show/Hide</span>
+        <div class="form-check form-switch m-0">
+          <input class="form-check-input" type="checkbox" id="showToggle" checked style="margin-left: 0;">
         </div>
+      </div>
 
-        <!-- Value Table -->
-        <div class="table-responsive">
-            <table class="table table-borderless">
-                <thead>
-                    <tr>
-                        <th class="text-muted">Market Value</th>
-                        <th class="text-muted">Assessed Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>None</td>
-                        <td>None</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+      <!-- Value Table -->
+      <div class="table-responsive">
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th class="text-muted">Market Value</th>
+              <th class="text-muted">Assessed Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>None</td>
+              <td>None</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-</section>
+  </section>
 
   <!-- Memoranda Section -->
   <section class="container my-5">
@@ -775,52 +784,52 @@ $conn->close();
     </div>
   </section>
 
-<!-- PLANTS AND TREES Section -->
-<section class="container my-5" id="plants-trees-section">
+  <!-- PLANTS AND TREES Section -->
+  <section class="container my-5" id="plants-trees-section">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="section-title">
-            PLANTS AND TREES
-        </h4>
+      <h4 class="section-title">
+        PLANTS AND TREES
+      </h4>
     </div>
 
     <div class="card border-0 shadow p-4 rounded-3">
-        <!-- Quick Actions Row -->
-        <div class="row mb-4">
-            <div class="col-md-6 mb-3">
-                <a href="PnTrees.php" class="btn w-100 py-2 text-white text-decoration-none" 
-                   style="background-color: #379777; border-color: #2e8266;">
-                    <i class="fas fa-plus-circle me-2"></i>Add Plants/Trees
-                </a>
-            </div>
+      <!-- Quick Actions Row -->
+      <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+          <a href="PnTrees.php" class="btn w-100 py-2 text-white text-decoration-none"
+            style="background-color: #379777; border-color: #2e8266;">
+            <i class="fas fa-plus-circle me-2"></i>Add Plants/Trees
+          </a>
         </div>
+      </div>
 
-        <!-- Toggle Section -->
-        <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded">
-            <span class="fw-bold me-3">Show/Hide</span>
-            <div class="form-check form-switch m-0">
-                <input class="form-check-input" type="checkbox" id="showPlantsToggle" checked style="margin-left: 0;">
-            </div>
+      <!-- Toggle Section -->
+      <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded">
+        <span class="fw-bold me-3">Show/Hide</span>
+        <div class="form-check form-switch m-0">
+          <input class="form-check-input" type="checkbox" id="showPlantsToggle" checked style="margin-left: 0;">
         </div>
+      </div>
 
-        <!-- Value Table -->
-        <div class="table-responsive">
-            <table class="table table-borderless">
-                <thead>
-                    <tr>
-                        <th class="text-muted">Market Value</th>
-                        <th class="text-muted">Assessed Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>None</td>
-                        <td>None</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+      <!-- Value Table -->
+      <div class="table-responsive">
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th class="text-muted">Market Value</th>
+              <th class="text-muted">Assessed Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>None</td>
+              <td>None</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-</section>
+  </section>
 
 
   <!-- Valuation Section -->
