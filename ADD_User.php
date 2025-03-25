@@ -150,161 +150,193 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="container mt-5">
-        <h2 class="text-center mb-4">Create New User</h2>
-        <form action="" method="POST">
+<div class="container mt-5">
+    <h2 class="text-center mb-4" style="color: #379777; font-weight: 600;">Create New User</h2>
+    <form action="" method="POST" class="bg-white p-4 rounded-lg" style="border: 1px solid #379777; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
 
-            <!-- User Credentials Section -->
-            <div class="mb-4">
-                <legend class="font-weight-bold">User Credentials</legend>
-                <div class="form-group">
-                    <label for="username"><span style="color: red;">*</span> Username:</label>
-                    <input type="text" id="username" name="username" class="form-control" placeholder="Enter username"
-                        required>
-                </div>
-
-                <div class="form-group">
-                    <label for="password"><span style="color: red;">*</span> New Password:</label>
-                    <input type="password" id="password" name="password" class="form-control"
-                        placeholder="Enter password" required pattern="^(?=.*[0-9])(?=.*[\W_]).{8,}$"
-                        title="Password must be at least 8 characters long, include at least one special character, and one number.">
-                </div>
-
-                <div class="form-group">
-                    <label for="confirm_password"><span style="color: red;">*</span> Confirm Password:</label>
-                    <input type="password" id="confirm_password" name="confirm_password" class="form-control"
-                        placeholder="Confirm password" required pattern="^(?=.*[0-9])(?=.*[\W_]).{8,}$"
-                        title="Password must match the required format.">
-                </div>
-
+        <!-- User Credentials Section -->
+        <div class="mb-4 p-3" style="border-radius: 8px; border-left: 4px solid #379777;">
+            <legend class="font-weight-bold mb-3" style="color: #379777; font-size: 1.1rem;">User Credentials</legend>
+            <div class="form-group mb-3">
+                <label for="username" class="form-label"><span style="color: #F3E407;">*</span> Username:</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Enter username"
+                    required style="border-radius: 6px; border: 1px solid #379777;">
             </div>
 
-            <!-- Personal Information Section -->
-            <div class="mb-4">
-                <legend class="font-weight-bold">Personal Information</legend>
+            <div class="form-group mb-3">
+                <label for="password" class="form-label"><span style="color: #F3E407;">*</span> New Password:</label>
+                <input type="password" id="password" name="password" class="form-control"
+                    placeholder="Enter password" required pattern="^(?=.*[0-9])(?=.*[\W_]).{8,}$"
+                    title="Password must be at least 8 characters long, include at least one special character, and one number."
+                    style="border-radius: 6px; border: 1px solid #379777;">
+                <small class="text-muted">Must be 8+ characters with a number and special character</small>
+            </div>
 
-                <div class="form-group">
-                    <label for="lastname"><span style="color: red;">*</span> Last Name:</label>
+            <div class="form-group">
+                <label for="confirm_password" class="form-label"><span style="color: #F3E407;">*</span> Confirm Password:</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control"
+                    placeholder="Confirm password" required pattern="^(?=.*[0-9])(?=.*[\W_]).{8,}$"
+                    title="Password must match the required format."
+                    style="border-radius: 6px; border: 1px solid #379777;">
+            </div>
+        </div>
+
+        <!-- Personal Information Section -->
+        <div class="mb-4 p-3" style="border-radius: 8px; border-left: 4px solid #379777;">
+            <legend class="font-weight-bold mb-3" style="color: #379777; font-size: 1.1rem;">Personal Information</legend>
+
+            <div class="row">
+                <div class="col-md-4 form-group mb-3">
+                    <label for="lastname" class="form-label"><span style="color: #F3E407;">*</span> Last Name:</label>
                     <input type="text" id="lastname" name="lastname" class="form-control" placeholder="Enter last name"
-                        required>
+                        required style="border-radius: 6px; border: 1px solid #379777;">
                 </div>
 
-                <div class="form-group">
-                    <label for="firstname"><span style="color: red;">*</span> First Name:</label>
+                <div class="col-md-4 form-group mb-3">
+                    <label for="firstname" class="form-label"><span style="color: #F3E407;">*</span> First Name:</label>
                     <input type="text" id="firstname" name="firstname" class="form-control"
-                        placeholder="Enter first name" required>
+                        placeholder="Enter first name" required style="border-radius: 6px; border: 1px solid #379777;">
                 </div>
 
-                <div class="form-group">
-                    <label for="middlename">Middle Name:</label>
+                <div class="col-md-4 form-group mb-3">
+                    <label for="middlename" class="form-label">Middle Name:</label>
                     <input type="text" id="middlename" name="middlename" class="form-control"
-                        placeholder="Enter middle name (optional)">
-                </div>
-
-                <div class="form-group">
-                    <label><span style="color: red;">*</span> Gender:</label>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" id="male" name="gender" value="male" required>
-                        <label class="form-check-label" for="male">Male</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" id="female" name="gender" value="female">
-                        <label class="form-check-label" for="female">Female</label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="birthdate"><span style="color: red;">*</span> Birthdate:</label>
-                    <input type="date" id="birthdate" name="birthdate" class="form-control" required>
-                </div>
-
-                <div class="form-group">
-                    <label><span style="color: red;">*</span> Marital Status:</label>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" id="single" name="marital_status" value="single"
-                            required>
-                        <label class="form-check-label" for="single">Single</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" id="married" name="marital_status" value="married">
-                        <label class="form-check-label" for="married">Married</label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="tin"><span style="color: red;">*</span> Tax Identification Number (TIN):</label>
-                    <input type="text" id="tin" name="tin" class="form-control" placeholder="Enter TIN" required>
+                        placeholder="Enter middle name (optional)" style="border-radius: 6px; border: 1px solid #379777;">
                 </div>
             </div>
 
-            <!-- Contact Information Section -->
-            <div class="mb-4">
-                <legend class="font-weight-bold">Contact Information</legend>
+            <div class="row">
+                <div class="col-md-6 form-group mb-3">
+                    <label class="form-label"><span style="color: #F3E407;">*</span> Gender:</label>
+                    <div class="d-flex">
+                        <div class="form-check me-3">
+                            <input class="form-check-input" type="radio" id="male" name="gender" value="male" required
+                                style="border: 1px solid #379777;">
+                            <label class="form-check-label" for="male">Male</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="female" name="gender" value="female"
+                                style="border: 1px solid #379777;">
+                            <label class="form-check-label" for="female">Female</label>
+                        </div>
+                    </div>
+                </div>
 
-                <div class="form-group">
-                    <label for="house_number"><span style="color: red;">*</span> House Number:</label>
+                <div class="col-md-6 form-group mb-3">
+                    <label for="birthdate" class="form-label"><span style="color: #F3E407;">*</span> Birthdate:</label>
+                    <input type="date" id="birthdate" name="birthdate" class="form-control" required
+                        style="border-radius: 6px; border: 1px solid #379777;">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 form-group mb-3">
+                    <label class="form-label"><span style="color: #F3E407;">*</span> Marital Status:</label>
+                    <div class="d-flex">
+                        <div class="form-check me-3">
+                            <input class="form-check-input" type="radio" id="single" name="marital_status" value="single"
+                                required style="border: 1px solid #379777;">
+                            <label class="form-check-label" for="single">Single</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="married" name="marital_status" value="married"
+                                style="border: 1px solid #379777;">
+                            <label class="form-check-label" for="married">Married</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 form-group mb-3">
+                    <label for="tin" class="form-label"><span style="color: #F3E407;">*</span> Tax Identification Number (TIN):</label>
+                    <input type="text" id="tin" name="tin" class="form-control" placeholder="Enter TIN" required
+                        style="border-radius: 6px; border: 1px solid #379777;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Information Section -->
+        <div class="mb-4 p-3" style="border-radius: 8px; border-left: 4px solid #379777;">
+            <legend class="font-weight-bold mb-3" style="color: #379777; font-size: 1.1rem;">Contact Information</legend>
+
+            <div class="row">
+                <div class="col-md-6 form-group mb-3">
+                    <label for="house_number" class="form-label"><span style="color: #F3E407;">*</span> House Number:</label>
                     <input type="text" id="house_number" name="house_number" class="form-control"
-                        placeholder="Enter house number" required>
+                        placeholder="Enter house number" required style="border-radius: 6px; border: 1px solid #379777;">
                 </div>
 
-                <div class="form-group">
-                    <label for="street"><span style="color: red;">*</span> Street:</label>
+                <div class="col-md-6 form-group mb-3">
+                    <label for="street" class="form-label"><span style="color: #F3E407;">*</span> Street:</label>
                     <input type="text" id="street" name="street" class="form-control" placeholder="Enter street name"
-                        required>
+                        required style="border-radius: 6px; border: 1px solid #379777;">
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label for="barangay"><span style="color: red;">*</span> Barangay:</label>
-                    <select id="barangay" name="barangay" class="form-control" required>
+            <div class="row">
+                <div class="col-md-6 form-group mb-3">
+                    <label for="barangay" class="form-label"><span style="color: #F3E407;">*</span> Barangay:</label>
+                    <select id="barangay" name="barangay" class="form-control" required
+                        style="border-radius: 6px; border: 1px solid #379777;">
                         <option value="" disabled selected>Select Barangay</option>
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="district"><span style="color: red;">*</span> District:</label>
-                    <select id="district" name="district" class="form-control" required>
+                <div class="col-md-6 form-group mb-3">
+                    <label for="district" class="form-label"><span style="color: #F3E407;">*</span> District:</label>
+                    <select id="district" name="district" class="form-control" required
+                        style="border-radius: 6px; border: 1px solid #379777;">
                         <option value="" disabled selected>Select District</option>
                     </select>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label for="municipality"><span style="color: red;">*</span> Municipality/City:</label>
-                    <select id="municipality" name="municipality" class="form-control" required>
+            <div class="row">
+                <div class="col-md-6 form-group mb-3">
+                    <label for="municipality" class="form-label"><span style="color: #F3E407;">*</span> Municipality/City:</label>
+                    <select id="municipality" name="municipality" class="form-control" required
+                        style="border-radius: 6px; border: 1px solid #379777;">
                         <option value="" disabled selected>Select Municipality</option>
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="province"><span style="color: red;">*</span> Province:</label>
-                    <select id="province" name="province" class="form-control" required>
+                <div class="col-md-6 form-group mb-3">
+                    <label for="province" class="form-label"><span style="color: #F3E407;">*</span> Province:</label>
+                    <select id="province" name="province" class="form-control" required
+                        style="border-radius: 6px; border: 1px solid #379777;">
                         <option value="Camarines Norte" selected>Camarines Norte</option>
                     </select>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label for="contact_number"><span style="color: red;">*</span> Contact Number:</label>
+            <div class="row">
+                <div class="col-md-6 form-group mb-3">
+                    <label for="contact_number" class="form-label"><span style="color: #F3E407;">*</span> Contact Number:</label>
                     <input type="text" id="contact_number" name="contact_number" class="form-control"
-                        placeholder="Enter contact number" required>
+                        placeholder="Enter contact number" required style="border-radius: 6px; border: 1px solid #379777;">
                 </div>
 
-                <div class="form-group">
-                    <label for="email"><span style="color: red;">*</span> Email:</label>
+                <div class="col-md-6 form-group mb-3">
+                    <label for="email" class="form-label"><span style="color: #F3E407;">*</span> Email:</label>
                     <input type="email" id="email" name="email" class="form-control" placeholder="Enter email address"
-                        required>
+                        required style="border-radius: 6px; border: 1px solid #379777;">
                 </div>
             </div>
+        </div>
 
-            <div class="form-group">
-                <label for="userType">User Type:</label>
-                <select id="userType" name="user_type" class="form-control">
-                    <option value="User" selected>User</option>
-                    <option value="Admin">Admin</option>
-                </select>
-            </div>
+        <div class="form-group mb-4">
+            <label for="userType" class="form-label">User Type:</label>
+            <select id="userType" name="user_type" class="form-control"
+                style="border-radius: 6px; border: 1px solid #379777;">
+                <option value="User" selected>User</option>
+                <option value="Admin">Admin</option>
+            </select>
+        </div>
 
-            <button type="submit" class="btn">Create User</button>
-        </form>
-    </div>
+        <button type="submit" class="btn w-100 py-2" style="background-color: #379777; color: white; border: none; border-radius: 6px; font-weight: 500; transition: all 0.3s;">
+            Create User
+        </button>
+    </form>
+</div>
 
     <!-- Footer -->
     <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
