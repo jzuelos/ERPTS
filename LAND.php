@@ -29,198 +29,210 @@
 <!-- LAND Section -->
 <section class="container my-5" id="land-section">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h4 class="section-title">
-        <a href="FAAS.php" class="text-decoration-none me-2">
-          <i class="fas fa-arrow-left"></i>
-        </a>
-        Land
-      </h4>
-      <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
-        data-bs-target="#editLandModal">Edit</button>
+        <h4 class="section-title">
+            <a href="FAAS.php" class="text-decoration-none me-2">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            Land
+        </h4>
+        <div>
+        
+            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                data-bs-target="#editLandModal">Edit</button>
+        </div>
     </div>
+    
     <div class="card border-0 shadow p-4 rounded-3">
-      <!-- Land Details Section -->
-      <h5 class="section-title">Land Details</h5>
+        <!-- Land Details Section -->
+        <h5 class="section-title">Land Details</h5>
 
-      <!-- Identification Numbers -->
-      <h6 class="section-subtitle mt-4">Identification Numbers</h6>
-      <div class="row">
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label for="octTctNumber" class="form-label">OCT/TCT Number</label>
-            <input type="text" id="octTctNumber" class="form-control" placeholder="Enter OCT/TCT Number" disabled>
-          </div>
+        <!-- Identification Numbers -->
+        <h6 class="section-subtitle mt-4">Identification Numbers</h6>
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="mb-3">
+                    <label for="octTctNumber" class="form-label">OCT/TCT Number</label>
+                    <input type="text" id="octTctNumber" class="form-control" placeholder="Enter OCT/TCT Number" disabled>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="mb-3">
+                    <label for="surveyNumber" class="form-label">Survey Number</label>
+                    <input type="text" id="surveyNumber" class="form-control" placeholder="Enter Survey Number" disabled>
+                </div>
+            </div>
         </div>
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label for="surveyNumber" class="form-label">Survey Number</label>
-            <input type="text" id="surveyNumber" class="form-control" placeholder="Enter Survey Number" disabled>
-          </div>
-        </div>
-      </div>
 
-      <!-- Boundaries -->
-      <h6 class="section-subtitle mt-4">Boundaries</h6>
-      <div class="row">
-        <div class="col-md-3 mb-4">
-          <div class="mb-3">
-            <label for="north" class="form-label">North</label>
-            <input type="text" id="north" class="form-control" placeholder="Enter North Boundary" disabled>
-          </div>
+        <!-- Boundaries -->
+        <h6 class="section-subtitle mt-4">Boundaries</h6>
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="mb-3">
+                    <label for="north" class="form-label">North</label>
+                    <input type="text" id="north" class="form-control" placeholder="Enter North Boundary" disabled>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="mb-3">
+                    <label for="south" class="form-label">South</label>
+                    <input type="text" id="south" class="form-control" placeholder="Enter South Boundary" disabled>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="mb-3">
+                    <label for="east" class="form-label">East</label>
+                    <input type="text" id="east" class="form-control" placeholder="Enter East Boundary" disabled>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="mb-3">
+                    <label for="west" class="form-label">West</label>
+                    <input type="text" id="west" class="form-control" placeholder="Enter West Boundary" disabled>
+                </div>
+            </div>
         </div>
-        <div class="col-md-3 mb-4">
-          <div class="mb-3">
-            <label for="south" class="form-label">South</label>
-            <input type="text" id="south" class="form-control" placeholder="Enter South Boundary" disabled>
-          </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="mb-3">
-            <label for="east" class="form-label">East</label>
-            <input type="text" id="east" class="form-control" placeholder="Enter East Boundary" disabled>
-          </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="mb-3">
-            <label for="west" class="form-label">West</label>
-            <input type="text" id="west" class="form-control" placeholder="Enter West Boundary" disabled>
-          </div>
-        </div>
-      </div>
 
-      <!-- Boundary Description -->
-      <h6 class="section-subtitle mt-4">Boundary Description</h6>
-      <textarea class="form-control mb-4" id="boundaryDescriptionModal" rows="2"
-        placeholder="Enter boundary description" disabled></textarea>
+        <!-- Boundary Description -->
+        <h6 class="section-subtitle mt-4">Boundary Description</h6>
+        <textarea class="form-control mb-4" id="boundaryDescriptionModal" rows="2"
+            placeholder="Enter boundary description" disabled></textarea>
 
-      <!-- Administrator Information Section -->
-      <h5 class="section-title mt-5">Administrator Information</h5>
-      <div class="row">
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="adminLastName" class="form-label">Last Name</label>
-            <input type="text" id="adminLastName" class="form-control" placeholder="Enter last name" disabled>
-          </div>
+        <!-- Administrator Information Section -->
+        <h5 class="section-title mt-5">Administrator Information</h5>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="mb-3">
+                    <label for="adminLastName" class="form-label">Last Name</label>
+                    <input type="text" id="adminLastName" class="form-control" placeholder="Enter last name" disabled>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="mb-3">
+                    <label for="adminFirstName" class="form-label">First Name</label>
+                    <input type="text" id="adminFirstName" class="form-control" placeholder="Enter first name" disabled>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="mb-3">
+                    <label for="adminMiddleName" class="form-label">Middle Name</label>
+                    <input type="text" id="adminMiddleName" class="form-control" placeholder="Enter middle name" disabled>
+                </div>
+            </div>
         </div>
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="adminFirstName" class="form-label">First Name</label>
-            <input type="text" id="adminFirstName" class="form-control" placeholder="Enter first name" disabled>
-          </div>
-        </div>
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="adminMiddleName" class="form-label">Middle Name</label>
-            <input type="text" id="adminMiddleName" class="form-control" placeholder="Enter middle name" disabled>
-          </div>
-        </div>
-      </div>
 
-      <!-- Contact Information -->
-      <div class="row">
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label for="adminContact" class="form-label">Contact Number</label>
-            <input type="text" id="adminContact" class="form-control" placeholder="Enter contact number" disabled>
-          </div>
+        <!-- Contact Information -->
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="mb-3">
+                    <label for="adminContact" class="form-label">Contact Number</label>
+                    <input type="text" id="adminContact" class="form-control" placeholder="Enter contact number" disabled>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="mb-3">
+                    <label for="adminEmail" class="form-label">Email</label>
+                    <input type="email" id="adminEmail" class="form-control" placeholder="Enter email" disabled>
+                </div>
+            </div>
         </div>
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label for="adminEmail" class="form-label">Email</label>
-            <input type="email" id="adminEmail" class="form-control" placeholder="Enter email" disabled>
-          </div>
-        </div>
-      </div>
 
-      <!-- Address Information -->
-      <h6 class="section-subtitle mt-4">Address</h6>
-      <div class="row">
-        <div class="col-md-3 mb-4">
-          <div class="mb-3">
-            <label for="adminAddressNumber" class="form-label">House Number</label>
-            <input type="text" id="adminAddressNumber" class="form-control" placeholder="Enter house number" disabled>
-          </div>
+        <!-- Address Information -->
+        <h6 class="section-subtitle mt-4">Address</h6>
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="mb-3">
+                    <label for="adminAddressNumber" class="form-label">House Number</label>
+                    <input type="text" id="adminAddressNumber" class="form-control" placeholder="Enter house number" disabled>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="mb-3">
+                    <label for="adminAddressStreet" class="form-label">Street</label>
+                    <input type="text" id="adminAddressStreet" class="form-control" placeholder="Enter street" disabled>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="mb-3">
+                    <label for="adminAddressBarangay" class="form-label">Barangay</label>
+                    <input type="text" id="adminAddressBarangay" class="form-control" placeholder="Enter barangay" disabled>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="mb-3">
+                    <label for="adminAddressDistrict" class="form-label">District</label>
+                    <input type="text" id="adminAddressDistrict" class="form-control" placeholder="Enter district" disabled>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="mb-3">
+                    <label for="adminAddressMunicipality" class="form-label">Municipality/City</label>
+                    <input type="text" id="adminAddressMunicipality" class="form-control"
+                        placeholder="Enter municipality or city" disabled>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="mb-3">
+                    <label for="adminAddressProvince" class="form-label">Province</label>
+                    <input type="text" id="adminAddressProvince" class="form-control" placeholder="Enter province" disabled>
+                </div>
+            </div>
         </div>
-        <div class="col-md-3 mb-4">
-          <div class="mb-3">
-            <label for="adminAddressStreet" class="form-label">Street</label>
-            <input type="text" id="adminAddressStreet" class="form-control" placeholder="Enter street" disabled>
-          </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="mb-3">
-            <label for="adminAddressBarangay" class="form-label">Barangay</label>
-            <input type="text" id="adminAddressBarangay" class="form-control" placeholder="Enter barangay" disabled>
-          </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="mb-3">
-            <label for="adminAddressDistrict" class="form-label">District</label>
-            <input type="text" id="adminAddressDistrict" class="form-control" placeholder="Enter district" disabled>
-          </div>
-        </div>
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label for="adminAddressMunicipality" class="form-label">Municipality/City</label>
-            <input type="text" id="adminAddressMunicipality" class="form-control"
-              placeholder="Enter municipality or city" disabled>
-          </div>
-        </div>
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label for="adminAddressProvince" class="form-label">Province</label>
-            <input type="text" id="adminAddressProvince" class="form-control" placeholder="Enter province" disabled>
-          </div>
-        </div>
-      </div>
 
-      <!-- Land Appraisal Section -->
-      <h5 class="section-title mt-5">Land Appraisal</h5>
-      <div class="row">
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <input type="text" id="description" class="form-control" placeholder="Enter description" disabled>
-          </div>
+        <!-- Land Appraisal Section -->
+        <h5 class="section-title mt-5">Land Appraisal</h5>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <input type="text" id="description" class="form-control" placeholder="Enter description" disabled>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="mb-3">
+                    <label for="classification" class="form-label">Classification</label>
+                    <input type="text" id="classification" class="form-control" placeholder="Enter classification" disabled>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="mb-3">
+                    <label for="subClass" class="form-label">Sub-Class</label>
+                    <input type="text" id="subClass" class="form-control" placeholder="Enter sub-class" disabled>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="mb-3">
+                    <label for="area" class="form-label">Area (sq m)</label>
+                    <input type="text" id="area" class="form-control" placeholder="Enter area" disabled>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="mb-3">
+                    <label for="actualUse" class="form-label">Actual Use</label>
+                    <input type="text" id="actualUse" class="form-control" placeholder="Enter actual use" disabled>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="mb-3">
+                    <label for="unitValue" class="form-label">Unit Value</label>
+                    <input type="text" id="unitValue" class="form-control" placeholder="Enter unit value" disabled>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="mb-3">
+                    <label for="marketValue" class="form-label">Market Value</label>
+                    <input type="text" id="marketValue" class="form-control" placeholder="Enter market value" disabled>
+                </div>
+            </div>
         </div>
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="classification" class="form-label">Classification</label>
-            <input type="text" id="classification" class="form-control" placeholder="Enter classification" disabled>
-          </div>
-        </div>
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="subClass" class="form-label">Sub-Class</label>
-            <input type="text" id="subClass" class="form-control" placeholder="Enter sub-class" disabled>
-          </div>
-        </div>
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="area" class="form-label">Area (sq m)</label>
-            <input type="text" id="area" class="form-control" placeholder="Enter area" disabled>
-          </div>
-        </div>
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="actualUse" class="form-label">Actual Use</label>
-            <input type="text" id="actualUse" class="form-control" placeholder="Enter actual use" disabled>
-          </div>
-        </div>
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="unitValue" class="form-label">Unit Value</label>
-            <input type="text" id="unitValue" class="form-control" placeholder="Enter unit value" disabled>
-          </div>
-        </div>
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="marketValue" class="form-label">Market Value</label>
-            <input type="text" id="marketValue" class="form-control" placeholder="Enter market value" disabled>
-          </div>
-        </div>
+                <!-- Print Button at Bottom Right -->
+        <div class="d-flex justify-content-end mt-4">
+             <button type="button" class="btn btn-outline-secondary py-2 px-4" onclick="openPrintPage()" 
+              style="font-size: 1.1rem;">
+            <i class="fas fa-print me-2"></i>Print
+        </button>
       </div>
     </div>
+  </div>
 </section>
 
     <!-- Modal for Editing Land Details -->
