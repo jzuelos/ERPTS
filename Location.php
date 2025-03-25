@@ -75,20 +75,31 @@
       <h2 class="text-secondary font-weight-bold" style="font-size: 2.5rem;">Location</h2>
     </div>
 
- <!-- Location Table Section -->
+<!-- Location Table Section -->
 <div class="card border-0 shadow p-4 rounded-3 mb-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h5 class="section-title mb-0">Location Information</h5>
-        <div class="dropdown">
-            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="locationTypeDropdown" 
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                Municipality
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="locationTypeDropdown">
-                <li><a class="dropdown-item" href="#" onclick="changeLocationType('Municipality')">Municipality</a></li>
-                <li><a class="dropdown-item" href="#" onclick="changeLocationType('District')">District</a></li>
-                <li><a class="dropdown-item" href="#" onclick="changeLocationType('Barangay')">Barangay</a></li>
-            </ul>
+        <div class="d-flex align-items-center">
+            <!-- Search Bar -->
+            <div class="input-group me-4" style="width: 250px;">
+                <input type="text" class="form-control border-start-0" id="tableSearch" placeholder="Search...">
+                <span class="input-group-text bg-transparent border-end-0">
+                    <i class="fas fa-search"></i>
+                </span>
+            </div>
+            
+            <!-- Dropdown -->
+            <div class="dropdown ml-5">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="locationTypeDropdown" 
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    Municipality
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="locationTypeDropdown">
+                    <li><a class="dropdown-item" href="#" onclick="changeLocationType('Municipality')">Municipality</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="changeLocationType('District')">District</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="changeLocationType('Barangay')">Barangay</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 
@@ -99,10 +110,11 @@
             <table class="table table-hover align-middle mb-0" id="municipalityTable">
                 <thead class="table-light">
                     <tr>
-                        <th style="width: 25%">Region</th>
+                        <th style="width: 20%">Region</th>
                         <th style="width: 15%">Code</th>
-                        <th style="width: 40%">Description</th>
-                        <th style="width: 20%">Status</th>
+                        <th style="width: 35%">Description</th>
+                        <th style="width: 15%">Status</th>
+                        <th style="width: 15%">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -111,12 +123,28 @@
                         <td>MUN-001</td>
                         <td>Sample Municipality</td>
                         <td><span class="badge bg-success-subtle text-success border border-success border-opacity-25">Active</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
                     </tr>
                     <tr>
                         <td>Region IV-A</td>
                         <td>MUN-002</td>
                         <td>Inactive Municipality</td>
                         <td><span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25">Inactive</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -125,10 +153,11 @@
             <table class="table table-hover align-middle mb-0 d-none" id="districtTable">
                 <thead class="table-light">
                     <tr>
-                        <th style="width: 25%">Municipality/City</th>
+                        <th style="width: 20%">Municipality/City</th>
                         <th style="width: 15%">Code</th>
-                        <th style="width: 40%">Description</th>
-                        <th style="width: 20%">Status</th>
+                        <th style="width: 35%">Description</th>
+                        <th style="width: 15%">Status</th>
+                        <th style="width: 15%">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -137,13 +166,29 @@
                         <td>DIST-001</td>
                         <td>Central District</td>
                         <td><span class="badge bg-success-subtle text-success border border-success border-opacity-25">Active</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
                     </tr>
                     <tr>
                         <td>Sample City</td>
                         <td>DIST-002</td>
                         <td>Old District</td>
                         <td><span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25">Inactive</span></td>                    
-                      </tr>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
 
@@ -151,10 +196,11 @@
             <table class="table table-hover align-middle mb-0 d-none" id="barangayTable">
                 <thead class="table-light">
                     <tr>
-                        <th style="width: 25%">District/Municipality/City</th>
+                        <th style="width: 20%">District/Municipality/City</th>
                         <th style="width: 15%">Barangay Code</th>
-                        <th style="width: 40%">Name of Barangay</th>
-                        <th style="width: 20%">Status</th>
+                        <th style="width: 35%">Name of Barangay</th>
+                        <th style="width: 15%">Status</th>
+                        <th style="width: 15%">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -163,20 +209,34 @@
                         <td>BRGY-001</td>
                         <td>Sample Barangay</td>
                         <td><span class="badge bg-success-subtle text-success border border-success border-opacity-25">Active</span></td>
-
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
                     </tr>
                     <tr>
                         <td>Central District</td>
                         <td>BRGY-002</td>
                         <td>Closed Barangay</td>
                         <td><span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25">Inactive</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-
 
     <!-- Add Table -->
     <div class="py-4"></div> 
@@ -415,6 +475,7 @@ function changeLocationType(type) {
     // Show selected table
     document.getElementById(type.toLowerCase() + 'Table').classList.remove('d-none');
 }
+
 </script>
   <script src="http://localhost/ERPTS/main-layout.js"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
