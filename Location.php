@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link rel="stylesheet" href="main_layout.css">
@@ -64,7 +65,7 @@
   <main class="container my-5">
     <!-- Back Button (Positioned to the top left) -->
     <div class="mb-4 d-flex justify-content-start">
-      <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">
+      <a href="Admin-Page-2.php" class="btn btn-outline-secondary btn-sm">
         <i class="fas fa-arrow-left"></i> Back
       </a>
     </div>
@@ -73,6 +74,115 @@
     <div class="text-center mb-5">
       <h2 class="text-secondary font-weight-bold" style="font-size: 2.5rem;">Location</h2>
     </div>
+
+ <!-- Location Table Section -->
+<div class="card border-0 shadow p-4 rounded-3 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="section-title mb-0">Location Information</h5>
+        <div class="dropdown">
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="locationTypeDropdown" 
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                Municipality
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="locationTypeDropdown">
+                <li><a class="dropdown-item" href="#" onclick="changeLocationType('Municipality')">Municipality</a></li>
+                <li><a class="dropdown-item" href="#" onclick="changeLocationType('District')">District</a></li>
+                <li><a class="dropdown-item" href="#" onclick="changeLocationType('Barangay')">Barangay</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Table Container with proper padding -->
+    <div class="px-3">
+        <div class="table-responsive rounded">
+            <!-- Municipality Table (Default) -->
+            <table class="table table-hover align-middle mb-0" id="municipalityTable">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 25%">Region</th>
+                        <th style="width: 15%">Code</th>
+                        <th style="width: 40%">Description</th>
+                        <th style="width: 20%">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Region IV-A</td>
+                        <td>MUN-001</td>
+                        <td>Sample Municipality</td>
+                        <td><span class="badge bg-success-subtle text-success border border-success border-opacity-25">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>Region IV-A</td>
+                        <td>MUN-002</td>
+                        <td>Inactive Municipality</td>
+                        <td><span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25">Inactive</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- District Table (Hidden by Default) -->
+            <table class="table table-hover align-middle mb-0 d-none" id="districtTable">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 25%">Municipality/City</th>
+                        <th style="width: 15%">Code</th>
+                        <th style="width: 40%">Description</th>
+                        <th style="width: 20%">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Sample City</td>
+                        <td>DIST-001</td>
+                        <td>Central District</td>
+                        <td><span class="badge bg-success-subtle text-success border border-success border-opacity-25">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>Sample City</td>
+                        <td>DIST-002</td>
+                        <td>Old District</td>
+                        <td><span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25">Inactive</span></td>                    
+                      </tr>
+                </tbody>
+            </table>
+
+            <!-- Barangay Table (Hidden by Default) -->
+            <table class="table table-hover align-middle mb-0 d-none" id="barangayTable">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 25%">District/Municipality/City</th>
+                        <th style="width: 15%">Barangay Code</th>
+                        <th style="width: 40%">Name of Barangay</th>
+                        <th style="width: 20%">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Central District</td>
+                        <td>BRGY-001</td>
+                        <td>Sample Barangay</td>
+                        <td><span class="badge bg-success-subtle text-success border border-success border-opacity-25">Active</span></td>
+
+                    </tr>
+                    <tr>
+                        <td>Central District</td>
+                        <td>BRGY-002</td>
+                        <td>Closed Barangay</td>
+                        <td><span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25">Inactive</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+    <!-- Add Table -->
+    <div class="py-4"></div> 
+    <div class="text-center mb-5">
+  <h2 class="text-secondary font-weight-bold" style="font-size: 2.5rem;">Add Location</h2>
+</div>
 
     <!-- Location Selection Options -->
     <div class="row justify-content-center">
@@ -283,6 +393,7 @@
   </div>
 
 
+
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start">
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
@@ -291,9 +402,23 @@
   </footer>
 
   <!-- Optional JavaScript -->
+  <script>
+function changeLocationType(type) {
+    // Update dropdown button text
+    document.getElementById('locationTypeDropdown').textContent = type;
+    
+    // Hide all tables
+    document.getElementById('municipalityTable').classList.add('d-none');
+    document.getElementById('districtTable').classList.add('d-none');
+    document.getElementById('barangayTable').classList.add('d-none');
+    
+    // Show selected table
+    document.getElementById(type.toLowerCase() + 'Table').classList.remove('d-none');
+}
+</script>
   <script src="http://localhost/ERPTS/main-layout.js"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
     integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
     crossorigin="anonymous"></script>
