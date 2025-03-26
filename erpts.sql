@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 24, 2025 at 02:53 PM
+-- Generation Time: Mar 26, 2025 at 05:00 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -104,6 +104,46 @@ INSERT INTO `faas` (`faas_id`, `propertyowner_id`, `pro_id`, `rpu_idno`, `land_i
 (29, '[57]', 140, NULL, NULL, NULL, NULL),
 (30, '[58]', 141, NULL, NULL, NULL, NULL),
 (31, '[59,60]', 142, NULL, NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `land`
+--
+
+CREATE TABLE `land` (
+  `land_id` int(50) NOT NULL,
+  `oct_no` int(50) NOT NULL,
+  `survey_no` varchar(250) NOT NULL,
+  `boundaries` varchar(250) NOT NULL,
+  `boun_desc` varchar(250) NOT NULL,
+  `last_name` varchar(250) NOT NULL,
+  `first_name` varchar(250) NOT NULL,
+  `middle_name` varchar(250) NOT NULL,
+  `contact_no` varchar(250) NOT NULL,
+  `email` varchar(250) NOT NULL,
+  `house_street` varchar(250) NOT NULL,
+  `barangay` varchar(250) NOT NULL,
+  `district` varchar(250) NOT NULL,
+  `municipality` varchar(250) NOT NULL,
+  `province` varchar(250) NOT NULL,
+  `land_desc` varchar(250) NOT NULL,
+  `classification` varchar(250) NOT NULL,
+  `sub_class` varchar(250) NOT NULL,
+  `area` varchar(250) NOT NULL,
+  `actual_use` varchar(250) NOT NULL,
+  `unit_value` int(50) NOT NULL,
+  `market_value` int(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `land`
+--
+
+INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `boundaries`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`) VALUES
+(1, 234234, 'afsdfasdf', '', 'asdfasdfasdf', 'gasdgasd', 'agsdgfasd', 'dasfd', 'gasdfgasd', 'jzuelos@gmail.com', 'asdgg', 'asdgadsf', '', 'gasdfasdf', 'gasdfasfd', '', '', '', '', '', 234235234, 234235345),
+(2, 4234234, 'sdfgsdfg', '', 'gsdfgsdfg', 'asdfas', 'sgdfg', 'asdgasd', 'gsdfgsdf', 'gsdfgsdfg@gmail.com', 'sdfgsdfg', 'sdfgsdfg', '', 'sdfgsdfgsdfg', 'sdfgsdfg', '', '', '', '', '', 234235, 2342352),
+(3, 4234234, 'adfsasdfas', '', 'asgasdfgas', 'asdfasdf', 'asdgasd', 'gasdgasd', 'fasdgfagsd', 'jzuelos@gmail.com', 'asdfasdf', 'sdfasdf', '', 'fasdfasdf', 'asdfasdfas', 'fasdfasdf', 'fdasf', 'asdfasdf', 'fasdfasd', 'fasdfasdf', 24234, 4234234);
 
 -- --------------------------------------------------------
 
@@ -350,6 +390,12 @@ ALTER TABLE `faas`
   ADD KEY `pro_id` (`pro_id`);
 
 --
+-- Indexes for table `land`
+--
+ALTER TABLE `land`
+  ADD PRIMARY KEY (`land_id`);
+
+--
 -- Indexes for table `municipality`
 --
 ALTER TABLE `municipality`
@@ -417,6 +463,12 @@ ALTER TABLE `district`
 --
 ALTER TABLE `faas`
   MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+
+--
+-- AUTO_INCREMENT for table `land`
+--
+ALTER TABLE `land`
+  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `municipality`
