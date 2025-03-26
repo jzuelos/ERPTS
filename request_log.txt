@@ -17,3 +17,6 @@
 {"faasId":"18","arpNumber":"1234567","propertyNumber":"44","taxability":"special","effectivity":"4235532"}
 {"faasId":"18","arpNumber":"1234567","propertyNumber":"44","taxability":"special","effectivity":"4235532"}
 {"faasId":"28","arpNumber":"","propertyNumber":"","taxability":"","effectivity":""}
+{"faasId":"32","arpNumber":"","propertyNumber":"789456","taxability":"taxable","effectivity":"2023"}
+{"faasId":"32","arpNumber":"","propertyNumber":"789456","taxability":"taxable","effectivity":"2023"}
+{"faasId":"32","arpNumber":"0462023012345","propertyNumber":"789456","taxability":"exempt","effectivity":"2023"}

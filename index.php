@@ -107,6 +107,7 @@ $conn->close();
           </button>
         </div>
       </div>
+      <a href="">Forgot Password?</a>
       <button type="submit" class="btn btn-dark w-100 mt-4">Log In</button>
     </form>
   </div>
