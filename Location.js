@@ -55,6 +55,7 @@ $('#submitBarangayFormBtn').on('click', function(e) {
 
   // Collect form data
   let formData = {
+    m_id: $('#locationDropdown').val(),  // Get the selected municipality ID
     brgy_code: $('#barangayCode').val(),
     brgy_name: $('#barangayName').val(),
     status: $('input[name="status"]:checked').val()
@@ -231,8 +232,8 @@ $('#barangayCode').on('input', function() {
   var value = this.value;
   // Allow only numeric input and limit to 3 digits
   value = value.replace(/\D/g, '');  // Remove non-digit characters
-  if (value.length > 3) {
-    value = value.slice(0, 3); // Limit input to 3 digits
+  if (value.length > 10) {
+    value = value.slice(0, 10); // Limit input to 3 digits
   }
   this.value = value;
 });

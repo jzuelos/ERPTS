@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 26, 2025 at 05:00 PM
+-- Generation Time: Mar 26, 2025 at 09:31 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -40,12 +40,16 @@ CREATE TABLE `brgy` (
 --
 
 INSERT INTO `brgy` (`brgy_id`, `brgy_code`, `brgy_name`, `status`, `m_id`) VALUES
-(53, '001', 'Bulala', 'Active', 0),
-(54, '002', 'bautista', 'Active', 0),
-(55, '004', 'fjsdfpnadf', 'Active', 0),
-(56, '004', 'tayabas', 'Active', 0),
-(57, '001', 'Bulala', 'Active', 0),
-(58, '001', 'Bulala', 'Active', 0);
+(66, '051603001', 'Alawihao', 'Active', 3),
+(67, '051603002', 'Awitan', 'Active', 3),
+(68, '051603003', 'Bagasbas', 'Active', 3),
+(69, '051603004', 'Barangay I (Poblacio', 'Active', 3),
+(70, '051607001', 'Apuao', 'Active', 4),
+(71, '051607002', 'Barangay I', 'Active', 3),
+(72, '051607009', 'Caringo', 'Active', 3),
+(73, '051612001', 'Aguit-It', 'Active', 6),
+(74, '051612002', 'Banocboc', 'Active', 3),
+(75, '051612003', 'Cagbalogo', 'Active', 3);
 
 -- --------------------------------------------------------
 
@@ -66,8 +70,18 @@ CREATE TABLE `district` (
 --
 
 INSERT INTO `district` (`district_id`, `district_code`, `description`, `status`, `m_id`) VALUES
-(11, '1234', 'District 2', 'Active', 2),
-(12, '13123', 'District 2', 'Active', 2);
+(13, '1', 'District 1', 'Active', 7),
+(14, '1', 'District 1', 'Active', 8),
+(15, '1', 'District 1', 'Active', 9),
+(16, '1', 'District 1', 'Active', 10),
+(17, '1', 'District 1', 'Active', 14),
+(18, '2', 'District 2', 'Active', 3),
+(19, '2', 'District 2', 'Active', 4),
+(20, '2', 'District 2', 'Active', 5),
+(21, '2', 'District 2', 'Active', 6),
+(22, '2', 'District 2', 'Active', 11),
+(23, '2', 'San Vicente', 'Active', 12),
+(24, '2', 'District 2', 'Active', 13);
 
 -- --------------------------------------------------------
 
@@ -90,20 +104,7 @@ CREATE TABLE `faas` (
 --
 
 INSERT INTO `faas` (`faas_id`, `propertyowner_id`, `pro_id`, `rpu_idno`, `land_id`, `plants_id`, `valuation_id`) VALUES
-(18, '[43]', 129, 44, NULL, NULL, NULL),
-(19, '[44]', 130, NULL, NULL, NULL, NULL),
-(20, '[45]', 131, NULL, NULL, NULL, NULL),
-(21, '[46,47]', 132, NULL, NULL, NULL, NULL),
-(22, '[48]', 133, NULL, NULL, NULL, NULL),
-(23, '[49]', 134, NULL, NULL, NULL, NULL),
-(24, '[50]', 135, NULL, NULL, NULL, NULL),
-(25, '[51]', 136, NULL, NULL, NULL, NULL),
-(26, '[52,53]', 137, NULL, NULL, NULL, NULL),
-(27, '[54,55]', 138, NULL, NULL, NULL, NULL),
-(28, '[56]', 139, NULL, NULL, NULL, NULL),
-(29, '[57]', 140, NULL, NULL, NULL, NULL),
-(30, '[58]', 141, NULL, NULL, NULL, NULL),
-(31, '[59,60]', 142, NULL, NULL, NULL, NULL);
+(32, '[61]', 143, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -136,15 +137,6 @@ CREATE TABLE `land` (
   `market_value` int(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `land`
---
-
-INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `boundaries`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`) VALUES
-(1, 234234, 'afsdfasdf', '', 'asdfasdfasdf', 'gasdgasd', 'agsdgfasd', 'dasfd', 'gasdfgasd', 'jzuelos@gmail.com', 'asdgg', 'asdgadsf', '', 'gasdfasdf', 'gasdfasfd', '', '', '', '', '', 234235234, 234235345),
-(2, 4234234, 'sdfgsdfg', '', 'gsdfgsdfg', 'asdfas', 'sgdfg', 'asdgasd', 'gsdfgsdf', 'gsdfgsdfg@gmail.com', 'sdfgsdfg', 'sdfgsdfg', '', 'sdfgsdfgsdfg', 'sdfgsdfg', '', '', '', '', '', 234235, 2342352),
-(3, 4234234, 'adfsasdfas', '', 'asgasdfgas', 'asdfasdf', 'asdgasd', 'gasdgasd', 'fasdgfagsd', 'jzuelos@gmail.com', 'asdfasdf', 'sdfasdf', '', 'fasdfasdf', 'asdfasdfas', 'fasdfasdf', 'fdasf', 'asdfasdf', 'fasdfasd', 'fasdfasdf', 24234, 4234234);
-
 -- --------------------------------------------------------
 
 --
@@ -164,8 +156,18 @@ CREATE TABLE `municipality` (
 --
 
 INSERT INTO `municipality` (`m_id`, `m_code`, `m_description`, `m_status`, `r_id`) VALUES
-(1, 4611, 'Sta. Elena', 'Active', 5),
-(2, 4600, 'Daet', 'Active', 5);
+(3, 4600, 'Daet', 'Active', 5),
+(4, 4601, 'Mercedes', 'Active', 5),
+(5, 4602, 'Talisay', 'Active', 5),
+(6, 4603, 'Vinzons', 'Active', 5),
+(7, 4604, 'Labo', 'Active', 5),
+(8, 4605, 'Paracale', 'Active', 5),
+(9, 4606, 'Jose Panganiban', 'Active', 5),
+(10, 4607, 'Capalonga', 'Active', 5),
+(11, 4608, 'Basud', 'Active', 5),
+(12, 4609, 'San Vicente', 'Active', 5),
+(13, 4610, 'San Lorenzo Ruiz', 'Active', 5),
+(14, 4611, 'Santa Elena', 'Active', 5);
 
 -- --------------------------------------------------------
 
@@ -193,8 +195,11 @@ CREATE TABLE `owners_tb` (
 --
 
 INSERT INTO `owners_tb` (`own_id`, `own_fname`, `own_mname`, `own_surname`, `tin_no`, `house_no`, `street`, `barangay`, `district`, `city`, `province`, `own_info`) VALUES
-(1, 'zuelos', '', 'john lloyd', 0, '', 'luzaragga', 'kalamunding', '2', 'labo', 'camarines norte', ''),
-(7, 'Renz', 'Dionela', 'Dioneda', 4234, '32423', '5', 'Bautista', 'District One', 'Sta Elena', 'Camarines Norte', 'Telephone: , Fax: , Email: , Website: ');
+(8, 'Renz', 'Balce', 'Dioneda', 0, '5', 'Purok', 'Bulala', 'District 1', 'Santa Elena', 'Camarines Norte', 'Telephone: 09922007821, Fax: , Email: rdioneda4@gmail.com, Website: '),
+(9, 'Jonard', 'Balce', 'Canaria', 0, '1', 'Purok 3', 'Alawihao', 'District 2', 'Santa elena', 'Camarines norte', 'Telephone: 09473846382, Fax: , Email: jonard@gmail.com, Website: '),
+(10, 'Rommel James', 'Balce', 'Gacho', 0, '3', 'Purok 2', 'Bagacay', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09738265234, Fax: , Email: rommel@gmail.com, Website: '),
+(11, 'John Lloyd', 'Balce', 'Zuelos', 0, '1', 'Purok 2', 'Kalamunding', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09643826422, Fax: , Email: jzuelos@gmail.com, Website: '),
+(12, 'Mark', 'Balce', 'Bertillo', 0, '3', 'Purok 1', 'Pasig', 'District 2', 'Daet', 'Camarines norte', 'Telephone: 09634618435, Fax: , Email: markbertillo@gmail.com, Website:');
 
 -- --------------------------------------------------------
 
@@ -214,31 +219,7 @@ CREATE TABLE `propertyowner` (
 --
 
 INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`) VALUES
-(1, 126, 7, 0),
-(14, 108, 1, 1),
-(17, 111, 1, 1),
-(23, 115, 1, 1),
-(33, 125, 7, 0),
-(41, 128, 1, 1),
-(42, 128, 7, 1),
-(43, 129, 7, 1),
-(44, 130, 1, 1),
-(45, 131, 1, 1),
-(46, 132, 7, 1),
-(47, 132, 1, 1),
-(48, 133, 7, 1),
-(49, 134, 7, 1),
-(50, 135, 7, 1),
-(51, 136, 1, 1),
-(52, 137, 7, 1),
-(53, 137, 1, 1),
-(54, 138, 7, 1),
-(55, 138, 1, 1),
-(56, 139, 7, 1),
-(57, 140, 7, 1),
-(58, 141, 7, 1),
-(59, 142, 7, 1),
-(60, 142, 1, 1);
+(61, 143, 12, 1);
 
 -- --------------------------------------------------------
 
@@ -267,20 +248,7 @@ CREATE TABLE `p_info` (
 --
 
 INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`) VALUES
-(129, 7, 12345, 0, 'Province 1', 'Labo', 'District 2', 'Bautista', '', 42355, 234233, '   ', 'affidavit, barangay'),
-(130, 1, 1234, 0, 'Province 1', 'Labo', 'District 1', 'Bautista', '', 0, 4324, '   ', 'barangay'),
-(131, 1, 42342, 0, 'Province 1', 'Labo', 'District 2', 'Bautista', '', 0, 4234, '   ', 'barangay'),
-(132, 7, 432, 0, 'Province 1', 'Labo', 'District 1', 'Kalamunding', '', 0, 23423, '   ', 'barangay'),
-(133, 7, 4324, 0, 'Province 1', 'Labo', 'District 1', 'Kalamunding', '', 0, 4234, '   ', 'barangay'),
-(134, 7, 423, 0, 'Province 1', 'Labo', 'District 2', 'Kalamunding', '', 0, 4324, '   ', 'barangay'),
-(135, 7, 4234, 0, 'Province 1', 'Daet', 'District 2', 'Kalamunding', '', 0, 4234, '   ', 'barangay'),
-(136, 1, 324, 0, 'Province 1', 'Labo', 'District 2', 'Kalamunding', '', 0, 4234, '   ', 'land_tagging'),
-(137, 7, 34534, 0, 'Province 1', 'Daet', 'District 1', 'Kalamunding', '', 0, 4234, '   ', 'affidavit, barangay'),
-(138, 7, 42342, 0, 'Province 2', 'Labo', 'District 1', 'Kalamunding', '', 0, 5234234, '   ', 'affidavit, barangay'),
-(139, 7, 4234, 0, 'Province 1', 'Labo', 'District 1', 'Kalamunding', '', 0, 23423, '   ', 'affidavit, barangay'),
-(140, 7, 4234, 0, 'Province 1', 'Daet', 'District 1', 'Kalamunding', '', 0, 4234, '   ', 'affidavit, barangay'),
-(141, 7, 23432, 0, 'Province 1', 'Labo', 'District 1', 'Kalamunding', '', 0, 423423, '   ', 'affidavit, barangay'),
-(142, 7, 123124, 0, 'Province 1', 'Labo', 'District 1', 'Kalamunding', '', 0, 12345, '   ', 'affidavit, barangay, land_tagg');
+(143, 12, 13, 8, 'Province 1', 'Daet', 'District 2', 'Bautista', '', 6, 100, '55   ', 'affidavit');
 
 -- --------------------------------------------------------
 
@@ -313,19 +281,6 @@ CREATE TABLE `rpu_idnum` (
   `taxability` varchar(20) NOT NULL,
   `effectivity` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `rpu_idnum`
---
-
-INSERT INTO `rpu_idnum` (`rpu_id`, `arp`, `pin`, `taxability`, `effectivity`) VALUES
-(38, 12314514, 12312412, 'special', '1234'),
-(39, 12354, 12345, 'special', '12325'),
-(40, 123545, 123115, 'exempt', '1234'),
-(41, 213423, 25234, 'exempt', '23453'),
-(42, 23445, 235256, 'special', '1231'),
-(43, 23544, 23523, 'exempt', '4235'),
-(44, 1234567, 44, 'special', '4235532');
 
 -- --------------------------------------------------------
 
@@ -361,8 +316,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `last_name`, `first_name`, `middle_name`, `gender`, `birthdate`, `marital_status`, `tin`, `house_number`, `street`, `barangay`, `district`, `municipality`, `province`, `contact_number`, `email`, `status`, `user_type`) VALUES
-(6, 'username', '$2y$10$hUAqqmcCIDXnVvR81hmjuO7r.2x3tnlKu6yruJFKjr6LnIoPgnRK.', 'name', 'user', 'hatdog', 'Male', '2003-11-14', 'Single', '1234', '1', '1', '1', '1', '1', '1', '1', 'testing@testing.com', 1, 'user'),
-(8, 'RIP_FISHY12', '$2y$10$smEhcMQrkEwgF/Whm1BrDeT0ru.898kqGKwEjVl1HhkR7Bpj/vdP.', 'Zuelos', 'Jomel', 'Villacruel', 'Female', '2012-12-19', 'Married', '32423423', '32', 'Luzaragga', 'Kalamunding', '2', 'Labo', 'Camarines Norte', '09923648721', 'sbjomel19@gmail.com', 0, 'admin');
+(8, 'RIP_FISHY12', '$2y$10$smEhcMQrkEwgF/Whm1BrDeT0ru.898kqGKwEjVl1HhkR7Bpj/vdP.', 'Zuelos', 'Jomel', 'Villacruel', 'Female', '2012-12-19', 'Married', '32423423', '32', 'Luzaragga', 'Kalamunding', '2', 'Labo', 'Camarines Norte', '09923648721', 'sbjomel19@gmail.com', 1, 'admin'),
+(9, 'admin', '$2y$10$cyc4ZGr2yJ6FhQWqomCbQuNbWB9ADdj0HQAFE2U4dU.fR9aRdteha', 'Admin', 'Admin', 'Admin', 'Male', '2001-11-11', 'Single', '000-123-456-789', '5', 'Purok', '66', '18', '14', 'Camarines Norte', '09123456789', 'admin@gmail.com', 1, 'admin'),
+(10, 'user', '$2y$10$XCD.AAvKsPiW0N5LsPJLNO8QlVaX3pcx2hBWCc5R3/951/g2tkTEi', 'User', 'User', 'User', 'Male', '2002-02-02', 'Single', '000-321-654-987', '1', 'Purok 2', '71', '18', '4', 'Camarines Norte', '09876543210', 'user@gmail.com', 1, 'user');
 
 --
 -- Indexes for dumped tables
@@ -388,12 +344,6 @@ ALTER TABLE `faas`
   ADD PRIMARY KEY (`faas_id`),
   ADD KEY `propertyowner_id` (`propertyowner_id`(768)),
   ADD KEY `pro_id` (`pro_id`);
-
---
--- Indexes for table `land`
---
-ALTER TABLE `land`
-  ADD PRIMARY KEY (`land_id`);
 
 --
 -- Indexes for table `municipality`
@@ -450,49 +400,43 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `brgy`
 --
 ALTER TABLE `brgy`
-  MODIFY `brgy_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `brgy_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- AUTO_INCREMENT for table `district`
 --
 ALTER TABLE `district`
-  MODIFY `district_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `district_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `faas`
 --
 ALTER TABLE `faas`
-  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
-
---
--- AUTO_INCREMENT for table `land`
---
-ALTER TABLE `land`
-  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `municipality`
 --
 ALTER TABLE `municipality`
-  MODIFY `m_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `m_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `owners_tb`
 --
 ALTER TABLE `owners_tb`
-  MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `propertyowner`
 --
 ALTER TABLE `propertyowner`
-  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT for table `p_info`
 --
 ALTER TABLE `p_info`
-  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=143;
+  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=144;
 
 --
 -- AUTO_INCREMENT for table `region`
@@ -510,7 +454,7 @@ ALTER TABLE `rpu_idnum`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Constraints for dumped tables
