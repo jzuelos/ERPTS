@@ -1,3 +1,17 @@
+<?php
+session_start(); // Start session at the top
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+require_once 'database.php'; // Include your database connection
+
+$conn = Database::getInstance();
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+?>
+
 <!doctype html>
 <html lang="en">
 
@@ -60,7 +74,6 @@
     </div>
   </nav>
 
-
   <!-- Main Body -->
   <main class="container my-5">
     <!-- Back Button (Positioned to the top left) -->
@@ -75,174 +88,169 @@
       <h2 class="text-secondary font-weight-bold" style="font-size: 2.5rem;">Location</h2>
     </div>
 
-<!-- Location Table Section -->
-<div class="card border-0 shadow p-4 rounded-3 mb-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <?php
+    // Fetch Municipality Data
+    $municipalityQuery = "SELECT m.m_id, m.m_code, m.m_description, m.m_status, r.r_no 
+                      FROM municipality m
+                      JOIN region r ON m.r_id = r.r_id";
+    $municipalityResult = mysqli_query($conn, $municipalityQuery);
+
+    // Fetch District Data
+    $districtQuery = "SELECT d.district_id, d.district_code, d.description, d.status, m.m_description 
+                  FROM district d
+                  JOIN municipality m ON d.m_id = m.m_id";
+    $districtResult = mysqli_query($conn, $districtQuery);
+
+    // Fetch Barangay Data
+    $barangayQuery = "SELECT b.brgy_id, b.brgy_code, b.brgy_name, b.status, m.m_description 
+                  FROM brgy b
+                  JOIN municipality m ON b.m_id = m.m_id";
+    $barangayResult = mysqli_query($conn, $barangayQuery);
+    ?>
+
+    <!-- Location Table Section -->
+    <div class="card border-0 shadow p-4 rounded-3 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
         <h5 class="section-title mb-0">Location Information</h5>
         <div class="d-flex align-items-center">
-            <!-- Search Bar -->
-            <div class="input-group me-4" style="width: 250px;">
-                <input type="text" class="form-control border-start-0" id="tableSearch" placeholder="Search...">
-                <span class="input-group-text bg-transparent border-end-0">
-                    <i class="fas fa-search"></i>
-                </span>
-            </div>
-            
-            <!-- Dropdown -->
-            <div class="dropdown ml-5">
-                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="locationTypeDropdown" 
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                    Municipality
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="locationTypeDropdown">
-                    <li><a class="dropdown-item" href="#" onclick="changeLocationType('Municipality')">Municipality</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="changeLocationType('District')">District</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="changeLocationType('Barangay')">Barangay</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
+          <!-- Search Bar -->
+          <div class="input-group me-4" style="width: 250px;">
+            <input type="text" class="form-control border-start-0" id="tableSearch" placeholder="Search...">
+            <span class="input-group-text bg-transparent border-end-0">
+              <i class="fas fa-search"></i>
+            </span>
+          </div>
 
-    <!-- Table Container with proper padding -->
-    <div class="px-3">
+          <!-- Dropdown -->
+          <div class="dropdown ml-5">
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="locationTypeDropdown"
+              data-bs-toggle="dropdown" aria-expanded="false">
+              Municipality
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="locationTypeDropdown">
+              <li><a class="dropdown-item" href="#" onclick="changeLocationType('Municipality')">Municipality</a></li>
+              <li><a class="dropdown-item" href="#" onclick="changeLocationType('District')">District</a></li>
+              <li><a class="dropdown-item" href="#" onclick="changeLocationType('Barangay')">Barangay</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Municipality Table -->
+      <div class="px-3">
         <div class="table-responsive rounded">
-            <!-- Municipality Table (Default) -->
-            <table class="table table-hover align-middle mb-0" id="municipalityTable">
-                <thead class="table-light">
-                    <tr>
-                        <th style="width: 20%">Region</th>
-                        <th style="width: 15%">Code</th>
-                        <th style="width: 35%">Description</th>
-                        <th style="width: 15%">Status</th>
-                        <th style="width: 15%">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Region IV-A</td>
-                        <td>MUN-001</td>
-                        <td>Sample Municipality</td>
-                        <td><span class="badge bg-success-subtle text-success border border-success border-opacity-25">Active</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" title="Delete">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Region IV-A</td>
-                        <td>MUN-002</td>
-                        <td>Inactive Municipality</td>
-                        <td><span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25">Inactive</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" title="Delete">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+          <table class="table table-hover align-middle mb-0" id="municipalityTable">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 20%">Region</th>
+                <th style="width: 15%">Code</th>
+                <th style="width: 35%">Description</th>
+                <th style="width: 15%">Status</th>
+                <th style="width: 15%">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php while ($row = mysqli_fetch_assoc($municipalityResult)) { ?>
+                <tr>
+                  <td><?= $row['r_no']; ?></td>
+                  <td><?= $row['m_code']; ?></td>
+                  <td><?= $row['m_description']; ?></td>
+                  <td>
+                    <span class="badge <?= $row['m_status'] == 'Active' ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'; ?>">
+                      <?= ucfirst($row['m_status']); ?>
+                    </span>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" title="Delete">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </td>
+                </tr>
+              <?php } ?>
+            </tbody>
+          </table>
 
-            <!-- District Table (Hidden by Default) -->
-            <table class="table table-hover align-middle mb-0 d-none" id="districtTable">
-                <thead class="table-light">
-                    <tr>
-                        <th style="width: 20%">Municipality/City</th>
-                        <th style="width: 15%">Code</th>
-                        <th style="width: 35%">Description</th>
-                        <th style="width: 15%">Status</th>
-                        <th style="width: 15%">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Sample City</td>
-                        <td>DIST-001</td>
-                        <td>Central District</td>
-                        <td><span class="badge bg-success-subtle text-success border border-success border-opacity-25">Active</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" title="Delete">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Sample City</td>
-                        <td>DIST-002</td>
-                        <td>Old District</td>
-                        <td><span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25">Inactive</span></td>                    
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" title="Delete">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+          <!-- District Table -->
+          <table class="table table-hover align-middle mb-0 d-none" id="districtTable">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 20%">Municipality/City</th>
+                <th style="width: 15%">Code</th>
+                <th style="width: 35%">Description</th>
+                <th style="width: 15%">Status</th>
+                <th style="width: 15%">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php while ($row = mysqli_fetch_assoc($districtResult)) { ?>
+                <tr>
+                  <td><?= $row['m_description']; ?></td>
+                  <td><?= $row['district_code']; ?></td>
+                  <td><?= $row['description']; ?></td>
+                  <td>
+                    <span class="badge <?= $row['status'] == 'Active' ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'; ?>">
+                      <?= ucfirst($row['status']); ?>
+                    </span>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" title="Delete">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </td>
+                </tr>
+              <?php } ?>
+            </tbody>
+          </table>
 
-            <!-- Barangay Table (Hidden by Default) -->
-            <table class="table table-hover align-middle mb-0 d-none" id="barangayTable">
-                <thead class="table-light">
-                    <tr>
-                        <th style="width: 20%">District/Municipality/City</th>
-                        <th style="width: 15%">Barangay Code</th>
-                        <th style="width: 35%">Name of Barangay</th>
-                        <th style="width: 15%">Status</th>
-                        <th style="width: 15%">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Central District</td>
-                        <td>BRGY-001</td>
-                        <td>Sample Barangay</td>
-                        <td><span class="badge bg-success-subtle text-success border border-success border-opacity-25">Active</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" title="Delete">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Central District</td>
-                        <td>BRGY-002</td>
-                        <td>Closed Barangay</td>
-                        <td><span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25">Inactive</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" title="Delete">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+          <!-- Barangay Table -->
+          <table class="table table-hover align-middle mb-0 d-none" id="barangayTable">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 20%">District/Municipality/City</th>
+                <th style="width: 15%">Barangay Code</th>
+                <th style="width: 35%">Name of Barangay</th>
+                <th style="width: 15%">Status</th>
+                <th style="width: 15%">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php while ($row = mysqli_fetch_assoc($barangayResult)) { ?>
+                <tr>
+                  <td><?= $row['m_description']; ?></td>
+                  <td><?= $row['brgy_code']; ?></td>
+                  <td><?= $row['brgy_name']; ?></td>
+                  <td>
+                    <span class="badge <?= $row['status'] == 'Active' ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'; ?>">
+                      <?= ucfirst($row['status']); ?>
+                    </span>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" title="Delete">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </td>
+                </tr>
+              <?php } ?>
+            </tbody>
+          </table>
         </div>
-    </div>
-</div>
+      </div>
+    </div>  
 
     <!-- Add Table -->
-    <div class="py-4"></div> 
+    <div class="py-4"></div>
     <div class="text-center mb-5">
-  <h2 class="text-secondary font-weight-bold" style="font-size: 2.5rem;">Add Location</h2>
-</div>
+      <h2 class="text-secondary font-weight-bold" style="font-size: 2.5rem;">Add Location</h2>
+    </div>
 
     <!-- Location Selection Options -->
     <div class="row justify-content-center">
@@ -457,28 +465,27 @@
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start">
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
-    <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span> 
+      <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span>
     </div>
   </footer>
 
   <!-- Optional JavaScript -->
   <script>
-function changeLocationType(type) {
-    // Update dropdown button text
-    document.getElementById('locationTypeDropdown').textContent = type;
-    
-    // Hide all tables
-    document.getElementById('municipalityTable').classList.add('d-none');
-    document.getElementById('districtTable').classList.add('d-none');
-    document.getElementById('barangayTable').classList.add('d-none');
-    
-    // Show selected table
-    document.getElementById(type.toLowerCase() + 'Table').classList.remove('d-none');
-}
+    function changeLocationType(type) {
+      // Update dropdown button text
+      document.getElementById('locationTypeDropdown').textContent = type;
 
-</script>
+      // Hide all tables
+      document.getElementById('municipalityTable').classList.add('d-none');
+      document.getElementById('districtTable').classList.add('d-none');
+      document.getElementById('barangayTable').classList.add('d-none');
+
+      // Show selected table
+      document.getElementById(type.toLowerCase() + 'Table').classList.remove('d-none');
+    }
+  </script>
   <script src="http://localhost/ERPTS/main-layout.js"></script>
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
     integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
@@ -487,8 +494,23 @@ function changeLocationType(type) {
     integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
-  <script src="http://localhost/ERPTS/Location.js"></script>
+  <script src="Location.js"></script>
 
+  <script>
+    function changeLocationType(type) {
+      document.getElementById("municipalityTable").classList.add("d-none");
+      document.getElementById("districtTable").classList.add("d-none");
+      document.getElementById("barangayTable").classList.add("d-none");
+
+      if (type === "Municipality") {
+        document.getElementById("municipalityTable").classList.remove("d-none");
+      } else if (type === "District") {
+        document.getElementById("districtTable").classList.remove("d-none");
+      } else if (type === "Barangay") {
+        document.getElementById("barangayTable").classList.remove("d-none");
+      }
+    }
+  </script>
 
 </body>
 
