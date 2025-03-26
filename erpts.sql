@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 26, 2025 at 09:31 PM
+-- Generation Time: Mar 26, 2025 at 10:30 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -104,7 +104,8 @@ CREATE TABLE `faas` (
 --
 
 INSERT INTO `faas` (`faas_id`, `propertyowner_id`, `pro_id`, `rpu_idno`, `land_id`, `plants_id`, `valuation_id`) VALUES
-(32, '[61]', 143, NULL, NULL, NULL, NULL);
+(32, '[61]', 143, 45, NULL, NULL, NULL),
+(33, '[62,63]', 144, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -134,8 +135,17 @@ CREATE TABLE `land` (
   `area` varchar(250) NOT NULL,
   `actual_use` varchar(250) NOT NULL,
   `unit_value` int(50) NOT NULL,
-  `market_value` int(50) NOT NULL
+  `market_value` int(50) NOT NULL,
+  `faas_id` int(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `land`
+--
+
+INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `boundaries`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`, `faas_id`) VALUES
+(6, 46, 'PSU-98765', '', 'Containing an area of 1,000 square meters, more or less.', 'Dioneda', 'Renz', 'Balce', '09932007821', 'rdioneda4@gmail.com', '1', 'Purok 5', '', 'Sta. Elena', 'Camarines Norte', '', 'Residential', 'Rice Land', '1500', 'Farmland', 2000, 3000000, 32),
+(7, 46, 'Lot 1234, Cad-5678', '', ' A rectangular lot with a frontage of 20 meters along Rizal Street, adjacent to commercial establishments.', 'Reyes', 'Carlos', 'Mendoza', '09171234567', 'carlos.reyes@email.com', '23-B', 'Mabini', '', 'San Fernando ', 'Pampanga', 'A 1,500 sq. m. residential lot along Rizal Street, fully fenced with road access and nearby utilities.', 'Residential', 'High-density Housing', '1500', 'Residential Property', 2000, 3000000, 32);
 
 -- --------------------------------------------------------
 
@@ -219,7 +229,9 @@ CREATE TABLE `propertyowner` (
 --
 
 INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`) VALUES
-(61, 143, 12, 1);
+(61, 143, 12, 1),
+(62, 144, 12, 1),
+(63, 144, 9, 1);
 
 -- --------------------------------------------------------
 
@@ -248,7 +260,8 @@ CREATE TABLE `p_info` (
 --
 
 INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`) VALUES
-(143, 12, 13, 8, 'Province 1', 'Daet', 'District 2', 'Bautista', '', 6, 100, '55   ', 'affidavit');
+(143, 12, 13, 8, 'Province 1', 'Daet', 'District 2', 'Bautista', '', 6, 100, '55   ', 'affidavit'),
+(144, 12, 23, 0, 'Province 1', 'Daet', 'District 1', 'Kalamunding', '', 0, 302, '   ', 'affidavit, barangay');
 
 -- --------------------------------------------------------
 
@@ -281,6 +294,13 @@ CREATE TABLE `rpu_idnum` (
   `taxability` varchar(20) NOT NULL,
   `effectivity` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `rpu_idnum`
+--
+
+INSERT INTO `rpu_idnum` (`rpu_id`, `arp`, `pin`, `taxability`, `effectivity`) VALUES
+(45, 2147483647, 789456, 'exempt', '2023');
 
 -- --------------------------------------------------------
 
@@ -344,6 +364,13 @@ ALTER TABLE `faas`
   ADD PRIMARY KEY (`faas_id`),
   ADD KEY `propertyowner_id` (`propertyowner_id`(768)),
   ADD KEY `pro_id` (`pro_id`);
+
+--
+-- Indexes for table `land`
+--
+ALTER TABLE `land`
+  ADD PRIMARY KEY (`land_id`),
+  ADD KEY `faas_id` (`faas_id`);
 
 --
 -- Indexes for table `municipality`
@@ -412,7 +439,13 @@ ALTER TABLE `district`
 -- AUTO_INCREMENT for table `faas`
 --
 ALTER TABLE `faas`
-  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+
+--
+-- AUTO_INCREMENT for table `land`
+--
+ALTER TABLE `land`
+  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `municipality`
@@ -430,13 +463,13 @@ ALTER TABLE `owners_tb`
 -- AUTO_INCREMENT for table `propertyowner`
 --
 ALTER TABLE `propertyowner`
-  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `p_info`
 --
 ALTER TABLE `p_info`
-  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=144;
+  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=145;
 
 --
 -- AUTO_INCREMENT for table `region`
@@ -448,7 +481,7 @@ ALTER TABLE `region`
 -- AUTO_INCREMENT for table `rpu_idnum`
 --
 ALTER TABLE `rpu_idnum`
-  MODIFY `rpu_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `rpu_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -473,10 +506,22 @@ ALTER TABLE `faas`
   ADD CONSTRAINT `pro_id` FOREIGN KEY (`pro_id`) REFERENCES `p_info` (`p_id`);
 
 --
+-- Constraints for table `land`
+--
+ALTER TABLE `land`
+  ADD CONSTRAINT `faas_id` FOREIGN KEY (`faas_id`) REFERENCES `faas` (`faas_id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `municipality`
 --
 ALTER TABLE `municipality`
   ADD CONSTRAINT `municipality_ibfk_1` FOREIGN KEY (`r_id`) REFERENCES `region` (`r_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `propertyowner`
+--
+ALTER TABLE `propertyowner`
+  ADD CONSTRAINT `property_id` FOREIGN KEY (`property_id`) REFERENCES `p_info` (`p_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `p_info`
