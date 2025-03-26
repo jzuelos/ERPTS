@@ -222,7 +222,7 @@ if ($conn->connect_error) {
             <tbody>
               <?php while ($row = mysqli_fetch_assoc($barangayResult)) { ?>
                 <tr>
-                  <td><?= $row['m_description']; ?></td>
+                  <td><?= $row['m_id']; ?></td>
                   <td><?= $row['brgy_code']; ?></td>
                   <td><?= $row['brgy_name']; ?></td>
                   <td>
@@ -244,7 +244,7 @@ if ($conn->connect_error) {
           </table>
         </div>
       </div>
-    </div>  
+    </div>
 
     <!-- Add Table -->
     <div class="py-4"></div>
