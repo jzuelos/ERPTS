@@ -17,14 +17,30 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
+// Get p_id from URL
+$p_id = isset($_GET['p_id']) ? (int)$_GET['p_id'] : 0;
+
+// Fetch faas_id using p_id
+$faas_id = 0;
+$query = $conn->prepare("SELECT faas_id FROM faas WHERE pro_id = ?");
+$query->bind_param("i", $p_id);
+$query->execute();
+$query->bind_result($faas_id);
+$query->fetch();
+$query->close();
+
+// Ensure we found a valid faas_id
+if ($faas_id == 0) {
+  die("Error: No FAAS record found for this property.");
+}
+
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  // Ensure integer fields are properly cast
   $oct_no = isset($_POST['oct_no']) ? (int)$_POST['oct_no'] : 0;
   $unit_value = isset($_POST['unit_value']) ? (int)$_POST['unit_value'] : 0;
   $market_value = isset($_POST['market_value']) ? (int)$_POST['market_value'] : 0;
 
-  // Collect all other input fields (strings)
+  // Collect all other input fields
   $survey_no = $_POST['survey_no'] ?? '';
   $boundaries = $_POST['boundaries'] ?? '';
   $boun_desc = $_POST['boun_desc'] ?? '';
@@ -45,10 +61,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $actual_use = $_POST['actual_use'] ?? '';
 
   // Prepare and execute the insert query
-  $stmt = $conn->prepare("INSERT INTO land (oct_no, survey_no, boundaries, boun_desc, last_name, first_name, middle_name, contact_no, email, house_street, barangay, district, municipality, province, land_desc, classification, sub_class, area, actual_use, unit_value, market_value)
-                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+  $stmt = $conn->prepare("INSERT INTO land (faas_id, oct_no, survey_no, boundaries, boun_desc, last_name, first_name, middle_name, contact_no, email, house_street, barangay, district, municipality, province, land_desc, classification, sub_class, area, actual_use, unit_value, market_value)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
   $stmt->bind_param(
-    "issssssssssssssssssii",
+    "iissssssssssssssssssii",
+    $faas_id,       // Foreign Key faas_id
     $oct_no,
     $survey_no,
     $boundaries,
@@ -73,9 +91,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   );
 
   if ($stmt->execute()) {
-    echo "<script>alert('Success'); window.location='Land.php';</script>";
+    echo "Land record added successfully!";
   } else {
-    echo "<script>alert('Error: " . $stmt->error . "');</script>";
+    echo "Error: " . $stmt->error;
   }
 
   $stmt->close();
@@ -467,7 +485,6 @@ $conn->close();
             <!-- Property Assessment Section -->
             <!-- Certification Section -->
             <!-- Miscellaneous Section -->
-
           </div>
 
           <div class="modal-footer">
