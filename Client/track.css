@@ -1,0 +1,69 @@
+:root {
+    --primary: #379777;
+    --primary-dark: #2a6b5a;
+    --accent: #FFED92;
+    --white: #FFFFFF;
+}
+
+body {
+    background-color: var(--white);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.bg-primary-custom {
+    background-color: var(--primary) !important;
+}
+
+.text-primary-custom {
+    color: var(--primary) !important;
+}
+
+.btn-primary-custom {
+    background-color: var(--primary);
+    border-color: var(--primary-dark);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.btn-primary-custom:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card-custom {
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+}
+
+.card-custom:hover {
+    transform: translateY(-5px);
+}
+
+.card-header-custom {
+    background-color: var(--primary);
+    color: white;
+    padding: 1.25rem;
+    border-bottom: none;
+}
+
+.info-section {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-left: 4px solid var(--primary);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.form-control-custom {
+    border: 1px solid #e0e0e0;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+}
+
+.form-control-custom:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(55, 151, 119, 0.25);
+}
