@@ -201,7 +201,7 @@
                 <div class="col-md-4 form-group mb-3">
                     <label for="middlename" class="form-label">Middle Name:</label>
                     <input type="text" id="middlename" name="middlename" class="form-control"
-                        placeholder="Enter middle name (optional)" style="border-radius: 6px; border: 1px solid #379777;">
+                        placeholder="Middle name (optional)" style="border-radius: 6px; border: 1px solid #379777;">
                 </div>
             </div>
 

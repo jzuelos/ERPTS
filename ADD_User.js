@@ -33,3 +33,21 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .catch(error => console.error('Error fetching location data:', error));
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    function capitalizeWords(input) {
+        input.value = input.value.replace(/\b\w/g, char => char.toUpperCase());
+    }
+
+    document.getElementById("lastname").addEventListener("input", function () {
+        capitalizeWords(this);
+    });
+
+    document.getElementById("firstname").addEventListener("input", function () {
+        capitalizeWords(this);
+    });
+
+    document.getElementById("middlename").addEventListener("input", function () {
+        capitalizeWords(this);
+    });
+});
