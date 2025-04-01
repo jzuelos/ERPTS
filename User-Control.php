@@ -173,7 +173,12 @@ $conn->close();
             <div class="alert alert-info text-center" role="alert">
                 Logged in as Admin
             </div>
-
+            
+            <div class="mb-4 d-flex justify-content-start">
+      <a href="Admin-Page-2.php" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left"></i> Back
+      </a>
+    </div>
             <h3 class="mb-4">Users</h3>
             <div class="button-group mb-4">
                 <a href="ADD_User.php" class="btn btn-outline-primary">Add User</a>
@@ -388,7 +393,11 @@ $conn->close();
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.bundle.min.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
+    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 </body>
 
 </html>
