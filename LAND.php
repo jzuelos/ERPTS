@@ -18,7 +18,7 @@ if ($conn->connect_error) {
 }
 
 // Get p_id from URL
-$p_id = isset($_GET['p_id']) ? (int)$_GET['p_id'] : 0;
+$p_id = isset($_GET['p_id']) ? (int) $_GET['p_id'] : 0;
 
 // Fetch faas_id using p_id
 $faas_id = 0;
@@ -36,9 +36,9 @@ if ($faas_id == 0) {
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  $oct_no = isset($_POST['oct_no']) ? (int)$_POST['oct_no'] : 0;
-  $unit_value = isset($_POST['unit_value']) ? (int)$_POST['unit_value'] : 0;
-  $market_value = isset($_POST['market_value']) ? (int)$_POST['market_value'] : 0;
+  $oct_no = isset($_POST['oct_no']) ? (int) $_POST['oct_no'] : 0;
+  $unit_value = isset($_POST['unit_value']) ? (int) $_POST['unit_value'] : 0;
+  $market_value = isset($_POST['market_value']) ? (int) $_POST['market_value'] : 0;
 
   // Collect all other input fields
   $survey_no = $_POST['survey_no'] ?? '';
@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
   $stmt->bind_param(
-    "iissssssssssssssssssii",
+    "iissssssssssssssssisii",
     $faas_id,       // Foreign Key faas_id
     $oct_no,
     $survey_no,
@@ -91,9 +91,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   );
 
   if ($stmt->execute()) {
-    echo "Land record added successfully!";
+    $p_id = isset($_GET['p_id']) ? htmlspecialchars($_GET['p_id']) : '';
+
+    echo "<script>
+            alert('Land record added successfully!');
+            window.location.href = 'FAAS.php?id=$p_id';
+          </script>";
+    exit(); // Stop further script execution
   } else {
-    echo "Error: " . $stmt->error;
+    echo "<script>alert('Error: " . addslashes($stmt->error) . "');</script>";
   }
 
   $stmt->close();
@@ -287,97 +293,119 @@ $conn->close();
       </div>
 
       <!-- Value Adjustment Factor Section -->
-<h5 class="section-title mt-5">Value Adjustment Factor</h5>
-<div class="row">
-  <div class="col-md-4 mb-4">
-    <div class="mb-3">
-      <label for="adjustmentFactor" class="form-label">Adjustment Factor</label>
-      <input type="text" id="adjustmentFactor" class="form-control" placeholder="Enter adjustment factor" disabled>
-    </div>
-  </div>
-  <div class="col-md-4 mb-4">
-    <div class="mb-3">
-      <label for="percentAdjustment" class="form-label">% Adjustment</label>
-      <input type="text" id="percentAdjustment" class="form-control" placeholder="Enter % adjustment" disabled>
-    </div>
-  </div>
-  <div class="col-md-4 mb-4">
-    <div class="mb-3">
-      <label for="valueAdjustment" class="form-label">Value Adjustment</label>
-      <input type="text" id="valueAdjustment" class="form-control" placeholder="Enter value adjustment" disabled>
-    </div>
-  </div>
-  <div class="col-md-4 mb-4">
-    <div class="mb-3">
-      <label for="adjustedMarketValue" class="form-label">Adjusted Market Value</label>
-      <input type="text" id="adjustedMarketValue" class="form-control" placeholder="Enter adjusted market value" disabled>
-    </div>
-  </div>
-</div>
+      <h5 class="section-title mt-5">Value Adjustment Factor</h5>
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <div class="mb-3">
+            <label for="adjustmentFactor" class="form-label">Adjustment Factor</label>
+            <input type="text" id="adjustmentFactor" class="form-control" placeholder="Enter adjustment factor"
+              disabled>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="mb-3">
+            <label for="percentAdjustment" class="form-label">% Adjustment</label>
+            <input type="text" id="percentAdjustment" class="form-control" placeholder="Enter % adjustment" disabled>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="mb-3">
+            <label for="valueAdjustment" class="form-label">Value Adjustment</label>
+            <input type="text" id="valueAdjustment" class="form-control" placeholder="Enter value adjustment" disabled>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="mb-3">
+            <label for="adjustedMarketValue" class="form-label">Adjusted Market Value</label>
+            <input type="text" id="adjustedMarketValue" class="form-control" placeholder="Enter adjusted market value"
+              disabled>
+          </div>
+        </div>
+      </div>
 
-<!-- Property Assessment Section -->
-<h5 class="section-title mt-5">Property Assessment</h5>
-<div class="row">
-  <div class="col-md-6 mb-4">
-    <div class="mb-3">
-      <label for="assessmentLevel" class="form-label">Assessment Level</label>
-      <input type="text" id="assessmentLevel" class="form-control" placeholder="Enter assessment level" disabled>
-    </div>
-  </div>
-  <div class="col-md-6 mb-4">
-    <div class="mb-3">
-      <label for="recommendedAssessmentLevel" class="form-label">% Recommended Assessment Level</label>
-      <input type="text" id="recommendedAssessmentLevel" class="form-control" 
-             placeholder="Enter recommended assessment level" disabled>
-    </div>
-  </div>
-  <div class="col-md-6 mb-4">
-    <div class="mb-3">
-      <label for="assessedValue" class="form-label">Assessed Value</label>
-      <input type="text" id="assessedValue" class="form-control" placeholder="Enter assessed value" disabled>
-    </div>
-  </div>
-</div>
+      <!-- Property Assessment Section -->
+      <h5 class="section-title mt-5">Property Assessment</h5>
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <div class="mb-3">
+            <label for="assessmentLevel" class="form-label">Assessment Level</label>
+            <input type="text" id="assessmentLevel" class="form-control" placeholder="Enter assessment level" disabled>
+          </div>
+        </div>
+        <div class="col-md-6 mb-4">
+          <div class="mb-3">
+            <label for="recommendedAssessmentLevel" class="form-label">% Recommended Assessment Level</label>
+            <input type="text" id="recommendedAssessmentLevel" class="form-control"
+              placeholder="Enter recommended assessment level" disabled>
+          </div>
+        </div>
+        <div class="col-md-6 mb-4">
+          <div class="mb-3">
+            <label for="assessedValue" class="form-label">Assessed Value</label>
+            <input type="text" id="assessedValue" class="form-control" placeholder="Enter assessed value" disabled>
+          </div>
+        </div>
+      </div>
 
       <!-- Land Appraisal Section -->
       <h5 class="section-title mt-5">Land Appraisal</h5>
+
       <div class="row">
-        <div class="col-md-4 mb-4">
+        <div class="col-md-6 col-12 mb-4">
           <div class="mb-3">
             <label for="description" class="form-label">Description</label>
             <input type="text" id="description" class="form-control" placeholder="Enter description" disabled>
           </div>
         </div>
-        <div class="col-md-4 mb-4">
+        <div class="col-md-6 col-12 mb-4">
           <div class="mb-3">
             <label for="classification" class="form-label">Classification</label>
             <input type="text" id="classification" class="form-control" placeholder="Enter classification" disabled>
           </div>
         </div>
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="subClass" class="form-label">Sub-Class</label>
-            <input type="text" id="subClass" class="form-control" placeholder="Enter sub-class" disabled>
-          </div>
-        </div>
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="area" class="form-label">Area (sq m)</label>
-            <input type="text" id="area" class="form-control" placeholder="Enter area" disabled>
-          </div>
-        </div>
-        <div class="col-md-4 mb-4">
+      </div>
+
+
+      <div class="row">
+        <div class="col-md-6 col-12 mb-4">
           <div class="mb-3">
             <label for="actualUse" class="form-label">Actual Use</label>
             <input type="text" id="actualUse" class="form-control" placeholder="Enter actual use" disabled>
           </div>
         </div>
+        <div class="col-md-6 col-12 mb-4">
+          <div class="mb-3">
+            <label for="subClass" class="form-label">Sub-Class</label>
+            <input type="text" id="subClass" class="form-control" placeholder="Enter sub-class" disabled>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <div class="mb-3">
+            <label for="area" class="form-label">Area</label>
+            <div class="input-group">
+              <input type="text" id="area" class="form-control" placeholder="Enter area in sq m" disabled>
+              <div class="input-group-text">
+                <label><input type="radio" name="areaUnit" value="sqm" checked> Sq m</label>
+                <label class="ms-2"><input type="radio" name="areaUnit" value="hectare" disabled> Ha</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
         <div class="col-md-4 mb-4">
           <div class="mb-3">
             <label for="unitValue" class="form-label">Unit Value</label>
             <input type="text" id="unitValue" class="form-control" placeholder="Enter unit value" disabled>
           </div>
         </div>
+      </div>
+
+      <div class="row">
         <div class="col-md-4 mb-4">
           <div class="mb-3">
             <label for="marketValue" class="form-label">Market Value</label>
@@ -385,6 +413,7 @@ $conn->close();
           </div>
         </div>
       </div>
+
       <!-- Print Button at Bottom Right -->
       <div class="d-flex justify-content-end mt-4">
         <button type="button" class="btn btn-outline-secondary py-2 px-4" onclick="openPrintPage()"
@@ -392,6 +421,7 @@ $conn->close();
           <i class="fas fa-print me-2"></i>Print
         </button>
       </div>
+
     </div>
     </div>
   </section>
@@ -411,11 +441,13 @@ $conn->close();
             <div class="row">
               <div class="col-md-6 mb-4">
                 <label for="octTctNumberModal" class="form-label">OCT/TCT Number</label>
-                <input type="text" id="octTctNumberModal" name="oct_no" class="form-control" placeholder="Enter OCT/TCT Number">
+                <input type="text" id="octTctNumberModal" name="oct_no" class="form-control"
+                  placeholder="Enter OCT/TCT Number">
               </div>
               <div class="col-md-6 mb-4">
                 <label for="surveyNumberModal" class="form-label">Survey Number</label>
-                <input type="text" id="surveyNumberModal" name="survey_no" class="form-control" placeholder="Enter Survey Number">
+                <input type="text" id="surveyNumberModal" name="survey_no" class="form-control"
+                  placeholder="Enter Survey Number">
               </div>
             </div>
 
@@ -423,26 +455,31 @@ $conn->close();
             <div class="row">
               <div class="col-md-3 mb-4">
                 <label for="northModal" class="form-label">North Boundary</label>
-                <input type="text" id="northModal" name="north_boundary" class="form-control" placeholder="Enter North Boundary">
+                <input type="text" id="northModal" name="north_boundary" class="form-control"
+                  placeholder="Enter North Boundary">
               </div>
               <div class="col-md-3 mb-4">
                 <label for="southModal" class="form-label">South Boundary</label>
-                <input type="text" id="southModal" name="south_boundary" class="form-control" placeholder="Enter South Boundary">
+                <input type="text" id="southModal" name="south_boundary" class="form-control"
+                  placeholder="Enter South Boundary">
               </div>
               <div class="col-md-3 mb-4">
                 <label for="eastModal" class="form-label">East Boundary</label>
-                <input type="text" id="eastModal" name="east_boundary" class="form-control" placeholder="Enter East Boundary">
+                <input type="text" id="eastModal" name="east_boundary" class="form-control"
+                  placeholder="Enter East Boundary">
               </div>
               <div class="col-md-3 mb-4">
                 <label for="westModal" class="form-label">West Boundary</label>
-                <input type="text" id="westModal" name="west_boundary" class="form-control" placeholder="Enter West Boundary">
+                <input type="text" id="westModal" name="west_boundary" class="form-control"
+                  placeholder="Enter West Boundary">
               </div>
             </div>
 
             <!-- Boundary Description -->
             <div class="mb-4">
               <label for="boundaryDescriptionModal" class="form-label">Boundary Description</label>
-              <textarea class="form-control" id="boundaryDescriptionModal" name="boun_desc" rows="2" placeholder="Enter boundary description"></textarea>
+              <textarea class="form-control" id="boundaryDescriptionModal" name="boun_desc" rows="2"
+                placeholder="Enter boundary description"></textarea>
             </div>
 
             <!-- Administrator Information -->
@@ -450,15 +487,18 @@ $conn->close();
             <div class="row">
               <div class="col-md-4 mb-4">
                 <label for="adminLastNameModal" class="form-label">Last Name</label>
-                <input type="text" id="adminLastNameModal" name="last_name" class="form-control" placeholder="Enter last name">
+                <input type="text" id="adminLastNameModal" name="last_name" class="form-control"
+                  placeholder="Enter last name">
               </div>
               <div class="col-md-4 mb-4">
                 <label for="adminFirstNameModal" class="form-label">First Name</label>
-                <input type="text" id="adminFirstNameModal" name="first_name" class="form-control" placeholder="Enter first name">
+                <input type="text" id="adminFirstNameModal" name="first_name" class="form-control"
+                  placeholder="Enter first name">
               </div>
               <div class="col-md-4 mb-4">
                 <label for="adminMiddleNameModal" class="form-label">Middle Name</label>
-                <input type="text" id="adminMiddleNameModal" name="middle_name" class="form-control" placeholder="Enter middle name">
+                <input type="text" id="adminMiddleNameModal" name="middle_name" class="form-control"
+                  placeholder="Enter middle name">
               </div>
             </div>
 
@@ -466,7 +506,8 @@ $conn->close();
             <div class="row">
               <div class="col-md-6 mb-4">
                 <label for="adminContactModal" class="form-label">Contact Number</label>
-                <input type="text" id="adminContactModal" name="contact_no" class="form-control" placeholder="Enter contact number">
+                <input type="text" id="adminContactModal" name="contact_no" class="form-control"
+                  placeholder="Enter contact number">
               </div>
               <div class="col-md-6 mb-4">
                 <label for="adminEmailModal" class="form-label">Email</label>
@@ -479,110 +520,139 @@ $conn->close();
             <div class="row">
               <div class="col-md-3 mb-4">
                 <label for="adminAddressNumberModal" class="form-label">House Number</label>
-                <input type="text" id="adminAddressNumberModal" name="house_street" class="form-control" placeholder="Enter house number">
+                <input type="text" id="adminAddressNumberModal" name="house_street" class="form-control"
+                  placeholder="Enter house number">
               </div>
               <div class="col-md-3 mb-4">
                 <label for="adminAddressStreetModal" class="form-label">Street</label>
-                <input type="text" id="adminAddressStreetModal" name="barangay" class="form-control" placeholder="Enter street">
+                <input type="text" id="adminAddressStreetModal" name="barangay" class="form-control"
+                  placeholder="Enter street">
               </div>
               <div class="col-md-3 mb-4">
                 <label for="adminAddressMunicipalityModal" class="form-label">Municipality</label>
-                <input type="text" id="adminAddressMunicipalityModal" name="municipality" class="form-control" placeholder="Enter municipality">
+                <input type="text" id="adminAddressMunicipalityModal" name="municipality" class="form-control"
+                  placeholder="Enter municipality">
               </div>
               <div class="col-md-3 mb-4">
                 <label for="adminAddressProvinceModal" class="form-label">Province</label>
-                <input type="text" id="adminAddressProvinceModal" name="province" class="form-control" placeholder="Enter province">
+                <input type="text" id="adminAddressProvinceModal" name="province" class="form-control"
+                  placeholder="Enter province">
               </div>
             </div>
 
-            <!-- Value Adjustment Factor Section in Modal -->
-<h5 class="section-title mt-5">Value Adjustment Factor</h5>
-<div class="row">
-  <div class="col-md-4 mb-4">
-    <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
-    <input type="text" id="adjustmentFactorModal" name="adjustment_factor" class="form-control" 
-           placeholder="Enter adjustment factor">
-  </div>
-  <div class="col-md-4 mb-4">
-    <label for="percentAdjustmentModal" class="form-label">% Adjustment</label>
-    <input type="text" id="percentAdjustmentModal" name="percent_adjustment" class="form-control" 
-           placeholder="Enter % adjustment">
-  </div>
-  <div class="col-md-4 mb-4">
-    <label for="valueAdjustmentModal" class="form-label">Value Adjustment</label>
-    <input type="text" id="valueAdjustmentModal" name="value_adjustment" class="form-control" 
-           placeholder="Enter value adjustment">
-  </div>
-  <div class="col-md-4 mb-4">
-    <label for="adjustedMarketValueModal" class="form-label">Adjusted Market Value</label>
-    <input type="text" id="adjustedMarketValueModal" name="adjusted_market_value" class="form-control" 
-           placeholder="Enter adjusted market value">
-  </div>
-</div>
+            <!-- Value Adjustment Factor Section in Modal
+            <h5 class="section-title mt-5">Value Adjustment Factor</h5>
+            <div class="row">
+              <div class="col-md-4 mb-4">
+                <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
+                <input type="text" id="adjustmentFactorModal" name="adjustment_factor" class="form-control"
+                  placeholder="Enter adjustment factor">
+              </div>
+              <div class="col-md-4 mb-4">
+                <label for="percentAdjustmentModal" class="form-label">% Adjustment</label>
+                <input type="text" id="percentAdjustmentModal" name="percent_adjustment" class="form-control"
+                  placeholder="Enter % adjustment">
+              </div>
+              <div class="col-md-4 mb-4">
+                <label for="valueAdjustmentModal" class="form-label">Value Adjustment</label>
+                <input type="text" id="valueAdjustmentModal" name="value_adjustment" class="form-control"
+                  placeholder="Enter value adjustment">
+              </div>
+              <div class="col-md-4 mb-4">
+                <label for="adjustedMarketValueModal" class="form-label">Adjusted Market Value</label>
+                <input type="text" id="adjustedMarketValueModal" name="adjusted_market_value" class="form-control"
+                  placeholder="Enter adjusted market value">
+              </div>
+            </div>
 
-<!-- Property Assessment Section in Modal -->
-<h5 class="section-title mt-5">Property Assessment</h5>
-<div class="row">
-  <div class="col-md-6 mb-4">
-    <label for="assessmentLevelModal" class="form-label">Assessment Level</label>
-    <input type="text" id="assessmentLevelModal" name="assessment_level" class="form-control" 
-           placeholder="Enter assessment level">
-  </div>
-  <div class="col-md-6 mb-4">
-    <label for="recommendedAssessmentLevelModal" class="form-label">% Recommended Assessment Level</label>
-    <input type="text" id="recommendedAssessmentLevelModal" name="recommended_assessment_level" class="form-control" 
-           placeholder="Enter recommended assessment level">
-  </div>
-  <div class="col-md-6 mb-4">
-    <label for="assessedValueModal" class="form-label">Assessed Value</label>
-    <input type="text" id="assessedValueModal" name="assessed_value" class="form-control" 
-           placeholder="Enter assessed value">
-  </div>
-</div>
+            Property Assessment Section in Modal
+            <h5 class="section-title mt-5">Property Assessment</h5>
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <label for="assessmentLevelModal" class="form-label">Assessment Level</label>
+                <input type="text" id="assessmentLevelModal" name="assessment_level" class="form-control"
+                  placeholder="Enter assessment level">
+              </div>
+              <div class="col-md-6 mb-4">
+                <label for="recommendedAssessmentLevelModal" class="form-label">% Recommended Assessment Level</label>
+                <input type="text" id="recommendedAssessmentLevelModal" name="recommended_assessment_level"
+                  class="form-control" placeholder="Enter recommended assessment level">
+              </div>
+              <div class="col-md-6 mb-4">
+                <label for="assessedValueModal" class="form-label">Assessed Value</label>
+                <input type="text" id="assessedValueModal" name="assessed_value" class="form-control"
+                  placeholder="Enter assessed value">
+              </div>
+            </div>
+            -->
 
             <!-- Land Appraisal Section -->
             <h5 class="section-title mt-5">Land Appraisal</h5>
             <div class="row">
-              <div class="col-md-4 mb-4">
+              <div class="col-md-6 mb-4">
                 <label for="landDescModal" class="form-label">Land Description</label>
-                <input type="text" id="landDescModal" name="land_desc" class="form-control" placeholder="Enter land description">
+                <input type="text" id="landDescModal" name="land_desc" class="form-control"
+                  placeholder="Enter land description">
               </div>
-              <div class="col-md-4 mb-4">
+              <div class="col-md-6 mb-4">
                 <label for="classificationModal" class="form-label">Classification</label>
-                <input type="text" id="classificationModal" name="classification" class="form-control" placeholder="Enter classification">
+                <input type="text" id="classificationModal" name="classification" class="form-control"
+                  placeholder="Enter classification">
               </div>
-              <div class="col-md-4 mb-4">
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-4">
                 <label for="subClassModal" class="form-label">Sub-Class</label>
-                <input type="text" id="subClassModal" name="sub_class" class="form-control" placeholder="Enter sub-class">
+                <input type="text" id="subClassModal" name="sub_class" class="form-control"
+                  placeholder="Enter sub-class">
               </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-4 mb-4">
-                <label for="areaModal" class="form-label">Area (sq m)</label>
-                <input type="text" id="areaModal" name="area" class="form-control" placeholder="Enter area">
-              </div>
-              <div class="col-md-4 mb-4">
+              <div class="col-md-6 mb-4">
                 <label for="actualUseModal" class="form-label">Actual Use</label>
-                <input type="text" id="actualUseModal" name="actual_use" class="form-control" placeholder="Enter actual use">
-              </div>
-              <div class="col-md-4 mb-4">
-                <label for="unitValueModal" class="form-label">Unit Value</label>
-                <input type="number" id="unitValueModal" name="unit_value" class="form-control" placeholder="Enter unit value">
+                <input type="text" id="actualUseModal" name="actual_use" class="form-control"
+                  placeholder="Enter actual use">
               </div>
             </div>
 
             <div class="row">
-              <div class="col-md-4 mb-4">
-                <label for="marketValueModal" class="form-label">Market Value</label>
-                <input type="number" id="marketValueModal" name="market_value" class="form-control" placeholder="Enter market value">
+              <div class="col-md-6 mb-4">
+                <label for="areaModal" class="form-label">Area</label>
+                <div class="input-group">
+                  <input type="number" id="areaModal" name="area" class="form-control" placeholder="Enter area">
+                  <div class="input-group-append ml-4">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="areaUnit" value="sqm" id="sqm" checked>
+                      <label class="form-check-label" for="sqm">Sqm</label>
+                    </div>
+                    <div class="form-check ms-2 ml-3">
+                      <input class="form-check-input" type="radio" name="areaUnit" value="hectare" id="hectare">
+                      <label class="form-check-label" for="hectare">Ha</label>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <!-- Commented Sections for Later Use -->
-            <!-- Property Assessment Section -->
-            <!-- Certification Section -->
-            <!-- Miscellaneous Section -->
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <label for="unitValueModal" class="form-label">Unit Value</label>
+                <input type="number" id="unitValueModal" name="unit_value" class="form-control"
+                  placeholder="Enter unit value">
+              </div>
+              <div class="col-md-4 mb-4">
+                <label for="recommendedUnitValue" class="form-label">Recommended Unit Value</label>
+                <input type="number" id="unitValueModal" name="unit_value" class="form-control" placeholder="loading..."
+                  disabled>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <label for="marketValueModal" class="form-label">Market Value</label>
+                <input type="number" id="marketValueModal" name="market_value" class="form-control"
+                  placeholder="Enter market value">
+              </div>
+            </div>
           </div>
 
           <div class="modal-footer">
@@ -608,135 +678,102 @@ $conn->close();
   <script src="http://localhost/ERPTS/Add-New-Real-Property-Unit.js"></script>
 
   <script>
-    function resetForm() {
-      // Target all forms inside modals
-      const modals = document.querySelectorAll('.modal');
+    document.addEventListener("DOMContentLoaded", function () {
+      // Function to reset all modal forms
+      function resetForm() {
+        document.querySelectorAll('.modal form').forEach(form => form.reset());
 
-      modals.forEach(modal => {
-        // Find all forms in the modal
-        const forms = modal.querySelectorAll('form');
-        forms.forEach(form => {
-          // Reset the form to its default state
-          form.reset();
-
-          // Clear additional fields if reset does not handle them
-          form.querySelectorAll("input, select, textarea").forEach(field => {
-            if (field.type === "text" || field.type === "textarea" || field.type === "email" || field.type === "date") {
-              field.value = ""; // Clear text, email, textarea, and date inputs
-            } else if (field.type === "checkbox" || field.type === "radio") {
-              field.checked = field.defaultChecked; // Reset checkboxes and radio buttons
-            } else if (field.tagName === "SELECT") {
-              field.selectedIndex = 0; // Reset select dropdowns to the first option
-            }
-          });
-        });
-      });
-
-      // Ensure manual clearing for LAND modal if it's outside a form
-      const landModal = document.getElementById("editLandModal");
-      if (landModal) {
-        const inputs = landModal.querySelectorAll("input, select, textarea");
-        inputs.forEach(input => {
-          if (input.type === "text" || input.type === "textarea" || input.type === "email" || input.type === "date") {
-            input.value = ""; // Clear the value
-          } else if (input.type === "checkbox" || input.type === "radio") {
-            input.checked = input.defaultChecked; // Reset to default checked state
-          } else if (input.tagName === "SELECT") {
-            input.selectedIndex = 0; // Reset select to the first option
+        document.querySelectorAll('.modal input, .modal select, .modal textarea').forEach(field => {
+          if (field.type === "checkbox" || field.type === "radio") {
+            field.checked = field.defaultChecked;
+          } else if (field.tagName === "SELECT") {
+            field.selectedIndex = 0;
+          } else {
+            field.value = "";
           }
         });
       }
-    }
 
-    function DRPprint() {
-      const printWindow = window.open('DRP.html', '_blank'); // '_blank' ensures the content opens in a new tab
-      printWindow.onload = function() {
-
-        printWindow.print();
-      };
-    }
-  </script>
-  <script>
-    function toggleEdit() {
-      const editButton = document.getElementById('editRPUButton');
-      const inputs = document.querySelectorAll('#rpu-identification-section input, #rpu-identification-section select');
-      const isEditMode = editButton.textContent === 'Edit';
-
-      if (isEditMode) {
-        // Change button text to "Save"
-        editButton.textContent = 'Save';
-
-        // Enable all inputs
-        inputs.forEach(input => {
-          input.disabled = false;
-        });
-      } else {
-        // Save data
-        saveRPUData();
-
-        // Change button text back to "Edit"
-        editButton.textContent = 'Edit';
-
-        // Disable all inputs
-        inputs.forEach(input => {
-          input.disabled = true;
-        });
-      }
-    }
-
-    let arpData = {}; // Object to store data
-
-    function saveRPUData() {
-      // Get Property ID (`pro_id`) from the URL
-      const propertyId = new URLSearchParams(window.location.search).get('id');
-
-      // Find the FAAS ID from the page (assuming it is inside a <div> or similar element)
-      const faasIdText = document.body.innerHTML.match(/Faas ID:\s*(\d+)/);
-      const faasId = faasIdText ? faasIdText[1] : null; // Extract FAAS ID
-
-      if (!faasId) {
-        alert("Error: FAAS ID not found on the page.");
-        return;
+      // Function to print DRP
+      function DRPprint() {
+        const printWindow = window.open('DRP.html', '_blank');
+        printWindow.onload = function () {
+          printWindow.print();
+        };
       }
 
-      // Get input values
-      const arpNumber = document.getElementById('arpNumber').value;
-      const propertyNumber = document.getElementById('propertyNumber').value;
-      const taxability = document.getElementById('taxability').value;
-      const effectivity = document.getElementById('effectivity').value;
+      // Function to toggle edit mode
+      function toggleEdit() {
+        const editButton = document.getElementById('editRPUButton');
+        const inputs = document.querySelectorAll('#rpu-identification-section input, #rpu-identification-section select');
 
-      // Store data including FAAS ID
-      arpData = {
-        faasId: faasId, // Correct FAAS ID extracted from page
-        arpNumber: arpNumber,
-        propertyNumber: propertyNumber,
-        taxability: taxability,
-        effectivity: effectivity
-      };
+        if (editButton.textContent === 'Edit') {
+          editButton.textContent = 'Save';
+          inputs.forEach(input => input.disabled = false);
+        } else {
+          saveRPUData();
+          editButton.textContent = 'Edit';
+          inputs.forEach(input => input.disabled = true);
+        }
+      }
 
-      // Send data to FAASrpuID.php
-      fetch('FAASrpuID.php', {
+      let arpData = {};
+
+      // Function to save data
+      function saveRPUData() {
+        const propertyId = new URLSearchParams(window.location.search).get('id');
+        const faasIdMatch = document.body.innerHTML.match(/Faas ID:\s*(\d+)/);
+        const faasId = faasIdMatch ? faasIdMatch[1] : null;
+
+        if (!faasId) {
+          alert("Error: FAAS ID not found on the page.");
+          return;
+        }
+
+        arpData = {
+          faasId: faasId,
+          arpNumber: document.getElementById('arpNumber').value,
+          propertyNumber: document.getElementById('propertyNumber').value,
+          taxability: document.getElementById('taxability').value,
+          effectivity: document.getElementById('effectivity').value
+        };
+
+        fetch('FAASrpuID.php', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(arpData)
         })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            alert('Success');
-          } else {
-            alert('Failed to insert data: ' + data.error);
+          .then(response => response.json())
+          .then(data => {
+            alert(data.success ? 'Success' : 'Failed to insert data: ' + data.error);
+          })
+          .catch(error => alert('An error occurred: ' + error));
+      }
+
+      // Function to update area when unit is changed
+      function updateAreaUnit() {
+        const areaInput = document.getElementById("areaModal");
+        const sqmRadio = document.getElementById("sqm");
+        const hectareRadio = document.getElementById("hectare");
+
+        function convertArea() {
+          let value = parseFloat(areaInput.value) || 0;
+          if (sqmRadio.checked) {
+            areaInput.value = (value * 10000).toFixed(2);
+          } else if (hectareRadio.checked) {
+            areaInput.value = (value / 10000).toFixed(4);
           }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('An error occurred while inserting the data.');
-        });
-    }
+        }
+
+        sqmRadio.addEventListener("change", convertArea);
+        hectareRadio.addEventListener("change", convertArea);
+      }
+
+      updateAreaUnit();
+    });
   </script>
-  <!-- Optional JavaScript -->
+
+  <!-- Load External Scripts -->
   <script src="http://localhost/ERPTS/FAAS.js"></script>
   <script src="http://localhost/ERPTS/print-layout.js"></script>
   <script src="http://localhost/ERPTS/printdata.js"></script>
@@ -750,6 +787,7 @@ $conn->close();
     integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 
 </html>
