@@ -85,7 +85,7 @@ if ($conn->connect_error) {
 
     <!-- Location Title -->
     <div class="text-center mb-5">
-      <h2 class="text-secondary font-weight-bold" style="font-size: 2.5rem;">Location</h2>
+      <h2 class="text-secondary font-weight-bold" style="font-size: 2.5rem;">Land</h2>
     </div>
 
     <?php
@@ -108,142 +108,136 @@ if ($conn->connect_error) {
     $barangayResult = mysqli_query($conn, $barangayQuery);
     ?>
 
-    <!-- Location Table Section -->
-    <div class="card border-0 shadow p-4 rounded-3 mb-4">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h5 class="section-title mb-0">Location Information</h5>
-        <div class="d-flex align-items-center">
-          <!-- Search Bar -->
-          <div class="input-group me-4" style="width: 250px;">
-            <input type="text" class="form-control border-start-0" id="tableSearch" placeholder="Search...">
-            <span class="input-group-text bg-transparent border-end-0">
-              <i class="fas fa-search"></i>
-            </span>
-          </div>
-
-          <!-- Dropdown -->
-          <div class="dropdown ml-5">
-            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="locationTypeDropdown"
-              data-bs-toggle="dropdown" aria-expanded="false">
-              Classification
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="locationTypeDropdown">
-              <li><a class="dropdown-item" href="#" onclick="changeLocationType('Classification')">Classification</a></li>
-              <li><a class="dropdown-item" href="#" onclick="changeLocationType('Actual Uses')">Actual Uses</a></li>
-              <li><a class="dropdown-item" href="#" onclick="changeLocationType('Sub-Classes')">Sub-Classes</a></li>
-            </ul>
-          </div>
-        </div>
+    <!-- Property Categories Table Section -->
+<div class="card border-0 shadow p-4 rounded-3 mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 class="section-title mb-0">Land Category Information</h5>
+    <div class="d-flex align-items-center">
+      <!-- Search Bar -->
+      <div class="input-group me-4" style="width: 250px;">
+        <input type="text" class="form-control border-start-0" id="tableSearch" placeholder="Search...">
+        <span class="input-group-text bg-transparent border-end-0">
+          <i class="fas fa-search"></i>
+        </span>
       </div>
 
-      <!-- Municipality Table -->
-      <div class="px-3">
-        <div class="table-responsive rounded">
-          <table class="table table-hover align-middle mb-0" id="municipalityTable">
-            <thead class="table-light">
-              <tr>
-                <th style="width: 20%">Region</th>
-                <th style="width: 15%">Code</th>
-                <th style="width: 35%">Description</th>
-                <th style="width: 15%">Status</th>
-                <th style="width: 15%">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php while ($row = mysqli_fetch_assoc($municipalityResult)) { ?>
-                <tr>
-                  <td><?= $row['r_no']; ?></td>
-                  <td><?= $row['m_code']; ?></td>
-                  <td><?= $row['m_description']; ?></td>
-                  <td>
-                    <span class="badge <?= $row['m_status'] == 'Active' ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'; ?>">
-                      <?= ucfirst($row['m_status']); ?>
-                    </span>
-                  </td>
-                  <td>
-                    <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" title="Delete">
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                  </td>
-                </tr>
-              <?php } ?>
-            </tbody>
-          </table>
-
-          <!-- District Table -->
-          <table class="table table-hover align-middle mb-0 d-none" id="districtTable">
-            <thead class="table-light">
-              <tr>
-                <th style="width: 20%">Municipality/City</th>
-                <th style="width: 15%">Code</th>
-                <th style="width: 35%">Description</th>
-                <th style="width: 15%">Status</th>
-                <th style="width: 15%">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php while ($row = mysqli_fetch_assoc($districtResult)) { ?>
-                <tr>
-                  <td><?= $row['m_description']; ?></td>
-                  <td><?= $row['district_code']; ?></td>
-                  <td><?= $row['description']; ?></td>
-                  <td>
-                    <span class="badge <?= $row['status'] == 'Active' ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'; ?>">
-                      <?= ucfirst($row['status']); ?>
-                    </span>
-                  </td>
-                  <td>
-                    <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" title="Delete">
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                  </td>
-                </tr>
-              <?php } ?>
-            </tbody>
-          </table>
-
-          <!-- Barangay Table -->
-          <table class="table table-hover align-middle mb-0 d-none" id="barangayTable">
-            <thead class="table-light">
-              <tr>
-                <th style="width: 20%">District/Municipality/City</th>
-                <th style="width: 15%">Barangay Code</th>
-                <th style="width: 35%">Name of Barangay</th>
-                <th style="width: 15%">Status</th>
-                <th style="width: 15%">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php while ($row = mysqli_fetch_assoc($barangayResult)) { ?>
-                <tr>
-                  <td><?= $row['brgy_code']; ?></td>
-                  <td><?= $row['brgy_name']; ?></td>
-                  <td>
-                    <span class="badge <?= $row['status'] == 'Active' ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'; ?>">
-                      <?= ucfirst($row['status']); ?>
-                    </span>
-                  </td>
-                  <td>
-                    <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" title="Delete">
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                  </td>
-                </tr>
-              <?php } ?>
-            </tbody>
-          </table>
-        </div>
+      <!-- Dropdown -->
+      <div class="dropdown ml-5">
+        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="categoryTypeDropdown"
+          data-bs-toggle="dropdown" aria-expanded="false">
+          Classification
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="categoryTypeDropdown">
+          <li><a class="dropdown-item" href="#" onclick="changeCategoryType('Classification')">Classification</a></li>
+          <li><a class="dropdown-item" href="#" onclick="changeCategoryType('ActualUses')">Actual Uses</a></li>
+          <li><a class="dropdown-item" href="#" onclick="changeCategoryType('SubClasses')">Sub-Classes</a></li>
+        </ul>
       </div>
     </div>
+  </div>
+
+  <div class="px-3">
+    <div class="table-responsive rounded">
+      <!-- Classification Table -->
+      <table class="table table-hover align-middle mb-0" id="classificationTable">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 15%">Code</th>
+            <th style="width: 40%">Description</th>
+            <th style="width: 15%">Assessment Level</th>
+            <th style="width: 15%">Status</th>
+            <th style="width: 15%">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- PHP data for Classification would go here -->
+          <tr>
+            <td>CL-001</td>
+            <td>Residential</td>
+            <td>20%</td>
+            <td>
+              <span class="badge bg-success-subtle text-success">Active</span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" title="Delete">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Actual Uses Table -->
+      <table class="table table-hover align-middle mb-0 d-none" id="actualUsesTable">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 15%">Report Code</th>
+            <th style="width: 15%">Code</th>
+            <th style="width: 30%">Description</th>
+            <th style="width: 15%">Assessment</th>
+            <th style="width: 15%">Status</th>
+            <th style="width: 10%">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- PHP data for Actual Uses would go here -->
+          <tr>
+            <td>SC</td>
+            <td>AU-001</td>
+            <td>Single Family Residence</td>
+            <td>25%</td>
+            <td>
+              <span class="badge bg-success-subtle text-success">Active</span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" title="Delete">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Sub-Classes Table -->
+      <table class="table table-hover align-middle mb-0 d-none" id="subClassesTable">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 15%">Code</th>
+            <th style="width: 40%">Description</th>
+            <th style="width: 15%">Unit Value</th>
+            <th style="width: 15%">Status</th>
+            <th style="width: 15%">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- PHP data for Sub-Classes would go here -->
+          <tr>
+            <td>SC-001</td>
+            <td>Luxury Residential</td>
+            <td>₱15,000</td>
+            <td>
+              <span class="badge bg-success-subtle text-success">Active</span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" title="Delete">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
     <!-- Add Table -->
     <div class="py-4"></div>
@@ -320,7 +314,6 @@ if ($conn->connect_error) {
         </button>
       </div>
       <div class="modal-body">
-        <!-- Form to enter Classification details -->
         <form id="classificationForm">
           <div class="form-group">
             <label for="classificationCode">Code</label>
@@ -481,7 +474,6 @@ if ($conn->connect_error) {
     </div>
   </footer>
 
-
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
@@ -489,91 +481,94 @@ if ($conn->connect_error) {
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
-  <script src="Property.js"></script>
+
   <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    let selectedForm = "";
+    document.addEventListener("DOMContentLoaded", function () {
+  let selectedForm = "";
 
-   
-    document.querySelectorAll(".location-card").forEach((card) => {
-      card.addEventListener("click", function (event) {
-        event.preventDefault();
+ 
+  document.querySelectorAll(".location-card").forEach((card) => {
+    card.addEventListener("click", function (event) {
+      event.preventDefault();
 
-        // Get the modal data from the clicked card
-        const categoryName = this.getAttribute("data-name");
-        selectedForm = this.getAttribute("data-form");
 
-        // Update modal content
-        document.getElementById("categoryName").textContent = categoryName;
+      const categoryName = this.getAttribute("data-name");
+      selectedForm = this.getAttribute("data-form");
 
-        // Show the confirmation modal
-        $("#confirmationModal").modal("show");
-      });
-    });
 
-    // When confirm is clicked, open the specific modal
-    document.getElementById("confirmBtn").addEventListener("click", function () {
-      $("#confirmationModal").modal("hide"); // Hide confirmation modal
-      setTimeout(() => {
-        $("#" + selectedForm).modal("show"); // Show specific modal
-      }, 500); // Small delay for smooth transition
+      document.getElementById("categoryName").textContent = categoryName;
+
+  
+      $("#confirmationModal").modal("show");
     });
   });
-</script>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("cancelBtn").addEventListener("click", function () {
-  $("#confirmationModal").modal("hide"); // Force-close modal
-});
-  
-    // Handle Reset Button Click (Resets Form Only)
-    document.querySelectorAll(".reset-btn").forEach((button) => {
-      button.addEventListener("click", function () {
-        const modal = this.closest(".modal");
-        const form = modal.querySelector("form");
-        if (form) form.reset();
-      });
-    });
-  
-    // Handle Submit Button Click (Validates & Closes Modal)
-    document.querySelectorAll(".submit-btn").forEach((button) => {
-      button.addEventListener("click", function () {
-        const modal = this.closest(".modal");
-        const form = modal.querySelector("form");
-  
-        if (form && form.checkValidity()) {
-          alert("Form submitted: " + form.id);
-          $(modal).modal("hide"); // Close the modal
-        } else {
-          form.reportValidity(); // Show validation errors
-        }
-      });
-    });
 
-    document.querySelectorAll(".close").forEach((button) => {
-  button.addEventListener("click", function () {
-    const modal = this.closest(".modal");
-    $(modal).modal("hide"); // Close the modal manually
+
+  document.getElementById("confirmBtn").addEventListener("click", function () {
+    $("#confirmationModal").modal("hide"); 
+    setTimeout(() => {
+      $("#" + selectedForm).modal("show"); 
+    }, 500); 
   });
 });
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("cancelBtn").addEventListener("click", function () {
+$("#confirmationModal").modal("hide"); 
+});
+
+  
+  document.querySelectorAll(".reset-btn").forEach((button) => {
+    button.addEventListener("click", function () {
+      const modal = this.closest(".modal");
+      const form = modal.querySelector("form");
+      if (form) form.reset();
+    });
   });
 
-</script>
-<script>
-  function changeLocationType(type) {
-      document.getElementById("municipalityTable").classList.add("d-none");
-      document.getElementById("districtTable").classList.add("d-none");
-      document.getElementById("barangayTable").classList.add("d-none");
+  document.querySelectorAll(".submit-btn").forEach((button) => {
+    button.addEventListener("click", function () {
+      const modal = this.closest(".modal");
+      const form = modal.querySelector("form");
 
-      if (type === "Municipality") {
-        document.getElementById("municipalityTable").classList.remove("d-none");
-      } else if (type === "District") {
-        document.getElementById("districtTable").classList.remove("d-none");
-      } else if (type === "Barangay") {
-        document.getElementById("barangayTable").classList.remove("d-none");
+      if (form && form.checkValidity()) {
+        alert("Form submitted: " + form.id);
+        $(modal).modal("hide"); 
+      } else {
+        form.reportValidity(); 
       }
-    }  
-</script>
+    });
+  });
+
+  document.querySelectorAll(".close").forEach((button) => {
+button.addEventListener("click", function () {
+  const modal = this.closest(".modal");
+  $(modal).modal("hide"); 
+});
+});
+});
+
+function changeCategoryType(type) {
+
+  document.getElementById("classificationTable").classList.add("d-none");
+  document.getElementById("actualUsesTable").classList.add("d-none");
+  document.getElementById("subClassesTable").classList.add("d-none");
+  
+
+  document.getElementById("categoryTypeDropdown").textContent = type;
+  
+
+  if (type === "Classification") {
+    document.getElementById("classificationTable").classList.remove("d-none");
+  } else if (type === "ActualUses") {
+    document.getElementById("actualUsesTable").classList.remove("d-none");
+  } else if (type === "SubClasses") {
+    document.getElementById("subClassesTable").classList.remove("d-none");
+  }
+}
+
+  </script>
 </body>
 
 </html>
