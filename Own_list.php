@@ -95,6 +95,11 @@ if ($result->num_rows > 0) {
 <!-- Main Body -->
 <section class="container mt-5">
   <div class="card p-4">
+  <div class="mb-4 d-flex justify-content-start">
+      <a href="Admin-Page-2.php" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left"></i> Back
+      </a>
+    </div>
     <h3 class="mb-4">Owner's List</h3>
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div>
@@ -334,7 +339,12 @@ if ($result->num_rows > 0) {
   <!-- Bootstrap 4.5.2 JS and Popper.js -->
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
+    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
   <!-- Your custom JS files -->
   <script src="http://localhost/ERPTS/main_layout.js"></script>
   <script src="http://localhost/ERPTS/Own_list.js"></script>

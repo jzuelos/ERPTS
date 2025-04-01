@@ -37,6 +37,11 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
 
   <!-- Main Body -->
   <section class="container mt-4">
+  <div class="mb-4 d-flex justify-content-start">
+      <a href="Home.php" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left"></i> Back
+      </a>
+    </div>
     <!-- Search Bar and Filters -->
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="d-flex">
@@ -171,6 +176,8 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
     integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 </body>
 
 </html>

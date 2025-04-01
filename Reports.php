@@ -1,20 +1,3 @@
-<?php
-session_start();
-
-// Check if the user is logged in by verifying if 'user_id' exists in the session
-if (!isset($_SESSION['user_id'])) {
-  header("Location: index.php"); // Redirect to login page if user is not logged in
-  exit; // Stop further execution after redirection
-}
-
-$user_role = $_SESSION['user_type'] ?? 'user'; // Default to 'user' if role is not set
-
-// Prevent the browser from caching this page
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
-header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
-header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility
-?>
-
 <!doctype html>
 <html lang="en">
 
@@ -29,117 +12,152 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="Reports.css">
   <title>Electronic Real Property Tax System</title>
+  <style>
+    /* Additional styles for sticky header and footer */
+    html, body {
+      height: 100%;
+    }
+    
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .content-wrapper {
+      flex: 1 0 auto;
+      padding-top: 70px; /* Adjust based on your header height */
+    }
+    
+    .footer {
+      flex-shrink: 0;
+    }
+    
+    /* Ensure header is sticky */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+  </style>
 </head>
 
 <body>
   <!-- Header Navigation -->
   <?php include 'header.php'; ?>
 
-  <!-- Main Body -->
-  <section class="container mt-4">
-    <div class="card p-4">
-      <form>
-        <!-- Filter by Classification -->
-        <div class="form-group form-check">
-          <input type="checkbox" class="form-check-input" id="classificationCheck">
-          <label class="form-check-label font-weight-bold" for="classificationCheck">Filter by: Classification</label>
-        </div>
-        <div class="form-group">
-          <label for="classificationSelect">Classification</label>
-          <select class="form-control w-25" id="classificationSelect">
-            <option>Residential</option>
-            <option>Credential</option>
-            <option>Industrial</option>
-            <option>Agricultural</option>
-            <option>Timberland</option>
-            <option>Mineral Lands</option>
-            <option>Special Property</option>
-          </select>
-        </div>
-        <hr>
-
-        <!-- Filter by Location -->
-        <div class="form-group form-check">
-          <input type="checkbox" class="form-check-input" id="locationCheck">
-          <label class="form-check-label font-weight-bold" for="locationCheck">Filter by: Location</label>
-        </div>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label for="provinceSelect">Province</label>
-            <select class="form-control" id="provinceSelect">
-              <option>Item 1</option>
-              <option>Item 2</option>
-              <option>Item 3</option>
+  <!-- Main Content Wrapper -->
+  <div class="content-wrapper">
+    <section class="container">
+      <div class="card p-4 mt-4">
+        <form>
+          <div class="mb-4 d-flex justify-content-start">
+            <a href="Home.php" class="btn btn-outline-secondary btn-sm">
+              <i class="fas fa-arrow-left"></i> Back
+            </a>
+          </div>
+          <!-- Filter by Classification -->
+          <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="classificationCheck">
+            <label class="form-check-label font-weight-bold" for="classificationCheck">Filter by: Classification</label>
+          </div>
+          <div class="form-group">
+            <label for="classificationSelect">Classification</label>
+            <select class="form-control w-25" id="classificationSelect">
+              <option>Residential</option>
+              <option>Credential</option>
+              <option>Industrial</option>
+              <option>Agricultural</option>
+              <option>Timberland</option>
+              <option>Mineral Lands</option>
+              <option>Special Property</option>
             </select>
           </div>
-          <div class="form-group col-md-6">
-            <label for="citySelect">Municipality/City</label>
-            <select class="form-control" id="citySelect">
-              <option>Item 1</option>
-              <option>Item 2</option>
-              <option>Item 3</option>
-            </select>
-          </div>
-          <div class="form-group col-md-6">
-            <label for="districtSelect">District</label>
-            <select class="form-control" id="districtSelect">
-              <option>Item 1</option>
-              <option>Item 2</option>
-              <option>Item 3</option>
-            </select>
-          </div>
-          <div class="form-group col-md-6">
-            <label for="barangaySelect">Barangay</label>
-            <select class="form-control" id="barangaySelect">
-              <option>Item 1</option>
-              <option>Item 2</option>
-              <option>Item 3</option>
-            </select>
-          </div>
-        </div>
-        <hr>
+          <hr>
 
-        <!-- Filter by Date -->
-        <div class="form-group form-check">
-          <input type="checkbox" class="form-check-input" id="dateCheck">
-          <label class="form-check-label font-weight-bold" for="dateCheck">Filter by: Date Created</label>
-        </div>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label for="fromDate">From:</label>
-            <input type="date" class="form-control" id="fromDate">
+          <!-- Filter by Location -->
+          <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="locationCheck">
+            <label class="form-check-label font-weight-bold" for="locationCheck">Filter by: Location</label>
           </div>
-          <div class="form-group col-md-6">
-            <label for="toDate">To:</label>
-            <input type="date" class="form-control" id="toDate">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="provinceSelect">Province</label>
+              <select class="form-control" id="provinceSelect">
+                <option>Item 1</option>
+                <option>Item 2</option>
+                <option>Item 3</option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="citySelect">Municipality/City</label>
+              <select class="form-control" id="citySelect">
+                <option>Item 1</option>
+                <option>Item 2</option>
+                <option>Item 3</option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="districtSelect">District</label>
+              <select class="form-control" id="districtSelect">
+                <option>Item 1</option>
+                <option>Item 2</option>
+                <option>Item 3</option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="barangaySelect">Barangay</label>
+              <select class="form-control" id="barangaySelect">
+                <option>Item 1</option>
+                <option>Item 2</option>
+                <option>Item 3</option>
+              </select>
+            </div>
           </div>
-        </div>
+          <hr>
 
-        <!-- Print All Checkbox -->
-        <div class="form-group form-check">
-          <input type="checkbox" class="form-check-input" id="printAllCheck">
-          <label class="form-check-label font-weight-bold" for="printAllCheck">Print ALL (No Filtering)</label>
-        </div>
+          <!-- Filter by Date -->
+          <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="dateCheck">
+            <label class="form-check-label font-weight-bold" for="dateCheck">Filter by: Date Created</label>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="fromDate">From:</label>
+              <input type="date" class="form-control" id="fromDate">
+            </div>
+            <div class="form-group col-md-6">
+              <label for="toDate">To:</label>
+              <input type="date" class="form-control" id="toDate">
+            </div>
+          </div>
 
-        <!-- Submit Button -->
-        <div class="text-right">
-          <a href="#" class="btn btn-primary" target="_blank">PRINT</a>
-        </div>
-      </form>
-    </div>
-  </section>
+          <!-- Print All Checkbox -->
+          <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="printAllCheck">
+            <label class="form-check-label font-weight-bold" for="printAllCheck">Print ALL (No Filtering)</label>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="text-right">
+            <a href="#" class="btn btn-primary" target="_blank">PRINT</a>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
 
   <!-- Footer -->
-  <footer class="bg-light text-center text-lg-start mt-4">
+  <footer class="footer bg-light text-center text-lg-start">
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
-    <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span> 
+      <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span> 
     </div>
   </footer>
 
   <!-- Optional JavaScript -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+  <script src="Location.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
     integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
     crossorigin="anonymous"></script>
