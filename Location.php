@@ -89,11 +89,22 @@ if ($conn->connect_error) {
     </div>
 
     <?php
-    // Fetch Municipality Data
+    $limit = 10; // Number of rows per page
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $offset = ($page - 1) * $limit;
+
+    // Fetch paginated data
     $municipalityQuery = "SELECT m.m_id, m.m_code, m.m_description, m.m_status, r.r_no 
-                      FROM municipality m
-                      JOIN region r ON m.r_id = r.r_id";
+                          FROM municipality m
+                          JOIN region r ON m.r_id = r.r_id 
+                          LIMIT $limit OFFSET $offset";
     $municipalityResult = mysqli_query($conn, $municipalityQuery);
+
+    // Get total rows count for pagination
+    $countQuery = "SELECT COUNT(*) AS total FROM municipality";
+    $countResult = mysqli_fetch_assoc(mysqli_query($conn, $countQuery));
+    $totalRows = $countResult['total'];
+    $totalPages = ceil($totalRows / $limit);
 
     // Fetch District Data
     $districtQuery = "SELECT d.district_id, d.district_code, d.description, d.status, m.m_description 
@@ -242,6 +253,30 @@ if ($conn->connect_error) {
             </tbody>
           </table>
         </div>
+      </div>
+      <!-- Pagination -->
+      <div class="d-flex justify-content-center mt-3">
+        <nav>
+          <ul class="pagination">
+            <?php if ($page > 1): ?>
+              <li class="page-item">
+                <a class="page-link" href="?page=<?= $page - 1; ?>">Previous</a>
+              </li>
+            <?php endif; ?>
+
+            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+              <li class="page-item <?= $i == $page ? 'active' : ''; ?>">
+                <a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a>
+              </li>
+            <?php endfor; ?>
+
+            <?php if ($page < $totalPages): ?>
+              <li class="page-item">
+                <a class="page-link" href="?page=<?= $page + 1; ?>">Next</a>
+              </li>
+            <?php endif; ?>
+          </ul>
+        </nav>
       </div>
     </div>
 
