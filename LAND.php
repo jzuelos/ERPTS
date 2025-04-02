@@ -294,6 +294,15 @@ $conn->close();
 
       <!-- Value Adjustment Factor Section -->
       <h5 class="section-title mt-5">Value Adjustment Factor</h5>
+
+      <div class="row">
+        <div class="col-md-12 mb-4">
+          <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
+          <textarea id="adjustmentFactorModal" name="adjustment_factor" class="form-control" rows="3"
+            placeholder="Enter adjustment factor" disabled></textarea>
+        </div>
+      </div>
+
       <div class="row">
         <div class="col-md-4 mb-4">
           <div class="mb-3">
@@ -364,7 +373,6 @@ $conn->close();
           </div>
         </div>
       </div>
-
 
       <div class="row">
         <div class="col-md-6 col-12 mb-4">
@@ -540,14 +548,17 @@ $conn->close();
               </div>
             </div>
 
-            <!-- Value Adjustment Factor Section in Modal
+            <!-- Value Adjustment Factor Section in Modal -->
             <h5 class="section-title mt-5">Value Adjustment Factor</h5>
             <div class="row">
-              <div class="col-md-4 mb-4">
+              <div class="col-md-12 mb-4">
                 <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
-                <input type="text" id="adjustmentFactorModal" name="adjustment_factor" class="form-control"
-                  placeholder="Enter adjustment factor">
+                <textarea id="adjustmentFactorModal" name="adjustment_factor" class="form-control" rows="3"
+                  placeholder="Enter adjustment factor"></textarea>
               </div>
+            </div>
+
+            <div class="row">
               <div class="col-md-4 mb-4">
                 <label for="percentAdjustmentModal" class="form-label">% Adjustment</label>
                 <input type="text" id="percentAdjustmentModal" name="percent_adjustment" class="form-control"
@@ -565,7 +576,7 @@ $conn->close();
               </div>
             </div>
 
-            Property Assessment Section in Modal
+            <!-- Property Assessment Section in Modal
             <h5 class="section-title mt-5">Property Assessment</h5>
             <div class="row">
               <div class="col-md-6 mb-4">
@@ -615,7 +626,7 @@ $conn->close();
             </div>
 
             <div class="row">
-              <div class="col-md-6 mb-4">
+              <div class="col-md-8 mb-4">
                 <label for="areaModal" class="form-label">Area</label>
                 <div class="input-group">
                   <input type="number" id="areaModal" name="area" class="form-control" placeholder="Enter area">
@@ -641,8 +652,8 @@ $conn->close();
               </div>
               <div class="col-md-4 mb-4">
                 <label for="recommendedUnitValue" class="form-label">Recommended Unit Value</label>
-                <input type="number" id="unitValueModal" name="unit_value" class="form-control" placeholder="loading..."
-                  disabled>
+                <input type="number" id="recommendedUnitValue" name="recommended_unit_value" class="form-control"
+                  placeholder="loading..." disabled>
               </div>
             </div>
 
@@ -650,7 +661,7 @@ $conn->close();
               <div class="col-md-6 mb-4">
                 <label for="marketValueModal" class="form-label">Market Value</label>
                 <input type="number" id="marketValueModal" name="market_value" class="form-control"
-                  placeholder="Enter market value">
+                  placeholder="Market value" readonly>
               </div>
             </div>
           </div>
@@ -666,7 +677,6 @@ $conn->close();
   </div>
   </div>
   </div>
-
 
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
@@ -755,20 +765,83 @@ $conn->close();
         const areaInput = document.getElementById("areaModal");
         const sqmRadio = document.getElementById("sqm");
         const hectareRadio = document.getElementById("hectare");
+        const unitValueInput = document.getElementById("unitValueModal");
+        const marketValueInput = document.getElementById("marketValueModal");
 
+        // Convert area when unit changes
         function convertArea() {
           let value = parseFloat(areaInput.value) || 0;
+
+          // Convert area based on selected unit
           if (sqmRadio.checked) {
-            areaInput.value = (value * 10000).toFixed(2);
+            areaInput.value = (value * 10000).toFixed(2); // Convert hectares to sqm
           } else if (hectareRadio.checked) {
-            areaInput.value = (value / 10000).toFixed(4);
+            areaInput.value = (value / 10000).toFixed(4); // Convert sqm to hectares
+          }
+
+          // Recalculate market value after area conversion
+          calculateMarketValue();
+        }
+
+        // Debounced version of the input event to improve performance
+        function debounce(func, wait) {
+          let timeout;
+          return function () {
+            clearTimeout(timeout);
+            timeout = setTimeout(func, wait);
+          };
+        }
+
+        // Calculate market value based on area and unit value
+        function calculateMarketValue() {
+          const area = parseFloat(areaInput.value) || 0;
+          const unitValue = parseFloat(unitValueInput.value) || 0;
+
+          // If hectares are selected, we need to convert them to sqm for calculation
+          let areaInSquareMeters = hectareRadio.checked ? area * 10000 : area;
+
+          // Only calculate if both area and unit value are valid
+          if (!isNaN(areaInSquareMeters) && !isNaN(unitValue) && areaInSquareMeters > 0 && unitValue > 0) {
+            let marketValue = areaInSquareMeters * unitValue; // Calculate market value
+            marketValueInput.value = marketValue.toFixed(2).toLocaleString(); // Display result with 2 decimal points and commas
+          } else {
+            marketValueInput.value = ''; // Clear market value if inputs are invalid
           }
         }
 
+        // Adding event listeners for area conversion
         sqmRadio.addEventListener("change", convertArea);
         hectareRadio.addEventListener("change", convertArea);
+
+        // Adding event listeners for input changes (debounced to reduce calls)
+        areaInput.addEventListener("input", debounce(calculateMarketValue, 300));
+        unitValueInput.addEventListener("input", debounce(calculateMarketValue, 300));
+
+        // Optional: Add validation to highlight invalid inputs
+        function validateInputs() {
+          const area = parseFloat(areaInput.value);
+          const unitValue = parseFloat(unitValueInput.value);
+
+          // Highlight the fields if values are invalid
+          if (isNaN(area) || area <= 0) {
+            areaInput.classList.add('is-invalid');
+          } else {
+            areaInput.classList.remove('is-invalid');
+          }
+
+          if (isNaN(unitValue) || unitValue <= 0) {
+            unitValueInput.classList.add('is-invalid');
+          } else {
+            unitValueInput.classList.remove('is-invalid');
+          }
+        }
+
+        // Event listeners to validate inputs
+        areaInput.addEventListener("input", validateInputs);
+        unitValueInput.addEventListener("input", validateInputs);
       }
 
+      // Initialize the function
       updateAreaUnit();
     });
   </script>
