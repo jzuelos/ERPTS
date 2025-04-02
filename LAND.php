@@ -567,12 +567,12 @@ $conn->close();
               <div class="col-md-4 mb-4">
                 <label for="valueAdjustmentModal" class="form-label">Value Adjustment</label>
                 <input type="text" id="valueAdjustmentModal" name="value_adjustment" class="form-control"
-                  placeholder="Enter value adjustment">
+                  placeholder="Enter value adjustment" readonly>
               </div>
               <div class="col-md-4 mb-4">
                 <label for="adjustedMarketValueModal" class="form-label">Adjusted Market Value</label>
                 <input type="text" id="adjustedMarketValueModal" name="adjusted_market_value" class="form-control"
-                  placeholder="Enter adjusted market value">
+                  placeholder="Enter adjusted market value" readonly>
               </div>
             </div>
 
@@ -843,6 +843,9 @@ $conn->close();
 
       // Initialize the function
       updateAreaUnit();
+
+      //Function to calculate value adjustment
+
     });
   </script>
 
