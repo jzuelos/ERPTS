@@ -37,8 +37,11 @@ if ($faas_id == 0) {
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $oct_no = isset($_POST['oct_no']) ? (int) $_POST['oct_no'] : 0;
-  $unit_value = isset($_POST['unit_value']) ? (int) $_POST['unit_value'] : 0;
-  $market_value = isset($_POST['market_value']) ? (int) $_POST['market_value'] : 0;
+  $unit_value = isset($_POST['unit_value']) ? (float) $_POST['unit_value'] : 0;
+  $market_value = isset($_POST['market_value']) ? (float) $_POST['market_value'] : 0;
+  $adjust_percent = isset($_POST['percent_adjustment']) ? (float) $_POST['percent_adjustment'] : 100; // Percentage Adjustment
+  $adjust_value = isset($_POST['value_adjustment']) ? (float) $_POST['value_adjustment'] : 0; // Value Adjustment
+  $adjust_mv = isset($_POST['adjusted_market_value']) ? (float) $_POST['adjusted_market_value'] : 0; // Adjusted Market Value
 
   // Collect all other input fields
   $survey_no = $_POST['survey_no'] ?? '';
@@ -59,13 +62,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $sub_class = $_POST['sub_class'] ?? '';
   $area = $_POST['area'] ?? '';
   $actual_use = $_POST['actual_use'] ?? '';
+  $adjust_factor = $_POST['adjustment_factor'] ?? ''; // Adjustment Factor (string)
 
   // Prepare and execute the insert query
-  $stmt = $conn->prepare("INSERT INTO land (faas_id, oct_no, survey_no, boundaries, boun_desc, last_name, first_name, middle_name, contact_no, email, house_street, barangay, district, municipality, province, land_desc, classification, sub_class, area, actual_use, unit_value, market_value)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+  $stmt = $conn->prepare("INSERT INTO land (faas_id, oct_no, survey_no, boundaries, boun_desc, last_name, first_name, middle_name, contact_no, email, house_street, barangay, district, municipality, province, land_desc, classification, sub_class, area, actual_use, unit_value, market_value, adjust_factor, adjust_percent, adjust_value, adjust_mv)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
   $stmt->bind_param(
-    "iissssssssssssssssisii",
+    "iissssssssssssssssisddsddd",
     $faas_id,       // Foreign Key faas_id
     $oct_no,
     $survey_no,
@@ -87,7 +91,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $area,
     $actual_use,
     $unit_value,
-    $market_value
+    $market_value,
+    $adjust_factor,
+    $adjust_percent,
+    $adjust_value,
+    $adjust_mv
   );
 
   if ($stmt->execute()) {
@@ -689,10 +697,10 @@ $conn->close();
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
+
       // Function to reset all modal forms
       function resetForm() {
         document.querySelectorAll('.modal form').forEach(form => form.reset());
-
         document.querySelectorAll('.modal input, .modal select, .modal textarea').forEach(field => {
           if (field.type === "checkbox" || field.type === "radio") {
             field.checked = field.defaultChecked;
@@ -760,19 +768,22 @@ $conn->close();
           .catch(error => alert('An error occurred: ' + error));
       }
 
-      // Function to update area when unit is changed
+      // Update area unit and recalculate market value
       function updateAreaUnit() {
         const areaInput = document.getElementById("areaModal");
         const sqmRadio = document.getElementById("sqm");
         const hectareRadio = document.getElementById("hectare");
         const unitValueInput = document.getElementById("unitValueModal");
         const marketValueInput = document.getElementById("marketValueModal");
+        const valueAdjustmentInput = document.getElementById("valueAdjustmentModal");
+        const adjustedMarketValueInput = document.getElementById("adjustedMarketValueModal");
+        const percentAdjustmentInput = document.getElementById("percentAdjustmentModal");
 
-        // Convert area when unit changes
+        // Convert area based on selected unit (sqm or hectare)
         function convertArea() {
           let value = parseFloat(areaInput.value) || 0;
 
-          // Convert area based on selected unit
+          // Convert area when unit changes
           if (sqmRadio.checked) {
             areaInput.value = (value * 10000).toFixed(2); // Convert hectares to sqm
           } else if (hectareRadio.checked) {
@@ -815,21 +826,27 @@ $conn->close();
 
         // Calculate value adjustment based on market value and percentage adjustment
         function calculateValueAdjustment(marketValue) {
-          const percentAdjustment = parseFloat(document.getElementById('percentAdjustmentModal').value) || 0;
+          const percentAdjustment = parseFloat(percentAdjustmentInput.value) || 0;
           let valueAdjustment = (marketValue * (percentAdjustment / 100 - 1)); // Adjusted calculation
 
           // Format the value adjustment with "-" if it's negative
           const formattedValue = (valueAdjustment < 0 ? "-" : "") + Math.abs(valueAdjustment).toFixed(2).toLocaleString();
 
-          document.getElementById('valueAdjustmentModal').value = formattedValue; // Display result
+          valueAdjustmentInput.value = formattedValue; // Display result
+          calculateAdjustedMarketValue(marketValue, valueAdjustment);
+        }
+
+        // Function to calculate the adjusted market value
+        function calculateAdjustedMarketValue(marketValue, valueAdjustment) {
+          const adjustedMarketValue = marketValue + valueAdjustment;
+          adjustedMarketValueInput.value = adjustedMarketValue.toFixed(2).toLocaleString();
         }
 
         // Event listener for percentage adjustment input
-        document.getElementById('percentAdjustmentModal').addEventListener('input', function () {
+        percentAdjustmentInput.addEventListener('input', function () {
           const marketValue = parseFloat(marketValueInput.value.replace(/,/g, '')) || 0; // Get current market value
           calculateValueAdjustment(marketValue); // Recalculate value adjustment
         });
-
 
         // Adding event listeners for area conversion
         sqmRadio.addEventListener("change", convertArea);
@@ -862,12 +879,12 @@ $conn->close();
         areaInput.addEventListener("input", validateInputs);
         unitValueInput.addEventListener("input", validateInputs);
       }
-      // Initialize the function
-      updateAreaUnit();
-      //Function to calculate value adjustment
 
+      // Initialize the area unit update function
+      updateAreaUnit();
     });
   </script>
+
 
   <!-- Load External Scripts -->
   <script src="http://localhost/ERPTS/FAAS.js"></script>
