@@ -78,3 +78,33 @@ function changeLocationType(type) {
     document.getElementById("barangayTable").classList.remove("d-none");
   }
 }  
+
+$(document).ready(function() {
+  $(".submit-btn").click(function() {
+      var formData = $("#classificationForm").serialize(); // Collect form data
+
+      $.ajax({
+          url: "propertyFunctions.php", // Updated PHP script path
+          type: "POST",
+          data: formData,
+          success: function(response) {
+              console.log("Server Response:", response); // Debugging
+              if (response.trim() === "Classification details added successfully!") {
+                  alert("Classification added successfully!");
+                  $("#classificationForm")[0].reset(); // Reset form
+              } else {
+                  alert("Error: " + response);
+              }
+          },
+          error: function(xhr, status, error) {
+              console.error("AJAX Error:", error);
+              alert("AJAX request failed. Check console for details.");
+          }
+      });
+  });
+
+  // Reset form button
+  $(".reset-btn").click(function() {
+      $("#classificationForm")[0].reset();
+  });
+});
