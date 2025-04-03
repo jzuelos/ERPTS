@@ -562,7 +562,7 @@ $conn->close();
               <div class="col-md-4 mb-4">
                 <label for="percentAdjustmentModal" class="form-label">% Adjustment</label>
                 <input type="text" id="percentAdjustmentModal" name="percent_adjustment" class="form-control"
-                  placeholder="Enter % adjustment">
+                  value="100">
               </div>
               <div class="col-md-4 mb-4">
                 <label for="valueAdjustmentModal" class="form-label">Value Adjustment</label>
@@ -804,10 +804,32 @@ $conn->close();
           if (!isNaN(areaInSquareMeters) && !isNaN(unitValue) && areaInSquareMeters > 0 && unitValue > 0) {
             let marketValue = areaInSquareMeters * unitValue; // Calculate market value
             marketValueInput.value = marketValue.toFixed(2).toLocaleString(); // Display result with 2 decimal points and commas
+
+            // Calculate value adjustment based on percentage
+            calculateValueAdjustment(marketValue);
           } else {
             marketValueInput.value = ''; // Clear market value if inputs are invalid
+            valueAdjustmentInput.value = ''; // Clear value adjustment
           }
         }
+
+        // Calculate value adjustment based on market value and percentage adjustment
+        function calculateValueAdjustment(marketValue) {
+          const percentAdjustment = parseFloat(document.getElementById('percentAdjustmentModal').value) || 0;
+          let valueAdjustment = (marketValue * (percentAdjustment / 100 - 1)); // Adjusted calculation
+
+          // Format the value adjustment with "-" if it's negative
+          const formattedValue = (valueAdjustment < 0 ? "-" : "") + Math.abs(valueAdjustment).toFixed(2).toLocaleString();
+
+          document.getElementById('valueAdjustmentModal').value = formattedValue; // Display result
+        }
+
+        // Event listener for percentage adjustment input
+        document.getElementById('percentAdjustmentModal').addEventListener('input', function () {
+          const marketValue = parseFloat(marketValueInput.value.replace(/,/g, '')) || 0; // Get current market value
+          calculateValueAdjustment(marketValue); // Recalculate value adjustment
+        });
+
 
         // Adding event listeners for area conversion
         sqmRadio.addEventListener("change", convertArea);
@@ -840,10 +862,8 @@ $conn->close();
         areaInput.addEventListener("input", validateInputs);
         unitValueInput.addEventListener("input", validateInputs);
       }
-
       // Initialize the function
       updateAreaUnit();
-
       //Function to calculate value adjustment
 
     });
