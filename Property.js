@@ -79,19 +79,63 @@ function changeLocationType(type) {
   }
 }  
 
+// Handle form submission logic for Classification form using AJAX
+$('#submitClassificationFormBtn').on('click', function(e) {
+  e.preventDefault(); // Prevent default form submission
+
+  // Collect form data
+  let formData = {
+    c_code: $('#classificationCode').val(),
+    c_description: $('#classificationDescription').val(),
+    c_uv: $('#unitValue').val(),
+    c_status: $('input[name="c_status"]:checked').val()
+  };
+
+  // Send data to PHP file for database insertion using AJAX
+  $.ajax({
+    url: 'propertyFunctions.php', // PHP file to handle database insertion
+    type: 'POST',
+    data: formData,
+    success: function(response) {
+      showToastMessage(response); // Display success or error message
+      $('#classificationModal').modal('hide'); // Close the modal on success
+    },
+    error: function(xhr, status, error) {
+      console.error("Error:", error); // Log any errors
+      showToastMessage("An error occurred. Please try again.");
+    }
+  });
+});
+
+  // Reset form button
+  $(".reset-btn").click(function() {
+      $("#classificationForm")[0].reset();
+  });
+
+//submit actual use form
 $(document).ready(function() {
-  $(".submit-btn").click(function() {
-      var formData = $("#classificationForm").serialize(); // Collect form data
+  // Handle Land Use Form Submission
+  $("#actUsesModal .submit-btn").click(function(event) {
+      event.preventDefault(); // Prevent default form submission
+
+      var formData = {
+          report_code: $("#reportCode").val(),
+          lu_code: $("#reportCodeValue").val(),
+          lu_description: $("#reportDescription").val(),
+          lu_al: $("#reportAssessmentLevel").val(),
+          lu_status: $("input[name='reportStatus']:checked").val()
+      };
 
       $.ajax({
-          url: "propertyFunctions.php", // Updated PHP script path
+          url: "propertyFunctions.php",
           type: "POST",
           data: formData,
           success: function(response) {
               console.log("Server Response:", response); // Debugging
-              if (response.trim() === "Classification details added successfully!") {
-                  alert("Classification added successfully!");
-                  $("#classificationForm")[0].reset(); // Reset form
+              if (response.trim() === "Land Use added successfully!") {
+                  alert("Land Use added successfully!");
+                  $("#reportForm")[0].reset(); // Reset form
+                  $("#actUsesModal").modal("hide"); // Close modal after success
               } else {
                   alert("Error: " + response);
               }
@@ -103,8 +147,8 @@ $(document).ready(function() {
       });
   });
 
-  // Reset form button
-  $(".reset-btn").click(function() {
-      $("#classificationForm")[0].reset();
+  // Reset form button for Land Use
+  $("#actUsesModal .reset-btn").click(function() {
+      $("#reportForm")[0].reset();
   });
 });

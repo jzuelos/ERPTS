@@ -88,26 +88,6 @@ if ($conn->connect_error) {
       <h2 class="text-secondary font-weight-bold" style="font-size: 2.5rem;">Land</h2>
     </div>
 
-    <?php
-    // Fetch Municipality Data
-    $municipalityQuery = "SELECT m.m_id, m.m_code, m.m_description, m.m_status, r.r_no 
-                      FROM municipality m
-                      JOIN region r ON m.r_id = r.r_id";
-    $municipalityResult = mysqli_query($conn, $municipalityQuery);
-
-    // Fetch District Data
-    $districtQuery = "SELECT d.district_id, d.district_code, d.description, d.status, m.m_description 
-                  FROM district d
-                  JOIN municipality m ON d.m_id = m.m_id";
-    $districtResult = mysqli_query($conn, $districtQuery);
-
-    // Fetch Barangay Data
-    $barangayQuery = "SELECT b.brgy_id, b.brgy_code, b.brgy_name, b.status, m.m_description 
-                  FROM brgy b
-                  JOIN municipality m ON b.m_id = m.m_id";
-    $barangayResult = mysqli_query($conn, $barangayQuery);
-    ?>
-
     <!-- Property Categories Table Section -->
     <div class="card border-0 shadow p-4 rounded-3 mb-4">
       <div class="d-flex justify-content-between align-items-center mb-4">
@@ -279,8 +259,6 @@ if ($conn->connect_error) {
     </div>
   </main>
 
-
-
   <!--Modal Section-->
   <!-- Confirmation Modal -->
   <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
@@ -315,6 +293,7 @@ if ($conn->connect_error) {
         </div>
         <div class="modal-body">
           <form id="classificationForm">
+          <input type="hidden" name="form_type" value="classification">
             <div class="form-group">
               <label for="classificationCode">Code</label>
               <input type="text" class="form-control" id="classificationCode" name="c_code" placeholder="Enter Classification Code" required>
@@ -376,6 +355,7 @@ if ($conn->connect_error) {
         </div>
         <div class="modal-body">
           <form id="reportForm">
+          <input type="hidden" name="form_type" value="land_use">
             <div class="form-group">
               <label for="reportCode">Report Code</label>
               <select class="form-control" id="reportCode" required>
