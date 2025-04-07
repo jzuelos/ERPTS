@@ -129,6 +129,7 @@ $conn->close();
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
@@ -434,6 +435,105 @@ $conn->close();
         </div>
       </div>
 
+    <!-- Certification Section -->
+<h5 class="section-title mt-5">Certification</h5>
+  <div class="row">
+    <!-- Left Column -->
+    <div class="col-md-6">
+      <!-- Verified By -->
+      <div class="row align-items-end mb-3">
+        <div class="col-8">
+          <label class="form-label">Verified By</label>
+          <input type="text" class="form-control" placeholder="Enter Verifier" disabled>
+        </div>
+        <div class="col-4">
+          <button type="button" class="btn btn-outline-primary btn-sm w-100">Verify</button>
+        </div>
+      </div>
+      
+      <!-- Plotted By -->
+      <div class="mb-3">
+        <label class="form-label">Plotted By</label>
+        <input type="text" class="form-control" placeholder="Enter Plotter" disabled>
+      </div>
+      
+      <!-- Noted By -->
+      <div class="mb-3">
+        <label class="form-label">Noted By</label>
+        <input type="text" class="form-control" placeholder="Enter Noter" disabled>
+      </div>
+    </div>
+    
+    <!-- Right Column -->
+    <div class="col-md-6">
+      <!-- Appraised By with Date -->
+      <div class="row mb-3">
+        <div class="col-8">
+          <label class="form-label">Appraised By</label>
+          <input type="text" class="form-control" placeholder="Enter Appraiser" disabled>
+        </div>
+        <div class="col-4">
+          <label class="form-label">Date</label>
+          <input type="text" class="form-control" placeholder="MM/DD/YYYY" disabled>
+        </div>
+      </div>
+      
+      <!-- Recommending Approval with Date -->
+      <div class="row mb-3">
+        <div class="col-8">
+          <label class="form-label">Recommending Approval</label>
+          <input type="text" class="form-control" placeholder="Enter Recommender" disabled>
+        </div>
+        <div class="col-4">
+          <label class="form-label">Date</label>
+          <input type="text" class="form-control" placeholder="MM/DD/YYYY" disabled>
+        </div>
+      </div>
+      
+      <!-- Approved By with Date -->
+      <div class="row">
+        <div class="col-8">
+          <label class="form-label">Approved By</label>
+          <input type="text" class="form-control" placeholder="Enter Approver" disabled>
+        </div>
+        <div class="col-4">
+          <label class="form-label">Date</label>
+          <input type="text" class="form-control" placeholder="MM/DD/YYYY" disabled>
+        </div>
+      </div>
+
+     <!-- Miscellaneous Section -->
+<h5 class="section-title mt-5">Miscellaneous</h5>
+<div class="row">
+  <div class="col-md-6 mb-4">
+    <div class="mb-3">
+      <label class="form-label d-block">Idle</label>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="yes" disabled>
+        <label class="form-check-label" for="idleYes">Yes</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="no" disabled>
+        <label class="form-check-label" for="idleNo">No</label>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 mb-4">
+    <div class="mb-3">
+      <label class="form-label d-block">Contested</label>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="yes" disabled>
+        <label class="form-check-label" for="contestedYes">Yes</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="no" disabled>
+        <label class="form-check-label" for="contestedNo">No</label>
+      </div>
+    </div>
+  </div>
+</div>
+
+
       <!-- Print Button at Bottom Right -->
       <div class="d-flex justify-content-end mt-4">
         <button type="button" class="btn btn-outline-secondary py-2 px-4" onclick="openPrintPage()"
@@ -441,14 +541,14 @@ $conn->close();
           <i class="fas fa-print me-2"></i>Print
         </button>
       </div>
-
     </div>
     </div>
   </section>
+ 
 
   <!-- Modal for Editing Land Details -->
   <div class="modal fade" id="editLandModal" tabindex="-1" aria-labelledby="editLandModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+  <div class="modal-dialog" style="max-width: 95%; width: 95%;">
       <div class="modal-content">
         <form method="POST" action=""> <!-- Form starts here -->
           <div class="modal-header">
@@ -630,6 +730,7 @@ $conn->close();
           </div>
 
           <!-- Value Adjustment Factor Section in Modal -->
+          <div class="section-wrap px-4 mb-5">
           <h5 class="section-title mt-5">Value Adjustment Factor</h5>
           <div class="row">
             <div class="col-md-12 mb-4">
@@ -655,8 +756,10 @@ $conn->close();
                 placeholder="Enter adjusted market value" readonly>
             </div>
           </div>
+          </div>
 
           <!-- Property Assessment Section in Modal -->
+          <div class="section-wrap px-4 mb-5">
           <h5 class="section-title mt-5">Property Assessment</h5>
           <div class="row">
             <div class="col-md-5 mb-4">
@@ -675,6 +778,138 @@ $conn->close();
                 placeholder="Assessed Value" readonly>
             </div>
           </div>
+          </div>
+
+          <!-- Certification Section in Modal -->
+<div class="section-wrap px-4 mb-5">
+  <h5 class="section-title mt-4">Certification</h5>
+  <div class="row gy-3">
+
+    <!-- Verified By -->
+    <div class="col-md-6">
+      <div class="d-flex align-items-center gap-2">
+        <label for="verifiedBy" class="form-label mb-0 w-50">Verified By</label>
+        <select class="form-select" id="verifiedBy" name="verified_by">
+          <option value="" selected disabled>Select verifier</option>
+          <option value="Verifier 1">Verifier 1</option>
+          <option value="Verifier 2">Verifier 2</option>
+          <option value="Verifier 3">Verifier 3</option>
+        </select>
+        <button type="button" class="btn btn-outline-primary">Verify</button>
+      </div>
+    </div>
+
+    <!-- Plotted By -->
+    <div class="col-md-6">
+      <div class="d-flex align-items-center gap-2">
+        <label for="plottedBy" class="form-label mb-0 w-50">Plotted By</label>
+        <select class="form-select" id="plottedBy" name="plotted_by">
+          <option value="" selected disabled>Select plotter</option>
+          <option value="Plotter 1">Plotter 1</option>
+          <option value="Plotter 2">Plotter 2</option>
+          <option value="Plotter 3">Plotter 3</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Noted By -->
+    <div class="col-md-6">
+      <div class="d-flex align-items-center gap-2">
+        <label for="notedBy" class="form-label mb-0 w-50">Noted By</label>
+        <select class="form-select" id="notedBy" name="noted_by">
+          <option value="" selected disabled>Select noter</option>
+          <option value="Noter 1">Noter 1</option>
+          <option value="Noter 2">Noter 2</option>
+          <option value="Noter 3">Noter 3</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Appraised By and Date -->
+    <div class="col-md-6">
+      <div class="d-flex align-items-center gap-2">
+        <label for="appraisedBy" class="form-label mb-0 w-50">Appraised By</label>
+        <select class="form-select" id="appraisedBy" name="appraised_by">
+          <option value="" selected disabled>Select appraiser</option>
+          <option value="Appraiser 1">Appraiser 1</option>
+          <option value="Appraiser 2">Appraiser 2</option>
+          <option value="Appraiser 3">Appraiser 3</option>
+        </select>
+      </div>
+      <div class="d-flex align-items-center gap-2 mt-2">
+        <label for="appraisalDate" class="form-label mb-0 w-50">Date</label>
+        <input type="date" class="form-control" id="appraisalDate" name="appraisal_date">
+      </div>
+    </div>
+
+    <!-- Recommending Approval and Date -->
+    <div class="col-md-6">
+      <div class="d-flex align-items-center gap-2">
+        <label for="recommendingApproval" class="form-label mb-0 w-50">Recommending Approval</label>
+        <select class="form-select" id="recommendingApproval" name="recommending_approval">
+          <option value="" selected disabled>Select recommender</option>
+          <option value="Recommender 1">Recommender 1</option>
+          <option value="Recommender 2">Recommender 2</option>
+          <option value="Recommender 3">Recommender 3</option>
+        </select>
+      </div>
+      <div class="d-flex align-items-center gap-2 mt-2">
+        <label for="recommendationDate" class="form-label mb-0 w-50">Date</label>
+        <input type="date" class="form-control" id="recommendationDate" name="recommendation_date">
+      </div>
+    </div>
+
+    <!-- Approved By and Date -->
+    <div class="col-md-6">
+      <div class="d-flex align-items-center gap-2">
+        <label for="approvedBy" class="form-label mb-0 w-50">Approved By</label>
+        <select class="form-select" id="approvedBy" name="approved_by">
+          <option value="" selected disabled>Select approver</option>
+          <option value="Approver 1">Approver 1</option>
+          <option value="Approver 2">Approver 2</option>
+          <option value="Approver 3">Approver 3</option>
+        </select>
+      </div>
+      <div class="d-flex align-items-center gap-2 mt-2">
+        <label for="approvalDate" class="form-label mb-0 w-50">Date</label>
+        <input type="date" class="form-control" id="approvalDate" name="approval_date">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Miscellaneous Section in Modal -->
+<div class="section-wrap px-4 mb-5">
+  <h5 class="section-title mt-5">Miscellaneous</h5>
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="mb-3">
+        <label class="form-label d-block">Idle</label>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="yes" enabled>
+          <label class="form-check-label" for="idleYes">Yes</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="no" enabled>
+          <label class="form-check-label" for="idleNo">No</label>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="mb-3">
+        <label class="form-label d-block">Contested</label>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="yes" enabled>
+          <label class="form-check-label" for="contestedYes">Yes</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="no" enabled>
+          <label class="form-check-label" for="contestedNo">No</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
