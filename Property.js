@@ -79,42 +79,47 @@ function changeLocationType(type) {
   }
 }  
 
-// Handle form submission logic for Classification form using AJAX
-$('#submitClassificationFormBtn').on('click', function(e) {
-  e.preventDefault(); // Prevent default form submission
+$(document).ready(function() {
+  // Submit Classification Form
+  $("#classificationModal .submit-btn").click(function(event) {
+    event.preventDefault();
 
-  // Collect form data
-  let formData = {
-    c_code: $('#classificationCode').val(),
-    c_description: $('#classificationDescription').val(),
-    c_uv: $('#unitValue').val(),
-    c_status: $('input[name="c_status"]:checked').val()
-  };
+    var formData = {
+      c_code: $("#classificationCode").val(),
+      c_description: $("#classificationDescription").val(),
+      c_uv: $("#unitValue").val(),
+      c_status: $("input[name='c_status']:checked").val()
+    };
 
-  // Send data to PHP file for database insertion using AJAX
-  $.ajax({
-    url: 'propertyFunctions.php', // PHP file to handle database insertion
-    type: 'POST',
-    data: formData,
-    success: function(response) {
-      showToastMessage(response); // Display success or error message
-      $('#classificationModal').modal('hide'); // Close the modal on success
-    },
-    error: function(xhr, status, error) {
-      console.error("Error:", error); // Log any errors
-      showToastMessage("An error occurred. Please try again.");
-    }
+    $.ajax({
+      url: "propertyFunctions.php",
+      type: "POST",
+      data: formData,
+      success: function(response) {
+        console.log("Server Response:", response); // Debugging
+        if (response.trim() === "Classification details added successfully!") {
+          alert("Classification added successfully!");
+          $("#classificationForm")[0].reset();
+          $("#classificationModal").modal("hide");
+        } else {
+          alert("Error: " + response);
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error("AJAX Error:", error);
+        alert("AJAX request failed. Check console for details.");
+      }
+    });
+  });
+
+  // Reset Classification Form
+  $("#classificationModal .reset-btn").click(function() {
+    $("#classificationForm")[0].reset();
   });
 });
 
-  // Reset form button
-  $(".reset-btn").click(function() {
-      $("#classificationForm")[0].reset();
-  });
-
 //submit actual use form
 $(document).ready(function() {
-  // Handle Land Use Form Submission
   $("#actUsesModal .submit-btn").click(function(event) {
       event.preventDefault(); // Prevent default form submission
 
@@ -150,5 +155,44 @@ $(document).ready(function() {
   // Reset form button for Land Use
   $("#actUsesModal .reset-btn").click(function() {
       $("#reportForm")[0].reset();
+  });
+});
+
+$(document).ready(function() {
+  // Submit Sub-Classes Form
+  $("#subClassesModal .submit-btn").click(function(event) {
+    event.preventDefault();
+
+    var formData = {
+      sc_code: $("#subClassesCode").val(),
+      sc_description: $("#subClassesDescription").val(),
+      sc_uv: $("#unitValue").val(),
+      sc_status: $("input[name='subClassesStatus']:checked").val()
+    };
+
+    $.ajax({
+      url: "propertyFunctions.php",
+      type: "POST",
+      data: formData,
+      success: function(response) {
+        console.log("Server Response:", response);
+        if (response.trim() === "Sub-Class added successfully!") {
+          alert("Sub-Class added successfully!");
+          $("#subClassesForm")[0].reset();
+          $("#subClassesModal").modal("hide");
+        } else {
+          alert("Error: " + response);
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error("AJAX Error:", error);
+        alert("AJAX request failed. Check console for details.");
+      }
+    });
+  });
+
+  // Reset Sub-Classes Form
+  $("#subClassesModal .reset-btn").click(function() {
+    $("#subClassesForm")[0].reset();
   });
 });
