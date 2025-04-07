@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 04, 2025 at 02:55 PM
+-- Generation Time: Apr 07, 2025 at 04:34 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -154,6 +154,8 @@ CREATE TABLE `land` (
   `adjust_percent` decimal(10,2) NOT NULL,
   `adjust_value` decimal(10,2) NOT NULL,
   `adjust_mv` decimal(10,2) NOT NULL,
+  `assess_lvl` decimal(10,2) NOT NULL,
+  `assess_value` decimal(10,2) NOT NULL,
   `faas_id` int(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -161,9 +163,10 @@ CREATE TABLE `land` (
 -- Dumping data for table `land`
 --
 
-INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `boundaries`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`, `adjust_factor`, `adjust_percent`, `adjust_value`, `adjust_mv`, `faas_id`) VALUES
-(6, 46, 'PSU-98765', '', 'Containing an area of 1,000 square meters, more or less.', 'Dioneda', 'Renz', 'Balce', '09932007821', 'rdioneda4@gmail.com', '1', 'Purok 5', '', 'Sta. Elena', 'Camarines Norte', '', 'Residential', 'Rice Land', 1500, 'Farmland', 2000.00, 3000000.00, NULL, 0.00, 0.00, 0.00, 32),
-(7, 46, 'Lot 1234, Cad-5678', '', ' A rectangular lot with a frontage of 20 meters along Rizal Street, adjacent to commercial establishments.', 'Reyes', 'Carlos', 'Mendoza', '09171234567', 'carlos.reyes@email.com', '23-B', 'Mabini', '', 'San Fernando ', 'Pampanga', 'A 1,500 sq. m. residential lot along Rizal Street, fully fenced with road access and nearby utilities.', 'Residential', 'High-density Housing', 1500, 'Residential Property', 2000.00, 3000000.00, NULL, 0.00, 0.00, 0.00, 32);
+INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `boundaries`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`, `adjust_factor`, `adjust_percent`, `adjust_value`, `adjust_mv`, `assess_lvl`, `assess_value`, `faas_id`) VALUES
+(6, 46, 'PSU-98765', '', 'Containing an area of 1,000 square meters, more or less.', 'Dioneda', 'Renz', 'Balce', '09932007821', 'rdioneda4@gmail.com', '1', 'Purok 5', '', 'Sta. Elena', 'Camarines Norte', '', 'Residential', 'Rice Land', 1500, 'Farmland', 2000.00, 3000000.00, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 32),
+(7, 46, 'Lot 1234, Cad-5678', '', ' A rectangular lot with a frontage of 20 meters along Rizal Street, adjacent to commercial establishments.', 'Reyes', 'Carlos', 'Mendoza', '09171234567', 'carlos.reyes@email.com', '23-B', 'Mabini', '', 'San Fernando ', 'Pampanga', 'A 1,500 sq. m. residential lot along Rizal Street, fully fenced with road access and nearby utilities.', 'Residential', 'High-density Housing', 1500, 'Residential Property', 2000.00, 3000000.00, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 32),
+(24, 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 1000, '', 620.00, 620000.00, '', 100.00, 0.00, 620000.00, 50.00, 310000.00, 32);
 
 -- --------------------------------------------------------
 
@@ -516,13 +519,7 @@ ALTER TABLE `faas`
 -- AUTO_INCREMENT for table `land`
 --
 ALTER TABLE `land`
-  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
-
---
--- AUTO_INCREMENT for table `land_use`
---
-ALTER TABLE `land_use`
-  MODIFY `lu_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `municipality`
@@ -559,12 +556,6 @@ ALTER TABLE `region`
 --
 ALTER TABLE `rpu_idnum`
   MODIFY `rpu_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
-
---
--- AUTO_INCREMENT for table `subclass`
---
-ALTER TABLE `subclass`
-  MODIFY `sc_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
