@@ -214,7 +214,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
       $faas_id = $faas_data['faas_id'];
 
       // Fetch land records matching the faas_id
-      $sql_land = "SELECT oct_no, survey_no, area, market_value FROM land WHERE faas_id = ?";
+      $sql_land = "SELECT oct_no, survey_no, area, market_value, assess_value FROM land WHERE faas_id = ?";
       if ($stmt_land = $conn->prepare($sql_land)) {
         $stmt_land->bind_param("i", $faas_id);
         $stmt_land->execute();
@@ -791,6 +791,7 @@ $conn->close();
               <th class="bold">Survey Number</th>
               <th class="bold">Area (sq m)</th>
               <th class="bold">Market Value</th>
+              <th class="bold">Assessed Value</th> <!-- New column header -->
             </tr>
           </thead>
           <tbody>
@@ -801,16 +802,22 @@ $conn->close();
                   <td><?= htmlspecialchars($record['survey_no']) ?></td>
                   <td><?= htmlspecialchars($record['area']) ?></td>
                   <td><?= number_format($record['market_value'], 2) ?></td>
+                  <td>
+                    <?= isset($record['assess_value']) ? number_format($record['assess_value'], 2) : '0.00' ?>
+                    <!-- Check if 'assess_value' exists -->
+                  </td>
                 </tr>
               <?php endforeach; ?>
             <?php else: ?>
               <tr>
-                <td colspan="4" class="text-center">No records found</td>
+                <td colspan="5" class="text-center">No records found</td> <!-- Adjust colspan to 5 -->
               </tr>
             <?php endif; ?>
           </tbody>
         </table>
       </div>
+
+
     </div>
   </section>
 
@@ -980,7 +987,7 @@ $conn->close();
   <script>
     // Function to capitalize the first letter of each word
     function capitalizeFirstLetter(element) {
-      element.value = element.value.replace(/\b\w/g, function(char) {
+      element.value = element.value.replace(/\b\w/g, function (char) {
         return char.toUpperCase();
       });
     }
@@ -991,7 +998,7 @@ $conn->close();
     }
 
     // Attach the function to the 'input' event of each relevant field after DOM is fully loaded
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       // Apply capitalization to specific input fields in the owner info section and modal
       const fieldsToCapitalize = [
         'ownerName', 'firstName', 'middleName', 'lastName',
@@ -1002,7 +1009,7 @@ $conn->close();
       fieldsToCapitalize.forEach(fieldId => {
         const inputField = document.getElementById(fieldId);
         if (inputField) {
-          inputField.addEventListener("input", function() {
+          inputField.addEventListener("input", function () {
             capitalizeFirstLetter(inputField);
           });
         }
@@ -1011,7 +1018,7 @@ $conn->close();
       // Event listener for ARD Number to restrict input to numbers only
       const ardNumberField = document.getElementById("ardNumberModal");
       if (ardNumberField) {
-        ardNumberField.addEventListener("input", function() {
+        ardNumberField.addEventListener("input", function () {
           restrictToNumbers(ardNumberField);
         });
       }
@@ -1060,7 +1067,7 @@ $conn->close();
 
     function DRPprint() {
       const printWindow = window.open('DRP.html', '_blank'); // '_blank' ensures the content opens in a new tab
-      printWindow.onload = function() {
+      printWindow.onload = function () {
 
         printWindow.print();
       };
@@ -1126,12 +1133,12 @@ $conn->close();
 
       // Send data to FAASrpuID.php
       fetch('FAASrpuID.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(arpData)
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(arpData)
+      })
         .then(response => response.json())
         .then(data => {
           if (data.success) {

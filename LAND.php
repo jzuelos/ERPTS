@@ -42,6 +42,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $adjust_percent = isset($_POST['percent_adjustment']) ? (float) $_POST['percent_adjustment'] : 100; // Percentage Adjustment
   $adjust_value = isset($_POST['value_adjustment']) ? (float) $_POST['value_adjustment'] : 0; // Value Adjustment
   $adjust_mv = isset($_POST['adjusted_market_value']) ? (float) $_POST['adjusted_market_value'] : 0; // Adjusted Market Value
+  $assess_lvl = isset($_POST['assessment_level']) ? (float) $_POST['assessment_level'] : 0; // Assessment Level
+  $assess_value = isset($_POST['assessed_value']) ? (float) $_POST['assessed_value'] : 0; // Assessment Value
 
   // Collect all other input fields
   $survey_no = $_POST['survey_no'] ?? '';
@@ -65,11 +67,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $adjust_factor = $_POST['adjustment_factor'] ?? ''; // Adjustment Factor (string)
 
   // Prepare and execute the insert query
-  $stmt = $conn->prepare("INSERT INTO land (faas_id, oct_no, survey_no, boundaries, boun_desc, last_name, first_name, middle_name, contact_no, email, house_street, barangay, district, municipality, province, land_desc, classification, sub_class, area, actual_use, unit_value, market_value, adjust_factor, adjust_percent, adjust_value, adjust_mv)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+  $stmt = $conn->prepare("INSERT INTO land (faas_id, oct_no, survey_no, boundaries, boun_desc, last_name, first_name, middle_name, contact_no, email, house_street, barangay, district, municipality, province, land_desc, classification, sub_class, area, actual_use, unit_value, market_value, adjust_factor, adjust_percent, adjust_value, adjust_mv, assess_lvl, assess_value)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
   $stmt->bind_param(
-    "iissssssssssssssssisddsddd",
+    "iissssssssssssssssisddsddddd",
     $faas_id,       // Foreign Key faas_id
     $oct_no,
     $survey_no,
@@ -95,7 +97,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $adjust_factor,
     $adjust_percent,
     $adjust_value,
-    $adjust_mv
+    $adjust_mv,
+    $assess_lvl,
+    $assess_value
   );
 
   if ($stmt->execute()) {
@@ -300,70 +304,6 @@ $conn->close();
         </div>
       </div>
 
-      <!-- Value Adjustment Factor Section -->
-      <h5 class="section-title mt-5">Value Adjustment Factor</h5>
-
-      <div class="row">
-        <div class="col-md-12 mb-4">
-          <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
-          <textarea id="adjustmentFactorModal" name="adjustment_factor" class="form-control" rows="3"
-            placeholder="Enter adjustment factor" disabled></textarea>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="adjustmentFactor" class="form-label">Adjustment Factor</label>
-            <input type="text" id="adjustmentFactor" class="form-control" placeholder="Enter adjustment factor"
-              disabled>
-          </div>
-        </div>
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="percentAdjustment" class="form-label">% Adjustment</label>
-            <input type="text" id="percentAdjustment" class="form-control" placeholder="Enter % adjustment" disabled>
-          </div>
-        </div>
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="valueAdjustment" class="form-label">Value Adjustment</label>
-            <input type="text" id="valueAdjustment" class="form-control" placeholder="Enter value adjustment" disabled>
-          </div>
-        </div>
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="adjustedMarketValue" class="form-label">Adjusted Market Value</label>
-            <input type="text" id="adjustedMarketValue" class="form-control" placeholder="Enter adjusted market value"
-              disabled>
-          </div>
-        </div>
-      </div>
-
-      <!-- Property Assessment Section -->
-      <h5 class="section-title mt-5">Property Assessment</h5>
-      <div class="row">
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label for="assessmentLevel" class="form-label">Assessment Level</label>
-            <input type="text" id="assessmentLevel" class="form-control" placeholder="Enter assessment level" disabled>
-          </div>
-        </div>
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label for="recommendedAssessmentLevel" class="form-label">% Recommended Assessment Level</label>
-            <input type="text" id="recommendedAssessmentLevel" class="form-control"
-              placeholder="Enter recommended assessment level" disabled>
-          </div>
-        </div>
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label for="assessedValue" class="form-label">Assessed Value</label>
-            <input type="text" id="assessedValue" class="form-control" placeholder="Enter assessed value" disabled>
-          </div>
-        </div>
-      </div>
-
       <!-- Land Appraisal Section -->
       <h5 class="section-title mt-5">Land Appraisal</h5>
 
@@ -426,6 +366,70 @@ $conn->close();
           <div class="mb-3">
             <label for="marketValue" class="form-label">Market Value</label>
             <input type="text" id="marketValue" class="form-control" placeholder="Enter market value" disabled>
+          </div>
+        </div>
+      </div>
+
+      <!-- Value Adjustment Factor Section -->
+      <h5 class="section-title mt-5">Value Adjustment Factor</h5>
+
+      <div class="row">
+        <div class="col-md-12 mb-4">
+          <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
+          <textarea id="adjustmentFactorModal" name="adjustment_factor" class="form-control" rows="3"
+            placeholder="Enter adjustment factor" disabled></textarea>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <div class="mb-3">
+            <label for="adjustmentFactor" class="form-label">Adjustment Factor</label>
+            <input type="text" id="adjustmentFactor" class="form-control" placeholder="Enter adjustment factor"
+              disabled>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="mb-3">
+            <label for="percentAdjustment" class="form-label">% Adjustment</label>
+            <input type="text" id="percentAdjustment" class="form-control" placeholder="Enter % adjustment" disabled>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="mb-3">
+            <label for="valueAdjustment" class="form-label">Value Adjustment</label>
+            <input type="text" id="valueAdjustment" class="form-control" placeholder="Enter value adjustment" disabled>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="mb-3">
+            <label for="adjustedMarketValue" class="form-label">Adjusted Market Value</label>
+            <input type="text" id="adjustedMarketValue" class="form-control" placeholder="Enter adjusted market value"
+              disabled>
+          </div>
+        </div>
+      </div>
+
+      <!-- Property Assessment Section -->
+      <h5 class="section-title mt-5">Property Assessment</h5>
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <div class="mb-3">
+            <label for="assessmentLevel" class="form-label">Assessment Level</label>
+            <input type="text" id="assessmentLevel" class="form-control" placeholder="Enter assessment level" disabled>
+          </div>
+        </div>
+        <div class="col-md-6 mb-4">
+          <div class="mb-3">
+            <label for="recommendedAssessmentLevel" class="form-label">% Recommended Assessment Level</label>
+            <input type="text" id="recommendedAssessmentLevel" class="form-control"
+              placeholder="Enter recommended assessment level" disabled>
+          </div>
+        </div>
+        <div class="col-md-6 mb-4">
+          <div class="mb-3">
+            <label for="assessedValue" class="form-label">Assessed Value</label>
+            <input type="text" id="assessedValue" class="form-control" placeholder="Enter assessed value" disabled>
           </div>
         </div>
       </div>
@@ -556,55 +560,6 @@ $conn->close();
               </div>
             </div>
 
-            <!-- Value Adjustment Factor Section in Modal -->
-            <h5 class="section-title mt-5">Value Adjustment Factor</h5>
-            <div class="row">
-              <div class="col-md-12 mb-4">
-                <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
-                <textarea id="adjustmentFactorModal" name="adjustment_factor" class="form-control" rows="3"
-                  placeholder="Enter adjustment factor"></textarea>
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-4 mb-4">
-                <label for="percentAdjustmentModal" class="form-label">% Adjustment</label>
-                <input type="text" id="percentAdjustmentModal" name="percent_adjustment" class="form-control"
-                  value="100">
-              </div>
-              <div class="col-md-4 mb-4">
-                <label for="valueAdjustmentModal" class="form-label">Value Adjustment</label>
-                <input type="text" id="valueAdjustmentModal" name="value_adjustment" class="form-control"
-                  placeholder="Enter value adjustment" readonly>
-              </div>
-              <div class="col-md-4 mb-4">
-                <label for="adjustedMarketValueModal" class="form-label">Adjusted Market Value</label>
-                <input type="text" id="adjustedMarketValueModal" name="adjusted_market_value" class="form-control"
-                  placeholder="Enter adjusted market value" readonly>
-              </div>
-            </div>
-
-            <!-- Property Assessment Section in Modal
-            <h5 class="section-title mt-5">Property Assessment</h5>
-            <div class="row">
-              <div class="col-md-6 mb-4">
-                <label for="assessmentLevelModal" class="form-label">Assessment Level</label>
-                <input type="text" id="assessmentLevelModal" name="assessment_level" class="form-control"
-                  placeholder="Enter assessment level">
-              </div>
-              <div class="col-md-6 mb-4">
-                <label for="recommendedAssessmentLevelModal" class="form-label">% Recommended Assessment Level</label>
-                <input type="text" id="recommendedAssessmentLevelModal" name="recommended_assessment_level"
-                  class="form-control" placeholder="Enter recommended assessment level">
-              </div>
-              <div class="col-md-6 mb-4">
-                <label for="assessedValueModal" class="form-label">Assessed Value</label>
-                <input type="text" id="assessedValueModal" name="assessed_value" class="form-control"
-                  placeholder="Enter assessed value">
-              </div>
-            </div>
-            -->
-
             <!-- Land Appraisal Section -->
             <h5 class="section-title mt-5">Land Appraisal</h5>
             <div class="row">
@@ -671,6 +626,53 @@ $conn->close();
                 <input type="number" id="marketValueModal" name="market_value" class="form-control"
                   placeholder="Market value" readonly>
               </div>
+            </div>
+          </div>
+
+          <!-- Value Adjustment Factor Section in Modal -->
+          <h5 class="section-title mt-5">Value Adjustment Factor</h5>
+          <div class="row">
+            <div class="col-md-12 mb-4">
+              <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
+              <textarea id="adjustmentFactorModal" name="adjustment_factor" class="form-control" rows="3"
+                placeholder="Enter adjustment factor"></textarea>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4 mb-4">
+              <label for="percentAdjustmentModal" class="form-label">% Adjustment</label>
+              <input type="text" id="percentAdjustmentModal" name="percent_adjustment" class="form-control" value="100">
+            </div>
+            <div class="col-md-4 mb-4">
+              <label for="valueAdjustmentModal" class="form-label">Value Adjustment</label>
+              <input type="text" id="valueAdjustmentModal" name="value_adjustment" class="form-control"
+                placeholder="Enter value adjustment" readonly>
+            </div>
+            <div class="col-md-4 mb-4">
+              <label for="adjustedMarketValueModal" class="form-label">Adjusted Market Value</label>
+              <input type="text" id="adjustedMarketValueModal" name="adjusted_market_value" class="form-control"
+                placeholder="Enter adjusted market value" readonly>
+            </div>
+          </div>
+
+          <!-- Property Assessment Section in Modal -->
+          <h5 class="section-title mt-5">Property Assessment</h5>
+          <div class="row">
+            <div class="col-md-5 mb-4">
+              <label for="assessmentLevelModal" class="form-label">Assessment Level</label>
+              <input type="number" id="assessmentLevelModal" name="assessment_level" class="form-control"
+                placeholder="Enter assessment level">
+            </div>
+            <div class="col-md-4 mb-4 ml-5">
+              <label for="recommendedAssessmentLevelModal" class="form-label">% Recommended Assessment Level</label>
+              <input type="number" id="recommendedAssessmentLevelModal" name="recommended_assessment_level"
+                class="form-control" placeholder="loading..." readonly>
+            </div>
+            <div class="col-md-5 mb-4">
+              <label for="assessedValueModal" class="form-label">Assessed Value</label>
+              <input type="number" id="assessedValueModal" name="assessed_value" class="form-control"
+                placeholder="Assessed Value" readonly>
             </div>
           </div>
 
@@ -842,6 +844,26 @@ $conn->close();
           adjustedMarketValueInput.value = adjustedMarketValue.toFixed(2).toLocaleString();
         }
 
+        // Function to calculate assessed value
+        function calculateAssessedValue() {
+          const adjustedMarketValue = parseFloat(adjustedMarketValueInput.value.replace(/,/g, '')) || 0;
+          const assessmentLevelInput = document.getElementById("assessmentLevelModal");
+          const assessedValueInput = document.getElementById("assessedValueModal");
+
+          const assessmentLevel = parseFloat(assessmentLevelInput.value) || 0;
+
+          if (!isNaN(adjustedMarketValue) && !isNaN(assessmentLevel) && assessmentLevel > 0) {
+            const assessedValue = adjustedMarketValue * (assessmentLevel / 100);
+            assessedValueInput.value = assessedValue.toFixed(2).toLocaleString();
+          } else {
+            assessedValueInput.value = '';
+          }
+        }
+
+        calculateAssessedValue(); // Recalculate assessed value whenever adjusted market value changes
+
+        document.getElementById("assessmentLevelModal").addEventListener("input", calculateAssessedValue); //Event listener for assessment level input
+
         // Event listener for percentage adjustment input
         percentAdjustmentInput.addEventListener('input', function () {
           const marketValue = parseFloat(marketValueInput.value.replace(/,/g, '')) || 0; // Get current market value
@@ -856,22 +878,26 @@ $conn->close();
         areaInput.addEventListener("input", debounce(calculateMarketValue, 300));
         unitValueInput.addEventListener("input", debounce(calculateMarketValue, 300));
 
-        // Optional: Add validation to highlight invalid inputs
         function validateInputs() {
           const area = parseFloat(areaInput.value);
           const unitValue = parseFloat(unitValueInput.value);
 
-          // Highlight the fields if values are invalid
+          // Highlight the area input if it's invalid (empty or non-positive)
           if (isNaN(area) || area <= 0) {
-            areaInput.classList.add('is-invalid');
+            areaInput.classList.add('is-invalid'); // Add 'is-invalid' class to highlight the field
+            areaInput.style.borderColor = 'red';   // Optional: Set the border color to red
           } else {
             areaInput.classList.remove('is-invalid');
+            areaInput.style.borderColor = '';      // Reset the border color if the input is valid
           }
 
+          // Highlight the unit value input if it's invalid (empty or non-positive)
           if (isNaN(unitValue) || unitValue <= 0) {
             unitValueInput.classList.add('is-invalid');
+            unitValueInput.style.borderColor = 'red';  // Set the border color to red
           } else {
             unitValueInput.classList.remove('is-invalid');
+            unitValueInput.style.borderColor = '';     // Reset the border color if the input is valid
           }
         }
 
@@ -900,7 +926,6 @@ $conn->close();
     integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 
 </html>
