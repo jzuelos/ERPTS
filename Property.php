@@ -130,24 +130,33 @@ if ($conn->connect_error) {
               </tr>
             </thead>
             <tbody>
-              <!-- PHP data for Classification would go here -->
-              <tr>
-                <td>CL-001</td>
-                <td>Residential</td>
-                <td>20%</td>
-                <td>
-                  <span class="badge bg-success-subtle text-success">Active</span>
-                </td>
-                <td>
-                  <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button class="btn btn-sm btn-outline-danger" title="Delete">
-                    <i class="fas fa-trash-alt"></i>
-                  </button>
-                </td>
-              </tr>
+              <?php
+              $query = "SELECT * FROM classification";
+              $result = mysqli_query($conn, $query);
+
+              while ($row = mysqli_fetch_assoc($result)) {
+                $statusBadge = ($row['c_status'] === 'Active')
+                  ? '<span class="badge bg-success-subtle text-success">Active</span>'
+                  : '<span class="badge bg-danger-subtle text-danger">Inactive</span>';
+
+                echo "<tr>
+              <td>{$row['c_code']}</td>
+              <td>{$row['c_description']}</td>
+              <td>{$row['c_uv']}%</td>
+              <td>{$statusBadge}</td>
+              <td>
+                <button class='btn btn-sm btn-outline-primary me-1' title='Edit'>
+                  <i class='fas fa-edit'></i>
+                </button>
+                <button class='btn btn-sm btn-outline-danger' title='Delete'>
+                  <i class='fas fa-trash-alt'></i>
+                </button>
+              </td>
+            </tr>";
+              }
+              ?>
             </tbody>
+
           </table>
 
           <!-- Actual Uses Table -->
@@ -163,24 +172,32 @@ if ($conn->connect_error) {
               </tr>
             </thead>
             <tbody>
-              <!-- PHP data for Actual Uses would go here -->
-              <tr>
-                <td>SC</td>
-                <td>AU-001</td>
-                <td>Single Family Residence</td>
-                <td>25%</td>
-                <td>
-                  <span class="badge bg-success-subtle text-success">Active</span>
-                </td>
-                <td>
-                  <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button class="btn btn-sm btn-outline-danger" title="Delete">
-                    <i class="fas fa-trash-alt"></i>
-                  </button>
-                </td>
-              </tr>
+              <?php
+              $query = "SELECT * FROM land_use";
+              $result = mysqli_query($conn, $query);
+
+              while ($row = mysqli_fetch_assoc($result)) {
+                $statusBadge = ($row['lu_status'] === 'Active')
+                  ? '<span class="badge bg-success-subtle text-success">Active</span>'
+                  : '<span class="badge bg-danger-subtle text-danger">Inactive</span>';
+
+                echo "<tr>
+              <td>{$row['report_code']}</td>
+              <td>{$row['lu_code']}</td>
+              <td>{$row['lu_description']}</td>
+              <td>{$row['lu_al']}%</td>
+              <td>{$statusBadge}</td>
+              <td>
+                <button class='btn btn-sm btn-outline-primary me-1' title='Edit'>
+                  <i class='fas fa-edit'></i>
+                </button>
+                <button class='btn btn-sm btn-outline-danger' title='Delete'>
+                  <i class='fas fa-trash-alt'></i>
+                </button>
+              </td>
+            </tr>";
+              }
+              ?>
             </tbody>
           </table>
 
@@ -196,23 +213,31 @@ if ($conn->connect_error) {
               </tr>
             </thead>
             <tbody>
-              <!-- PHP data for Sub-Classes would go here -->
-              <tr>
-                <td>SC-001</td>
-                <td>Luxury Residential</td>
-                <td>₱15,000</td>
-                <td>
-                  <span class="badge bg-success-subtle text-success">Active</span>
-                </td>
-                <td>
-                  <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button class="btn btn-sm btn-outline-danger" title="Delete">
-                    <i class="fas fa-trash-alt"></i>
-                  </button>
-                </td>
-              </tr>
+              <?php
+              $query = "SELECT * FROM subclass";
+              $result = mysqli_query($conn, $query);
+
+              while ($row = mysqli_fetch_assoc($result)) {
+                $statusBadge = ($row['sc_status'] === 'Active')
+                  ? '<span class="badge bg-success-subtle text-success">Active</span>'
+                  : '<span class="badge bg-danger-subtle text-danger">Inactive</span>';
+
+                echo "<tr>
+              <td>{$row['sc_code']}</td>
+              <td>{$row['sc_description']}</td>
+              <td>₱" . number_format($row['sc_uv'], 2) . "</td>
+              <td>{$statusBadge}</td>
+              <td>
+                <button class='btn btn-sm btn-outline-primary me-1' title='Edit'>
+                  <i class='fas fa-edit'></i>
+                </button>
+                <button class='btn btn-sm btn-outline-danger' title='Delete'>
+                  <i class='fas fa-trash-alt'></i>
+                </button>
+              </td>
+            </tr>";
+              }
+              ?>
             </tbody>
           </table>
         </div>
@@ -293,7 +318,7 @@ if ($conn->connect_error) {
         </div>
         <div class="modal-body">
           <form id="classificationForm">
-          <input type="hidden" name="form_type" value="classification">
+            <input type="hidden" name="form_type" value="classification">
             <div class="form-group">
               <label for="classificationCode">Code</label>
               <input type="text" class="form-control" id="classificationCode" name="c_code" placeholder="Enter Classification Code" required>
@@ -355,7 +380,7 @@ if ($conn->connect_error) {
         </div>
         <div class="modal-body">
           <form id="reportForm">
-          <input type="hidden" name="form_type" value="land_use">
+            <input type="hidden" name="form_type" value="land_use">
             <div class="form-group">
               <label for="reportCode">Report Code</label>
               <select class="form-control" id="reportCode" required>
@@ -457,7 +482,7 @@ if ($conn->connect_error) {
     </div>
   </footer>
 
-  
+
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
