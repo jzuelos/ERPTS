@@ -149,22 +149,6 @@ function savePlantsTreesData() {
   myModal.hide();  // Close the modal
 }
 
-function showEditValuationModal() {
-  console.log("Edit button clicked!"); // Debugging message
-
-  // Populate modal fields with current values from the main form
-  document.getElementById('landMarketValueModal').value = document.getElementById('landMarketValue').value;
-  document.getElementById('landAssessedValueModal').value = document.getElementById('landAssessedValue').value;
-  document.getElementById('plantsMarketValueModal').value = document.getElementById('plantsMarketValue').value;
-  document.getElementById('plantsAssessedValueModal').value = document.getElementById('plantsAssessedValue').value;
-
-  // Show the modal
-  var myModal = new bootstrap.Modal(document.getElementById('editValuationModal'), {
-    keyboard: false
-  });
-  myModal.show();
-}
-
 function saveValuationData() {
   console.log("Saving data!"); // Debugging message
 

@@ -1,12 +1,13 @@
 <?php
 session_start();
 
-// Uncomment the following code to enforce login check and cache control
-
+// Redirect to login if not authenticated
 if (!isset($_SESSION['user_id'])) {
-  header("Location: index.php"); // Redirect to login page if user is not logged in
+  header("Location: index.php");
   exit;
 }
+
+// Cache control headers
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
@@ -18,219 +19,183 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-$property = null; // Default to null in case no property is loaded
-
-// Check if 'id' is provided in the URL
-if (isset($_GET['id']) && !empty($_GET['id'])) {
-  $p_id = $_GET['id']; // Get the property ID from the URL
-
-  // Prepare the SQL statement with a placeholder
-  $sql = "SELECT p.p_id, p.house_no, p.block_no, p.barangay, p.province, p.city, p.district, p.land_area, 
-                 CONCAT(o.own_fname, ', ', o.own_mname, ' ', o.own_surname) AS owner_name,
-                 o.own_fname AS first_name, o.own_mname AS middle_name, o.own_surname AS last_name
-          FROM p_info p
-          LEFT JOIN owners_tb o ON p.ownId_Fk = o.own_id
-          WHERE p.p_id = ?";
-
-  // Prepare and execute the statement
+// Utility function to safely fetch a property by ID
+function fetchProperty($conn, $p_id)
+{
+  $sql = "
+    SELECT p.p_id, p.house_no, p.block_no, p.barangay, p.province, p.city, p.district, p.land_area,
+           CONCAT(o.own_fname, ', ', o.own_mname, ' ', o.own_surname) AS owner_name,
+           o.own_fname AS first_name, o.own_mname AS middle_name, o.own_surname AS last_name
+    FROM p_info p
+    LEFT JOIN owners_tb o ON p.ownId_Fk = o.own_id
+    WHERE p.p_id = ?
+  ";
   $stmt = $conn->prepare($sql);
-  $stmt->bind_param("i", $p_id); // Bind the parameter as an integer
+  $stmt->bind_param("i", $p_id);
+  $stmt->execute();
+  return $stmt->get_result()->fetch_assoc();
+}
+
+// Fetch owners list
+function fetchOwners($conn)
+{
+  $sql = "
+    SELECT own_id,
+           CONCAT(own_fname, ' ', own_mname, ' ', own_surname) AS owner_name,
+           CONCAT(house_no, ', ', barangay, ', ', city, ', ', province) AS address
+    FROM owners_tb
+  ";
+  $result = $conn->query($sql);
+  return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+// Fetch junction table (propertyowner) owner IDs
+function fetchPropertyOwnerIDs($conn, $property_id)
+{
+  $stmt = $conn->prepare("SELECT owner_id FROM propertyowner WHERE property_id = ?");
+  $stmt->bind_param("i", $property_id);
   $stmt->execute();
   $result = $stmt->get_result();
-  $property = $result->fetch_assoc();
+  return array_column($result->fetch_all(MYSQLI_ASSOC), 'owner_id');
 }
 
-// Separate SQL query to fetch data from owners_tb
-$sql_owners = "SELECT 
-                  own_id, 
-                  CONCAT(own_fname, ' ', own_mname, ' ', own_surname) AS owner_name,
-                  CONCAT(house_no, ', ', barangay, ', ', city, ', ', province) AS address
-               FROM owners_tb"; // Corrected the CONCAT syntax
+// Fetch owner details by a list of IDs
+function fetchOwnersByIds($conn, $owner_ids)
+{
+  $ids = implode(',', array_map('intval', $owner_ids));
+  $sql = "
+    SELECT own_id, 
+           CONCAT(own_fname, ', ', own_mname, ' ', own_surname) AS owner_name,
+           own_fname AS first_name, own_mname AS middle_name, own_surname AS last_name
+    FROM owners_tb
+    WHERE own_id IN ($ids)
+  ";
+  $result = $conn->query($sql);
+  return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+}
 
-// Execute the owner query
-$ownersResult = $conn->query($sql_owners);
+// Fetch faas info (faas_id, propertyowner_id)
+function fetchFaasInfo($conn, $property_id)
+{
+  $stmt = $conn->prepare("SELECT faas_id, propertyowner_id FROM faas WHERE pro_id = ?");
+  $stmt->bind_param("i", $property_id);
+  $stmt->execute();
+  return $stmt->get_result()->fetch_assoc();
+}
 
-// Fetch owner data
+// Fetch RPU ID and details
+function fetchRPUDetails($conn, $property_id)
+{
+  $stmt = $conn->prepare("SELECT rpu_idno FROM faas WHERE pro_id = ?");
+  $stmt->bind_param("i", $property_id);
+  $stmt->execute();
+  $rpu_id = $stmt->get_result()->fetch_assoc()['rpu_idno'] ?? null;
+
+  if (!$rpu_id)
+    return null;
+
+  $stmt = $conn->prepare("SELECT arp, pin, taxability, effectivity FROM rpu_idnum WHERE rpu_id = ?");
+  $stmt->bind_param("i", $rpu_id);
+  $stmt->execute();
+  return $stmt->get_result()->fetch_assoc();
+}
+
+// Fetch land records tied to faas_id
+function fetchLandRecords($conn, $faas_id)
+{
+  $stmt = $conn->prepare("SELECT oct_no, area, market_value, assess_value FROM land WHERE faas_id = ?");
+  $stmt->bind_param("i", $faas_id);
+  $stmt->execute();
+  return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+// Calculate total land values (market and assess)
+function calculateTotalLandValues($conn, $faas_id)
+{
+  $stmt = $conn->prepare("
+    SELECT 
+      SUM(market_value) AS total_market_value, 
+      SUM(assess_value) AS total_assess_value 
+    FROM land 
+    WHERE faas_id = ?
+  ");
+  $stmt->bind_param("i", $faas_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  return $result->fetch_assoc(); // returns associative array with total values
+}
+
+// MAIN: Begin processing
+$property = null;
 $owners = [];
-if ($ownersResult && $ownersResult->num_rows > 0) {
-  while ($row = $ownersResult->fetch_assoc()) {
-    $owners[] = $row; // Append each owner to the owners array
-  }
-}
+$owners_details = [];
+$rpu_details = null;
+$landRecords = [];
+$faas_id = null;
+$totalMarketValue = 0;
+$totalAssessedValue = 0;
 
-// Step 1: Prepare the SQL statement to get the faas_id and propertyowner_id from the `faas` table
-$sql_editowner = "
-SELECT 
-    f.faas_id,            -- Fetch the faas_id
-    f.propertyowner_id    -- Fetch the propertyowner_id
-FROM faas f
-WHERE f.pro_id = ?";    // Use the property_id from the URL
-
-// Check if property ID (`pro_id`) is provided
 if (isset($_GET['id']) && !empty($_GET['id'])) {
-  $p_id = intval($_GET['id']); // Sanitize input
-  // Echo property ID with a top margin for debugging
-  echo "<div style='margin-top: 10px;'>&nbsp;&nbsp;&nbsp;&nbsp;Property ID: " . $p_id . "<br></div>";
+  $property_id = intval($_GET['id']);
+  echo "<div style='margin-top:10px;'>&nbsp;&nbsp;&nbsp;&nbsp;Property ID: $property_id<br></div>";
 
+  // Fetch main property
+  $property = fetchProperty($conn, $property_id);
 
-  // Step 2: Prepare and execute the query to get both faas_id and propertyowner_id (junction table IDs)
-  if ($stmt = $conn->prepare($sql_editowner)) {
-    $stmt->bind_param("i", $p_id); // Bind property ID to the query
-    $stmt->execute();
-    $result = $stmt->get_result();
+  // Fetch faas info
+  $faas_info = fetchFaasInfo($conn, $property_id);
+  if ($faas_info) {
+    $faas_id = $faas_info['faas_id'];
 
-    // Step 3: Check if the query returned a row
-    if ($result->num_rows > 0) {
-      $row = $result->fetch_assoc();
+    // ✅ Calculate land values right after faas_id is known
+    $totals = calculateTotalLandValues($conn, $faas_id);
+    $totalMarketValue = $totals['total_market_value'] ?? 0;
+    $totalAssessedValue = $totals['total_assess_value'] ?? 0;
 
-      // Step 4: Get the faas_id and propertyowner_id
-      $faas_id = $row['faas_id'];
-      $propertyowner_id = $row['propertyowner_id'];
+    echo "&nbsp;&nbsp;&nbsp;&nbsp;Faas ID: {$faas_info['faas_id']}<br>";
+    echo "&nbsp;&nbsp;&nbsp;&nbsp;Property Owner ID: {$faas_info['propertyowner_id']}<br>";
 
-      // Echo both faas_id and propertyowner_id for debugging with indentation
-      echo "&nbsp;&nbsp;&nbsp;&nbsp;Faas ID: " . $faas_id . "<br>"; // Indentation using non-breaking spaces
-      echo "&nbsp;&nbsp;&nbsp;&nbsp;Property Owner ID: " . $propertyowner_id . "<br>"; // Indentation using non-breaking spaces
+    // Fetch owner IDs
+    $owner_ids = fetchPropertyOwnerIDs($conn, $property_id);
+    echo "&nbsp;&nbsp;&nbsp;&nbsp;Owner IDs: " . implode(", ", $owner_ids) . "<br>";
 
-
-      // Step 5: Query the junction table `propertyowner` to get the related owner IDs
-      $sql_propertyowner = "
-                SELECT owner_id 
-                FROM propertyowner 
-                WHERE property_id = ?"; // Use property_id from the URL to get related owner_ids
-
-      if ($stmt2 = $conn->prepare($sql_propertyowner)) {
-        $stmt2->bind_param("i", $p_id); // Bind property ID to the query
-        $stmt2->execute();
-        $result2 = $stmt2->get_result();
-
-        // Step 6: Collect all the owner IDs
-        $owner_ids = [];
-        while ($row2 = $result2->fetch_assoc()) {
-          $owner_ids[] = $row2['owner_id']; // Store each owner_id from the junction table
-        }
-
-        // Echo all the collected owner IDs for debugging
-        echo "&nbsp;&nbsp;&nbsp;&nbsp;Owner IDs: " . implode(", ", $owner_ids) . "<br>";
-
-        if (!empty($owner_ids)) {
-          // Step 7: Build the query to fetch owner details from owners_tb
-          $ids = implode(',', array_map('intval', $owner_ids)); // Convert IDs to a comma-separated string
-
-          $sql_owners = "
-  SELECT 
-    own_id, 
-    CONCAT(own_fname, ', ', own_mname, ' ', own_surname) AS owner_name,
-    own_fname AS first_name, 
-    own_mname AS middle_name, 
-    own_surname AS last_name
-  FROM owners_tb
-  WHERE own_id IN ($ids)"; // Use IN clause to get all matching owners
-
-          // Step 8: Execute the query to fetch owner details
-          $owners_result = $conn->query($sql_owners);
-
-          // Store owners' details in an array
-          $owners_details = [];
-          if ($owners_result->num_rows > 0) {
-            while ($owner = $owners_result->fetch_assoc()) {
-              $owners_details[] = $owner;
-            }
-          }
-          // Step 9: Check if we got owner details
-          if ($owners_result->num_rows > 0) {
-            // Echo the number of owners found for debugging
-            echo "&nbsp;&nbsp;&nbsp;&nbsp;Found owners: " . $owners_result->num_rows . "<br>";
-
-            while ($owner = $owners_result->fetch_assoc()) {
-              // Echo the details of each owner for debugging
-              echo "Owner ID: " . $owner['own_id'] . "<br>";
-              echo "Owner Name: " . $owner['owner_name'] . "<br>";
-              echo "First Name: " . $owner['first_name'] . "<br>";
-              echo "Middle Name: " . $owner['middle_name'] . "<br>";
-              echo "Last Name: " . $owner['last_name'] . "<br><br>";
-            }
-          } else {
-            echo "No owner details found for the given property.<br>";
-          }
-        } else {
-          echo "No owners found for the given property.<br>";
-        }
-      } else {
-        echo "Error preparing query for junction table.<br>";
+    // Fetch owner details
+    if (!empty($owner_ids)) {
+      $owners_details = fetchOwnersByIds($conn, $owner_ids);
+      echo "&nbsp;&nbsp;&nbsp;&nbsp;Found owners: " . count($owners_details) . "<br>";
+      foreach ($owners_details as $owner) {
+        echo "Owner ID: {$owner['own_id']}<br>";
+        echo "Owner Name: {$owner['owner_name']}<br>";
+        echo "First Name: {$owner['first_name']}<br>";
+        echo "Middle Name: {$owner['middle_name']}<br>";
+        echo "Last Name: {$owner['last_name']}<br><br>";
       }
     } else {
-      echo "No data found for the given property ID.<br>";
+      echo "No owners found for the given property.<br>";
     }
-    $stmt->close();
+
+    // Fetch land records
+    $landRecords = fetchLandRecords($conn, $faas_id);
   } else {
-    echo "Error preparing the statement.<br>";
+    echo "No data found for the given property ID.<br>";
   }
+
+  // Fetch RPU details
+  $rpu_details = fetchRPUDetails($conn, $property_id);
 } else {
   echo "Property ID not provided.<br>";
 }
 
-// Fetching the RPU ID Section
-//get the faas_id
-$sql_rpu = "SELECT rpu_idno FROM faas WHERE pro_id = ?";
-$stmt_rpu = $conn->prepare($sql_rpu);
-$stmt_rpu->bind_param("i", $p_id);
-$stmt_rpu->execute();
-$result_rpu = $stmt_rpu->get_result();
-$rpu_idno = null;
+// General owners list
+$owners = fetchOwners($conn);
 
-if ($row_rpu = $result_rpu->fetch_assoc()) {
-  $rpu_idno = $row_rpu['rpu_idno'];
-}
-
-$rpu_details = null;
-if (!empty($rpu_idno)) {
-  $sql_rpu_details = "SELECT arp, pin, taxability, effectivity FROM rpu_idnum WHERE rpu_id = ?";
-  $stmt_rpu_details = $conn->prepare($sql_rpu_details);
-  $stmt_rpu_details->bind_param("i", $rpu_idno);
-  $stmt_rpu_details->execute();
-  $result_rpu_details = $stmt_rpu_details->get_result();
-
-  if ($row_rpu_details = $result_rpu_details->fetch_assoc()) {
-    $rpu_details = $row_rpu_details; // Store RPU details
-  }
-}
-
-//Fetch land property data
-$landRecords = []; // Store land records
-
-// Get property ID from URL
-if (isset($_GET['id']) && !empty($_GET['id'])) {
-  $property_id = intval($_GET['id']); // Sanitize input
-
-  // Fetch the faas_id from the faas table
-  $sql_faas = "SELECT faas_id FROM faas WHERE pro_id = ?";
-  if ($stmt_faas = $conn->prepare($sql_faas)) {
-    $stmt_faas->bind_param("i", $property_id);
-    $stmt_faas->execute();
-    $result_faas = $stmt_faas->get_result();
-
-    if ($result_faas->num_rows > 0) {
-      $faas_data = $result_faas->fetch_assoc();
-      $faas_id = $faas_data['faas_id'];
-
-      // Fetch land records matching the faas_id
-      $sql_land = "SELECT oct_no, survey_no, area, market_value, assess_value FROM land WHERE faas_id = ?";
-      if ($stmt_land = $conn->prepare($sql_land)) {
-        $stmt_land->bind_param("i", $faas_id);
-        $stmt_land->execute();
-        $result_land = $stmt_land->get_result();
-
-        while ($row = $result_land->fetch_assoc()) {
-          $landRecords[] = $row;
-        }
-        $stmt_land->close();
-      }
-    }
-    $stmt_faas->close();
-  }
-}
 $conn->close();
 ?>
+
+
+$conn->close();
+?>
+
 
 <!doctype html>
 <html lang="en">
@@ -534,7 +499,7 @@ $conn->close();
           <div class="col-md-6 mb-3">
             <label for="propertyNumber" class="form-label">Property Number</label>
             <input type="number" class="form-control" id="propertyNumber" placeholder="Enter Property Number"
-              value="<?= isset($rpu_idno) ? htmlspecialchars($rpu_idno) : ''; ?>" disabled>
+              value="<?= isset($rpu_details['pin']) ? htmlspecialchars($rpu_details['pin']) : ''; ?>" disabled>
           </div>
 
           <!-- Taxability Dropdown -->
@@ -576,10 +541,6 @@ $conn->close();
           <div class="col-md-6">
             <label for="editID" class="form-label">Edit ID</label>
             <input type="text" class="form-control" id="editID" placeholder="Enter Edit ID" disabled>
-          </div>
-          <div class="col-md-6 d-flex align-items-end">
-            <button type="button" class="btn btn-outline-secondary btn-sm ms-2" id="editButton"
-              onclick="toggleEdit()">Edit</button>
           </div>
         </div>
 
@@ -784,14 +745,14 @@ $conn->close();
 
       <!-- Value Table -->
       <div class="table-responsive">
-        <table class="table table-borderless">
+        <table class="table table-borderless text-center"> <!-- Added text-center here -->
           <thead class="border-bottom border-2">
             <tr class="border-bottom border-2">
-              <th class="bold">OCT/TCT Number</th>
-              <th class="bold">Survey Number</th>
+              <th class="bold" style="width: 10%;">OCT/TCT Number</th>
               <th class="bold">Area (sq m)</th>
               <th class="bold">Market Value</th>
-              <th class="bold">Assessed Value</th> <!-- New column header -->
+              <th class="bold">Assessed Value</th>
+              <th class="bold" style="width: 10%;">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -799,24 +760,24 @@ $conn->close();
               <?php foreach ($landRecords as $record): ?>
                 <tr class="border-bottom border-3">
                   <td><?= htmlspecialchars($record['oct_no']) ?></td>
-                  <td><?= htmlspecialchars($record['survey_no']) ?></td>
                   <td><?= htmlspecialchars($record['area']) ?></td>
                   <td><?= number_format($record['market_value'], 2) ?></td>
                   <td>
                     <?= isset($record['assess_value']) ? number_format($record['assess_value'], 2) : '0.00' ?>
-                    <!-- Check if 'assess_value' exists -->
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">Edit</button>
                   </td>
                 </tr>
               <?php endforeach; ?>
             <?php else: ?>
               <tr>
-                <td colspan="5" class="text-center">No records found</td> <!-- Adjust colspan to 5 -->
+                <td colspan="6" class="text-center">No records found</td>
               </tr>
             <?php endif; ?>
           </tbody>
         </table>
       </div>
-
 
     </div>
   </section>
@@ -890,7 +851,6 @@ $conn->close();
   <section class="container my-5" id="valuation-section">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h4 class="section-title">Valuation</h4>
-      <button type="button" class="btn btn-outline-primary btn-sm" onclick="showEditValuationModal()">Edit</button>
     </div>
 
     <div class="card border-0 shadow p-5 rounded-3 bg-light">
@@ -906,10 +866,12 @@ $conn->close();
           <tr>
             <td>Land</td>
             <td class="text-center">
-              <input type="text" class="form-control text-center" id="landMarketValue" value="380,160.00" disabled>
+              <input type="text" class="form-control text-center" id="landMarketValue"
+                value="<?= number_format($totalMarketValue ?? 0, 2) ?>" disabled>
             </td>
             <td class="text-center">
-              <input type="text" class="form-control text-center" id="landAssessedValue" value="22,810.00" disabled>
+              <input type="text" class="form-control text-center" id="landAssessedValue"
+                value="<?= number_format($totalAssessedValue ?? 0, 2) ?>" disabled>
             </td>
           </tr>
           <tr>
@@ -924,57 +886,18 @@ $conn->close();
           <tr class="border-top font-weight-bold">
             <td>Total</td>
             <td class="text-center">
-              <input type="text" class="form-control text-center" id="totalMarketValue" value="380,160.00" disabled>
+              <input type="text" class="form-control text-center" id="totalMarketValue"
+                value="<?= number_format($totalMarketValue ?? 0, 2) ?>" disabled>
             </td>
             <td class="text-center">
-              <input type="text" class="form-control text-center" id="totalAssessedValue" value="22,810.00" disabled>
+              <input type="text" class="form-control text-center" id="totalAssessedValue"
+                value="<?= number_format($totalAssessedValue ?? 0, 2) ?>" disabled>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
   </section>
-
-  <!-- Modal for Editing Valuation -->
-  <div class="modal fade" id="editValuationModal" tabindex="-1" aria-labelledby="editValuationModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editValuationModalLabel">Edit Valuation Information</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="editValuationForm">
-            <div class="mb-3">
-              <label for="landMarketValueModal" class="form-label">Land Market Value</label>
-              <input type="text" class="form-control" id="landMarketValueModal"
-                placeholder="Enter market value for Land">
-            </div>
-            <div class="mb-3">
-              <label for="landAssessedValueModal" class="form-label">Land Assessed Value</label>
-              <input type="text" class="form-control" id="landAssessedValueModal"
-                placeholder="Enter assessed value for Land">
-            </div>
-            <div class="mb-3">
-              <label for="plantsMarketValueModal" class="form-label">Plants/Trees Market Value</label>
-              <input type="text" class="form-control" id="plantsMarketValueModal"
-                placeholder="Enter market value for Plants/Trees">
-            </div>
-            <div class="mb-3">
-              <label for="plantsAssessedValueModal" class="form-label">Plants/Trees Assessed Value</label>
-              <input type="text" class="form-control" id="plantsAssessedValueModal"
-                placeholder="Enter assessed value for Plants/Trees">
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="saveValuationData()">Save changes</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
@@ -1168,5 +1091,4 @@ $conn->close();
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
