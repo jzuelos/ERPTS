@@ -34,45 +34,59 @@ if ($faas_id == 0) {
   die("Error: No FAAS record found for this property.");
 }
 
-// Handle form submission
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  $oct_no = isset($_POST['oct_no']) ? (int) $_POST['oct_no'] : 0;
-  $unit_value = isset($_POST['unit_value']) ? (float) $_POST['unit_value'] : 0;
-  $market_value = isset($_POST['market_value']) ? (float) $_POST['market_value'] : 0;
-  $adjust_percent = isset($_POST['percent_adjustment']) ? (float) $_POST['percent_adjustment'] : 100; // Percentage Adjustment
-  $adjust_value = isset($_POST['value_adjustment']) ? (float) $_POST['value_adjustment'] : 0; // Value Adjustment
-  $adjust_mv = isset($_POST['adjusted_market_value']) ? (float) $_POST['adjusted_market_value'] : 0; // Adjusted Market Value
-  $assess_lvl = isset($_POST['assessment_level']) ? (float) $_POST['assessment_level'] : 0; // Assessment Level
-  $assess_value = isset($_POST['assessed_value']) ? (float) $_POST['assessed_value'] : 0; // Assessment Value
+  // Collect numeric values
+  $oct_no = (int) ($_POST['oct_no'] ?? 0);
+  $unit_value = (float) ($_POST['unit_value'] ?? 0);
+  $market_value = (float) ($_POST['market_value'] ?? 0);
+  $adjust_percent = (float) ($_POST['percent_adjustment'] ?? 100);
+  $adjust_value = (float) ($_POST['value_adjustment'] ?? 0);
+  $adjust_mv = (float) ($_POST['adjusted_market_value'] ?? 0);
+  $assess_lvl = (float) ($_POST['assessment_level'] ?? 0);
+  $assess_value = (float) ($_POST['assessed_value'] ?? 0);
 
-  // Collect all other input fields
-  $survey_no = $_POST['survey_no'] ?? '';
-  $boundaries = $_POST['boundaries'] ?? '';
-  $boun_desc = $_POST['boun_desc'] ?? '';
-  $last_name = $_POST['last_name'] ?? '';
-  $first_name = $_POST['first_name'] ?? '';
-  $middle_name = $_POST['middle_name'] ?? '';
-  $contact_no = $_POST['contact_no'] ?? '';
-  $email = $_POST['email'] ?? '';
-  $house_street = $_POST['house_street'] ?? '';
-  $barangay = $_POST['barangay'] ?? '';
-  $district = $_POST['district'] ?? '';
-  $municipality = $_POST['municipality'] ?? '';
-  $province = $_POST['province'] ?? '';
-  $land_desc = $_POST['land_desc'] ?? '';
-  $classification = $_POST['classification'] ?? '';
-  $sub_class = $_POST['sub_class'] ?? '';
-  $area = $_POST['area'] ?? '';
-  $actual_use = $_POST['actual_use'] ?? '';
-  $adjust_factor = $_POST['adjustment_factor'] ?? ''; // Adjustment Factor (string)
+  // Collect text values
+  $fields = [
+    'survey_no',
+    'boundaries',
+    'boun_desc',
+    'last_name',
+    'first_name',
+    'middle_name',
+    'contact_no',
+    'email',
+    'house_street',
+    'barangay',
+    'district',
+    'municipality',
+    'province',
+    'land_desc',
+    'classification',
+    'sub_class',
+    'area',
+    'actual_use',
+    'adjustment_factor'
+  ];
 
-  // Prepare and execute the insert query
-  $stmt = $conn->prepare("INSERT INTO land (faas_id, oct_no, survey_no, boundaries, boun_desc, last_name, first_name, middle_name, contact_no, email, house_street, barangay, district, municipality, province, land_desc, classification, sub_class, area, actual_use, unit_value, market_value, adjust_factor, adjust_percent, adjust_value, adjust_mv, assess_lvl, assess_value)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+  foreach ($fields as $field) {
+    $$field = $_POST[$field] ?? '';
+  }
+
+  // === INSERT INTO land ===
+  $stmt = $conn->prepare("
+      INSERT INTO land (
+          faas_id, oct_no, survey_no, boundaries, boun_desc, last_name, 
+          first_name, middle_name, contact_no, email, house_street, barangay, 
+          district, municipality, province, land_desc, classification, sub_class, 
+          area, actual_use, unit_value, market_value, adjust_factor, 
+          adjust_percent, adjust_value, adjust_mv, assess_lvl, assess_value
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ");
 
   $stmt->bind_param(
     "iissssssssssssssssisddsddddd",
-    $faas_id,       // Foreign Key faas_id
+    $faas_id,
     $oct_no,
     $survey_no,
     $boundaries,
@@ -94,7 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $actual_use,
     $unit_value,
     $market_value,
-    $adjust_factor,
+    $adjustment_factor,
     $adjust_percent,
     $adjust_value,
     $adjust_mv,
@@ -103,19 +117,87 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   );
 
   if ($stmt->execute()) {
-    $p_id = isset($_GET['p_id']) ? htmlspecialchars($_GET['p_id']) : '';
+    $land_id = $conn->insert_id; // Get last inserted ID from land table
 
+    // Add land_id to $_POST so it's passed into insertCertification
+    $_POST['land_id'] = $land_id;
+
+    insertCertification($conn, $_POST);
+
+    $p_id = htmlspecialchars($_GET['p_id'] ?? '');
     echo "<script>
             alert('Land record added successfully!');
             window.location.href = 'FAAS.php?id=$p_id';
           </script>";
-    exit(); // Stop further script execution
+    exit();
   } else {
     echo "<script>alert('Error: " . addslashes($stmt->error) . "');</script>";
   }
 
   $stmt->close();
 }
+
+function insertCertification($conn, $data)
+{
+  $land_id = $data['land_id'] ?? null; // Foreign key reference
+
+  $verified = $data['verified_by'] ?? null;
+  $noted = $data['noted_by'] ?? null;
+  $recomApproval = $data['recommending_approval'] ?? null;
+  $recomDate = !empty($data['recommendation_date']) ? $data['recommendation_date'] : null;
+  $plotted = $data['plotted_by'] ?? null;
+  $appraised = $data['appraised_by'] ?? null;
+  $appraisedDate = !empty($data['appraisal_date']) ? $data['appraisal_date'] : null;
+  $approved = $data['approved_by'] ?? null;
+  $approvedDate = !empty($data['approval_date']) ? $data['approval_date'] : null;
+
+  $idle = isset($data['idleStatus']) && $data['idleStatus'] === 'yes' ? 1 : 0;
+  $contested = isset($data['contestedStatus']) && $data['contestedStatus'] === 'yes' ? 1 : 0;
+
+  // Start building dynamic query
+  $fields = ['land_id', 'verified', 'noted', 'recom_approval', 'plotted', 'appraised', 'approved', 'idle', 'contested'];
+  $placeholders = ['?', '?', '?', '?', '?', '?', '?', '?', '?'];
+  $values = [$land_id, $verified, $noted, $recomApproval, $plotted, $appraised, $approved, $idle, $contested];
+  $types = 'issssssii';
+
+  if ($recomDate !== null) {
+    $fields[] = 'recom_date';
+    $placeholders[] = '?';
+    $values[] = $recomDate;
+    $types .= 's';
+  }
+
+  if ($appraisedDate !== null) {
+    $fields[] = 'appraised_date';
+    $placeholders[] = '?';
+    $values[] = $appraisedDate;
+    $types .= 's';
+  }
+
+  if ($approvedDate !== null) {
+    $fields[] = 'approved_date';
+    $placeholders[] = '?';
+    $values[] = $approvedDate;
+    $types .= 's';
+  }
+
+  $sql = "INSERT INTO certification (" . implode(', ', $fields) . ") VALUES (" . implode(', ', $placeholders) . ")";
+  $stmt = $conn->prepare($sql);
+
+  if (!$stmt) {
+    echo "<script>alert('Certification Prep Error: " . addslashes($conn->error) . "');</script>";
+    return;
+  }
+
+  $stmt->bind_param($types, ...$values);
+
+  if (!$stmt->execute()) {
+    echo "<script>alert('Certification Insert Error: " . addslashes($stmt->error) . "');</script>";
+  }
+
+  $stmt->close();
+}
+
 $conn->close();
 ?>
 
@@ -435,120 +517,122 @@ $conn->close();
         </div>
       </div>
 
-    <!-- Certification Section -->
-<h5 class="section-title mt-5">Certification</h5>
-  <div class="row">
-    <!-- Left Column -->
-    <div class="col-md-6">
-      <!-- Verified By -->
-      <div class="row align-items-end mb-3">
-        <div class="col-8">
-          <label class="form-label">Verified By</label>
-          <input type="text" class="form-control" placeholder="Enter Verifier" disabled>
-        </div>
-        <div class="col-4">
-          <button type="button" class="btn btn-outline-primary btn-sm w-100">Verify</button>
-        </div>
-      </div>
-      
-      <!-- Plotted By -->
-      <div class="mb-3">
-        <label class="form-label">Plotted By</label>
-        <input type="text" class="form-control" placeholder="Enter Plotter" disabled>
-      </div>
-      
-      <!-- Noted By -->
-      <div class="mb-3">
-        <label class="form-label">Noted By</label>
-        <input type="text" class="form-control" placeholder="Enter Noter" disabled>
-      </div>
-    </div>
-    
-    <!-- Right Column -->
-    <div class="col-md-6">
-      <!-- Appraised By with Date -->
-      <div class="row mb-3">
-        <div class="col-8">
-          <label class="form-label">Appraised By</label>
-          <input type="text" class="form-control" placeholder="Enter Appraiser" disabled>
-        </div>
-        <div class="col-4">
-          <label class="form-label">Date</label>
-          <input type="text" class="form-control" placeholder="MM/DD/YYYY" disabled>
-        </div>
-      </div>
-      
-      <!-- Recommending Approval with Date -->
-      <div class="row mb-3">
-        <div class="col-8">
-          <label class="form-label">Recommending Approval</label>
-          <input type="text" class="form-control" placeholder="Enter Recommender" disabled>
-        </div>
-        <div class="col-4">
-          <label class="form-label">Date</label>
-          <input type="text" class="form-control" placeholder="MM/DD/YYYY" disabled>
-        </div>
-      </div>
-      
-      <!-- Approved By with Date -->
+      <!-- Certification Section -->
+      <h5 class="section-title mt-5">Certification</h5>
       <div class="row">
-        <div class="col-8">
-          <label class="form-label">Approved By</label>
-          <input type="text" class="form-control" placeholder="Enter Approver" disabled>
+        <!-- Left Column -->
+        <div class="col-md-6">
+          <!-- Verified By -->
+          <div class="row align-items-end mb-3">
+            <div class="col-8">
+              <label class="form-label">Verified By</label>
+              <input type="text" class="form-control" placeholder="Enter Verifier" disabled>
+            </div>
+            <div class="col-4">
+              <button type="button" class="btn btn-outline-primary btn-sm w-100">Verify</button>
+            </div>
+          </div>
+
+          <!-- Plotted By -->
+          <div class="mb-3">
+            <label class="form-label">Plotted By</label>
+            <input type="text" class="form-control" placeholder="Enter Plotter" disabled>
+          </div>
+
+          <!-- Noted By -->
+          <div class="mb-3">
+            <label class="form-label">Noted By</label>
+            <input type="text" class="form-control" placeholder="Enter Noter" disabled>
+          </div>
         </div>
-        <div class="col-4">
-          <label class="form-label">Date</label>
-          <input type="text" class="form-control" placeholder="MM/DD/YYYY" disabled>
+
+        <!-- Right Column -->
+        <div class="col-md-6">
+          <!-- Appraised By with Date -->
+          <div class="row mb-3">
+            <div class="col-8">
+              <label class="form-label">Appraised By</label>
+              <input type="text" class="form-control" placeholder="Enter Appraiser" disabled>
+            </div>
+            <div class="col-4">
+              <label class="form-label">Date</label>
+              <input type="text" class="form-control" placeholder="MM/DD/YYYY" disabled>
+            </div>
+          </div>
+
+          <!-- Recommending Approval with Date -->
+          <div class="row mb-3">
+            <div class="col-4">
+              <label class="form-label">Recommending Approval</label>
+              <input type="text" class="form-control" placeholder="Enter Recommender" disabled>
+            </div>
+            <div class="col-4">
+              <label class="form-label">Date</label>
+              <input type="text" class="form-control" placeholder="MM/DD/YYYY" disabled>
+            </div>
+          </div>
+
+          <!-- Approved By with Date -->
+          <div class="row">
+            <div class="col-8">
+              <label class="form-label">Approved By</label>
+              <input type="text" class="form-control" placeholder="Enter Approver" disabled>
+            </div>
+            <div class="col-4">
+              <label class="form-label">Date</label>
+              <input type="text" class="form-control" placeholder="MM/DD/YYYY" disabled>
+            </div>
+          </div>
+
+          <!-- Miscellaneous Section -->
+          <h5 class="section-title mt-5">Miscellaneous</h5>
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <div class="mb-3">
+                <label class="form-label d-block">Idle</label>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="yes" disabled>
+                  <label class="form-check-label" for="idleYes">Yes</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="no" disabled>
+                  <label class="form-check-label" for="idleNo">No</label>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-4">
+              <div class="mb-3">
+                <label class="form-label d-block">Contested</label>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="yes"
+                    disabled>
+                  <label class="form-check-label" for="contestedYes">Yes</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="no"
+                    disabled>
+                  <label class="form-check-label" for="contestedNo">No</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- Print Button at Bottom Right -->
+          <div class="d-flex justify-content-end mt-4">
+            <button type="button" class="btn btn-outline-secondary py-2 px-4" onclick="openPrintPage()"
+              style="font-size: 1.1rem;">
+              <i class="fas fa-print me-2"></i>Print
+            </button>
+          </div>
         </div>
       </div>
-
-     <!-- Miscellaneous Section -->
-<h5 class="section-title mt-5">Miscellaneous</h5>
-<div class="row">
-  <div class="col-md-6 mb-4">
-    <div class="mb-3">
-      <label class="form-label d-block">Idle</label>
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="yes" disabled>
-        <label class="form-check-label" for="idleYes">Yes</label>
-      </div>
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="no" disabled>
-        <label class="form-check-label" for="idleNo">No</label>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-6 mb-4">
-    <div class="mb-3">
-      <label class="form-label d-block">Contested</label>
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="yes" disabled>
-        <label class="form-check-label" for="contestedYes">Yes</label>
-      </div>
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="no" disabled>
-        <label class="form-check-label" for="contestedNo">No</label>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-      <!-- Print Button at Bottom Right -->
-      <div class="d-flex justify-content-end mt-4">
-        <button type="button" class="btn btn-outline-secondary py-2 px-4" onclick="openPrintPage()"
-          style="font-size: 1.1rem;">
-          <i class="fas fa-print me-2"></i>Print
-        </button>
-      </div>
-    </div>
-    </div>
   </section>
- 
+
 
   <!-- Modal for Editing Land Details -->
   <div class="modal fade" id="editLandModal" tabindex="-1" aria-labelledby="editLandModalLabel" aria-hidden="true">
-  <div class="modal-dialog" style="max-width: 95%; width: 95%;">
+    <div class="modal-dialog" style="max-width: 95%; width: 95%;">
       <div class="modal-content">
         <form method="POST" action=""> <!-- Form starts here -->
           <div class="modal-header">
@@ -562,12 +646,12 @@ $conn->close();
               <div class="col-md-6 mb-4">
                 <label for="octTctNumberModal" class="form-label">OCT/TCT Number</label>
                 <input type="text" id="octTctNumberModal" name="oct_no" class="form-control"
-                  placeholder="Enter OCT/TCT Number">
+                  placeholder="Enter OCT/TCT Number" required>
               </div>
               <div class="col-md-6 mb-4">
                 <label for="surveyNumberModal" class="form-label">Survey Number</label>
                 <input type="text" id="surveyNumberModal" name="survey_no" class="form-control"
-                  placeholder="Enter Survey Number">
+                  placeholder="Enter Survey Number" required>
               </div>
             </div>
 
@@ -692,7 +776,7 @@ $conn->close();
               <div class="col-md-8 mb-4">
                 <label for="areaModal" class="form-label">Area</label>
                 <div class="input-group">
-                  <input type="number" id="areaModal" name="area" class="form-control" placeholder="Enter area">
+                  <input type="number" id="areaModal" name="area" class="form-control" placeholder="Enter area" step="any" required>
                   <div class="input-group-append ml-4">
                     <div class="form-check">
                       <input class="form-check-input" type="radio" name="areaUnit" value="sqm" id="sqm" checked>
@@ -731,185 +815,211 @@ $conn->close();
 
           <!-- Value Adjustment Factor Section in Modal -->
           <div class="section-wrap px-4 mb-5">
-          <h5 class="section-title mt-5">Value Adjustment Factor</h5>
-          <div class="row">
-            <div class="col-md-12 mb-4">
-              <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
-              <textarea id="adjustmentFactorModal" name="adjustment_factor" class="form-control" rows="3"
-                placeholder="Enter adjustment factor"></textarea>
+            <h5 class="section-title mt-5">Value Adjustment Factor</h5>
+            <div class="row">
+              <div class="col-md-12 mb-4">
+                <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
+                <textarea id="adjustmentFactorModal" name="adjustment_factor" class="form-control" rows="3"
+                  placeholder="Enter adjustment factor"></textarea>
+              </div>
             </div>
-          </div>
 
-          <div class="row">
-            <div class="col-md-4 mb-4">
-              <label for="percentAdjustmentModal" class="form-label">% Adjustment</label>
-              <input type="text" id="percentAdjustmentModal" name="percent_adjustment" class="form-control" value="100">
+            <div class="row">
+              <div class="col-md-4 mb-4">
+                <label for="percentAdjustmentModal" class="form-label">% Adjustment</label>
+                <input type="text" id="percentAdjustmentModal" name="percent_adjustment" class="form-control"
+                  value="100">
+              </div>
+              <div class="col-md-4 mb-4">
+                <label for="valueAdjustmentModal" class="form-label">Value Adjustment</label>
+                <input type="text" id="valueAdjustmentModal" name="value_adjustment" class="form-control"
+                  placeholder="Enter value adjustment" readonly>
+              </div>
+              <div class="col-md-4 mb-4">
+                <label for="adjustedMarketValueModal" class="form-label">Adjusted Market Value</label>
+                <input type="text" id="adjustedMarketValueModal" name="adjusted_market_value" class="form-control"
+                  placeholder="Enter adjusted market value" readonly>
+              </div>
             </div>
-            <div class="col-md-4 mb-4">
-              <label for="valueAdjustmentModal" class="form-label">Value Adjustment</label>
-              <input type="text" id="valueAdjustmentModal" name="value_adjustment" class="form-control"
-                placeholder="Enter value adjustment" readonly>
-            </div>
-            <div class="col-md-4 mb-4">
-              <label for="adjustedMarketValueModal" class="form-label">Adjusted Market Value</label>
-              <input type="text" id="adjustedMarketValueModal" name="adjusted_market_value" class="form-control"
-                placeholder="Enter adjusted market value" readonly>
-            </div>
-          </div>
           </div>
 
           <!-- Property Assessment Section in Modal -->
           <div class="section-wrap px-4 mb-5">
-          <h5 class="section-title mt-5">Property Assessment</h5>
-          <div class="row">
-            <div class="col-md-5 mb-4">
-              <label for="assessmentLevelModal" class="form-label">Assessment Level</label>
-              <input type="number" id="assessmentLevelModal" name="assessment_level" class="form-control"
-                placeholder="Enter assessment level">
+            <h5 class="section-title mt-5">Property Assessment</h5>
+            <div class="row">
+              <div class="col-md-5 mb-4">
+                <label for="assessmentLevelModal" class="form-label">Assessment Level</label>
+                <input type="number" id="assessmentLevelModal" name="assessment_level" class="form-control"
+                  placeholder="Enter assessment level">
+              </div>
+              <div class="col-md-4 mb-4 ml-5">
+                <label for="recommendedAssessmentLevelModal" class="form-label">% Recommended Assessment Level</label>
+                <input type="number" id="recommendedAssessmentLevelModal" name="recommended_assessment_level"
+                  class="form-control" placeholder="loading..." readonly>
+              </div>
+              <div class="col-md-5 mb-4">
+                <label for="assessedValueModal" class="form-label">Assessed Value</label>
+                <input type="number" id="assessedValueModal" name="assessed_value" class="form-control"
+                  placeholder="Assessed Value" readonly>
+              </div>
             </div>
-            <div class="col-md-4 mb-4 ml-5">
-              <label for="recommendedAssessmentLevelModal" class="form-label">% Recommended Assessment Level</label>
-              <input type="number" id="recommendedAssessmentLevelModal" name="recommended_assessment_level"
-                class="form-control" placeholder="loading..." readonly>
-            </div>
-            <div class="col-md-5 mb-4">
-              <label for="assessedValueModal" class="form-label">Assessed Value</label>
-              <input type="number" id="assessedValueModal" name="assessed_value" class="form-control"
-                placeholder="Assessed Value" readonly>
-            </div>
-          </div>
           </div>
 
           <!-- Certification Section in Modal -->
-<div class="section-wrap px-4 mb-5">
-  <h5 class="section-title mt-4">Certification</h5>
-  <div class="row gy-3">
+          <div class="section-wrap px-4 mb-5 border rounded p-3">
+            <h5 class="section-title mt-4">Certification</h5>
+            <div class="row gy-3">
 
-    <!-- Verified By -->
-    <div class="col-md-6">
-      <div class="d-flex align-items-center gap-2">
-        <label for="verifiedBy" class="form-label mb-0 w-50">Verified By</label>
-        <select class="form-select" id="verifiedBy" name="verified_by">
-          <option value="" selected disabled>Select verifier</option>
-          <option value="Verifier 1">Verifier 1</option>
-          <option value="Verifier 2">Verifier 2</option>
-          <option value="Verifier 3">Verifier 3</option>
-        </select>
-        <button type="button" class="btn btn-outline-primary">Verify</button>
-      </div>
-    </div>
+              <!-- Verified By -->
+              <div class="col-md-6">
+                <div class="row align-items-center">
+                  <div class="col-5">
+                    <label for="verifiedBy" class="form-label mb-0">Verified By</label>
+                  </div>
+                  <div class="col-5">
+                    <select class="form-select" id="verifiedBy" name="verified_by">
+                      <option value="" selected disabled>Select verifier</option>
+                      <option value="Verifier 1">Verifier 1</option>
+                      <option value="Verifier 2">Verifier 2</option>
+                      <option value="Verifier 3">Verifier 3</option>
+                    </select>
+                  </div>
+                  <div class="col-2">
+                    <button type="button" class="btn btn-outline-primary">Verify</button>
+                  </div>
+                </div>
+              </div>
 
-    <!-- Plotted By -->
-    <div class="col-md-6">
-      <div class="d-flex align-items-center gap-2">
-        <label for="plottedBy" class="form-label mb-0 w-50">Plotted By</label>
-        <select class="form-select" id="plottedBy" name="plotted_by">
-          <option value="" selected disabled>Select plotter</option>
-          <option value="Plotter 1">Plotter 1</option>
-          <option value="Plotter 2">Plotter 2</option>
-          <option value="Plotter 3">Plotter 3</option>
-        </select>
-      </div>
-    </div>
+              <!-- Plotted By -->
+              <div class="col-md-6">
+                <div class="row align-items-center">
+                  <div class="col-5">
+                    <label for="plottedBy" class="form-label mb-0">Plotted By</label>
+                  </div>
+                  <div class="col-7">
+                    <select class="form-select" id="plottedBy" name="plotted_by">
+                      <option value="" selected disabled>Select plotter</option>
+                      <option value="Plotter 1">Plotter 1</option>
+                      <option value="Plotter 2">Plotter 2</option>
+                      <option value="Plotter 3">Plotter 3</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
 
-    <!-- Noted By -->
-    <div class="col-md-6">
-      <div class="d-flex align-items-center gap-2">
-        <label for="notedBy" class="form-label mb-0 w-50">Noted By</label>
-        <select class="form-select" id="notedBy" name="noted_by">
-          <option value="" selected disabled>Select noter</option>
-          <option value="Noter 1">Noter 1</option>
-          <option value="Noter 2">Noter 2</option>
-          <option value="Noter 3">Noter 3</option>
-        </select>
-      </div>
-    </div>
+              <!-- Noted By -->
+              <div class="col-md-6">
+                <div class="row align-items-center">
+                  <div class="col-5">
+                    <label for="notedBy" class="form-label mb-0">Noted By</label>
+                  </div>
+                  <div class="col-7">
+                    <select class="form-select" id="notedBy" name="noted_by">
+                      <option value="" selected disabled>Select noter</option>
+                      <option value="Noter 1">Noter 1</option>
+                      <option value="Noter 2">Noter 2</option>
+                      <option value="Noter 3">Noter 3</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
 
-    <!-- Appraised By and Date -->
-    <div class="col-md-6">
-      <div class="d-flex align-items-center gap-2">
-        <label for="appraisedBy" class="form-label mb-0 w-50">Appraised By</label>
-        <select class="form-select" id="appraisedBy" name="appraised_by">
-          <option value="" selected disabled>Select appraiser</option>
-          <option value="Appraiser 1">Appraiser 1</option>
-          <option value="Appraiser 2">Appraiser 2</option>
-          <option value="Appraiser 3">Appraiser 3</option>
-        </select>
-      </div>
-      <div class="d-flex align-items-center gap-2 mt-2">
-        <label for="appraisalDate" class="form-label mb-0 w-50">Date</label>
-        <input type="date" class="form-control" id="appraisalDate" name="appraisal_date">
-      </div>
-    </div>
+              <!-- Appraised By and Date -->
+              <div class="col-md-6">
+                <div class="row align-items-center">
+                  <div class="col-4">
+                    <label for="appraisedBy" class="form-label mb-0">Appraised By</label>
+                  </div>
+                  <div class="col-4">
+                    <select class="form-select" id="appraisedBy" name="appraised_by">
+                      <option value="" selected disabled>Select appraiser</option>
+                      <option value="Appraiser 1">Appraiser 1</option>
+                      <option value="Appraiser 2">Appraiser 2</option>
+                      <option value="Appraiser 3">Appraiser 3</option>
+                    </select>
+                  </div>
+                  <div class="col-4">
+                    <input type="date" class="form-control" id="appraisalDate" name="appraisal_date">
+                  </div>
+                </div>
+              </div>
 
-    <!-- Recommending Approval and Date -->
-    <div class="col-md-6">
-      <div class="d-flex align-items-center gap-2">
-        <label for="recommendingApproval" class="form-label mb-0 w-50">Recommending Approval</label>
-        <select class="form-select" id="recommendingApproval" name="recommending_approval">
-          <option value="" selected disabled>Select recommender</option>
-          <option value="Recommender 1">Recommender 1</option>
-          <option value="Recommender 2">Recommender 2</option>
-          <option value="Recommender 3">Recommender 3</option>
-        </select>
-      </div>
-      <div class="d-flex align-items-center gap-2 mt-2">
-        <label for="recommendationDate" class="form-label mb-0 w-50">Date</label>
-        <input type="date" class="form-control" id="recommendationDate" name="recommendation_date">
-      </div>
-    </div>
+              <!-- Recommending Approval and Date -->
+              <div class="col-md-6">
+                <div class="row align-items-center">
+                  <div class="col-4">
+                    <label for="recommendingApproval" class="form-label mb-0">Recommending Approval</label>
+                  </div>
+                  <div class="col-4">
+                    <select class="form-select" id="recommendingApproval" name="recommending_approval">
+                      <option value="" selected disabled>Select recommender</option>
+                      <option value="Recommender 1">Recommender 1</option>
+                      <option value="Recommender 2">Recommender 2</option>
+                      <option value="Recommender 3">Recommender 3</option>
+                    </select>
+                  </div>
+                  <div class="col-4">
+                    <input type="date" class="form-control" id="recommendationDate" name="recommendation_date">
+                  </div>
+                </div>
+              </div>
 
-    <!-- Approved By and Date -->
-    <div class="col-md-6">
-      <div class="d-flex align-items-center gap-2">
-        <label for="approvedBy" class="form-label mb-0 w-50">Approved By</label>
-        <select class="form-select" id="approvedBy" name="approved_by">
-          <option value="" selected disabled>Select approver</option>
-          <option value="Approver 1">Approver 1</option>
-          <option value="Approver 2">Approver 2</option>
-          <option value="Approver 3">Approver 3</option>
-        </select>
-      </div>
-      <div class="d-flex align-items-center gap-2 mt-2">
-        <label for="approvalDate" class="form-label mb-0 w-50">Date</label>
-        <input type="date" class="form-control" id="approvalDate" name="approval_date">
-      </div>
-    </div>
-  </div>
-</div>
+              <!-- Approved By and Date -->
+              <div class="col-md-6">
+                <div class="row align-items-center">
+                  <div class="col-4">
+                    <label for="approvedBy" class="form-label mb-0">Approved By</label>
+                  </div>
+                  <div class="col-4">
+                    <select class="form-select" id="approvedBy" name="approved_by">
+                      <option value="" selected disabled>Select approver</option>
+                      <option value="Approver 1">Approver 1</option>
+                      <option value="Approver 2">Approver 2</option>
+                      <option value="Approver 3">Approver 3</option>
+                    </select>
+                  </div>
+                  <div class="col-4">
+                    <input type="date" class="form-control" id="approvalDate" name="approval_date">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-<!-- Miscellaneous Section in Modal -->
-<div class="section-wrap px-4 mb-5">
-  <h5 class="section-title mt-5">Miscellaneous</h5>
-  <div class="row">
-    <div class="col-md-6 mb-4">
-      <div class="mb-3">
-        <label class="form-label d-block">Idle</label>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="yes" enabled>
-          <label class="form-check-label" for="idleYes">Yes</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="no" enabled>
-          <label class="form-check-label" for="idleNo">No</label>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6 mb-4">
-      <div class="mb-3">
-        <label class="form-label d-block">Contested</label>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="yes" enabled>
-          <label class="form-check-label" for="contestedYes">Yes</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="no" enabled>
-          <label class="form-check-label" for="contestedNo">No</label>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+          <!-- Miscellaneous Section in Modal -->
+          <div class="section-wrap px-4 mb-5 border rounded p-3">
+            <h5 class="section-title mt-5">Miscellaneous</h5>
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <div class="mb-3">
+                  <label class="form-label d-block">Idle</label>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="yes">
+                    <label class="form-check-label" for="idleYes">Yes</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="no" checked>
+                    <label class="form-check-label" for="idleNo">No</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 mb-4">
+                <div class="mb-3">
+                  <label class="form-label d-block">Contested</label>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="yes">
+                    <label class="form-check-label" for="contestedYes">Yes</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="no"
+                      checked>
+                    <label class="form-check-label" for="contestedNo">No</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
 
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -934,6 +1044,12 @@ $conn->close();
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
+
+      // Set today's date in the date input
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('approvalDate').value = today;
+      document.getElementById('recommendationDate').value = today;
+      document.getElementById('appraisalDate').value = today;
 
       // Function to reset all modal forms
       function resetForm() {
