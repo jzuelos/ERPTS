@@ -616,11 +616,9 @@ $conn->close();
               </div>
             </div>
           </div>
-
-
           <!-- Print Button at Bottom Right -->
           <div class="d-flex justify-content-end mt-4">
-            <button type="button" class="btn btn-outline-secondary py-2 px-4" onclick="openPrintPage()"
+            <button type="button" class="btn btn-outline-secondary py-2 px-4"
               style="font-size: 1.1rem;">
               <i class="fas fa-print me-2"></i>Print
             </button>

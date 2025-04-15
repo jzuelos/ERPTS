@@ -103,7 +103,7 @@ function fetchRPUDetails($conn, $property_id)
 // Fetch land records tied to faas_id
 function fetchLandRecords($conn, $faas_id)
 {
-  $stmt = $conn->prepare("SELECT oct_no, area, market_value, assess_value FROM land WHERE faas_id = ?");
+  $stmt = $conn->prepare("SELECT * FROM land WHERE faas_id = ?");
   $stmt->bind_param("i", $faas_id);
   $stmt->execute();
   return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -208,6 +208,7 @@ $conn->close();
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="FAAS.css">
   <title>Electronic Real Property Tax System</title>
@@ -766,7 +767,15 @@ $conn->close();
                     <?= isset($record['assess_value']) ? number_format($record['assess_value'], 2) : '0.00' ?>
                   </td>
                   <td>
-                    <button class="btn btn-sm btn-primary">Edit</button>
+                    <div class="btn-group" role="group">
+                      <button class="btn btn-sm btn-primary">
+                        Edit
+                      </button>
+                      <a href="print-layout.php?p_id=<?= urlencode($p_id); ?>&land_id=<?= urlencode($record['land_id']); ?>"
+                        class="btn btn-sm btn-secondary ml-3" title="View" target="_blank">
+                        <i class="bi bi-printer"></i>
+                      </a>
+                    </div>
                   </td>
                 </tr>
               <?php endforeach; ?>
@@ -1091,4 +1100,5 @@ $conn->close();
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
