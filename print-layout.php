@@ -249,7 +249,7 @@ if ($p_id > 0) {
                     ?>
                 </td>
                 <td>
-                    ADDRESS:<br> <!-- adds space after the label -->
+                    ADDRESS:<br>
                     <?php
                     $ownerAddresses = [];
                     foreach ($owners as $owner) {
