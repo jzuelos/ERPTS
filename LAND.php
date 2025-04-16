@@ -630,7 +630,7 @@ $conn->close();
 
   <!-- Modal for Editing Land Details -->
   <div class="modal fade" id="editLandModal" tabindex="-1" aria-labelledby="editLandModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="max-width: 95%; width: 95%;">
+    <div class="modal-dialog" style="max-width: 55%; width: 55%;">
       <div class="modal-content">
         <form method="POST" action=""> <!-- Form starts here -->
           <div class="modal-header">
@@ -863,126 +863,107 @@ $conn->close();
             </div>
           </div>
 
-          <!-- Certification Section in Modal -->
-          <div class="section-wrap px-4 mb-5 border rounded p-3">
-            <h5 class="section-title mt-4">Certification</h5>
-            <div class="row gy-3">
+          <!--Certification Section -->
+              <div class="section-wrap px-4 mb-5">
+      <h5 class="section-title mt-4">Certification</h5>
+      
+      <div class="row gx-4">
+        <!-- Left Column -->
+        <div class="col-md-6">
+          <!-- Verified By -->
+          <div class="d-flex align-items-center mb-3">
+            <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Verified By</label>
+            <select class="form-select flex-grow-1 mx-2">
+              <option selected disabled>Select verifier</option>
+              <option>Verifier 1</option>
+              <option>Verifier 2</option>
+              <option>Verifier 3</option>
+            </select>
+            <button type="button" class="btn btn-outline-primary flex-shrink-0" style="width: 80px;">Verify</button>
+          </div>
 
-              <!-- Verified By -->
-              <div class="col-md-6">
-                <div class="row align-items-center">
-                  <div class="col-5">
-                    <label for="verifiedBy" class="form-label mb-0">Verified By</label>
-                  </div>
-                  <div class="col-5">
-                    <select class="form-select" id="verifiedBy" name="verified_by">
-                      <option value="" selected disabled>Select verifier</option>
-                      <option value="Verifier 1">Verifier 1</option>
-                      <option value="Verifier 2">Verifier 2</option>
-                      <option value="Verifier 3">Verifier 3</option>
-                    </select>
-                  </div>
-                  <div class="col-2">
-                    <button type="button" class="btn btn-outline-primary">Verify</button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Plotted By -->
-              <div class="col-md-6">
-                <div class="row align-items-center">
-                  <div class="col-5">
-                    <label for="plottedBy" class="form-label mb-0">Plotted By</label>
-                  </div>
-                  <div class="col-7">
-                    <select class="form-select" id="plottedBy" name="plotted_by">
-                      <option value="" selected disabled>Select plotter</option>
-                      <option value="Plotter 1">Plotter 1</option>
-                      <option value="Plotter 2">Plotter 2</option>
-                      <option value="Plotter 3">Plotter 3</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Noted By -->
-              <div class="col-md-6">
-                <div class="row align-items-center">
-                  <div class="col-5">
-                    <label for="notedBy" class="form-label mb-0">Noted By</label>
-                  </div>
-                  <div class="col-7">
-                    <select class="form-select" id="notedBy" name="noted_by">
-                      <option value="" selected disabled>Select noter</option>
-                      <option value="Noter 1">Noter 1</option>
-                      <option value="Noter 2">Noter 2</option>
-                      <option value="Noter 3">Noter 3</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Appraised By and Date -->
-              <div class="col-md-6">
-                <div class="row align-items-center">
-                  <div class="col-4">
-                    <label for="appraisedBy" class="form-label mb-0">Appraised By</label>
-                  </div>
-                  <div class="col-4">
-                    <select class="form-select" id="appraisedBy" name="appraised_by">
-                      <option value="" selected disabled>Select appraiser</option>
-                      <option value="Appraiser 1">Appraiser 1</option>
-                      <option value="Appraiser 2">Appraiser 2</option>
-                      <option value="Appraiser 3">Appraiser 3</option>
-                    </select>
-                  </div>
-                  <div class="col-4">
-                    <input type="date" class="form-control" id="appraisalDate" name="appraisal_date">
-                  </div>
-                </div>
-              </div>
-
-              <!-- Recommending Approval and Date -->
-              <div class="col-md-6">
-                <div class="row align-items-center">
-                  <div class="col-4">
-                    <label for="recommendingApproval" class="form-label mb-0">Recommending Approval</label>
-                  </div>
-                  <div class="col-4">
-                    <select class="form-select" id="recommendingApproval" name="recommending_approval">
-                      <option value="" selected disabled>Select recommender</option>
-                      <option value="Recommender 1">Recommender 1</option>
-                      <option value="Recommender 2">Recommender 2</option>
-                      <option value="Recommender 3">Recommender 3</option>
-                    </select>
-                  </div>
-                  <div class="col-4">
-                    <input type="date" class="form-control" id="recommendationDate" name="recommendation_date">
-                  </div>
-                </div>
-              </div>
-
-              <!-- Approved By and Date -->
-              <div class="col-md-6">
-                <div class="row align-items-center">
-                  <div class="col-4">
-                    <label for="approvedBy" class="form-label mb-0">Approved By</label>
-                  </div>
-                  <div class="col-4">
-                    <select class="form-select" id="approvedBy" name="approved_by">
-                      <option value="" selected disabled>Select approver</option>
-                      <option value="Approver 1">Approver 1</option>
-                      <option value="Approver 2">Approver 2</option>
-                      <option value="Approver 3">Approver 3</option>
-                    </select>
-                  </div>
-                  <div class="col-4">
-                    <input type="date" class="form-control" id="approvalDate" name="approval_date">
-                  </div>
-                </div>
-              </div>
+          <!-- Noted By -->
+          <div class="d-flex align-items-center mb-3">
+            <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Noted By</label>
+            <select class="form-select flex-grow-1 mx-2">
+              <option selected disabled>Select noter</option>
+              <option>Noter 1</option>
+              <option>Noter 2</option>
+              <option>Noter 3</option>
+            </select>
+            <div class="flex-shrink-0 text-center" style="width: 80px;">
+              <i class="bi bi-check-lg fs-4 text-success"></i>
             </div>
           </div>
+
+          <!-- Recommending Approval -->
+          <div class="d-flex align-items-center mb-3">
+            <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Recommending Approval</label>
+            <select class="form-select flex-grow-1 mx-2">
+              <option selected disabled>Select recommender</option>
+              <option>Recommender 1</option>
+              <option>Recommender 2</option>
+              <option>Recommender 3</option>
+            </select>
+            <div class="flex-shrink-0 text-center" style="width: 80px;">
+              <i class="bi bi-check-lg fs-4 text-success"></i>
+            </div>
+          </div>
+
+          <!-- Date -->
+          <div class="d-flex align-items-center">
+            <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Date</label>
+            <input type="date" class="form-control flex-grow-1 mx-2">
+            <div class="flex-shrink-0 text-center" style="width: 80px;">
+              <i class="bi bi-square fs-4"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-md-6">
+          <div class="d-flex align-items-center mb-3">
+            <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Plotted By</label>
+            <select class="form-select flex-grow-1">
+              <option selected disabled>Select plotter</option>
+              <option>Plotter 1</option>
+              <option>Plotter 2</option>
+              <option>Plotter 3</option>
+            </select>
+          </div>
+
+          <div class="d-flex align-items-center mb-3">
+            <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Appraised By</label>
+            <select class="form-select flex-grow-1">
+              <option selected disabled>Select appraiser</option>
+              <option>Appraiser 1</option>
+              <option>Appraiser 2</option>
+              <option>Appraiser 3</option>
+            </select>
+          </div>
+
+          <div class="d-flex align-items-center mb-3">
+            <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Date</label>
+            <input type="date" class="form-control flex-grow-1">
+          </div>
+
+          <div class="d-flex align-items-center mb-3">
+            <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Approved By</label>
+            <select class="form-select flex-grow-1">
+              <option selected disabled>Select approver</option>
+              <option>Approver 1</option>
+              <option>Approver 2</option>
+              <option>Approver 3</option>
+            </select>
+          </div>
+
+          <div class="d-flex align-items-center">
+            <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Date</label>
+            <input type="date" class="form-control flex-grow-1">
+          </div>
+        </div>
+      </div>
+    </div>
 
           <!-- Miscellaneous Section in Modal -->
           <div class="section-wrap px-4 mb-5 border rounded p-3">
