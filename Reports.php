@@ -83,7 +83,7 @@
           $conn = Database::getInstance();
 
           // Fetch active provinces
-          $stmt = $conn->prepare("SELECT province_id, province_name FROM province");
+          $stmt = $conn->prepare("SELECT province_id, province_name FROM province");  
           $stmt->execute();
           $regions_result = $stmt->get_result();
 
@@ -222,6 +222,56 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
       integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
       crossorigin="anonymous"></script>
+
+      <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const printAllCheckbox = document.getElementById("printAllCheck");
+    const filterCheckboxes = [
+      document.getElementById("classificationCheck"),
+      document.getElementById("locationCheck"),
+      document.getElementById("dateCheck")
+    ];
+
+    function updateCheckboxStates() {
+      // If any filter checkbox is checked, disable the Print All checkbox
+      if (filterCheckboxes.some(cb => cb.checked)) {
+        printAllCheckbox.checked = false;
+        printAllCheckbox.disabled = true;
+      } else {
+        printAllCheckbox.disabled = false;
+      }
+    }
+
+    function handlePrintAllClick() {
+      if (printAllCheckbox.checked) {
+        // Uncheck and disable all filter checkboxes
+        filterCheckboxes.forEach(cb => {
+          cb.checked = false;
+          cb.disabled = true;
+        });
+      } else {
+        // Enable all filter checkboxes
+        filterCheckboxes.forEach(cb => {
+          cb.disabled = false;
+        });
+      }
+    }
+
+    // Attach event listeners
+    filterCheckboxes.forEach(cb => cb.addEventListener("change", updateCheckboxStates));
+    printAllCheckbox.addEventListener("change", handlePrintAllClick);
+
+    // Initial check on page load
+    updateCheckboxStates();
+  });
+
+  window.addEventListener("beforeunload", function (e) {
+  e.preventDefault(); // Required for some browsers
+  e.returnValue = ""; // Show the default browser confirmation dialog
+});
+
+</script>
+
 </body>
 
 </html>
