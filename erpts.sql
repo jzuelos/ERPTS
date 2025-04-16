@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 07, 2025 at 04:34 PM
+-- Generation Time: Apr 16, 2025 at 03:50 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -50,6 +50,36 @@ INSERT INTO `brgy` (`brgy_id`, `brgy_code`, `brgy_name`, `status`, `m_id`) VALUE
 (73, '051612001', 'Aguit-It', 'Active', 6),
 (74, '051612002', 'Banocboc', 'Active', 3),
 (75, '051612003', 'Cagbalogo', 'Active', 3);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `certification`
+--
+
+CREATE TABLE `certification` (
+  `cert_id` int(50) NOT NULL,
+  `verified` varchar(50) NOT NULL,
+  `noted` varchar(50) NOT NULL,
+  `recom_approval` varchar(50) NOT NULL,
+  `recom_date` date NOT NULL DEFAULT current_timestamp(),
+  `plotted` varchar(50) NOT NULL,
+  `appraised` varchar(50) NOT NULL,
+  `appraised_date` date NOT NULL DEFAULT current_timestamp(),
+  `approved` varchar(50) NOT NULL,
+  `approved_date` date NOT NULL DEFAULT current_timestamp(),
+  `idle` tinyint(4) NOT NULL,
+  `contested` tinyint(4) NOT NULL,
+  `land_id` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `certification`
+--
+
+INSERT INTO `certification` (`cert_id`, `verified`, `noted`, `recom_approval`, `recom_date`, `plotted`, `appraised`, `appraised_date`, `approved`, `approved_date`, `idle`, `contested`, `land_id`) VALUES
+(8, '', '', 'Jo Torio', '2025-04-16', '', '', '2025-04-16', 'MAXIMO P. MAGANA, JR, REA', '2025-04-16', 0, 0, 7),
+(9, 'Verifier 1', 'Noter 1', 'Recommender 2', '2025-04-16', 'Plotter 2', 'Appraiser 2', '2025-04-16', 'Approver 1', '2025-04-16', 0, 0, 41);
 
 -- --------------------------------------------------------
 
@@ -119,7 +149,7 @@ CREATE TABLE `faas` (
 
 INSERT INTO `faas` (`faas_id`, `propertyowner_id`, `pro_id`, `rpu_idno`, `land_id`, `plants_id`, `valuation_id`) VALUES
 (32, '[61]', 143, 45, NULL, NULL, NULL),
-(33, '[62,63]', 144, NULL, NULL, NULL, NULL);
+(33, '[62,63]', 144, 46, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -166,7 +196,7 @@ CREATE TABLE `land` (
 INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `boundaries`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`, `adjust_factor`, `adjust_percent`, `adjust_value`, `adjust_mv`, `assess_lvl`, `assess_value`, `faas_id`) VALUES
 (6, 46, 'PSU-98765', '', 'Containing an area of 1,000 square meters, more or less.', 'Dioneda', 'Renz', 'Balce', '09932007821', 'rdioneda4@gmail.com', '1', 'Purok 5', '', 'Sta. Elena', 'Camarines Norte', '', 'Residential', 'Rice Land', 1500, 'Farmland', 2000.00, 3000000.00, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 32),
 (7, 46, 'Lot 1234, Cad-5678', '', ' A rectangular lot with a frontage of 20 meters along Rizal Street, adjacent to commercial establishments.', 'Reyes', 'Carlos', 'Mendoza', '09171234567', 'carlos.reyes@email.com', '23-B', 'Mabini', '', 'San Fernando ', 'Pampanga', 'A 1,500 sq. m. residential lot along Rizal Street, fully fenced with road access and nearby utilities.', 'Residential', 'High-density Housing', 1500, 'Residential Property', 2000.00, 3000000.00, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 32),
-(24, 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 1000, '', 620.00, 620000.00, '', 100.00, 0.00, 620000.00, 50.00, 310000.00, 32);
+(41, 2147483647, '4235234', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 325, '', 500.00, 162500.00, '', 90.00, -16250.00, 146250.00, 75.00, 109687.50, 33);
 
 -- --------------------------------------------------------
 
@@ -182,6 +212,13 @@ CREATE TABLE `land_use` (
   `lu_al` decimal(10,2) NOT NULL,
   `lu_status` enum('Active','Inactive') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `land_use`
+--
+
+INSERT INTO `land_use` (`lu_id`, `report_code`, `lu_code`, `lu_description`, `lu_al`, `lu_status`) VALUES
+(0, 'SC', 'SC234', '', 60.00, 'Active');
 
 -- --------------------------------------------------------
 
@@ -272,6 +309,24 @@ INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`) 
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `province`
+--
+
+CREATE TABLE `province` (
+  `province_id` int(11) NOT NULL,
+  `province_name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `province`
+--
+
+INSERT INTO `province` (`province_id`, `province_name`) VALUES
+(54, 'Camarines Norte');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `p_info`
 --
 
@@ -296,7 +351,7 @@ CREATE TABLE `p_info` (
 --
 
 INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`) VALUES
-(143, 12, 13, 8, 'Province 1', 'Daet', 'District 2', 'Bautista', '', 6, 100, '55   ', 'affidavit'),
+(143, 12, 13, 8, 'Province 1', 'Daet', 'District 2', 'Bautista', 'Zalcedo', 6, 200, '55   ', 'affidavit'),
 (144, 12, 23, 0, 'Province 1', 'Daet', 'District 1', 'Kalamunding', '', 0, 302, '   ', 'affidavit, barangay');
 
 -- --------------------------------------------------------
@@ -336,7 +391,8 @@ CREATE TABLE `rpu_idnum` (
 --
 
 INSERT INTO `rpu_idnum` (`rpu_id`, `arp`, `pin`, `taxability`, `effectivity`) VALUES
-(45, 2147483647, 789456, 'exempt', '2023');
+(45, 2147483647, 213, 'special', '2024'),
+(46, 12345, 1234, 'taxable', '2023');
 
 -- --------------------------------------------------------
 
@@ -401,6 +457,13 @@ ALTER TABLE `brgy`
   ADD PRIMARY KEY (`brgy_id`);
 
 --
+-- Indexes for table `certification`
+--
+ALTER TABLE `certification`
+  ADD PRIMARY KEY (`cert_id`),
+  ADD KEY `land_id` (`land_id`);
+
+--
 -- Indexes for table `classification`
 --
 ALTER TABLE `classification`
@@ -456,6 +519,12 @@ ALTER TABLE `propertyowner`
   ADD KEY `owner_id` (`owner_id`);
 
 --
+-- Indexes for table `province`
+--
+ALTER TABLE `province`
+  ADD PRIMARY KEY (`province_id`);
+
+--
 -- Indexes for table `p_info`
 --
 ALTER TABLE `p_info`
@@ -498,6 +567,12 @@ ALTER TABLE `brgy`
   MODIFY `brgy_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
+-- AUTO_INCREMENT for table `certification`
+--
+ALTER TABLE `certification`
+  MODIFY `cert_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
 -- AUTO_INCREMENT for table `classification`
 --
 ALTER TABLE `classification`
@@ -519,7 +594,7 @@ ALTER TABLE `faas`
 -- AUTO_INCREMENT for table `land`
 --
 ALTER TABLE `land`
-  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT for table `municipality`
@@ -540,6 +615,12 @@ ALTER TABLE `propertyowner`
   MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
+-- AUTO_INCREMENT for table `province`
+--
+ALTER TABLE `province`
+  MODIFY `province_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+
+--
 -- AUTO_INCREMENT for table `p_info`
 --
 ALTER TABLE `p_info`
@@ -555,7 +636,7 @@ ALTER TABLE `region`
 -- AUTO_INCREMENT for table `rpu_idnum`
 --
 ALTER TABLE `rpu_idnum`
-  MODIFY `rpu_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `rpu_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -566,6 +647,12 @@ ALTER TABLE `users`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `certification`
+--
+ALTER TABLE `certification`
+  ADD CONSTRAINT `land_id` FOREIGN KEY (`land_id`) REFERENCES `land` (`land_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `district`
