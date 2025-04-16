@@ -14,24 +14,26 @@
   <title>Electronic Real Property Tax System</title>
   <style>
     /* Additional styles for sticky header and footer */
-    html, body {
+    html,
+    body {
       height: 100%;
     }
-    
+
     body {
       display: flex;
       flex-direction: column;
     }
-    
+
     .content-wrapper {
       flex: 1 0 auto;
-      padding-top: 70px; /* Adjust based on your header height */
+      padding-top: 70px;
+      /* Adjust based on your header height */
     }
-    
+
     .footer {
       flex-shrink: 0;
     }
-    
+
     /* Ensure header is sticky */
     .navbar {
       position: fixed;
@@ -75,46 +77,100 @@
           </div>
           <hr>
 
+          <?php
+          // Include the database connection
+          include 'database.php';
+          $conn = Database::getInstance();
+
+          // Fetch active provinces
+          $stmt = $conn->prepare("SELECT province_id, province_name FROM province");
+          $stmt->execute();
+          $regions_result = $stmt->get_result();
+
+          // Fetch active municipalities
+          $municipalities_stmt = $conn->prepare("SELECT m_id, m_description FROM municipality WHERE m_status = 'Active'");
+          $municipalities_stmt->execute();
+          $municipalities_result = $municipalities_stmt->get_result();
+
+          // Fetch active districts
+          $districts_stmt = $conn->prepare("SELECT district_id, description FROM district WHERE status = 'Active'");
+          $districts_stmt->execute();
+          $districts_result = $districts_stmt->get_result();
+
+          // Fetch active barangays
+          $barangays_stmt = $conn->prepare("SELECT brgy_id, brgy_name FROM brgy WHERE status = 'Active'");
+          $barangays_stmt->execute();
+          $barangays_result = $barangays_stmt->get_result();
+          ?>
+
           <!-- Filter by Location -->
           <div class="form-group form-check">
             <input type="checkbox" class="form-check-input" id="locationCheck">
             <label class="form-check-label font-weight-bold" for="locationCheck">Filter by: Location</label>
           </div>
           <div class="form-row">
+            <!-- Province Dropdown -->
             <div class="form-group col-md-6">
               <label for="provinceSelect">Province</label>
               <select class="form-control" id="provinceSelect">
-                <option>Item 1</option>
-                <option>Item 2</option>
-                <option>Item 3</option>
+                <option value="" disabled selected>Select Province</option>
+                <?php
+                while ($row = $regions_result->fetch_assoc()) {
+                  echo "<option value='" . htmlspecialchars($row['province_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['province_name'], ENT_QUOTES) . "</option>";
+                }
+                ?>
               </select>
             </div>
+
+            <!-- Municipality/City Dropdown -->
             <div class="form-group col-md-6">
               <label for="citySelect">Municipality/City</label>
               <select class="form-control" id="citySelect">
-                <option>Item 1</option>
-                <option>Item 2</option>
-                <option>Item 3</option>
+                <option value="" disabled selected>Select Municipality</option>
+                <?php
+                while ($row = $municipalities_result->fetch_assoc()) {
+                  echo "<option value='" . htmlspecialchars($row['m_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['m_description'], ENT_QUOTES) . "</option>";
+                }
+                ?>
               </select>
             </div>
+
+            <!-- District Dropdown -->
             <div class="form-group col-md-6">
               <label for="districtSelect">District</label>
               <select class="form-control" id="districtSelect">
-                <option>Item 1</option>
-                <option>Item 2</option>
-                <option>Item 3</option>
+                <option value="" disabled selected>Select District</option>
+                <?php
+                if ($districts_result && $districts_result->num_rows > 0) {
+                  while ($row = $districts_result->fetch_assoc()) {
+                    echo "<option value='" . htmlspecialchars($row['district_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['description'], ENT_QUOTES) . "</option>";
+                  }
+                } else {
+                  echo "<option disabled>No active districts</option>";
+                }
+                ?>
               </select>
             </div>
+
+            <!-- Barangay Dropdown -->
             <div class="form-group col-md-6">
               <label for="barangaySelect">Barangay</label>
               <select class="form-control" id="barangaySelect">
-                <option>Item 1</option>
-                <option>Item 2</option>
-                <option>Item 3</option>
+                <option value="" disabled selected>Select Barangay</option>
+                <?php
+                if ($barangays_result && $barangays_result->num_rows > 0) {
+                  while ($row = $barangays_result->fetch_assoc()) {
+                    echo "<option value='" . htmlspecialchars($row['brgy_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['brgy_name'], ENT_QUOTES) . "</option>";
+                  }
+                } else {
+                  echo "<option disabled>No active barangays</option>";
+                }
+                ?>
               </select>
             </div>
           </div>
           <hr>
+
 
           <!-- Filter by Date -->
           <div class="form-group form-check">
@@ -150,20 +206,22 @@
   <!-- Footer -->
   <footer class="footer bg-light text-center text-lg-start">
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
-      <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span> 
+      <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span>
     </div>
   </footer>
 
   <!-- Optional JavaScript -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
-  <script src="Location.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-    crossorigin="anonymous"></script>
+  <scripts src="reports.js">
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    <script src="Location.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
+      integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
+      integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+      crossorigin="anonymous"></script>
 </body>
 
 </html>
