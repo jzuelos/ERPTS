@@ -45,6 +45,65 @@ if ($land_id > 0) {
         $stmt->close();
     }
 }
+
+$certificationData = null;
+if ($land_id > 0) {
+    // Prepare the SQL query to fetch the certification data
+    if ($stmt = $conn->prepare("SELECT * FROM certification WHERE land_id = ?")) {
+        $stmt->bind_param("i", $land_id);  // Bind land_id from URL or previous query
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $certificationData = $result->fetch_assoc();  // Fetch the certification data
+        $stmt->close();
+    }
+
+    // Optionally, handle cases where no certification is found
+    if (!$certificationData) {
+        echo "No certification data found for this land.";
+    }
+}
+
+$propertyData = null;
+if ($p_id > 0) {
+    if ($stmt = $conn->prepare("SELECT * FROM p_info WHERE p_id = ?")) {
+        $stmt->bind_param("i", $p_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $propertyData = $result->fetch_assoc();  // ✅ Corrected
+        $stmt->close();
+    }
+}
+
+$owners = [];
+if ($p_id > 0) {
+    if (
+        $stmt = $conn->prepare("
+        SELECT 
+            o.own_id,
+            o.own_fname,
+            o.own_mname,
+            o.own_surname,
+            o.house_no,
+            o.street,
+            o.barangay,
+            o.district,
+            o.city,
+            o.province,
+            o.own_info
+        FROM owners_tb o
+        INNER JOIN propertyowner po ON o.own_id = po.owner_id
+        WHERE po.property_id = ?
+    ")
+    ) {
+        $stmt->bind_param("i", $p_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $owners[] = $row; // $row now contains only the selected fields
+        }
+        $stmt->close();
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -179,15 +238,77 @@ if ($land_id > 0) {
                 <td></td>
             </tr>
             <tr>
-                <td>OWNER: <span id="print-ownerName"></span></td>
-                <td>Address: <span id="print-ownerAddress"></span></td>
+                <td>
+                    OWNER:<br>
+                    <?php
+                    $ownerNames = [];
+                    foreach ($owners as $owner) {
+                        $ownerNames[] = '&nbsp;&nbsp;' . htmlspecialchars($owner['own_fname'] . ' ' . $owner['own_mname'] . ' ' . $owner['own_surname']);
+                    }
+                    echo implode('<br>', $ownerNames);
+                    ?>
+                </td>
+                <td>
+                    ADDRESS:<br> <!-- adds space after the label -->
+                    <?php
+                    $ownerAddresses = [];
+                    foreach ($owners as $owner) {
+                        $fullAddress = '&nbsp;&nbsp;&nbsp;&nbsp;' . htmlspecialchars(
+                            $owner['house_no'] . ' ' . $owner['street'] . ', ' . $owner['barangay'] . ', ' . $owner['city']
+                        );
+                        $ownerAddresses[] = $fullAddress;
+                    }
+                    echo implode('<br>', $ownerAddresses);
+                    ?>
+                </td>
             </tr>
             <tr>
-                <td>Administrator/Occupant: <span id="print-adminName"></span></td>
-                <td>Address: <span id="print-adminAddress"></span></td>
+                <td>Administrator/Occupant:
+                    <?= htmlspecialchars(
+                        ($landRecord['first_name'] ?? 'N/A') . ' ' .
+                        ($landRecord['middle_name'] ?? '') . ' ' .
+                        ($landRecord['last_name'] ?? '')
+                    ) ?>
+                </td>
+                <td>ADDRESS:
+                    <?= htmlspecialchars(
+                        trim(
+                            implode(', ', array_filter([
+                                $landRecord['house_street'] ?? '',
+                                $landRecord['barangay'] ?? '',
+                                $landRecord['district'] ?? '',
+                                $landRecord['municipality'] ?? '',
+                                $landRecord['province'] ?? ''
+                            ]))
+                        )
+                    )
+                        ?>
+                </td>
             </tr>
             <tr>
-                <td>Tel No.: <span id="print-adminContact"></span></td>
+                <td>Tel No.: <br>
+                    <?php
+                    $ownerPhones = [];
+
+                    // Loop through each owner and extract the telephone number
+                    foreach ($owners as $owner) {
+                        // Assuming $owner['own_info'] contains the owner's info string
+                        $own_info = $owner['own_info'];
+
+                        // Regular expression to extract the telephone number
+                        preg_match('/Telephone:\s*(\d{11})/', $own_info, $matches);
+
+                        // Check if a phone number was found
+                        if (isset($matches[1])) {
+                            $ownerPhones[] = '&nbsp;&nbsp;&nbsp;&nbsp;' . htmlspecialchars($matches[1]); // Store the telephone number
+                        } else {
+                            $ownerPhones[] = "N/A"; // If no telephone number is found
+                        }
+                    }
+                    // Output the list of telephone numbers
+                    echo implode('<br>', $ownerPhones);  // Display each phone number on a new line
+                    ?>
+                </td>
                 <td></td>
             </tr>
         </table>
@@ -197,12 +318,18 @@ if ($land_id > 0) {
                 <th colspan="2" class="section-title">PROPERTY LOCATION</th>
             </tr>
             <tr>
-                <td>No./Street: <span id="print-street"></span></td>
-                <td>Brgy./Dist: <span id="print-barangay"></span></td>
+                <td>No./Street: <?= htmlspecialchars(($propertyData['house_no'] ?? 'N/A') . ' ' . ($propertyData['street'] ?? '')) ?>
+                </td>
+                <td>Brgy./Dist:
+                    <?= htmlspecialchars(
+                        ($propertyData['barangay'] ?? 'N/A') .
+                        (($propertyData['barangay'] && $propertyData['district']) ? ', ' : '') .
+                        ($propertyData['district'] ?? 'N/A')
+                    ) ?>
             </tr>
             <tr>
-                <td>Municipality: <span id="print-municipality"></span></td>
-                <td>Province: <span id="print-province"></span></td>
+                <td>Municipality: <?= htmlspecialchars($propertyData['city'] ?? 'N/A') ?></td>
+                <td>Province: <?= htmlspecialchars($landRecord['province'] ?? 'N/A') ?></td>
             </tr>
             <tr>
                 <td>North: <span id="print-north"></span></td>
@@ -293,8 +420,9 @@ if ($land_id > 0) {
                 </tr>
                 <!-- Additional rows can be added here if needed -->
                 <tr>
-                    <td colspan="4">TOTAL</td>
-                    <td id="print-totalAdjustedMarketValue"></td>
+                    <td colspan="4"><b>TOTAL</b></td>
+                    <td><b><?= htmlspecialchars($landRecord['adjust_mv'] ?? 'N/A') ?></b>
+                    </td>
                 </tr>
             </table>
 
@@ -310,19 +438,18 @@ if ($land_id > 0) {
                     <th>Assessed Value</th>
                 </tr>
                 <tr>
-                    <td id="print-kind"></td>
-                    <td id="print-actualUseSummary"></td>
-                    <td id="print-adjustedMarketValueSummary"></td>
-                    <td id="print-assessmentLevel"></td>
-                    <td id="print-assessedValue"></td>
+                    <td>Land</td>
+                    <td><?= htmlspecialchars($landRecord['actual_use'] ?? 'N/A') ?></td>
+                    <td><?= htmlspecialchars($landRecord['adjust_mv'] ?? 'N/A') ?></td>
+                    <td><?= htmlspecialchars($landRecord['assess_lvl'] ?? 'N/A') ?></td>
+                    <td><?= htmlspecialchars($landRecord['assess_value'] ?? 'N/A') ?></td>
                 </tr>
                 <!-- Additional rows can be added here if needed -->
                 <tr>
-                    <td colspan="4">TOTAL</td>
-                    <td id="print-totalAssessedValue"></td>
+                    <td colspan="4"><b>TOTAL</b></td>
+                    <td><b><?= htmlspecialchars($landRecord['assess_value'] ?? 'N/A') ?></b></td>
                 </tr>
             </table>
-
             <table>
                 <tr>
                     <td>Previous Owner: <span id="print-previousOwner"></span></td>
@@ -349,7 +476,9 @@ if ($land_id > 0) {
                     <div class="signature-title">APPROVED:</div>
                     <br>
                     <div class="signature-text">
-                        <b>MAXIMO P. MAGANA, JR, REA</b>
+                        <b><?= htmlspecialchars($certificationData['approved'] ?? 'N/A') ?>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            (<?= htmlspecialchars($certificationData['approved_date'] ?? 'N/A') ?>)</b>
                     </div>
                     <div class="signature-line"></div>
                     <div class="signature-text">
@@ -373,7 +502,10 @@ if ($land_id > 0) {
                     <div class="signature-title">RECOMMENDING APPROVAL:</div>
                     <br>
                     <div class="signature-text">
-                        <b>NERISSA A. AUGUSTO, REA</b>
+                        <b><?= htmlspecialchars($certificationData['recom_approval'] ?? 'N/A') ?>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            (<?= htmlspecialchars($certificationData['recom_date'] ?? 'N/A') ?>)
+                        </b>
                     </div>
                     <div class="signature-line"></div>
                     <div class="signature-text">
@@ -437,11 +569,11 @@ if ($land_id > 0) {
 
 </body>
 <script>
-   // Automatically print after populating the fields
-   /* setTimeout(() => {
-        window.print();
-    }, 500); // Adjust delay if needed
-    */
+    // Automatically print after populating the fields
+    /* setTimeout(() => {
+         window.print();
+     }, 500); // Adjust delay if needed
+     */
 </script>
 
 </html>
