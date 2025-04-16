@@ -106,4 +106,3 @@ function validateDocumentsForm() {
         return true; // Allow form submission
     }
 }
-

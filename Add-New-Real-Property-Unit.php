@@ -17,7 +17,7 @@
   <div id="selectedOwnerDisplay"></div> <!-- Display area for selected owner IDs -->
   <?php
   session_start(); // Start session at the top
-  
+
   // Prevent the browser from caching this page
   header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
   header("Cache-Control: post-check=0, pre-check=0", false);
@@ -70,7 +70,7 @@
           if ($stmt->execute()) {
             $property_id = $stmt->insert_id; // Get last inserted ID
             $_SESSION['last_property_id'] = $property_id; // Store it in session
-  
+
             // Insert owners into propertyowner table and collect propertyowner_ids
             $propertyowner_ids = [];
             if (!empty($selected_owner_ids)) {
@@ -278,39 +278,88 @@
             </div>
           </div>
 
-          <!-- Province, City, District, Barangay -->
+          <?php
+          // Get the database connection
+          $conn = Database::getInstance();
+
+          // Fetch active provinces
+          $stmt = $conn->prepare("SELECT province_id, province_name FROM province");
+          $stmt->execute();
+          $regions_result = $stmt->get_result();
+
+          // Fetch active municipalities
+          $municipalities_stmt = $conn->prepare("SELECT m_id, m_description FROM municipality WHERE m_status = 'Active'");
+          $municipalities_stmt->execute();
+          $municipalities_result = $municipalities_stmt->get_result();
+
+          // Fetch active districts
+          $districts_stmt = $conn->prepare("SELECT district_id, description FROM district WHERE status = 'Active'");
+          $districts_stmt->execute();
+          $districts_result = $districts_stmt->get_result();
+
+          // Fetch active barangays
+          $barangays_stmt = $conn->prepare("SELECT brgy_id, brgy_name FROM brgy WHERE status = 'Active'");
+          $barangays_stmt->execute();
+          $barangays_result = $barangays_stmt->get_result();
+          ?>
+          <!-- Province Dropdown -->
           <div class="row mb-3">
             <div class="col-md-3">
-              <label for="province" class="form-label"><span style="color: red;">*</span> Province</label>
-              <select id="province" name="province" class="form-select" required>
+              <label for="province" class="form-label">Province</label>
+              <select class="form-control" id="province" name="province" required>
                 <option value="" disabled selected>Select Province</option>
-                <option value="Province 1">Province 1</option>
-                <option value="Province 2">Province 2</option>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <label for="city" class="form-label"><span style="color: red;">*</span> City</label>
-              <select id="city" name="city" class="form-select" required>
-                <option value="" disabled selected>Select City</option>
-                <option value="Labo">Labo</option>
-                <option value="Daet">Daet</option>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <label for="district" class="form-label"><span style="color: red;">*</span> District</label>
-              <select id="district" name="district" class="form-select" required>
-                <option value="" disabled selected>Select District</option>
-                <option value="District 1">District 1</option>
-                <option value="District 2">District 2</option>
+                <?php
+                while ($row = $regions_result->fetch_assoc()) {
+                  echo "<option value='" . htmlspecialchars($row['province_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['province_name'], ENT_QUOTES) . "</option>";
+                }
+                ?>
               </select>
             </div>
 
+            <!-- Municipality Dropdown -->
             <div class="col-md-3">
-              <label for="barangay" class="form-label"><span style="color: red;">*</span> Barangay</label>
-              <select id="barangay" name="barangay" class="form-select" required>
+              <label for="municipality" class="form-label">Municipality</label>
+              <select class="form-control" id="municipality" name="municipality" required>
+                <option value="" disabled selected>Select Municipality</option>
+                <?php
+                while ($row = $municipalities_result->fetch_assoc()) {
+                  echo "<option value='" . htmlspecialchars($row['m_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['m_description'], ENT_QUOTES) . "</option>";
+                }
+                ?>
+              </select>
+            </div>
+
+            <!-- District Dropdown -->
+            <div class="col-md-3">
+              <label for="district" class="form-label">District</label>
+              <select class="form-control" id="district" name="district" required>
+                <option value="" disabled selected>Select District</option>
+                <?php
+                if ($districts_result && $districts_result->num_rows > 0) {
+                  while ($row = $districts_result->fetch_assoc()) {
+                    echo "<option value='" . htmlspecialchars($row['district_id']) . "'>" . htmlspecialchars($row['description']) . "</option>";
+                  }
+                } else {
+                  echo "<option disabled>No active districts</option>";
+                }
+                ?>
+              </select>
+            </div>
+
+            <!-- Barangay Dropdown -->
+            <div class="col-md-3">
+              <label for="barangay" class="form-label">Barangay</label>
+              <select class="form-control" id="barangay" name="barangay" required>
                 <option value="" disabled selected>Select Barangay</option>
-                <option value="Kalamunding">Kalamunding</option>
-                <option value="Bautista">Bautista</option>
+                <?php
+                if ($barangays_result && $barangays_result->num_rows > 0) {
+                  while ($row = $barangays_result->fetch_assoc()) {
+                    echo "<option value='" . htmlspecialchars($row['brgy_id']) . "'>" . htmlspecialchars($row['brgy_name']) . "</option>";
+                  }
+                } else {
+                  echo "<option disabled>No active barangays</option>";
+                }
+                ?>
               </select>
             </div>
           </div>
@@ -381,9 +430,7 @@
 
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
     integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
     crossorigin="anonymous"></script>
