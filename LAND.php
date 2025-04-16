@@ -1239,6 +1239,12 @@ $conn->close();
       // Initialize the area unit update function
       updateAreaUnit();
     });
+
+    window.addEventListener("beforeunload", function (e) {
+  e.preventDefault(); // Required for some browsers
+  e.returnValue = ""; // Show the default browser confirmation dialog
+});
+
   </script>
 
 
