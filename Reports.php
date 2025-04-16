@@ -266,7 +266,7 @@
   });
 
   window.addEventListener("beforeunload", function (e) {
-  e.preventDefault(); // Required for some browsers
+  e.preventDefault();
   e.returnValue = ""; // Show the default browser confirmation dialog
 });
 
