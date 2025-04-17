@@ -523,72 +523,79 @@ $conn->close();
         </div>
       </div>
 
-      <!-- Certification Section -->
-      <h5 class="section-title mt-5">Certification</h5>
-      <div class="row">
-        <!-- Left Column -->
-        <div class="col-md-6">
-          <!-- Verified By -->
-          <div class="row align-items-end mb-3">
-            <div class="col-8">
-              <label class="form-label">Verified By</label>
-              <input type="text" class="form-control" placeholder="Enter Verifier" disabled>
-            </div>
-            <div class="col-4">
-              <button type="button" class="btn btn-outline-primary btn-sm w-100">Verify</button>
-            </div>
-          </div>
+<!-- Certification Section -->
+<h5 class="section-title mt-5">Certification</h5>
+<div class="container">
+  <div class="row">
+    <div class="col-12">
 
-          <!-- Plotted By -->
-          <div class="mb-3">
-            <label class="form-label">Plotted By</label>
-            <input type="text" class="form-control" placeholder="Enter Plotter" disabled>
-          </div>
-
-          <!-- Noted By -->
-          <div class="mb-3">
-            <label class="form-label">Noted By</label>
-            <input type="text" class="form-control" placeholder="Enter Noter" disabled>
-          </div>
+      <!-- Verified By -->
+      <div class="row mb-3 align-items-center">
+        <label class="col-md-2 col-form-label">Verified By</label>
+        <div class="col-md-4">
+          <input type="text" class="form-control" placeholder="Enter Verifier" disabled>
         </div>
+        <div class="col-md-3">
+          <button type="button" class="btn btn-outline-primary btn-sm w-100">Verify</button>
+        </div>
+      </div>
 
-        <!-- Right Column -->
-        <div class="col-md-6">
-          <!-- Appraised By with Date -->
-          <div class="row mb-3">
-            <div class="col-8">
-              <label class="form-label">Appraised By</label>
-              <input type="text" class="form-control" placeholder="Enter Appraiser" disabled>
-            </div>
-            <div class="col-4">
-              <label class="form-label">Date</label>
-              <input type="text" class="form-control" placeholder="MM/DD/YYYY" disabled>
-            </div>
-          </div>
+      <!-- Plotted By -->
+      <div class="row mb-3 align-items-center">
+        <label class="col-md-2 col-form-label">Plotted By</label>
+        <div class="col-md-4">
+          <input type="text" class="form-control" placeholder="Enter Plotter" disabled>
+        </div>
+      </div>
 
-          <!-- Recommending Approval with Date -->
-          <div class="row mb-3">
-            <div class="col-4">
-              <label class="form-label">Recommending Approval</label>
-              <input type="text" class="form-control" placeholder="Enter Recommender" disabled>
-            </div>
-            <div class="col-4">
-              <label class="form-label">Date</label>
-              <input type="text" class="form-control" placeholder="MM/DD/YYYY" disabled>
-            </div>
-          </div>
+      <!-- Noted By -->
+      <div class="row mb-3 align-items-center">
+        <label class="col-md-2 col-form-label">Noted By</label>
+        <div class="col-md-4">
+          <input type="text" class="form-control" placeholder="Enter Noter" disabled>
+        </div>
+      </div>
 
-          <!-- Approved By with Date -->
-          <div class="row">
-            <div class="col-8">
-              <label class="form-label">Approved By</label>
-              <input type="text" class="form-control" placeholder="Enter Approver" disabled>
-            </div>
-            <div class="col-4">
-              <label class="form-label">Date</label>
-              <input type="text" class="form-control" placeholder="MM/DD/YYYY" disabled>
-            </div>
-          </div>
+      <!-- Appraised By -->
+      <div class="row mb-3 align-items-center">
+        <label class="col-md-2 col-form-label">Appraised By</label>
+        <div class="col-md-4">
+          <input type="text" class="form-control" placeholder="Enter Appraiser" disabled>
+        </div>
+        <label class="col-md-1 col-form-label text-end">Date</label>
+        <div class="col-md-3">
+          <input type="date" class="form-control" disabled>
+        </div>
+      </div>
+
+      <!-- Recommending Approval -->
+      <div class="row mb-3 align-items-center">
+        <label class="col-md-2 col-form-label">Recommending Approval</label>
+        <div class="col-md-4">
+          <input type="text" class="form-control" placeholder="Enter Recommender" disabled>
+        </div>
+        <label class="col-md-1 col-form-label text-end">Date</label>
+        <div class="col-md-3">
+          <input type="date" class="form-control" disabled>
+        </div>
+      </div>
+
+      <!-- Approved By -->
+      <div class="row mb-3 align-items-center">
+        <label class="col-md-2 col-form-label">Approved By</label>
+        <div class="col-md-4">
+          <input type="text" class="form-control" placeholder="Enter Approver" disabled>
+        </div>
+        <label class="col-md-1 col-form-label text-end">Date</label>
+        <div class="col-md-3">
+          <input type="date" class="form-control" disabled>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 
           <!-- Miscellaneous Section -->
           <h5 class="section-title mt-5">Miscellaneous</h5>
@@ -869,7 +876,7 @@ $conn->close();
             </div>
           </div>
 
-          <!-- Certification Section -->
+          <!-- Certification Section Modal -->
           <div class="section-wrap px-4 mb-5">
             <h5 class="section-title mt-4">Certification</h5>
             <div class="row gx-4">
