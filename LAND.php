@@ -876,104 +876,77 @@ $conn->close();
             </div>
           </div>
 
-          <!-- Certification Section Modal -->
-          <div class="section-wrap px-4 mb-5">
-            <h5 class="section-title mt-4">Certification</h5>
-            <div class="row gx-4">
-              <!-- Left Column -->
-              <div class="col-md-6">
+<!-- Certification Section Modal -->
+<div class="section-wrap px-4 mb-5">
+  <h5 class="section-title mt-4">Certification</h5>
+  <div class="row gx-4">
+    <div class="col-md-12">
+      <!-- Verified By -->
+      <div class="d-flex align-items-center mb-3">
+        <label class="form-label mb-0 me-2" style="width: 140px;">Verified By</label>
+        <select class="form-select me-2" style="width: 30%;" name="verified_by">
+          <option selected disabled>Select verifier</option>
+          <option>Malapajo, Antonio Menorca</option>
+        </select>
+        <button type="button" class="btn btn-outline-primary" style="width: 100px;">Verify</button>
+      </div>
 
-                <!-- Verified By -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Verified By</label>
-                  <select class="form-select flex-grow-1 mx-2" name="verified_by">
-                    <option selected disabled>Select verifier</option>
-                    <option>Verifier 1</option>
-                  </select>
-                  <button type="button" class="btn btn-outline-primary flex-shrink-0"
-                    style="width: 80px;">Verify</button>
-                </div>
+      <!-- Plotted By -->
+      <div class="d-flex align-items-center mb-3">
+        <label class="form-label mb-0 me-2" style="width: 140px;">Plotted By</label>
+        <select class="form-select" style="width: 30%;" name="plotted_by">
+          <option selected disabled>Select plotter</option>
+          <option>Malapajo, Antonio Menorca</option>
+        </select>
+      </div>
 
-                <!-- Noted By -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Noted By</label>
-                  <select class="form-select flex-grow-1 mx-2" name="noted_by">
-                    <option selected disabled>Select noter</option>
-                    <option>Noter 1</option>
-                  </select>
-                  <div class="flex-shrink-0 text-center" style="width: 80px;">
-                    <i class="bi bi-check-lg fs-4 text-success"></i>
-                  </div>
-                </div>
+      <!-- Noted By -->
+      <div class="d-flex align-items-center mb-3">
+        <label class="form-label mb-0 me-2" style="width: 140px;">Noted By</label>
+        <select class="form-select" style="width: 30%;" name="noted_by">
+          <option selected disabled>Select noter</option>
+          <option>Lingon, Nestor Jacolbia</option>
+        </select>
+      </div>
 
-                <!-- Recommending Approval -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Recommending Approval</label>
-                  <select class="form-select flex-grow-1 mx-2" name="recommending_approval">
-                    <option selected disabled>Select recommender</option>
-                    <option>Recommender 1</option>
-                  </select>
-                  <div class="flex-shrink-0 text-center" style="width: 80px;">
-                    <i class="bi bi-check-lg fs-4 text-success"></i>
-                  </div>
-                </div>
+      <!-- Appraised By -->
+      <div class="d-flex align-items-center mb-3">
+        <label class="form-label mb-0 me-2" style="width: 140px;">Appraised By</label>
+        <select class="form-select me-2" style="width: 30%;" name="appraised_by">
+          <option selected disabled>Select appraiser</option>
+          <option>Lingon, Nestor Jacolbia</option>
+        </select>
+        <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
+        <input type="date" class="form-control" name="appraisal_date" id="appraisalDate" style="width: 30%;">
+      </div>
 
-                <!-- Recommendation Date -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Date</label>
-                  <input type="date" class="form-control flex-grow-1 mx-2" name="recommendation_date"
-                    id="recommendationDate">
-                  <div class="flex-shrink-0 text-center" style="width: 80px;">
-                    <i class="bi bi-square fs-4"></i>
-                  </div>
-                </div>
-              </div>
+      <!-- Recommending Approval -->
+      <div class="d-flex align-items-center mb-3">
+        <label class="form-label mb-0 me-2" style="width: 140px;">Recommending Approval</label>
+        <select class="form-select me-2" style="width: 30%;" name="recommending_approval">
+          <option selected disabled>Select recommender</option>
+          <option>Malapajo, Antonio Menorca</option>
+        </select>
+        <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
+        <input type="date" class="form-control" name="recommendation_date" id="recommendationDate" style="width: 30%;">
+      </div>
 
-              <!-- Right Column -->
-              <div class="col-md-6">
-                <!-- Plotted By -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Plotted By</label>
-                  <select class="form-select flex-grow-1" name="plotted_by">
-                    <option selected disabled>Select plotter</option>
-                    <option>Plotter 1</option>
-                  </select>
-                </div>
+      <!-- Approved By -->
+      <div class="d-flex align-items-center mb-3">
+        <label class="form-label mb-0 me-2" style="width: 140px;">Approved By</label>
+        <select class="form-select me-2" style="width: 30%;" name="approved_by">
+          <option selected disabled>Select approver</option>
+          <option>Lingon, Nestor Jacolbia</option>
+        </select>
+        <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
+        <input type="date" class="form-control" name="approval_date" id="approvalDate" style="width: 30%;">
+      </div>
+    </div>
+  </div>
+</div>
 
-                <!-- Appraised By -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Appraised By</label>
-                  <select class="form-select flex-grow-1" name="appraised_by">
-                    <option selected disabled>Select appraiser</option>
-                    <option>Appraiser 1</option>
-                  </select>
-                </div>
 
-                <!-- Appraisal Date -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Date</label>
-                  <input type="date" class="form-control flex-grow-1" name="appraisal_date" id="appraisalDate">
-                </div>
-
-                <!-- Approved By -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Approved By</label>
-                  <select class="form-select flex-grow-1" name="approved_by">
-                    <option selected disabled>Select approver</option>
-                    <option>Approver 1</option>
-                  </select>
-                </div>
-
-                <!-- Approval Date -->
-                <div class="d-flex align-items-center">
-                  <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Date</label>
-                  <input type="date" class="form-control flex-grow-1" name="approval_date" id="approvalDate">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Miscellaneous Section -->
+          <!-- Miscellaneous Section Modal -->
           <div class="section-wrap px-4 mb-5 border rounded p-3">
             <h5 class="section-title mt-5">Miscellaneous</h5>
             <div class="row">
