@@ -46,10 +46,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $assess_lvl = (float) ($_POST['assessment_level'] ?? 0);
   $assess_value = (float) ($_POST['assessed_value'] ?? 0);
 
-  // Collect text values
+  // Collect text values from the form
   $fields = [
     'survey_no',
-    'boundaries',
+    'north_boundary',
+    'south_boundary',
+    'east_boundary',
+    'west_boundary',
     'boun_desc',
     'last_name',
     'first_name',
@@ -76,20 +79,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   // === INSERT INTO land ===
   $stmt = $conn->prepare("
       INSERT INTO land (
-          faas_id, oct_no, survey_no, boundaries, boun_desc, last_name, 
+          faas_id, oct_no, survey_no, north, east, south, west, boun_desc, last_name, 
           first_name, middle_name, contact_no, email, house_street, barangay, 
           district, municipality, province, land_desc, classification, sub_class, 
           area, actual_use, unit_value, market_value, adjust_factor, 
           adjust_percent, adjust_value, adjust_mv, assess_lvl, assess_value
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   ");
 
   $stmt->bind_param(
-    "iissssssssssssssssisddsddddd",
+    "iisssssssssssssssssssisddsddddd",
     $faas_id,
     $oct_no,
     $survey_no,
-    $boundaries,
+    $north_boundary,
+    $east_boundary,
+    $south_boundary,
+    $west_boundary,
     $boun_desc,
     $last_name,
     $first_name,
@@ -618,8 +624,7 @@ $conn->close();
           </div>
           <!-- Print Button at Bottom Right -->
           <div class="d-flex justify-content-end mt-4">
-            <button type="button" class="btn btn-outline-secondary py-2 px-4"
-              style="font-size: 1.1rem;">
+            <button type="button" class="btn btn-outline-secondary py-2 px-4" style="font-size: 1.1rem;">
               <i class="fas fa-print me-2"></i>Print
             </button>
           </div>
@@ -774,7 +779,8 @@ $conn->close();
               <div class="col-md-8 mb-4">
                 <label for="areaModal" class="form-label">Area</label>
                 <div class="input-group">
-                  <input type="number" id="areaModal" name="area" class="form-control" placeholder="Enter area" step="any" required>
+                  <input type="number" id="areaModal" name="area" class="form-control" placeholder="Enter area"
+                    step="any" required>
                   <div class="input-group-append ml-4">
                     <div class="form-check">
                       <input class="form-check-input" type="radio" name="areaUnit" value="sqm" id="sqm" checked>
@@ -863,109 +869,103 @@ $conn->close();
             </div>
           </div>
 
-          <!--Certification Section -->
-              <div class="section-wrap px-4 mb-5">
-      <h5 class="section-title mt-4">Certification</h5>
-      
-      <div class="row gx-4">
-        <!-- Left Column -->
-        <div class="col-md-6">
-          <!-- Verified By -->
-          <div class="d-flex align-items-center mb-3">
-            <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Verified By</label>
-            <select class="form-select flex-grow-1 mx-2">
-              <option selected disabled>Select verifier</option>
-              <option>Verifier 1</option>
-              <option>Verifier 2</option>
-              <option>Verifier 3</option>
-            </select>
-            <button type="button" class="btn btn-outline-primary flex-shrink-0" style="width: 80px;">Verify</button>
-          </div>
+          <!-- Certification Section -->
+          <div class="section-wrap px-4 mb-5">
+            <h5 class="section-title mt-4">Certification</h5>
+            <div class="row gx-4">
+              <!-- Left Column -->
+              <div class="col-md-6">
 
-          <!-- Noted By -->
-          <div class="d-flex align-items-center mb-3">
-            <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Noted By</label>
-            <select class="form-select flex-grow-1 mx-2">
-              <option selected disabled>Select noter</option>
-              <option>Noter 1</option>
-              <option>Noter 2</option>
-              <option>Noter 3</option>
-            </select>
-            <div class="flex-shrink-0 text-center" style="width: 80px;">
-              <i class="bi bi-check-lg fs-4 text-success"></i>
+                <!-- Verified By -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Verified By</label>
+                  <select class="form-select flex-grow-1 mx-2" name="verified_by">
+                    <option selected disabled>Select verifier</option>
+                    <option>Verifier 1</option>
+                  </select>
+                  <button type="button" class="btn btn-outline-primary flex-shrink-0"
+                    style="width: 80px;">Verify</button>
+                </div>
+
+                <!-- Noted By -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Noted By</label>
+                  <select class="form-select flex-grow-1 mx-2" name="noted_by">
+                    <option selected disabled>Select noter</option>
+                    <option>Noter 1</option>
+                  </select>
+                  <div class="flex-shrink-0 text-center" style="width: 80px;">
+                    <i class="bi bi-check-lg fs-4 text-success"></i>
+                  </div>
+                </div>
+
+                <!-- Recommending Approval -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Recommending Approval</label>
+                  <select class="form-select flex-grow-1 mx-2" name="recommending_approval">
+                    <option selected disabled>Select recommender</option>
+                    <option>Recommender 1</option>
+                  </select>
+                  <div class="flex-shrink-0 text-center" style="width: 80px;">
+                    <i class="bi bi-check-lg fs-4 text-success"></i>
+                  </div>
+                </div>
+
+                <!-- Recommendation Date -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Date</label>
+                  <input type="date" class="form-control flex-grow-1 mx-2" name="recommendation_date">
+                  <div class="flex-shrink-0 text-center" style="width: 80px;">
+                    <i class="bi bi-square fs-4"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column -->
+              <div class="col-md-6">
+                <!-- Plotted By -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Plotted By</label>
+                  <select class="form-select flex-grow-1" name="plotted_by">
+                    <option selected disabled>Select plotter</option>
+                    <option>Plotter 1</option>
+                  </select>
+                </div>
+
+                <!-- Appraised By -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Appraised By</label>
+                  <select class="form-select flex-grow-1" name="appraised_by">
+                    <option selected disabled>Select appraiser</option>
+                    <option>Appraiser 1</option>
+                  </select>
+                </div>
+
+                <!-- Appraisal Date -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Date</label>
+                  <input type="date" class="form-control flex-grow-1" name="appraisal_date">
+                </div>
+
+                <!-- Approved By -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Approved By</label>
+                  <select class="form-select flex-grow-1" name="approved_by">
+                    <option selected disabled>Select approver</option>
+                    <option>Approver 1</option>
+                  </select>
+                </div>
+
+                <!-- Approval Date -->
+                <div class="d-flex align-items-center">
+                  <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Date</label>
+                  <input type="date" class="form-control flex-grow-1" name="approval_date">
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Recommending Approval -->
-          <div class="d-flex align-items-center mb-3">
-            <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Recommending Approval</label>
-            <select class="form-select flex-grow-1 mx-2">
-              <option selected disabled>Select recommender</option>
-              <option>Recommender 1</option>
-              <option>Recommender 2</option>
-              <option>Recommender 3</option>
-            </select>
-            <div class="flex-shrink-0 text-center" style="width: 80px;">
-              <i class="bi bi-check-lg fs-4 text-success"></i>
-            </div>
-          </div>
-
-          <!-- Date -->
-          <div class="d-flex align-items-center">
-            <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Date</label>
-            <input type="date" class="form-control flex-grow-1 mx-2">
-            <div class="flex-shrink-0 text-center" style="width: 80px;">
-              <i class="bi bi-square fs-4"></i>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right Column -->
-        <div class="col-md-6">
-          <div class="d-flex align-items-center mb-3">
-            <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Plotted By</label>
-            <select class="form-select flex-grow-1">
-              <option selected disabled>Select plotter</option>
-              <option>Plotter 1</option>
-              <option>Plotter 2</option>
-              <option>Plotter 3</option>
-            </select>
-          </div>
-
-          <div class="d-flex align-items-center mb-3">
-            <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Appraised By</label>
-            <select class="form-select flex-grow-1">
-              <option selected disabled>Select appraiser</option>
-              <option>Appraiser 1</option>
-              <option>Appraiser 2</option>
-              <option>Appraiser 3</option>
-            </select>
-          </div>
-
-          <div class="d-flex align-items-center mb-3">
-            <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Date</label>
-            <input type="date" class="form-control flex-grow-1">
-          </div>
-
-          <div class="d-flex align-items-center mb-3">
-            <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Approved By</label>
-            <select class="form-select flex-grow-1">
-              <option selected disabled>Select approver</option>
-              <option>Approver 1</option>
-              <option>Approver 2</option>
-              <option>Approver 3</option>
-            </select>
-          </div>
-
-          <div class="d-flex align-items-center">
-            <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Date</label>
-            <input type="date" class="form-control flex-grow-1">
-          </div>
-        </div>
-      </div>
-    </div>
-
-          <!-- Miscellaneous Section in Modal -->
+          <!-- Miscellaneous Section -->
           <div class="section-wrap px-4 mb-5 border rounded p-3">
             <h5 class="section-title mt-5">Miscellaneous</h5>
             <div class="row">
@@ -999,7 +999,6 @@ $conn->close();
             </div>
           </div>
 
-
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
             <button type="reset" class="btn btn-warning">Reset</button>
@@ -1018,8 +1017,6 @@ $conn->close();
       <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span>
     </div>
   </footer>
-
-  <script src="http://localhost/ERPTS/Add-New-Real-Property-Unit.js"></script>
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -1042,14 +1039,6 @@ $conn->close();
             field.value = "";
           }
         });
-      }
-
-      // Function to print DRP
-      function DRPprint() {
-        const printWindow = window.open('DRP.html', '_blank');
-        printWindow.onload = function () {
-          printWindow.print();
-        };
       }
 
       // Function to toggle edit mode
@@ -1241,26 +1230,14 @@ $conn->close();
     });
 
     window.addEventListener("beforeunload", function (e) {
-  e.preventDefault(); // Required for some browsers
-  e.returnValue = ""; // Show the default browser confirmation dialog
-});
-
+      e.preventDefault(); // Required for some browsers
+      e.returnValue = ""; // Show the default browser confirmation dialog
+    });
   </script>
 
-
   <!-- Load External Scripts -->
-  <script src="http://localhost/ERPTS/FAAS.js"></script>
-  <script src="http://localhost/ERPTS/print-layout.js"></script>
-  <script src="http://localhost/ERPTS/printdata.js"></script>
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-    crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/5hb5g5/5hb5g5/5hb5g5/5hb5g5/5hb5g5" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
