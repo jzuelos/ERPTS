@@ -305,61 +305,40 @@ if ($p_id > 0) {
             </tr>
         </table>
 
-        <table>
-            <tr>
-                <th colspan="2" class="section-title">PROPERTY LOCATION</th>
-            </tr>
-            <tr>
-                <td><strong>No./Street:</strong>
-                    <?= htmlspecialchars(($propertyData['house_no'] ?? 'N/A') . ' ' . ($propertyData['street'] ?? '')) ?>
-                </td>
-                <td><strong>Brgy./Dist:</strong>
-                    <?= htmlspecialchars(
-                        ($propertyData['barangay'] ?? 'N/A') .
-                        (($propertyData['barangay'] && $propertyData['district']) ? ', ' : '') .
-                        ($propertyData['district'] ?? 'N/A')
-                    ) ?>
-                </td>
-            </tr>
-            <tr>
-                <td><strong>Municipality:</strong> <?= htmlspecialchars($propertyData['city'] ?? 'N/A') ?></td>
-                <td><strong>Province:</strong> <?= htmlspecialchars($landRecord['province'] ?? 'N/A') ?></td>
-            </tr>
-            <tr>
-                <td><strong>North:</strong> <span id="print-north"></span></td>
-                <td><strong>South:</strong> <span id="print-south"></span></td>
-            </tr>
-            <tr>
-                <td><strong>East:</strong> <span id="print-east"></span></td>
-                <td><strong>West:</strong> <span id="print-west"></span></td>
-            </tr>
-        </table>
-
-        <table>
-            <tr>
-                <th colspan="6" class="section-title">LAND APPRAISAL:</th>
-            </tr>
-            <tr>
-                <th>Classification</th>
-                <th>Sub-Class</th>
-                <th>Area</th>
-                <th>Actual Use</th>
-                <th>Unit Value</th>
-                <th>Market Value</th>
-            </tr>
-            <tr>
-                <td><?= htmlspecialchars($landRecord['classification'] ?? 'N/A') ?></td>
-                <td><?= htmlspecialchars($landRecord['sub_class'] ?? 'N/A') ?></td>
-                <td><?= htmlspecialchars($landRecord['area'] ?? 'N/A') ?></td>
-                <td><?= htmlspecialchars($landRecord['actual_use'] ?? 'N/A') ?></td>
-                <td><?= htmlspecialchars($landRecord['unit_value'] ?? 'N/A') ?></td>
-                <td><?= htmlspecialchars($landRecord['market_value'] ?? 'N/A') ?></td>
-            </tr>
-            <tr>
-                <th colspan="5">TOTAL:</th>
-                <td><b><?= htmlspecialchars($landRecord['market_value'] ?? 'N/A') ?></b></td>
-            </tr>
-        </table>
+        <table border="1" cellspacing="0" cellpadding="5" width="100%">
+    <tr>
+        <th colspan="2" class="section-title">PROPERTY LOCATION</th>
+    </tr>
+    <tr>
+        <td><strong>No./Street:</strong>
+            <?= htmlspecialchars(($propertyData['house_no'] ?? 'N/A') . ' ' . ($propertyData['street'] ?? '')) ?>
+        </td>
+        <td><strong>Brgy./Dist:</strong>
+            <?= htmlspecialchars(
+                ($propertyData['barangay'] ?? 'N/A') . 
+                (($propertyData['barangay'] && $propertyData['district']) ? ', ' : '') . 
+                ($propertyData['district'] ?? 'N/A')
+            ) ?>
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Municipality:</strong> <?= htmlspecialchars($propertyData['city'] ?? 'N/A') ?></td>
+        <td><strong>Province:</strong> <?= htmlspecialchars($landRecord['province'] ?? 'N/A') ?></td>
+    </tr>
+    <tr>
+        <td><strong>North:</strong> <span id="print-north"></span></td>
+        <td rowspan="4" style="background-color: white;"></td> <!-- changed to white -->
+    </tr>
+    <tr>
+        <td><strong>East:</strong> <span id="print-east"></span></td>
+    </tr>
+    <tr>
+        <td><strong>West:</strong> <span id="print-west"></span></td>
+    </tr>
+    <tr>
+        <td><strong>South:</strong> <span id="print-south"></span></td>
+    </tr>
+</table>
 
         <table>
             <tr>
