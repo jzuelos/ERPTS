@@ -211,6 +211,7 @@ if ($p_id > 0) {
             width: 100%;
             /* Ensure it spans the full width */
         }
+    
     </style>
 </head>
 
@@ -222,24 +223,24 @@ if ($p_id > 0) {
         </div>
         <table>
             <tr>
-                <td>ARP NO.: <?= htmlspecialchars($rpu_Data['arp'] ?? 'N/A') ?></td>
+                <td><strong>ARP NO.:</strong> <?= htmlspecialchars($rpu_Data['arp'] ?? 'N/A') ?></td>
                 <td></td>
             </tr>
             <tr>
-                <td>PIN: <?= htmlspecialchars($rpu_Data['pin'] ?? 'N/A') ?></td>
+                <td><strong>PIN:</strong> <?= htmlspecialchars($rpu_Data['pin'] ?? 'N/A') ?></td>
                 <td></td>
             </tr>
             <tr>
-                <td>OCT/TCT NO.: <?= htmlspecialchars($landRecord['oct_no'] ?? 'N/A') ?></td>
+                <td><strong>OCT/TCT NO.:</strong> <?= htmlspecialchars($landRecord['oct_no'] ?? 'N/A') ?></td>
                 <td></td>
             </tr>
             <tr>
-                <td>Survey No.: <?= htmlspecialchars($landRecord['survey_no'] ?? 'N/A') ?></td>
+                <td><strong>Survey No.:</strong> <?= htmlspecialchars($landRecord['survey_no'] ?? 'N/A') ?></td>
                 <td></td>
             </tr>
             <tr>
                 <td>
-                    OWNER:<br>
+                    <strong>OWNER:</strong><br>
                     <?php
                     $ownerNames = [];
                     foreach ($owners as $owner) {
@@ -249,7 +250,7 @@ if ($p_id > 0) {
                     ?>
                 </td>
                 <td>
-                    ADDRESS:<br>
+                    <strong>ADDRESS:</strong><br>
                     <?php
                     $ownerAddresses = [];
                     foreach ($owners as $owner) {
@@ -263,14 +264,14 @@ if ($p_id > 0) {
                 </td>
             </tr>
             <tr>
-                <td>Administrator/Occupant:
+                <td><strong>Administrator/Occupant:</strong>
                     <?= htmlspecialchars(
                         ($landRecord['first_name'] ?? 'N/A') . ' ' .
                         ($landRecord['middle_name'] ?? '') . ' ' .
                         ($landRecord['last_name'] ?? '')
                     ) ?>
                 </td>
-                <td>ADDRESS:
+                <td><strong>ADDRESS:</strong>
                     <?= htmlspecialchars(
                         trim(
                             implode(', ', array_filter([
@@ -281,32 +282,23 @@ if ($p_id > 0) {
                                 $landRecord['province'] ?? ''
                             ]))
                         )
-                    )
-                        ?>
+                    ) ?>
                 </td>
             </tr>
             <tr>
-                <td>Tel No.: <br>
+                <td><strong>Tel No.:</strong><br>
                     <?php
                     $ownerPhones = [];
-
-                    // Loop through each owner and extract the telephone number
                     foreach ($owners as $owner) {
-                        // Assuming $owner['own_info'] contains the owner's info string
                         $own_info = $owner['own_info'];
-
-                        // Regular expression to extract the telephone number
                         preg_match('/Telephone:\s*(\d{11})/', $own_info, $matches);
-
-                        // Check if a phone number was found
                         if (isset($matches[1])) {
-                            $ownerPhones[] = '&nbsp;&nbsp;&nbsp;&nbsp;' . htmlspecialchars($matches[1]); // Store the telephone number
+                            $ownerPhones[] = '&nbsp;&nbsp;&nbsp;&nbsp;' . htmlspecialchars($matches[1]);
                         } else {
-                            $ownerPhones[] = "N/A"; // If no telephone number is found
+                            $ownerPhones[] = "N/A";
                         }
                     }
-                    // Output the list of telephone numbers
-                    echo implode('<br>', $ownerPhones);  // Display each phone number on a new line
+                    echo implode('<br>', $ownerPhones);
                     ?>
                 </td>
                 <td></td>
@@ -318,26 +310,28 @@ if ($p_id > 0) {
                 <th colspan="2" class="section-title">PROPERTY LOCATION</th>
             </tr>
             <tr>
-                <td>No./Street: <?= htmlspecialchars(($propertyData['house_no'] ?? 'N/A') . ' ' . ($propertyData['street'] ?? '')) ?>
+                <td><strong>No./Street:</strong>
+                    <?= htmlspecialchars(($propertyData['house_no'] ?? 'N/A') . ' ' . ($propertyData['street'] ?? '')) ?>
                 </td>
-                <td>Brgy./Dist:
+                <td><strong>Brgy./Dist:</strong>
                     <?= htmlspecialchars(
                         ($propertyData['barangay'] ?? 'N/A') .
                         (($propertyData['barangay'] && $propertyData['district']) ? ', ' : '') .
                         ($propertyData['district'] ?? 'N/A')
                     ) ?>
+                </td>
             </tr>
             <tr>
-                <td>Municipality: <?= htmlspecialchars($propertyData['city'] ?? 'N/A') ?></td>
-                <td>Province: <?= htmlspecialchars($landRecord['province'] ?? 'N/A') ?></td>
+                <td><strong>Municipality:</strong> <?= htmlspecialchars($propertyData['city'] ?? 'N/A') ?></td>
+                <td><strong>Province:</strong> <?= htmlspecialchars($landRecord['province'] ?? 'N/A') ?></td>
             </tr>
             <tr>
-                <td>North: <span id="print-north"></span></td>
-                <td>South: <span id="print-south"></span></td>
+                <td><strong>North:</strong> <span id="print-north"></span></td>
+                <td><strong>South:</strong> <span id="print-south"></span></td>
             </tr>
             <tr>
-                <td>East: <span id="print-east"></span></td>
-                <td>West: <span id="print-west"></span></td>
+                <td><strong>East:</strong> <span id="print-east"></span></td>
+                <td><strong>West:</strong> <span id="print-west"></span></td>
             </tr>
         </table>
 
