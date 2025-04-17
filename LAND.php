@@ -914,7 +914,8 @@ $conn->close();
                 <!-- Recommendation Date -->
                 <div class="d-flex align-items-center mb-3">
                   <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Date</label>
-                  <input type="date" class="form-control flex-grow-1 mx-2" name="recommendation_date">
+                  <input type="date" class="form-control flex-grow-1 mx-2" name="recommendation_date"
+                    id="recommendationDate">
                   <div class="flex-shrink-0 text-center" style="width: 80px;">
                     <i class="bi bi-square fs-4"></i>
                   </div>
@@ -944,7 +945,7 @@ $conn->close();
                 <!-- Appraisal Date -->
                 <div class="d-flex align-items-center mb-3">
                   <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Date</label>
-                  <input type="date" class="form-control flex-grow-1" name="appraisal_date">
+                  <input type="date" class="form-control flex-grow-1" name="appraisal_date" id="appraisalDate">
                 </div>
 
                 <!-- Approved By -->
@@ -959,7 +960,7 @@ $conn->close();
                 <!-- Approval Date -->
                 <div class="d-flex align-items-center">
                   <label class="form-label mb-0 flex-shrink-0" style="width: 140px;">Date</label>
-                  <input type="date" class="form-control flex-grow-1" name="approval_date">
+                  <input type="date" class="form-control flex-grow-1" name="approval_date" id="approvalDate">
                 </div>
               </div>
             </div>
