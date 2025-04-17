@@ -224,46 +224,67 @@
       crossorigin="anonymous"></script>
 
       <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const printAllCheckbox = document.getElementById("printAllCheck");
-    const filterCheckboxes = [
-      document.getElementById("classificationCheck"),
-      document.getElementById("locationCheck"),
-      document.getElementById("dateCheck")
-    ];
+document.addEventListener("DOMContentLoaded", function () {
+  const printAllCheckbox = document.getElementById("printAllCheck");
 
-    function updateCheckboxStates() {
-      // If any filter checkbox is checked, disable the Print All checkbox
-      if (filterCheckboxes.some(cb => cb.checked)) {
-        printAllCheckbox.checked = false;
-        printAllCheckbox.disabled = true;
-      } else {
-        printAllCheckbox.disabled = false;
-      }
+  const classificationCheckbox = document.getElementById("classificationCheck");
+  const locationCheckbox = document.getElementById("locationCheck");
+  const dateCheckbox = document.getElementById("dateCheck");
+
+  const classificationSelect = document.getElementById("classificationSelect");
+
+  const provinceSelect = document.getElementById("provinceSelect");
+  const citySelect = document.getElementById("citySelect");
+  const districtSelect = document.getElementById("districtSelect");
+  const barangaySelect = document.getElementById("barangaySelect");
+
+  const fromDate = document.getElementById("fromDate");
+  const toDate = document.getElementById("toDate");
+
+  const filterCheckboxes = [classificationCheckbox, locationCheckbox, dateCheckbox];
+  const dropdowns = [
+    classificationSelect,
+    provinceSelect,
+    citySelect,
+    districtSelect,
+    barangaySelect,
+    fromDate,
+    toDate
+  ];
+
+  function updateStates() {
+    if (printAllCheckbox.checked) {
+      // Disable everything
+      filterCheckboxes.forEach(cb => cb.disabled = true);
+      dropdowns.forEach(drop => drop.disabled = true);
+    } else {
+      // Enable checkboxes
+      filterCheckboxes.forEach(cb => cb.disabled = false);
+
+      // Enable dropdowns based on checkbox status
+      classificationSelect.disabled = !classificationCheckbox.checked;
+
+      const loc = locationCheckbox.checked;
+      provinceSelect.disabled = !loc;
+      citySelect.disabled = !loc;
+      districtSelect.disabled = !loc;
+      barangaySelect.disabled = !loc;
+
+      const date = dateCheckbox.checked;
+      fromDate.disabled = !date;
+      toDate.disabled = !date;
     }
+  }
 
-    function handlePrintAllClick() {
-      if (printAllCheckbox.checked) {
-        // Uncheck and disable all filter checkboxes
-        filterCheckboxes.forEach(cb => {
-          cb.checked = false;
-          cb.disabled = true;
-        });
-      } else {
-        // Enable all filter checkboxes
-        filterCheckboxes.forEach(cb => {
-          cb.disabled = false;
-        });
-      }
-    }
+  // Attach listeners
+  printAllCheckbox.addEventListener("change", updateStates);
+  filterCheckboxes.forEach(cb => cb.addEventListener("change", updateStates));
 
-    // Attach event listeners
-    filterCheckboxes.forEach(cb => cb.addEventListener("change", updateCheckboxStates));
-    printAllCheckbox.addEventListener("change", handlePrintAllClick);
+  // Initial state: don't disable anything
+  dropdowns.forEach(drop => drop.disabled = false);
+  filterCheckboxes.forEach(cb => cb.disabled = false);
+});
 
-    // Initial check on page load
-    updateCheckboxStates();
-  });
 
   window.addEventListener("beforeunload", function (e) {
   e.preventDefault();
