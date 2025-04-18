@@ -768,9 +768,10 @@ $conn->close();
                   </td>
                   <td>
                     <div class="btn-group" role="group">
-                      <button class="btn btn-sm btn-primary">
-                        Edit
-                      </button>
+                      <a href="LAND_Edit.php?p_id=<?= urlencode($p_id); ?>&land_id=<?= urlencode($record['land_id']); ?>"
+                        class="btn btn-sm btn-primary" title="Edit">
+                        <i class="bi bi-pencil"></i>
+                      </a>
                       <a href="print-layout.php?p_id=<?= urlencode($p_id); ?>&land_id=<?= urlencode($record['land_id']); ?>"
                         class="btn btn-sm btn-secondary ml-3" title="View" target="_blank">
                         <i class="bi bi-printer"></i>
