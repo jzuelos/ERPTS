@@ -155,7 +155,7 @@ if ($conn->connect_error) {
               <tr>
                 <th style="width: 20%">Region</th>
                 <th style="width: 15%">Code</th>
-                <th style="width: 35%">Description</th>
+                <th style="width: 35%">Municipality</th>
                 <th style="width: 15%">Status</th>
                 <th style="width: 15%">Actions</th>
               </tr>
@@ -233,6 +233,7 @@ if ($conn->connect_error) {
             <tbody>
               <?php while ($row = mysqli_fetch_assoc($barangayResult)) { ?>
                 <tr>
+                  <td><?= $row['m_description']; ?></td>
                   <td><?= $row['brgy_code']; ?></td>
                   <td><?= $row['brgy_name']; ?></td>
                   <td>
@@ -252,6 +253,7 @@ if ($conn->connect_error) {
               <?php } ?>
             </tbody>
           </table>
+
         </div>
       </div>
       <!-- Pagination -->
@@ -505,23 +507,8 @@ if ($conn->connect_error) {
   <!-- Bootstrap JS -->
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="Location.js"></script>
-
-  <script>
-    function changeLocationType(type) {
-      document.getElementById("municipalityTable").classList.add("d-none");
-      document.getElementById("districtTable").classList.add("d-none");
-      document.getElementById("barangayTable").classList.add("d-none");
-
-      if (type === "Municipality") {
-        document.getElementById("municipalityTable").classList.remove("d-none");
-      } else if (type === "District") {
-        document.getElementById("districtTable").classList.remove("d-none");
-      } else if (type === "Barangay") {
-        document.getElementById("barangayTable").classList.remove("d-none");
-      }
-    }
-  </script>
 
 </body>
 
