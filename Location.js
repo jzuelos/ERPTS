@@ -292,3 +292,37 @@ function showToastMessage(message) {
   // You can replace this with any toast or notification library you prefer
   alert(message); // For simplicity, using alert here
 }
+
+// Location.js
+
+// Function to handle switching between location types
+function changeLocationType(type) {
+  // Update the dropdown button label
+  const dropdownButton = document.getElementById('locationTypeDropdown');
+  if (dropdownButton) {
+    dropdownButton.innerText = type;
+  }
+
+  // Get the table elements
+  const municipalityTable = document.getElementById('municipalityTable');
+  const districtTable = document.getElementById('districtTable');
+  const barangayTable = document.getElementById('barangayTable');
+
+  // Hide all tables
+  if (municipalityTable) municipalityTable.classList.add('d-none');
+  if (districtTable) districtTable.classList.add('d-none');
+  if (barangayTable) barangayTable.classList.add('d-none');
+
+  // Show the selected table
+  switch (type) {
+    case 'Municipality':
+      if (municipalityTable) municipalityTable.classList.remove('d-none');
+      break;
+    case 'District':
+      if (districtTable) districtTable.classList.remove('d-none');
+      break;
+    case 'Barangay':
+      if (barangayTable) barangayTable.classList.remove('d-none');
+      break;
+  }
+}
