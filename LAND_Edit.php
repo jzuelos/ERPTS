@@ -102,7 +102,7 @@ echo "<script>
   </nav>
 
   <!-- LAND Section -->
-  <section class="container my-5" id="land-section">
+  <section class="container my-5" id="rpu-identification-section">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h4 class="section-title">
         <?php
@@ -116,8 +116,8 @@ echo "<script>
       </h4>
       <div>
 
-        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
-          data-bs-target="#editLandModal">Edit</button>
+        <button type="button" id="editRPUButton" class="btn btn-outline-primary btn-sm"
+          onclick="toggleEdit()">Edit</button>
       </div>
     </div>
 
@@ -125,420 +125,425 @@ echo "<script>
       <!-- Land Details Section -->
       <h5 class="section-title">Land Details</h5>
 
-      <!-- Identification Numbers -->
-      <h6 class="section-subtitle mt-4">Identification Numbers</h6>
-      <div class="row">
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label for="octTctNumber" class="form-label">OCT/TCT Number</label>
-            <input type="text" id="octTctNumber" class="form-control" placeholder="Enter OCT/TCT Number" disabled
-              value="<?php echo htmlspecialchars($land_data['oct_no']); ?>">
-          </div>
-        </div>
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label for="surveyNumber" class="form-label">Survey Number</label>
-            <input type="text" id="surveyNumber" class="form-control" placeholder="Enter Survey Number" disabled
-              value="<?php echo htmlspecialchars($land_data['survey_no']); ?>">
-          </div>
-        </div>
-      </div>
-
-      <!-- Boundaries -->
-      <h6 class="section-subtitle mt-4">Boundaries</h6>
-      <div class="row">
-        <div class="col-md-3 mb-4">
-          <div class="mb-3">
-            <label for="north" class="form-label">North</label>
-            <input type="text" id="north" class="form-control" placeholder="Enter North Boundary" disabled
-              value="<?php echo htmlspecialchars($land_data['north']); ?>">
-          </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="mb-3">
-            <label for="south" class="form-label">South</label>
-            <input type="text" id="south" class="form-control" placeholder="Enter South Boundary" disabled
-              value="<?php echo htmlspecialchars($land_data['south']); ?>">
-          </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="mb-3">
-            <label for="east" class="form-label">East</label>
-            <input type="text" id="east" class="form-control" placeholder="Enter East Boundary" disabled
-              value="<?php echo htmlspecialchars($land_data['east']); ?>">
-          </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="mb-3">
-            <label for="west" class="form-label">West</label>
-            <input type="text" id="west" class="form-control" placeholder="Enter West Boundary" disabled
-              value="<?php echo htmlspecialchars($land_data['west']); ?>">
-          </div>
-        </div>
-      </div>
-
-      <!-- Boundary Description -->
-      <h6 class="section-subtitle mt-4">Boundary Description</h6>
-      <textarea class="form-control mb-4" id="boundaryDescriptionModal" rows="2"
-        placeholder="Enter boundary description"
-        disabled><?php echo htmlspecialchars($land_data['boun_desc']); ?></textarea>
-
-      <!-- Administrator Information Section -->
-      <h5 class="section-title mt-5">Administrator Information</h5>
-      <div class="row">
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="adminLastName" class="form-label">Last Name</label>
-            <input type="text" id="adminLastName" class="form-control" placeholder="Enter last name" disabled
-              value="<?php echo htmlspecialchars($land_data['last_name']); ?>">
-          </div>
-        </div>
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="adminFirstName" class="form-label">First Name</label>
-            <input type="text" id="adminFirstName" class="form-control" placeholder="Enter first name" disabled
-              value="<?php echo htmlspecialchars($land_data['first_name']); ?>">
-          </div>
-        </div>
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="adminMiddleName" class="form-label">Middle Name</label>
-            <input type="text" id="adminMiddleName" class="form-control" placeholder="Enter middle name" disabled
-              value="<?php echo htmlspecialchars($land_data['middle_name']); ?>">
-          </div>
-        </div>
-      </div>
-
-      <!-- Contact Information -->
-      <h6 class="section-subtitle mt-4">Contact Information</h6>
-      <div class="row">
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label for="adminContact" class="form-label">Contact Number</label>
-            <input type="text" id="adminContact" class="form-control" placeholder="Enter contact number" disabled
-              value="<?php echo htmlspecialchars($land_data['contact_no']); ?>">
-          </div>
-        </div>
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label for="adminEmail" class="form-label">Email</label>
-            <input type="email" id="adminEmail" class="form-control" placeholder="Enter email" disabled
-              value="<?php echo htmlspecialchars($land_data['email']); ?>">
-          </div>
-        </div>
-      </div>
-
-      <!-- Address Information -->
-      <h6 class="section-subtitle mt-4">Address</h6>
-      <div class="row">
-        <div class="col-md-3 mb-4">
-          <div class="mb-3">
-            <label for="adminAddressNumber" class="form-label">House Number</label>
-            <input type="text" id="adminAddressNumber" class="form-control" placeholder="Enter house number" disabled
-              value="<?php echo htmlspecialchars($land_data['house_street']); ?>">
-          </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="mb-3">
-            <label for="adminAddressStreet" class="form-label">Street</label>
-            <input type="text" id="adminAddressStreet" class="form-control" placeholder="Enter street" disabled
-              value="<?php echo htmlspecialchars($land_data['house_street']); ?>">
-          </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="mb-3">
-            <label for="adminAddressBarangay" class="form-label">Barangay</label>
-            <input type="text" id="adminAddressBarangay" class="form-control" placeholder="Enter barangay" disabled
-              value="<?php echo htmlspecialchars($land_data['barangay']); ?>">
-          </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="mb-3">
-            <label for="adminAddressDistrict" class="form-label">District</label>
-            <input type="text" id="adminAddressDistrict" class="form-control" placeholder="Enter district" disabled
-              value="<?php echo htmlspecialchars($land_data['district']); ?>">
-          </div>
-        </div>
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label for="adminAddressMunicipality" class="form-label">Municipality/City</label>
-            <input type="text" id="adminAddressMunicipality" class="form-control"
-              placeholder="Enter municipality or city" disabled
-              value="<?php echo htmlspecialchars($land_data['municipality']); ?>">
-          </div>
-        </div>
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label for="adminAddressProvince" class="form-label">Province</label>
-            <input type="text" id="adminAddressProvince" class="form-control" placeholder="Enter province" disabled
-              value="<?php echo htmlspecialchars($land_data['province']); ?>">
-          </div>
-        </div>
-      </div>
-
-      <!-- Land Appraisal Section -->
-      <h5 class="section-title mt-5">Land Appraisal</h5>
-
-      <div class="row">
-        <div class="col-md-6 col-12 mb-4">
-          <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <input type="text" id="description" class="form-control" placeholder="Enter description" disabled
-              value="<?php echo htmlspecialchars($land_data['land_desc']); ?>">
-          </div>
-        </div>
-        <div class="col-md-6 col-12 mb-4">
-          <div class="mb-3">
-            <label for="classification" class="form-label">Classification</label>
-            <input type="text" id="classification" class="form-control" placeholder="Enter classification" disabled
-              value="<?php echo htmlspecialchars($land_data['classification']); ?>">
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-6 col-12 mb-4">
-          <div class="mb-3">
-            <label for="actualUse" class="form-label">Actual Use</label>
-            <input type="text" id="actualUse" class="form-control" placeholder="Enter actual use" disabled
-              value="<?php echo htmlspecialchars($land_data['actual_use']); ?>">
-          </div>
-        </div>
-        <div class="col-md-6 col-12 mb-4">
-          <div class="mb-3">
-            <label for="subClass" class="form-label">Sub-Class</label>
-            <input type="text" id="subClass" class="form-control" placeholder="Enter sub-class" disabled
-              value="<?php echo htmlspecialchars($land_data['sub_class']); ?>">
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="area" class="form-label">Area</label>
-            <div class="input-group">
-              <input type="text" id="area" class="form-control" placeholder="Enter area in sq m" disabled
-                value="<?php echo htmlspecialchars($land_data['area']); ?>">
-              <div class="input-group-text">
-                <label><input type="radio" name="areaUnit" value="sqm" checked> Sq m</label>
-                <label class="ms-2"><input type="radio" name="areaUnit" value="hectare" disabled> Ha</label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="unitValue" class="form-label">Unit Value</label>
-            <input type="text" id="unitValue" class="form-control" placeholder="Enter unit value" disabled
-              value="<?php echo htmlspecialchars($land_data['unit_value']); ?>">
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="marketValue" class="form-label">Market Value</label>
-            <input type="text" id="marketValue" class="form-control" placeholder="Enter market value" disabled
-              value="<?php echo htmlspecialchars($land_data['market_value']); ?>">
-          </div>
-        </div>
-      </div>
-
-      <!-- Value Adjustment Factor Section -->
-      <h5 class="section-title mt-5">Value Adjustment Factor</h5>
-
-      <div class="row">
-        <div class="col-md-12 mb-4">
-          <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
-          <textarea id="adjustmentFactorModal" name="adjustment_factor" class="form-control" rows="3"
-            placeholder="Enter adjustment factor"
-            disabled><?php echo htmlspecialchars($land_data['adjust_factor']); ?></textarea>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="adjustmentFactor" class="form-label">Adjustment Factor</label>
-            <input type="text" id="adjustmentFactor" class="form-control" placeholder="Enter adjustment factor" disabled
-              value="<?php echo htmlspecialchars($land_data['adjust_factor']); ?>">
-          </div>
-        </div>
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="percentAdjustment" class="form-label">% Adjustment</label>
-            <input type="text" id="percentAdjustment" class="form-control" placeholder="Enter % adjustment" disabled
-              value="<?php echo htmlspecialchars($land_data['adjust_percent']); ?>">
-          </div>
-        </div>
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="valueAdjustment" class="form-label">Value Adjustment</label>
-            <input type="text" id="valueAdjustment" class="form-control" placeholder="Enter value adjustment" disabled
-              value="<?php echo htmlspecialchars($land_data['adjust_value']); ?>">
-          </div>
-        </div>
-        <div class="col-md-4 mb-4">
-          <div class="mb-3">
-            <label for="adjustedMarketValue" class="form-label">Adjusted Market Value</label>
-            <input type="text" id="adjustedMarketValue" class="form-control" placeholder="Enter adjusted market value"
-              disabled value="<?php echo htmlspecialchars($land_data['adjust_mv']); ?>">
-          </div>
-        </div>
-      </div>
-
-      <!-- Property Assessment Section -->
-      <h5 class="section-title mt-5">Property Assessment</h5>
-      <div class="row">
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label for="assessmentLevel" class="form-label">Assessment Level</label>
-            <input type="text" id="assessmentLevel" class="form-control" placeholder="Enter assessment level" disabled
-              value="<?php echo htmlspecialchars($land_data['assess_lvl']); ?>">
-          </div>
-        </div>
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label for="recommendedAssessmentLevel" class="form-label">% Recommended Assessment Level</label>
-            <input type="text" id="recommendedAssessmentLevel" class="form-control"
-              placeholder="Enter recommended assessment level" disabled
-              value="<?php echo htmlspecialchars($land_data['assess_lvl']); ?>">
-          </div>
-        </div>
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label for="assessedValue" class="form-label">Assessed Value</label>
-            <input type="text" id="assessedValue" class="form-control" placeholder="Enter assessed value" disabled
-              value="<?php echo htmlspecialchars($land_data['assess_value']); ?>">
-          </div>
-        </div>
-      </div>
-
-      <!-- Certification Section -->
-      <div class="section-wrap px-4 mb-5">
-        <h5 class="section-title mt-4">Certification</h5>
-        <div class="row gx-4">
-          <div class="col-md-12">
-            <!-- Verified By -->
-            <div class="d-flex align-items-center mb-3">
-              <label class="form-label mb-0 me-2" style="width: 140px;">Verified By</label>
-              <select class="form-select me-2" style="width: 30%;" name="verified_by" disabled>
-                <option disabled <?= empty($cert_data['verified']) ? 'selected' : '' ?>>Select verifier</option>
-                <option <?= ($cert_data['verified'] ?? '') === 'Malapajo, Antonio Menorca' ? 'selected' : '' ?>>
-                  Malapajo, Antonio Menorca
-                </option>
-              </select>
-              <button type="button" class="btn btn-outline-primary" style="width: 100px;" disabled>Verify</button>
-            </div>
-
-            <!-- Plotted By -->
-            <div class="d-flex align-items-center mb-3">
-              <label class="form-label mb-0 me-2" style="width: 140px;">Plotted By</label>
-              <select class="form-select" style="width: 30%;" name="plotted_by" disabled>
-                <option disabled <?= empty($cert_data['plotted']) ? 'selected' : '' ?>>Select plotter</option>
-                <option <?= ($cert_data['plotted'] ?? '') === 'Malapajo, Antonio Menorca' ? 'selected' : '' ?>>
-                  Malapajo, Antonio Menorca
-                </option>
-              </select>
-            </div>
-
-            <!-- Noted By -->
-            <div class="d-flex align-items-center mb-3">
-              <label class="form-label mb-0 me-2" style="width: 140px;">Noted By</label>
-              <select class="form-select" style="width: 30%;" name="noted_by" disabled>
-                <option disabled <?= empty($cert_data['noted']) ? 'selected' : '' ?>>Select noter</option>
-                <option <?= ($cert_data['noted'] ?? '') === 'Lingon, Nestor Jacolbia' ? 'selected' : '' ?>>
-                  Lingon, Nestor Jacolbia
-                </option>
-              </select>
-            </div>
-
-            <!-- Appraised By -->
-            <div class="d-flex align-items-center mb-3">
-              <label class="form-label mb-0 me-2" style="width: 140px;">Appraised By</label>
-              <select class="form-select me-2" style="width: 30%;" name="appraised_by" disabled>
-                <option disabled <?= empty($cert_data['appraised']) ? 'selected' : '' ?>>Select appraiser</option>
-                <option <?= ($cert_data['appraised'] ?? '') === 'Lingon, Nestor Jacolbia' ? 'selected' : '' ?>>
-                  Lingon, Nestor Jacolbia
-                </option>
-              </select>
-              <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
-              <input type="date" class="form-control" name="appraisal_date" id="appraisalDate" style="width: 30%;"
-                disabled value="<?= htmlspecialchars($cert_data['appraised_date'] ?? '') ?>">
-            </div>
-
-            <!-- Recommending Approval -->
-            <div class="d-flex align-items-center mb-3">
-              <label class="form-label mb-0 me-2" style="width: 140px;">Recommending Approval</label>
-              <select class="form-select me-2" style="width: 30%;" name="recommending_approval" disabled>
-                <option disabled <?= empty($cert_data['recom_approval']) ? 'selected' : '' ?>>Select recommender</option>
-                <option <?= ($cert_data['recom_approval'] ?? '') === 'Malapajo, Antonio Menorca' ? 'selected' : '' ?>>
-                  Malapajo, Antonio Menorca
-                </option>
-              </select>
-              <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
-              <input type="date" class="form-control" name="recommendation_date" id="recommendationDate"
-                style="width: 30%;" disabled value="<?= htmlspecialchars($cert_data['recom_date'] ?? '') ?>">
-            </div>
-
-            <!-- Approved By -->
-            <div class="d-flex align-items-center mb-3">
-              <label class="form-label mb-0 me-2" style="width: 140px;">Approved By</label>
-              <select class="form-select me-2" style="width: 30%;" name="approved_by" disabled>
-                <option disabled <?= empty($cert_data['approved']) ? 'selected' : '' ?>>Select approver</option>
-                <option <?= ($cert_data['approved'] ?? '') === 'Lingon, Nestor Jacolbia' ? 'selected' : '' ?>>
-                  Lingon, Nestor Jacolbia
-                </option>
-              </select>
-              <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
-              <input type="date" class="form-control" name="approval_date" id="approvalDate" style="width: 30%;"
-                disabled value="<?= htmlspecialchars($cert_data['approved_date'] ?? '') ?>">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Miscellaneous Section -->
-      <div class="section-wrap px-4 mb-5 border rounded p-3">
-        <h5 class="section-title mt-5">Miscellaneous</h5>
+      <form action="" method="post">
+        <!-- Identification Numbers -->
+        <h6 class="section-subtitle mt-4">Identification Numbers</h6>
         <div class="row">
           <div class="col-md-6 mb-4">
             <div class="mb-3">
-              <label class="form-label d-block">Idle</label>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="yes" disabled
-                  <?= ($cert_data['idle'] ?? '') === 'yes' ? 'checked' : '' ?>>
-                <label class="form-check-label" for="idleYes">Yes</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="no" disabled
-                  <?= ($cert_data['idle'] ?? 'no') === 'no' ? 'checked' : '' ?>>
-                <label class="form-check-label" for="idleNo">No</label>
-              </div>
+              <label for="octTctNumber" class="form-label">OCT/TCT Number</label>
+              <input type="text" id="octTctNumber" class="form-control" placeholder="Enter OCT/TCT Number" disabled
+                value="<?php echo htmlspecialchars($land_data['oct_no']); ?>">
             </div>
           </div>
           <div class="col-md-6 mb-4">
             <div class="mb-3">
-              <label class="form-label d-block">Contested</label>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="yes"
-                  disabled <?= ($cert_data['contested'] ?? '') === 'yes' ? 'checked' : '' ?>>
-                <label class="form-check-label" for="contestedYes">Yes</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="no" disabled
-                  <?= ($cert_data['contested'] ?? 'no') === 'no' ? 'checked' : '' ?>>
-                <label class="form-check-label" for="contestedNo">No</label>
+              <label for="surveyNumber" class="form-label">Survey Number</label>
+              <input type="text" id="surveyNumber" class="form-control" placeholder="Enter Survey Number" disabled
+                value="<?php echo htmlspecialchars($land_data['survey_no']); ?>">
+            </div>
+          </div>
+        </div>
+
+        <!-- Boundaries -->
+        <h6 class="section-subtitle mt-4">Boundaries</h6>
+        <div class="row">
+          <div class="col-md-3 mb-4">
+            <div class="mb-3">
+              <label for="north" class="form-label">North</label>
+              <input type="text" id="north" class="form-control" placeholder="Enter North Boundary" disabled
+                value="<?php echo htmlspecialchars($land_data['north']); ?>">
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <div class="mb-3">
+              <label for="south" class="form-label">South</label>
+              <input type="text" id="south" class="form-control" placeholder="Enter South Boundary" disabled
+                value="<?php echo htmlspecialchars($land_data['south']); ?>">
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <div class="mb-3">
+              <label for="east" class="form-label">East</label>
+              <input type="text" id="east" class="form-control" placeholder="Enter East Boundary" disabled
+                value="<?php echo htmlspecialchars($land_data['east']); ?>">
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <div class="mb-3">
+              <label for="west" class="form-label">West</label>
+              <input type="text" id="west" class="form-control" placeholder="Enter West Boundary" disabled
+                value="<?php echo htmlspecialchars($land_data['west']); ?>">
+            </div>
+          </div>
+        </div>
+
+        <!-- Boundary Description -->
+        <h6 class="section-subtitle mt-4">Boundary Description</h6>
+        <textarea class="form-control mb-4" id="boundaryDescriptionModal" rows="2"
+          placeholder="Enter boundary description"
+          disabled><?php echo htmlspecialchars($land_data['boun_desc']); ?></textarea>
+
+        <!-- Administrator Information Section -->
+        <h5 class="section-title mt-5">Administrator Information</h5>
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <div class="mb-3">
+              <label for="adminLastName" class="form-label">Last Name</label>
+              <input type="text" id="adminLastName" class="form-control" placeholder="Enter last name" disabled
+                value="<?php echo htmlspecialchars($land_data['last_name']); ?>">
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="mb-3">
+              <label for="adminFirstName" class="form-label">First Name</label>
+              <input type="text" id="adminFirstName" class="form-control" placeholder="Enter first name" disabled
+                value="<?php echo htmlspecialchars($land_data['first_name']); ?>">
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="mb-3">
+              <label for="adminMiddleName" class="form-label">Middle Name</label>
+              <input type="text" id="adminMiddleName" class="form-control" placeholder="Enter middle name" disabled
+                value="<?php echo htmlspecialchars($land_data['middle_name']); ?>">
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Information -->
+        <h6 class="section-subtitle mt-4">Contact Information</h6>
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="mb-3">
+              <label for="adminContact" class="form-label">Contact Number</label>
+              <input type="text" id="adminContact" class="form-control" placeholder="Enter contact number" disabled
+                value="<?php echo htmlspecialchars($land_data['contact_no']); ?>">
+            </div>
+          </div>
+          <div class="col-md-6 mb-4">
+            <div class="mb-3">
+              <label for="adminEmail" class="form-label">Email</label>
+              <input type="email" id="adminEmail" class="form-control" placeholder="Enter email" disabled
+                value="<?php echo htmlspecialchars($land_data['email']); ?>">
+            </div>
+          </div>
+        </div>
+
+        <!-- Address Information -->
+        <h6 class="section-subtitle mt-4">Address</h6>
+        <div class="row">
+          <div class="col-md-3 mb-4">
+            <div class="mb-3">
+              <label for="adminAddressNumber" class="form-label">House Number</label>
+              <input type="text" id="adminAddressNumber" class="form-control" placeholder="Enter house number" disabled
+                value="<?php echo htmlspecialchars($land_data['house_street']); ?>">
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <div class="mb-3">
+              <label for="adminAddressStreet" class="form-label">Street</label>
+              <input type="text" id="adminAddressStreet" class="form-control" placeholder="Enter street" disabled
+                value="<?php echo htmlspecialchars($land_data['house_street']); ?>">
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <div class="mb-3">
+              <label for="adminAddressBarangay" class="form-label">Barangay</label>
+              <input type="text" id="adminAddressBarangay" class="form-control" placeholder="Enter barangay" disabled
+                value="<?php echo htmlspecialchars($land_data['barangay']); ?>">
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <div class="mb-3">
+              <label for="adminAddressDistrict" class="form-label">District</label>
+              <input type="text" id="adminAddressDistrict" class="form-control" placeholder="Enter district" disabled
+                value="<?php echo htmlspecialchars($land_data['district']); ?>">
+            </div>
+          </div>
+          <div class="col-md-6 mb-4">
+            <div class="mb-3">
+              <label for="adminAddressMunicipality" class="form-label">Municipality/City</label>
+              <input type="text" id="adminAddressMunicipality" class="form-control"
+                placeholder="Enter municipality or city" disabled
+                value="<?php echo htmlspecialchars($land_data['municipality']); ?>">
+            </div>
+          </div>
+          <div class="col-md-6 mb-4">
+            <div class="mb-3">
+              <label for="adminAddressProvince" class="form-label">Province</label>
+              <input type="text" id="adminAddressProvince" class="form-control" placeholder="Enter province" disabled
+                value="<?php echo htmlspecialchars($land_data['province']); ?>">
+            </div>
+          </div>
+        </div>
+
+        <!-- Land Appraisal Section -->
+        <h5 class="section-title mt-5">Land Appraisal</h5>
+
+        <div class="row">
+          <div class="col-md-6 col-12 mb-4">
+            <div class="mb-3">
+              <label for="description" class="form-label">Description</label>
+              <input type="text" id="description" class="form-control" placeholder="Enter description" disabled
+                value="<?php echo htmlspecialchars($land_data['land_desc']); ?>">
+            </div>
+          </div>
+          <div class="col-md-6 col-12 mb-4">
+            <div class="mb-3">
+              <label for="classification" class="form-label">Classification</label>
+              <input type="text" id="classification" class="form-control" placeholder="Enter classification" disabled
+                value="<?php echo htmlspecialchars($land_data['classification']); ?>">
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 col-12 mb-4">
+            <div class="mb-3">
+              <label for="actualUse" class="form-label">Actual Use</label>
+              <input type="text" id="actualUse" class="form-control" placeholder="Enter actual use" disabled
+                value="<?php echo htmlspecialchars($land_data['actual_use']); ?>">
+            </div>
+          </div>
+          <div class="col-md-6 col-12 mb-4">
+            <div class="mb-3">
+              <label for="subClass" class="form-label">Sub-Class</label>
+              <input type="text" id="subClass" class="form-control" placeholder="Enter sub-class" disabled
+                value="<?php echo htmlspecialchars($land_data['sub_class']); ?>">
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <div class="mb-3">
+              <label for="area" class="form-label">Area</label>
+              <div class="input-group">
+                <input type="text" id="area" class="form-control" placeholder="Enter area in sq m" name="area" disabled
+                  value="<?php echo htmlspecialchars($land_data['area']); ?>">
+                <div class="input-group-text">
+                  <label><input type="radio" id="sqm" name="areaUnit" value="sqm" checked> Sq m</label>
+                  <label class="ms-2"><input type="radio" id="hectare" name="areaUnit" value="hectare" disabled>
+                    Ha</label>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <div class="mb-3">
+              <label for="unitValue" class="form-label">Unit Value</label>
+              <input type="text" id="unitValue" class="form-control" placeholder="Enter unit value" name="unitValue"
+                disabled value="<?php echo htmlspecialchars($land_data['unit_value']); ?>">
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <div class="mb-3">
+              <label for="marketValue" class="form-label">Market Value</label>
+              <input type="text" id="marketValue" class="form-control" placeholder="Enter market value"
+                name="marketValue" disabled value="<?php echo htmlspecialchars($land_data['market_value']); ?>">
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Value Adjustment Factor Section -->
+        <h5 class="section-title mt-5">Value Adjustment Factor</h5>
+
+        <div class="row">
+          <div class="col-md-12 mb-4">
+            <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
+            <textarea id="adjustmentFactorModal" name="adjustment_factor" class="form-control" rows="3"
+              placeholder="Enter adjustment factor"
+              disabled><?php echo htmlspecialchars($land_data['adjust_factor']); ?></textarea>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <div class="mb-3">
+              <label for="percentAdjustment" class="form-label">Adjustment Factor (%)</label>
+              <input type="text" id="percentAdjustment" class="form-control" placeholder="Enter adjustment factor"
+                disabled value="<?php echo htmlspecialchars($land_data['adjust_factor']); ?>">
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-4">
+            <div class="mb-3">
+              <label for="valueAdjustment" class="form-label">Value Adjustment</label>
+              <input type="text" id="valueAdjustment" class="form-control" placeholder="Enter value adjustment" disabled
+                value="<?php echo htmlspecialchars($land_data['adjust_value']); ?>">
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-4">
+            <div class="mb-3">
+              <label for="adjustedMarketValue" class="form-label">Adjusted Market Value</label>
+              <input type="text" id="adjustedMarketValue" class="form-control" placeholder="Enter adjusted market value"
+                disabled value="<?php echo htmlspecialchars($land_data['adjust_mv']); ?>">
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Property Assessment Section -->
+        <h5 class="section-title mt-5">Property Assessment</h5>
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="mb-3">
+              <label for="assessmentLevel" class="form-label">Assessment Level</label>
+              <input type="text" id="assessmentLevel" class="form-control" placeholder="Enter assessment level" disabled
+                value="<?php echo htmlspecialchars($land_data['assess_lvl']); ?>">
+            </div>
+          </div>
+          <div class="col-md-6 mb-4">
+            <div class="mb-3">
+              <label for="recommendedAssessmentLevel" class="form-label">% Recommended Assessment Level</label>
+              <input type="text" id="recommendedAssessmentLevel" class="form-control"
+                placeholder="Enter recommended assessment level" disabled
+                value="<?php echo htmlspecialchars($land_data['assess_lvl']); ?>">
+            </div>
+          </div>
+          <div class="col-md-6 mb-4">
+            <div class="mb-3">
+              <label for="assessedValue" class="form-label">Assessed Value</label>
+              <input type="text" id="assessedValue" class="form-control" placeholder="Enter assessed value" disabled
+                value="<?php echo htmlspecialchars($land_data['assess_value']); ?>">
+            </div>
+          </div>
+        </div>
+
+        <!-- Certification Section -->
+        <div class="section-wrap px-4 mb-5">
+          <h5 class="section-title mt-4">Certification</h5>
+          <div class="row gx-4">
+            <div class="col-md-12">
+              <!-- Verified By -->
+              <div class="d-flex align-items-center mb-3">
+                <label class="form-label mb-0 me-2" style="width: 140px;">Verified By</label>
+                <select class="form-select me-2" style="width: 30%;" name="verified_by" disabled>
+                  <option disabled <?= empty($cert_data['verified']) ? 'selected' : '' ?>>Select verifier</option>
+                  <option <?= ($cert_data['verified'] ?? '') === 'Malapajo, Antonio Menorca' ? 'selected' : '' ?>>
+                    Malapajo, Antonio Menorca
+                  </option>
+                </select>
+                <button type="button" class="btn btn-outline-primary" style="width: 100px;" disabled>Verify</button>
+              </div>
+
+              <!-- Plotted By -->
+              <div class="d-flex align-items-center mb-3">
+                <label class="form-label mb-0 me-2" style="width: 140px;">Plotted By</label>
+                <select class="form-select" style="width: 30%;" name="plotted_by" disabled>
+                  <option disabled <?= empty($cert_data['plotted']) ? 'selected' : '' ?>>Select plotter</option>
+                  <option <?= ($cert_data['plotted'] ?? '') === 'Malapajo, Antonio Menorca' ? 'selected' : '' ?>>
+                    Malapajo, Antonio Menorca
+                  </option>
+                </select>
+              </div>
+
+              <!-- Noted By -->
+              <div class="d-flex align-items-center mb-3">
+                <label class="form-label mb-0 me-2" style="width: 140px;">Noted By</label>
+                <select class="form-select" style="width: 30%;" name="noted_by" disabled>
+                  <option disabled <?= empty($cert_data['noted']) ? 'selected' : '' ?>>Select noter</option>
+                  <option <?= ($cert_data['noted'] ?? '') === 'Lingon, Nestor Jacolbia' ? 'selected' : '' ?>>
+                    Lingon, Nestor Jacolbia
+                  </option>
+                </select>
+              </div>
+
+              <!-- Appraised By -->
+              <div class="d-flex align-items-center mb-3">
+                <label class="form-label mb-0 me-2" style="width: 140px;">Appraised By</label>
+                <select class="form-select me-2" style="width: 30%;" name="appraised_by" disabled>
+                  <option disabled <?= empty($cert_data['appraised']) ? 'selected' : '' ?>>Select appraiser</option>
+                  <option <?= ($cert_data['appraised'] ?? '') === 'Lingon, Nestor Jacolbia' ? 'selected' : '' ?>>
+                    Lingon, Nestor Jacolbia
+                  </option>
+                </select>
+                <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
+                <input type="date" class="form-control" name="appraisal_date" id="appraisalDate" style="width: 30%;"
+                  disabled value="<?= htmlspecialchars($cert_data['appraised_date'] ?? '') ?>">
+              </div>
+
+              <!-- Recommending Approval -->
+              <div class="d-flex align-items-center mb-3">
+                <label class="form-label mb-0 me-2" style="width: 140px;">Recommending Approval</label>
+                <select class="form-select me-2" style="width: 30%;" name="recommending_approval" disabled>
+                  <option disabled <?= empty($cert_data['recom_approval']) ? 'selected' : '' ?>>Select recommender
+                  </option>
+                  <option <?= ($cert_data['recom_approval'] ?? '') === 'Malapajo, Antonio Menorca' ? 'selected' : '' ?>>
+                    Malapajo, Antonio Menorca
+                  </option>
+                </select>
+                <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
+                <input type="date" class="form-control" name="recommendation_date" id="recommendationDate"
+                  style="width: 30%;" disabled value="<?= htmlspecialchars($cert_data['recom_date'] ?? '') ?>">
+              </div>
+
+              <!-- Approved By -->
+              <div class="d-flex align-items-center mb-3">
+                <label class="form-label mb-0 me-2" style="width: 140px;">Approved By</label>
+                <select class="form-select me-2" style="width: 30%;" name="approved_by" disabled>
+                  <option disabled <?= empty($cert_data['approved']) ? 'selected' : '' ?>>Select approver</option>
+                  <option <?= ($cert_data['approved'] ?? '') === 'Lingon, Nestor Jacolbia' ? 'selected' : '' ?>>
+                    Lingon, Nestor Jacolbia
+                  </option>
+                </select>
+                <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
+                <input type="date" class="form-control" name="approval_date" id="approvalDate" style="width: 30%;"
+                  disabled value="<?= htmlspecialchars($cert_data['approved_date'] ?? '') ?>">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Miscellaneous Section -->
+        <div class="section-wrap px-4 mb-5 border rounded p-3">
+          <h5 class="section-title mt-5">Miscellaneous</h5>
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <div class="mb-3">
+                <label class="form-label d-block">Idle</label>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="yes" disabled
+                    <?= ($cert_data['idle'] ?? '') === 'yes' ? 'checked' : '' ?>>
+                  <label class="form-check-label" for="idleYes">Yes</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="no" disabled
+                    <?= ($cert_data['idle'] ?? 'no') === 'no' ? 'checked' : '' ?>>
+                  <label class="form-check-label" for="idleNo">No</label>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-4">
+              <div class="mb-3">
+                <label class="form-label d-block">Contested</label>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="yes"
+                    disabled <?= ($cert_data['contested'] ?? '') === 'yes' ? 'checked' : '' ?>>
+                  <label class="form-check-label" for="contestedYes">Yes</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="no"
+                    disabled <?= ($cert_data['contested'] ?? 'no') === 'no' ? 'checked' : '' ?>>
+                  <label class="form-check-label" for="contestedNo">No</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <input type="submit" name="submit" value="Submit">
+
+      </form>
 
       <!-- Print Button at Bottom Right -->
       <div class="d-flex justify-content-end mt-4">
@@ -549,359 +554,6 @@ echo "<script>
     </div>
     </div>
   </section>
-
-
-  <!-- Modal for Editing Land Details -->
-  <div class="modal fade" id="editLandModal" tabindex="-1" aria-labelledby="editLandModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="max-width: 55%; width: 55%;">
-      <div class="modal-content">
-        <form method="POST" action=""> <!-- Form starts here -->
-          <div class="modal-header">
-            <h5 class="modal-title" id="editLandModalLabel">Edit Land Details</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-
-          <div class="modal-body">
-            <!-- Identification Numbers -->
-            <div class="row">
-              <div class="col-md-6 mb-4">
-                <label for="octTctNumberModal" class="form-label">OCT/TCT Number</label>
-                <input type="text" id="octTctNumberModal" name="oct_no" class="form-control"
-                  placeholder="Enter OCT/TCT Number" required>
-              </div>
-              <div class="col-md-6 mb-4">
-                <label for="surveyNumberModal" class="form-label">Survey Number</label>
-                <input type="text" id="surveyNumberModal" name="survey_no" class="form-control"
-                  placeholder="Enter Survey Number" required>
-              </div>
-            </div>
-
-            <!-- Boundaries -->
-            <div class="row">
-              <div class="col-md-3 mb-4">
-                <label for="northModal" class="form-label">North Boundary</label>
-                <input type="text" id="northModal" name="north_boundary" class="form-control"
-                  placeholder="Enter North Boundary">
-              </div>
-              <div class="col-md-3 mb-4">
-                <label for="southModal" class="form-label">South Boundary</label>
-                <input type="text" id="southModal" name="south_boundary" class="form-control"
-                  placeholder="Enter South Boundary">
-              </div>
-              <div class="col-md-3 mb-4">
-                <label for="eastModal" class="form-label">East Boundary</label>
-                <input type="text" id="eastModal" name="east_boundary" class="form-control"
-                  placeholder="Enter East Boundary">
-              </div>
-              <div class="col-md-3 mb-4">
-                <label for="westModal" class="form-label">West Boundary</label>
-                <input type="text" id="westModal" name="west_boundary" class="form-control"
-                  placeholder="Enter West Boundary">
-              </div>
-            </div>
-
-            <!-- Boundary Description -->
-            <div class="mb-4">
-              <label for="boundaryDescriptionModal" class="form-label">Boundary Description</label>
-              <textarea class="form-control" id="boundaryDescriptionModal" name="boun_desc" rows="2"
-                placeholder="Enter boundary description"></textarea>
-            </div>
-
-            <!-- Administrator Information -->
-            <h5 class="section-title mt-5">Administrator Information</h5>
-            <div class="row">
-              <div class="col-md-4 mb-4">
-                <label for="adminLastNameModal" class="form-label">Last Name</label>
-                <input type="text" id="adminLastNameModal" name="last_name" class="form-control"
-                  placeholder="Enter last name">
-              </div>
-              <div class="col-md-4 mb-4">
-                <label for="adminFirstNameModal" class="form-label">First Name</label>
-                <input type="text" id="adminFirstNameModal" name="first_name" class="form-control"
-                  placeholder="Enter first name">
-              </div>
-              <div class="col-md-4 mb-4">
-                <label for="adminMiddleNameModal" class="form-label">Middle Name</label>
-                <input type="text" id="adminMiddleNameModal" name="middle_name" class="form-control"
-                  placeholder="Enter middle name">
-              </div>
-            </div>
-
-            <!-- Contact Information -->
-            <div class="row">
-              <div class="col-md-6 mb-4">
-                <label for="adminContactModal" class="form-label">Contact Number</label>
-                <input type="text" id="adminContactModal" name="contact_no" class="form-control"
-                  placeholder="Enter contact number">
-              </div>
-              <div class="col-md-6 mb-4">
-                <label for="adminEmailModal" class="form-label">Email</label>
-                <input type="email" id="adminEmailModal" name="email" class="form-control" placeholder="Enter email">
-              </div>
-            </div>
-
-            <!-- Address Information -->
-            <h6 class="section-subtitle mt-4">Address</h6>
-            <div class="row">
-              <div class="col-md-3 mb-4">
-                <label for="adminAddressNumberModal" class="form-label">House Number</label>
-                <input type="text" id="adminAddressNumberModal" name="house_street" class="form-control"
-                  placeholder="Enter house number">
-              </div>
-              <div class="col-md-3 mb-4">
-                <label for="adminAddressStreetModal" class="form-label">Street</label>
-                <input type="text" id="adminAddressStreetModal" name="barangay" class="form-control"
-                  placeholder="Enter street">
-              </div>
-              <div class="col-md-3 mb-4">
-                <label for="adminAddressMunicipalityModal" class="form-label">Municipality</label>
-                <input type="text" id="adminAddressMunicipalityModal" name="municipality" class="form-control"
-                  placeholder="Enter municipality">
-              </div>
-              <div class="col-md-3 mb-4">
-                <label for="adminAddressProvinceModal" class="form-label">Province</label>
-                <input type="text" id="adminAddressProvinceModal" name="province" class="form-control"
-                  placeholder="Enter province">
-              </div>
-            </div>
-
-            <!-- Land Appraisal Section -->
-            <h5 class="section-title mt-5">Land Appraisal</h5>
-            <div class="row">
-              <div class="col-md-6 mb-4">
-                <label for="landDescModal" class="form-label">Land Description</label>
-                <input type="text" id="landDescModal" name="land_desc" class="form-control"
-                  placeholder="Enter land description">
-              </div>
-              <div class="col-md-6 mb-4">
-                <label for="classificationModal" class="form-label">Classification</label>
-                <input type="text" id="classificationModal" name="classification" class="form-control"
-                  placeholder="Enter classification">
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-6 mb-4">
-                <label for="subClassModal" class="form-label">Sub-Class</label>
-                <input type="text" id="subClassModal" name="sub_class" class="form-control"
-                  placeholder="Enter sub-class">
-              </div>
-              <div class="col-md-6 mb-4">
-                <label for="actualUseModal" class="form-label">Actual Use</label>
-                <input type="text" id="actualUseModal" name="actual_use" class="form-control"
-                  placeholder="Enter actual use">
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-8 mb-4">
-                <label for="areaModal" class="form-label">Area</label>
-                <div class="input-group">
-                  <input type="number" id="areaModal" name="area" class="form-control" placeholder="Enter area"
-                    step="any" required>
-                  <div class="input-group-append ml-4">
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="areaUnit" value="sqm" id="sqm" checked>
-                      <label class="form-check-label" for="sqm">Sqm</label>
-                    </div>
-                    <div class="form-check ms-2 ml-3">
-                      <input class="form-check-input" type="radio" name="areaUnit" value="hectare" id="hectare">
-                      <label class="form-check-label" for="hectare">Ha</label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-6 mb-4">
-                <label for="unitValueModal" class="form-label">Unit Value</label>
-                <input type="number" id="unitValueModal" name="unit_value" class="form-control"
-                  placeholder="Enter unit value">
-              </div>
-              <div class="col-md-4 mb-4">
-                <label for="recommendedUnitValue" class="form-label">Recommended Unit Value</label>
-                <input type="number" id="recommendedUnitValue" name="recommended_unit_value" class="form-control"
-                  placeholder="loading..." disabled>
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-6 mb-4">
-                <label for="marketValueModal" class="form-label">Market Value</label>
-                <input type="number" id="marketValueModal" name="market_value" class="form-control"
-                  placeholder="Market value" readonly>
-              </div>
-            </div>
-          </div>
-
-          <!-- Value Adjustment Factor Section in Modal -->
-          <div class="section-wrap px-4 mb-5">
-            <h5 class="section-title mt-5">Value Adjustment Factor</h5>
-            <div class="row">
-              <div class="col-md-12 mb-4">
-                <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
-                <textarea id="adjustmentFactorModal" name="adjustment_factor" class="form-control" rows="3"
-                  placeholder="Enter adjustment factor"></textarea>
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-4 mb-4">
-                <label for="percentAdjustmentModal" class="form-label">% Adjustment</label>
-                <input type="text" id="percentAdjustmentModal" name="percent_adjustment" class="form-control"
-                  value="100">
-              </div>
-              <div class="col-md-4 mb-4">
-                <label for="valueAdjustmentModal" class="form-label">Value Adjustment</label>
-                <input type="text" id="valueAdjustmentModal" name="value_adjustment" class="form-control"
-                  placeholder="Enter value adjustment" readonly>
-              </div>
-              <div class="col-md-4 mb-4">
-                <label for="adjustedMarketValueModal" class="form-label">Adjusted Market Value</label>
-                <input type="text" id="adjustedMarketValueModal" name="adjusted_market_value" class="form-control"
-                  placeholder="Enter adjusted market value" readonly>
-              </div>
-            </div>
-          </div>
-
-          <!-- Property Assessment Section in Modal -->
-          <div class="section-wrap px-4 mb-5">
-            <h5 class="section-title mt-5">Property Assessment</h5>
-            <div class="row">
-              <div class="col-md-5 mb-4">
-                <label for="assessmentLevelModal" class="form-label">Assessment Level</label>
-                <input type="number" id="assessmentLevelModal" name="assessment_level" class="form-control"
-                  placeholder="Enter assessment level">
-              </div>
-              <div class="col-md-4 mb-4 ml-5">
-                <label for="recommendedAssessmentLevelModal" class="form-label">% Recommended Assessment Level</label>
-                <input type="number" id="recommendedAssessmentLevelModal" name="recommended_assessment_level"
-                  class="form-control" placeholder="loading..." readonly>
-              </div>
-              <div class="col-md-5 mb-4">
-                <label for="assessedValueModal" class="form-label">Assessed Value</label>
-                <input type="number" id="assessedValueModal" name="assessed_value" class="form-control"
-                  placeholder="Assessed Value" readonly>
-              </div>
-            </div>
-          </div>
-
-          <!-- Certification Section Modal -->
-          <div class="section-wrap px-4 mb-5">
-            <h5 class="section-title mt-4">Certification</h5>
-            <div class="row gx-4">
-              <div class="col-md-12">
-                <!-- Verified By -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 me-2" style="width: 140px;">Verified By</label>
-                  <select class="form-select me-2" style="width: 30%;" name="verified_by">
-                    <option selected disabled>Select verifier</option>
-                    <option>Malapajo, Antonio Menorca</option>
-                  </select>
-                  <button type="button" class="btn btn-outline-primary" style="width: 100px;">Verify</button>
-                </div>
-
-                <!-- Plotted By -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 me-2" style="width: 140px;">Plotted By</label>
-                  <select class="form-select" style="width: 30%;" name="plotted_by">
-                    <option selected disabled>Select plotter</option>
-                    <option>Malapajo, Antonio Menorca</option>
-                  </select>
-                </div>
-
-                <!-- Noted By -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 me-2" style="width: 140px;">Noted By</label>
-                  <select class="form-select" style="width: 30%;" name="noted_by">
-                    <option selected disabled>Select noter</option>
-                    <option>Lingon, Nestor Jacolbia</option>
-                  </select>
-                </div>
-
-                <!-- Appraised By -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 me-2" style="width: 140px;">Appraised By</label>
-                  <select class="form-select me-2" style="width: 30%;" name="appraised_by">
-                    <option selected disabled>Select appraiser</option>
-                    <option>Lingon, Nestor Jacolbia</option>
-                  </select>
-                  <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
-                  <input type="date" class="form-control" name="appraisal_date" id="appraisalDate" style="width: 30%;">
-                </div>
-
-                <!-- Recommending Approval -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 me-2" style="width: 140px;">Recommending Approval</label>
-                  <select class="form-select me-2" style="width: 30%;" name="recommending_approval">
-                    <option selected disabled>Select recommender</option>
-                    <option>Malapajo, Antonio Menorca</option>
-                  </select>
-                  <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
-                  <input type="date" class="form-control" name="recommendation_date" id="recommendationDate"
-                    style="width: 30%;">
-                </div>
-
-                <!-- Approved By -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 me-2" style="width: 140px;">Approved By</label>
-                  <select class="form-select me-2" style="width: 30%;" name="approved_by">
-                    <option selected disabled>Select approver</option>
-                    <option>Lingon, Nestor Jacolbia</option>
-                  </select>
-                  <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
-                  <input type="date" class="form-control" name="approval_date" id="approvalDate" style="width: 30%;">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Miscellaneous Section Modal -->
-          <div class="section-wrap px-4 mb-5 border rounded p-3">
-            <h5 class="section-title mt-5">Miscellaneous</h5>
-            <div class="row">
-              <div class="col-md-6 mb-4">
-                <div class="mb-3">
-                  <label class="form-label d-block">Idle</label>
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="yes">
-                    <label class="form-check-label" for="idleYes">Yes</label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="no" checked>
-                    <label class="form-check-label" for="idleNo">No</label>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6 mb-4">
-                <div class="mb-3">
-                  <label class="form-label d-block">Contested</label>
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="yes">
-                    <label class="form-check-label" for="contestedYes">Yes</label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="no"
-                      checked>
-                    <label class="form-check-label" for="contestedNo">No</label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="reset" class="btn btn-warning">Reset</button>
-            <button type="submit" class="btn btn-primary" name="save_changes">Save Changes</button>
-          </div>
-        </form> <!-- Form ends here -->
-      </div>
-    </div>
-  </div>
-  </div>
-  </div>
 
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
@@ -919,213 +571,138 @@ echo "<script>
       document.getElementById('recommendationDate').value = today;
       document.getElementById('appraisalDate').value = today;
 
-      // Function to reset all modal forms
-      function resetForm() {
-        document.querySelectorAll('.modal form').forEach(form => form.reset());
-        document.querySelectorAll('.modal input, .modal select, .modal textarea').forEach(field => {
-          if (field.type === "checkbox" || field.type === "radio") {
-            field.checked = field.defaultChecked;
-          } else if (field.tagName === "SELECT") {
-            field.selectedIndex = 0;
-          } else {
-            field.value = "";
-          }
-        });
-      }
-
-      // Function to toggle edit mode
       function toggleEdit() {
         const editButton = document.getElementById('editRPUButton');
-        const inputs = document.querySelectorAll('#rpu-identification-section input, #rpu-identification-section select');
+        const inputs = document.querySelectorAll('#rpu-identification-section input, #rpu-identification-section select, #rpu-identification-section textarea');
 
-        if (editButton.textContent === 'Edit') {
-          editButton.textContent = 'Save';
-          inputs.forEach(input => input.disabled = false);
-        } else {
-          saveRPUData();
-          editButton.textContent = 'Edit';
-          inputs.forEach(input => input.disabled = true);
-        }
+        const isEditing = editButton.textContent.trim() === 'Edit';
+
+        editButton.textContent = isEditing ? 'Done' : 'Edit';
+
+        const excludeIds = ["marketValue, valueAdjustment, adjustedMarketValue"];
+
+        inputs.forEach(input => {
+          if (excludeIds.includes(input.id)) return;
+
+          input.disabled = !isEditing;
+        });
+
       }
 
-      let arpData = {};
+      // Attach event listener for edit button
+      document.getElementById('editRPUButton').addEventListener('click', toggleEdit);
 
-      // Function to save data
-      function saveRPUData() {
-        const propertyId = new URLSearchParams(window.location.search).get('id');
-        const faasIdMatch = document.body.innerHTML.match(/Faas ID:\s*(\d+)/);
-        const faasId = faasIdMatch ? faasIdMatch[1] : null;
+      // DOM elements
+      const areaInput = document.getElementById("area");
+      const sqmRadio = document.querySelector("input[name='areaUnit'][value='sqm']");
+      const hectareRadio = document.querySelector("input[name='areaUnit'][value='hectare']");
+      const unitValueInput = document.getElementById("unitValue");
+      const marketValueInput = document.getElementById("marketValue");
 
-        if (!faasId) {
-          alert("Error: FAAS ID not found on the page.");
+      const percentAdjustmentInput = document.getElementById("percentAdjustment");
+      const valueAdjustmentInput = document.getElementById("valueAdjustment");
+      const adjustedMarketValueInput = document.getElementById("adjustedMarketValue");
+
+      // Convert area when unit changes
+      sqmRadio.addEventListener('change', convertArea);
+      hectareRadio.addEventListener('change', convertArea);
+
+      // Debounced recalculations on input
+      areaInput.addEventListener('input', debounce(() => {
+        calculateMarketValue();
+        validateInputs();
+      }, 300));
+
+      unitValueInput.addEventListener('input', debounce(() => {
+        calculateMarketValue();
+        validateInputs();
+      }, 300));
+
+      percentAdjustmentInput.addEventListener('input', debounce(() => {
+        const marketValue = parseFloat(marketValueInput.value) || 0;
+        calculateAdjustment(marketValue);
+      }, 300));
+
+      // Convert area (without triggering on typing)
+      function convertArea() {
+        const rawValue = areaInput.value.trim();
+        if (rawValue === '' || isNaN(rawValue)) {
+          marketValueInput.value = '';
           return;
         }
 
-        arpData = {
-          faasId: faasId,
-          arpNumber: document.getElementById('arpNumber').value,
-          propertyNumber: document.getElementById('propertyNumber').value,
-          taxability: document.getElementById('taxability').value,
-          effectivity: document.getElementById('effectivity').value
+        const value = parseFloat(rawValue);
+
+        if (hectareRadio.checked) {
+          areaInput.value = (value / 10000).toFixed(4); // sqm to ha
+        } else if (sqmRadio.checked) {
+          areaInput.value = (value * 10000).toFixed(2); // ha to sqm
+        }
+
+        calculateMarketValue();
+      }
+
+      // Market value = area * unit value
+      function calculateMarketValue() {
+        const area = parseFloat(areaInput.value);
+        const unitValue = parseFloat(unitValueInput.value);
+
+        if (isNaN(area) || isNaN(unitValue)) {
+          marketValueInput.value = '';
+          valueAdjustmentInput.value = '';
+          adjustedMarketValueInput.value = '';
+          return;
+        }
+
+        const marketValue = area * unitValue;
+        marketValueInput.value = marketValue.toFixed(2);
+        calculateAdjustment(marketValue);
+      }
+
+      // Apply % adjustment to market value
+      function calculateAdjustment(marketValue) {
+        const percent = parseFloat(percentAdjustmentInput.value);
+
+        if (isNaN(percent)) {
+          valueAdjustmentInput.value = '';
+          adjustedMarketValueInput.value = '';
+          return;
+        }
+
+        const adjusted = marketValue * (percent / 100);
+        const adjustment = adjusted - marketValue;
+
+        valueAdjustmentInput.value = (adjustment < 0 ? "-" : "") + Math.abs(adjustment).toFixed(2);
+        adjustedMarketValueInput.value = adjusted.toFixed(2);
+      }
+
+      // Visual validation
+      function validateInputs() {
+        const area = parseFloat(areaInput.value);
+        const unitValue = parseFloat(unitValueInput.value);
+
+        areaInput.classList.toggle('is-invalid', isNaN(area) || area <= 0);
+        areaInput.style.borderColor = (isNaN(area) || area <= 0) ? 'red' : '';
+
+        unitValueInput.classList.toggle('is-invalid', isNaN(unitValue) || unitValue <= 0);
+        unitValueInput.style.borderColor = (isNaN(unitValue) || unitValue <= 0) ? 'red' : '';
+      }
+
+      // Debounce utility
+      function debounce(func, wait) {
+        let timeout;
+        return function () {
+          clearTimeout(timeout);
+          timeout = setTimeout(func, wait);
         };
-
-        fetch('FAASrpuID.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(arpData)
-        })
-          .then(response => response.json())
-          .then(data => {
-            alert(data.success ? 'Success' : 'Failed to insert data: ' + data.error);
-          })
-          .catch(error => alert('An error occurred: ' + error));
       }
 
-      // Update area unit and recalculate market value
-      function updateAreaUnit() {
-        const areaInput = document.getElementById("areaModal");
-        const sqmRadio = document.getElementById("sqm");
-        const hectareRadio = document.getElementById("hectare");
-        const unitValueInput = document.getElementById("unitValueModal");
-        const marketValueInput = document.getElementById("marketValueModal");
-        const valueAdjustmentInput = document.getElementById("valueAdjustmentModal");
-        const adjustedMarketValueInput = document.getElementById("adjustedMarketValueModal");
-        const percentAdjustmentInput = document.getElementById("percentAdjustmentModal");
-
-        // Convert area based on selected unit (sqm or hectare)
-        function convertArea() {
-          let value = parseFloat(areaInput.value) || 0;
-
-          // Convert area when unit changes
-          if (sqmRadio.checked) {
-            areaInput.value = (value * 10000).toFixed(2); // Convert hectares to sqm
-          } else if (hectareRadio.checked) {
-            areaInput.value = (value / 10000).toFixed(4); // Convert sqm to hectares
-          }
-
-          // Recalculate market value after area conversion
-          calculateMarketValue();
-        }
-
-        // Debounced version of the input event to improve performance
-        function debounce(func, wait) {
-          let timeout;
-          return function () {
-            clearTimeout(timeout);
-            timeout = setTimeout(func, wait);
-          };
-        }
-
-        // Calculate market value based on area and unit value
-        function calculateMarketValue() {
-          const area = parseFloat(areaInput.value) || 0;
-          const unitValue = parseFloat(unitValueInput.value) || 0;
-
-          // If hectares are selected, we need to convert them to sqm for calculation
-          let areaInSquareMeters = hectareRadio.checked ? area * 10000 : area;
-
-          // Only calculate if both area and unit value are valid
-          if (!isNaN(areaInSquareMeters) && !isNaN(unitValue) && areaInSquareMeters > 0 && unitValue > 0) {
-            let marketValue = areaInSquareMeters * unitValue; // Calculate market value
-            marketValueInput.value = marketValue.toFixed(2).toLocaleString(); // Display result with 2 decimal points and commas
-
-            // Calculate value adjustment based on percentage
-            calculateValueAdjustment(marketValue);
-          } else {
-            marketValueInput.value = ''; // Clear market value if inputs are invalid
-            valueAdjustmentInput.value = ''; // Clear value adjustment
-          }
-        }
-
-        // Calculate value adjustment based on market value and percentage adjustment
-        function calculateValueAdjustment(marketValue) {
-          const percentAdjustment = parseFloat(percentAdjustmentInput.value) || 0;
-          let valueAdjustment = (marketValue * (percentAdjustment / 100 - 1)); // Adjusted calculation
-
-          // Format the value adjustment with "-" if it's negative
-          const formattedValue = (valueAdjustment < 0 ? "-" : "") + Math.abs(valueAdjustment).toFixed(2).toLocaleString();
-
-          valueAdjustmentInput.value = formattedValue; // Display result
-          calculateAdjustedMarketValue(marketValue, valueAdjustment);
-        }
-
-        // Function to calculate the adjusted market value
-        function calculateAdjustedMarketValue(marketValue, valueAdjustment) {
-          const adjustedMarketValue = marketValue + valueAdjustment;
-          adjustedMarketValueInput.value = adjustedMarketValue.toFixed(2).toLocaleString();
-        }
-
-        // Function to calculate assessed value
-        function calculateAssessedValue() {
-          const adjustedMarketValue = parseFloat(adjustedMarketValueInput.value.replace(/,/g, '')) || 0;
-          const assessmentLevelInput = document.getElementById("assessmentLevelModal");
-          const assessedValueInput = document.getElementById("assessedValueModal");
-
-          const assessmentLevel = parseFloat(assessmentLevelInput.value) || 0;
-
-          if (!isNaN(adjustedMarketValue) && !isNaN(assessmentLevel) && assessmentLevel > 0) {
-            const assessedValue = adjustedMarketValue * (assessmentLevel / 100);
-            assessedValueInput.value = assessedValue.toFixed(2).toLocaleString();
-          } else {
-            assessedValueInput.value = '';
-          }
-        }
-
-        calculateAssessedValue(); // Recalculate assessed value whenever adjusted market value changes
-
-        document.getElementById("assessmentLevelModal").addEventListener("input", calculateAssessedValue); //Event listener for assessment level input
-
-        // Event listener for percentage adjustment input
-        percentAdjustmentInput.addEventListener('input', function () {
-          const marketValue = parseFloat(marketValueInput.value.replace(/,/g, '')) || 0; // Get current market value
-          calculateValueAdjustment(marketValue); // Recalculate value adjustment
-        });
-
-        // Adding event listeners for area conversion
-        sqmRadio.addEventListener("change", convertArea);
-        hectareRadio.addEventListener("change", convertArea);
-
-        // Adding event listeners for input changes (debounced to reduce calls)
-        areaInput.addEventListener("input", debounce(calculateMarketValue, 300));
-        unitValueInput.addEventListener("input", debounce(calculateMarketValue, 300));
-
-        function validateInputs() {
-          const area = parseFloat(areaInput.value);
-          const unitValue = parseFloat(unitValueInput.value);
-
-          // Highlight the area input if it's invalid (empty or non-positive)
-          if (isNaN(area) || area <= 0) {
-            areaInput.classList.add('is-invalid'); // Add 'is-invalid' class to highlight the field
-            areaInput.style.borderColor = 'red';   // Optional: Set the border color to red
-          } else {
-            areaInput.classList.remove('is-invalid');
-            areaInput.style.borderColor = '';      // Reset the border color if the input is valid
-          }
-
-          // Highlight the unit value input if it's invalid (empty or non-positive)
-          if (isNaN(unitValue) || unitValue <= 0) {
-            unitValueInput.classList.add('is-invalid');
-            unitValueInput.style.borderColor = 'red';  // Set the border color to red
-          } else {
-            unitValueInput.classList.remove('is-invalid');
-            unitValueInput.style.borderColor = '';     // Reset the border color if the input is valid
-          }
-        }
-
-        // Event listeners to validate inputs
-        areaInput.addEventListener("input", validateInputs);
-        unitValueInput.addEventListener("input", validateInputs);
-      }
-
-      // Initialize the area unit update function
-      updateAreaUnit();
-    });
-
-    window.addEventListener("beforeunload", function (e) {
-      e.preventDefault(); // Required for some browsers
-      e.returnValue = ""; // Show the default browser confirmation dialog
+      // Initial calc on load
+      calculateMarketValue();
+      validateInputs();
     });
   </script>
+
 
   <!-- Load External Scripts -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"
