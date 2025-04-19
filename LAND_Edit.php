@@ -420,108 +420,126 @@ echo "<script>
       </div>
 
       <!-- Certification Section -->
-      <h5 class="section-title mt-5">Certification</h5>
-      <div class="container">
-        <div class="row">
-          <div class="col-12">
-
+      <div class="section-wrap px-4 mb-5">
+        <h5 class="section-title mt-4">Certification</h5>
+        <div class="row gx-4">
+          <div class="col-md-12">
             <!-- Verified By -->
-            <div class="row mb-3 align-items-center">
-              <label class="col-md-2 col-form-label">Verified By</label>
-              <div class="col-md-4">
-                <input type="text" class="form-control" placeholder="Enter Verifier" disabled>
-              </div>
-              <div class="col-md-3">
-                <button type="button" class="btn btn-outline-primary btn-sm w-100">Verify</button>
-              </div>
+            <div class="d-flex align-items-center mb-3">
+              <label class="form-label mb-0 me-2" style="width: 140px;">Verified By</label>
+              <select class="form-select me-2" style="width: 30%;" name="verified_by" disabled>
+                <option disabled <?= empty($cert_data['verified']) ? 'selected' : '' ?>>Select verifier</option>
+                <option <?= ($cert_data['verified'] ?? '') === 'Malapajo, Antonio Menorca' ? 'selected' : '' ?>>
+                  Malapajo, Antonio Menorca
+                </option>
+              </select>
+              <button type="button" class="btn btn-outline-primary" style="width: 100px;" disabled>Verify</button>
             </div>
 
             <!-- Plotted By -->
-            <div class="row mb-3 align-items-center">
-              <label class="col-md-2 col-form-label">Plotted By</label>
-              <div class="col-md-4">
-                <input type="text" class="form-control" placeholder="Enter Plotter" disabled>
-              </div>
+            <div class="d-flex align-items-center mb-3">
+              <label class="form-label mb-0 me-2" style="width: 140px;">Plotted By</label>
+              <select class="form-select" style="width: 30%;" name="plotted_by" disabled>
+                <option disabled <?= empty($cert_data['plotted']) ? 'selected' : '' ?>>Select plotter</option>
+                <option <?= ($cert_data['plotted'] ?? '') === 'Malapajo, Antonio Menorca' ? 'selected' : '' ?>>
+                  Malapajo, Antonio Menorca
+                </option>
+              </select>
             </div>
 
             <!-- Noted By -->
-            <div class="row mb-3 align-items-center">
-              <label class="col-md-2 col-form-label">Noted By</label>
-              <div class="col-md-4">
-                <input type="text" class="form-control" placeholder="Enter Noter" disabled>
-              </div>
+            <div class="d-flex align-items-center mb-3">
+              <label class="form-label mb-0 me-2" style="width: 140px;">Noted By</label>
+              <select class="form-select" style="width: 30%;" name="noted_by" disabled>
+                <option disabled <?= empty($cert_data['noted']) ? 'selected' : '' ?>>Select noter</option>
+                <option <?= ($cert_data['noted'] ?? '') === 'Lingon, Nestor Jacolbia' ? 'selected' : '' ?>>
+                  Lingon, Nestor Jacolbia
+                </option>
+              </select>
             </div>
 
             <!-- Appraised By -->
-            <div class="row mb-3 align-items-center">
-              <label class="col-md-2 col-form-label">Appraised By</label>
-              <div class="col-md-4">
-                <input type="text" class="form-control" placeholder="Enter Appraiser" disabled>
-              </div>
-              <label class="col-md-1 col-form-label text-end">Date</label>
-              <div class="col-md-3">
-                <input type="date" class="form-control" disabled>
-              </div>
+            <div class="d-flex align-items-center mb-3">
+              <label class="form-label mb-0 me-2" style="width: 140px;">Appraised By</label>
+              <select class="form-select me-2" style="width: 30%;" name="appraised_by" disabled>
+                <option disabled <?= empty($cert_data['appraised']) ? 'selected' : '' ?>>Select appraiser</option>
+                <option <?= ($cert_data['appraised'] ?? '') === 'Lingon, Nestor Jacolbia' ? 'selected' : '' ?>>
+                  Lingon, Nestor Jacolbia
+                </option>
+              </select>
+              <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
+              <input type="date" class="form-control" name="appraisal_date" id="appraisalDate" style="width: 30%;"
+                disabled value="<?= htmlspecialchars($cert_data['appraised_date'] ?? '') ?>">
             </div>
 
             <!-- Recommending Approval -->
-            <div class="row mb-3 align-items-center">
-              <label class="col-md-2 col-form-label">Recommending Approval</label>
-              <div class="col-md-4">
-                <input type="text" class="form-control" placeholder="Enter Recommender" disabled>
-              </div>
-              <label class="col-md-1 col-form-label text-end">Date</label>
-              <div class="col-md-3">
-                <input type="date" class="form-control" disabled>
-              </div>
+            <div class="d-flex align-items-center mb-3">
+              <label class="form-label mb-0 me-2" style="width: 140px;">Recommending Approval</label>
+              <select class="form-select me-2" style="width: 30%;" name="recommending_approval" disabled>
+                <option disabled <?= empty($cert_data['recom_approval']) ? 'selected' : '' ?>>Select recommender</option>
+                <option <?= ($cert_data['recom_approval'] ?? '') === 'Malapajo, Antonio Menorca' ? 'selected' : '' ?>>
+                  Malapajo, Antonio Menorca
+                </option>
+              </select>
+              <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
+              <input type="date" class="form-control" name="recommendation_date" id="recommendationDate"
+                style="width: 30%;" disabled value="<?= htmlspecialchars($cert_data['recom_date'] ?? '') ?>">
             </div>
 
             <!-- Approved By -->
-            <div class="row mb-3 align-items-center">
-              <label class="col-md-2 col-form-label">Approved By</label>
-              <div class="col-md-4">
-                <input type="text" class="form-control" placeholder="Enter Approver" disabled>
-              </div>
-              <label class="col-md-1 col-form-label text-end">Date</label>
-              <div class="col-md-3">
-                <input type="date" class="form-control" disabled>
-              </div>
+            <div class="d-flex align-items-center mb-3">
+              <label class="form-label mb-0 me-2" style="width: 140px;">Approved By</label>
+              <select class="form-select me-2" style="width: 30%;" name="approved_by" disabled>
+                <option disabled <?= empty($cert_data['approved']) ? 'selected' : '' ?>>Select approver</option>
+                <option <?= ($cert_data['approved'] ?? '') === 'Lingon, Nestor Jacolbia' ? 'selected' : '' ?>>
+                  Lingon, Nestor Jacolbia
+                </option>
+              </select>
+              <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
+              <input type="date" class="form-control" name="approval_date" id="approvalDate" style="width: 30%;"
+                disabled value="<?= htmlspecialchars($cert_data['approved_date'] ?? '') ?>">
             </div>
           </div>
         </div>
       </div>
 
       <!-- Miscellaneous Section -->
-      <h5 class="section-title mt-5">Miscellaneous</h5>
-      <div class="row">
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label class="form-label d-block">Idle</label>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="yes" disabled>
-              <label class="form-check-label" for="idleYes">Yes</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="no" disabled>
-              <label class="form-check-label" for="idleNo">No</label>
+      <div class="section-wrap px-4 mb-5 border rounded p-3">
+        <h5 class="section-title mt-5">Miscellaneous</h5>
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="mb-3">
+              <label class="form-label d-block">Idle</label>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="yes" disabled
+                  <?= ($cert_data['idle'] ?? '') === 'yes' ? 'checked' : '' ?>>
+                <label class="form-check-label" for="idleYes">Yes</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="no" disabled
+                  <?= ($cert_data['idle'] ?? 'no') === 'no' ? 'checked' : '' ?>>
+                <label class="form-check-label" for="idleNo">No</label>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label class="form-label d-block">Contested</label>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="yes"
-                disabled>
-              <label class="form-check-label" for="contestedYes">Yes</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="no" disabled>
-              <label class="form-check-label" for="contestedNo">No</label>
+          <div class="col-md-6 mb-4">
+            <div class="mb-3">
+              <label class="form-label d-block">Contested</label>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="yes"
+                  disabled <?= ($cert_data['contested'] ?? '') === 'yes' ? 'checked' : '' ?>>
+                <label class="form-check-label" for="contestedYes">Yes</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="no" disabled
+                  <?= ($cert_data['contested'] ?? 'no') === 'no' ? 'checked' : '' ?>>
+                <label class="form-check-label" for="contestedNo">No</label>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
       <!-- Print Button at Bottom Right -->
       <div class="d-flex justify-content-end mt-4">
         <button type="button" class="btn btn-outline-secondary py-2 px-4" style="font-size: 1.1rem;">
@@ -838,7 +856,6 @@ echo "<script>
               </div>
             </div>
           </div>
-
 
           <!-- Miscellaneous Section Modal -->
           <div class="section-wrap px-4 mb-5 border rounded p-3">
