@@ -576,38 +576,135 @@ echo "<script>
         const inputs = document.querySelectorAll('#rpu-identification-section input, #rpu-identification-section select, #rpu-identification-section textarea');
 
         const isEditing = editButton.textContent.trim() === 'Edit';
-
         editButton.textContent = isEditing ? 'Done' : 'Edit';
 
-        const excludeIds = ["marketValue, valueAdjustment, adjustedMarketValue"];
+        const excludeIds = [
+          "marketValue",
+          "valueAdjustment",
+          "adjustedMarketValue",
+          "assessedValue",
+          "recommendedAssessmentLevel",
+          "recommendedUnitValue"
+        ];
 
         inputs.forEach(input => {
           if (excludeIds.includes(input.id)) return;
-
           input.disabled = !isEditing;
         });
-
       }
 
       // Attach event listener for edit button
       document.getElementById('editRPUButton').addEventListener('click', toggleEdit);
 
-      // DOM elements
+      // DOM Elements
       const areaInput = document.getElementById("area");
-      const sqmRadio = document.querySelector("input[name='areaUnit'][value='sqm']");
-      const hectareRadio = document.querySelector("input[name='areaUnit'][value='hectare']");
       const unitValueInput = document.getElementById("unitValue");
       const marketValueInput = document.getElementById("marketValue");
+
+      const sqmRadio = document.querySelector("input[name='areaUnit'][value='sqm']");
+      const hectareRadio = document.querySelector("input[name='areaUnit'][value='hectare']");
 
       const percentAdjustmentInput = document.getElementById("percentAdjustment");
       const valueAdjustmentInput = document.getElementById("valueAdjustment");
       const adjustedMarketValueInput = document.getElementById("adjustedMarketValue");
 
-      // Convert area when unit changes
+      const assessmentLevelInput = document.getElementById("assessmentLevel");
+      const assessedValueInput = document.getElementById("assessedValue");
+
+      // Utility: Debounce
+      function debounce(func, wait) {
+        let timeout;
+        return function (...args) {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+      }
+
+      // Convert area between sqm and hectare
+      function convertArea() {
+        const raw = areaInput.value.trim();
+        if (raw === '' || isNaN(raw)) {
+          marketValueInput.value = '';
+          return;
+        }
+
+        const val = parseFloat(raw);
+        areaInput.value = hectareRadio.checked
+          ? (val / 10000).toFixed(4) // sqm → ha
+          : (val * 10000).toFixed(2); // ha → sqm
+
+        calculateMarketValue();
+      }
+
+      // Calculate market value = area * unit value
+      function calculateMarketValue() {
+        const area = parseFloat(areaInput.value);
+        const unitValue = parseFloat(unitValueInput.value);
+
+        if (isNaN(area) || isNaN(unitValue)) {
+          clearValues([marketValueInput, valueAdjustmentInput, adjustedMarketValueInput]);
+          return;
+        }
+
+        const marketValue = area * unitValue;
+        marketValueInput.value = marketValue.toFixed(2);
+        calculateAdjustment(marketValue);
+      }
+
+      // Calculate adjustment and adjusted market value
+      function calculateAdjustment(marketValue) {
+        const percent = parseFloat(percentAdjustmentInput.value);
+        if (isNaN(percent)) {
+          clearValues([valueAdjustmentInput, adjustedMarketValueInput]);
+          return;
+        }
+
+        const adjustedValue = marketValue * (percent / 100);
+        const adjustment = adjustedValue - marketValue;
+
+        valueAdjustmentInput.value = formatSigned(adjustment);
+        adjustedMarketValueInput.value = adjustedValue.toFixed(2);
+
+        calculateAssessedValue(); // Recalculate assessed value on adjustment
+      }
+
+      // Calculate assessed value = adjustedMarketValue * (assessmentLevel / 100)
+      function calculateAssessedValue() {
+        const adjustedMarketValue = parseFloat(adjustedMarketValueInput.value.replace(/,/g, '')) || 0;
+        const assessmentLevel = parseFloat(assessmentLevelInput.value) || 0;
+
+        if (!isNaN(adjustedMarketValue) && !isNaN(assessmentLevel) && assessmentLevel > 0) {
+          const assessed = adjustedMarketValue * (assessmentLevel / 100);
+          assessedValueInput.value = assessed.toFixed(2).toLocaleString();
+        } else {
+          assessedValueInput.value = '';
+        }
+      }
+
+      // Visual input validation
+      function validateInputs() {
+        highlightInvalid(areaInput, isNaN(parseFloat(areaInput.value)) || parseFloat(areaInput.value) <= 0);
+        highlightInvalid(unitValueInput, isNaN(parseFloat(unitValueInput.value)) || parseFloat(unitValueInput.value) <= 0);
+      }
+
+      // Helpers
+      function formatSigned(num) {
+        return (num < 0 ? "-" : "") + Math.abs(num).toFixed(2);
+      }
+
+      function clearValues(elements) {
+        elements.forEach(el => el.value = '');
+      }
+
+      function highlightInvalid(input, condition) {
+        input.classList.toggle('is-invalid', condition);
+        input.style.borderColor = condition ? 'red' : '';
+      }
+
+      // Event listeners
       sqmRadio.addEventListener('change', convertArea);
       hectareRadio.addEventListener('change', convertArea);
 
-      // Debounced recalculations on input
       areaInput.addEventListener('input', debounce(() => {
         calculateMarketValue();
         validateInputs();
@@ -623,83 +720,12 @@ echo "<script>
         calculateAdjustment(marketValue);
       }, 300));
 
-      // Convert area (without triggering on typing)
-      function convertArea() {
-        const rawValue = areaInput.value.trim();
-        if (rawValue === '' || isNaN(rawValue)) {
-          marketValueInput.value = '';
-          return;
-        }
+      assessmentLevelInput.addEventListener('input', debounce(calculateAssessedValue, 300));
 
-        const value = parseFloat(rawValue);
-
-        if (hectareRadio.checked) {
-          areaInput.value = (value / 10000).toFixed(4); // sqm to ha
-        } else if (sqmRadio.checked) {
-          areaInput.value = (value * 10000).toFixed(2); // ha to sqm
-        }
-
-        calculateMarketValue();
-      }
-
-      // Market value = area * unit value
-      function calculateMarketValue() {
-        const area = parseFloat(areaInput.value);
-        const unitValue = parseFloat(unitValueInput.value);
-
-        if (isNaN(area) || isNaN(unitValue)) {
-          marketValueInput.value = '';
-          valueAdjustmentInput.value = '';
-          adjustedMarketValueInput.value = '';
-          return;
-        }
-
-        const marketValue = area * unitValue;
-        marketValueInput.value = marketValue.toFixed(2);
-        calculateAdjustment(marketValue);
-      }
-
-      // Apply % adjustment to market value
-      function calculateAdjustment(marketValue) {
-        const percent = parseFloat(percentAdjustmentInput.value);
-
-        if (isNaN(percent)) {
-          valueAdjustmentInput.value = '';
-          adjustedMarketValueInput.value = '';
-          return;
-        }
-
-        const adjusted = marketValue * (percent / 100);
-        const adjustment = adjusted - marketValue;
-
-        valueAdjustmentInput.value = (adjustment < 0 ? "-" : "") + Math.abs(adjustment).toFixed(2);
-        adjustedMarketValueInput.value = adjusted.toFixed(2);
-      }
-
-      // Visual validation
-      function validateInputs() {
-        const area = parseFloat(areaInput.value);
-        const unitValue = parseFloat(unitValueInput.value);
-
-        areaInput.classList.toggle('is-invalid', isNaN(area) || area <= 0);
-        areaInput.style.borderColor = (isNaN(area) || area <= 0) ? 'red' : '';
-
-        unitValueInput.classList.toggle('is-invalid', isNaN(unitValue) || unitValue <= 0);
-        unitValueInput.style.borderColor = (isNaN(unitValue) || unitValue <= 0) ? 'red' : '';
-      }
-
-      // Debounce utility
-      function debounce(func, wait) {
-        let timeout;
-        return function () {
-          clearTimeout(timeout);
-          timeout = setTimeout(func, wait);
-        };
-      }
-
-      // Initial calc on load
+      // Initial run
       calculateMarketValue();
       validateInputs();
+
     });
   </script>
 
