@@ -287,10 +287,19 @@
           $stmt->execute();
           $regions_result = $stmt->get_result();
 
-          // Fetch active municipalities
-          $municipalities_stmt = $conn->prepare("SELECT m_id, m_description FROM municipality WHERE m_status = 'Active'");
+          // Fetch active municipalities with their district names
+          $municipalities_stmt = $conn->prepare("
+              SELECT 
+                municipality.m_id, 
+                municipality.m_description, 
+                district.description AS district_name 
+              FROM municipality
+              LEFT JOIN district ON municipality.m_id = district.m_id 
+              WHERE municipality.m_status = 'Active'
+            ");
           $municipalities_stmt->execute();
           $municipalities_result = $municipalities_stmt->get_result();
+
 
           // Fetch active districts
           $districts_stmt = $conn->prepare("SELECT district_id, description FROM district WHERE status = 'Active'");
@@ -323,10 +332,14 @@
                 <option value="" disabled selected>Select Municipality</option>
                 <?php
                 while ($row = $municipalities_result->fetch_assoc()) {
-                  echo "<option value='" . htmlspecialchars($row['m_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['m_description'], ENT_QUOTES) . "</option>";
+                  $m_id = htmlspecialchars($row['m_id'], ENT_QUOTES);
+                  $municipality = htmlspecialchars($row['m_description'], ENT_QUOTES);
+                  $district = htmlspecialchars($row['district_name'], ENT_QUOTES);
+                  echo "<option value='$m_id'>$municipality - $district</option>";
                 }
                 ?>
               </select>
+
             </div>
 
             <!-- District Dropdown -->
