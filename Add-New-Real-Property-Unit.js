@@ -106,3 +106,19 @@ function validateDocumentsForm() {
         return true; // Allow form submission
     }
 }
+
+// Function to handle the change event for the municipality select element
+// and update the district input field accordingly
+document.addEventListener('DOMContentLoaded', function () {
+    const municipalitySelect = document.getElementById('municipality');
+    const districtInput = document.getElementById('district');
+  
+    if (municipalitySelect && districtInput) {
+      municipalitySelect.addEventListener('change', function () {
+        const selectedOption = this.options[this.selectedIndex];
+        const districtName = selectedOption.getAttribute('data-district') || '';
+        districtInput.value = districtName;
+      });
+    }
+  });
+  

@@ -289,22 +289,16 @@
 
           // Fetch active municipalities with their district names
           $municipalities_stmt = $conn->prepare("
-              SELECT 
-                municipality.m_id, 
-                municipality.m_description, 
-                district.description AS district_name 
-              FROM municipality
-              LEFT JOIN district ON municipality.m_id = district.m_id 
-              WHERE municipality.m_status = 'Active'
-            ");
+            SELECT 
+              municipality.m_id, 
+              municipality.m_description, 
+              district.description AS district_name 
+            FROM municipality
+            LEFT JOIN district ON municipality.m_id = district.m_id 
+            WHERE municipality.m_status = 'Active'
+        ");
           $municipalities_stmt->execute();
           $municipalities_result = $municipalities_stmt->get_result();
-
-
-          // Fetch active districts
-          $districts_stmt = $conn->prepare("SELECT district_id, description FROM district WHERE status = 'Active'");
-          $districts_stmt->execute();
-          $districts_result = $districts_stmt->get_result();
 
           // Fetch active barangays
           $barangays_stmt = $conn->prepare("SELECT brgy_id, brgy_name FROM brgy WHERE status = 'Active'");
@@ -335,28 +329,17 @@
                   $m_id = htmlspecialchars($row['m_id'], ENT_QUOTES);
                   $municipality = htmlspecialchars($row['m_description'], ENT_QUOTES);
                   $district = htmlspecialchars($row['district_name'], ENT_QUOTES);
-                  echo "<option value='$m_id'>$municipality - $district</option>";
+                  echo "<option value='$m_id' data-district='$district'>$municipality</option>";
                 }
                 ?>
               </select>
-
             </div>
 
-            <!-- District Dropdown -->
+
+            <!-- District (auto-filled) -->
             <div class="col-md-3">
               <label for="district" class="form-label">District</label>
-              <select class="form-control" id="district" name="district" required>
-                <option value="" disabled selected>Select District</option>
-                <?php
-                if ($districts_result && $districts_result->num_rows > 0) {
-                  while ($row = $districts_result->fetch_assoc()) {
-                    echo "<option value='" . htmlspecialchars($row['district_id']) . "'>" . htmlspecialchars($row['description']) . "</option>";
-                  }
-                } else {
-                  echo "<option disabled>No active districts</option>";
-                }
-                ?>
-              </select>
+              <input type="text" class="form-control" id="district" name="district" readonly placeholder="Auto-filled from Municipality">
             </div>
 
             <!-- Barangay Dropdown -->
