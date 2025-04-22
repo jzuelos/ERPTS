@@ -509,10 +509,17 @@ echo "<script>
 
         <div class="row">
           <div class="col-md-4 mb-4">
-            <div class="mb-3">
-              <label for="unitValue" class="form-label">Unit Value</label>
-              <input type="text" id="unitValue" class="form-control" placeholder="Enter unit value" name="unit_value"
-                disabled value="<?php echo htmlspecialchars($land_data['unit_value']); ?>">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="unitValue" class="form-label">Unit Value</label>
+                <input type="text" id="unitValue" class="form-control" placeholder="Enter unit value" name="unit_value"
+                  disabled value="<?php echo htmlspecialchars($land_data['unit_value']); ?>">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="recom_unitValue" class="form-label">Recommended Unit Value</label>
+                <input type="text" id="recom_unitValue" class="form-control" placeholder="loading..."
+                  name="unit_value" disabled value="">
+              </div>
             </div>
           </div>
         </div>
@@ -585,8 +592,7 @@ echo "<script>
             <div class="mb-3">
               <label for="recommendedAssessmentLevel" class="form-label">% Recommended Assessment Level</label>
               <input type="text" id="recommendedAssessmentLevel" class="form-control"
-                placeholder="Enter recommended assessment level" disabled
-                value="loading...">
+                placeholder="Enter recommended assessment level" disabled value="loading...">
             </div>
           </div>
           <div class="col-md-6 mb-4">
@@ -707,13 +713,13 @@ echo "<script>
               <div class="mb-3">
                 <label class="form-label d-block">Contested</label>
                 <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="1" disabled
-                    <?= (isset($cert_data['contested']) && $cert_data['contested'] == 1) ? 'checked' : '' ?>>
+                  <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="1"
+                    disabled <?= (isset($cert_data['contested']) && $cert_data['contested'] == 1) ? 'checked' : '' ?>>
                   <label class="form-check-label" for="contestedYes">Yes</label>
                 </div>
                 <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="0" disabled
-                    <?= (!isset($cert_data['contested']) || $cert_data['contested'] == 0) ? 'checked' : '' ?>>
+                  <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="0"
+                    disabled <?= (!isset($cert_data['contested']) || $cert_data['contested'] == 0) ? 'checked' : '' ?>>
                   <label class="form-check-label" for="contestedNo">No</label>
                 </div>
               </div>
