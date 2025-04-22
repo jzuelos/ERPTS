@@ -47,6 +47,10 @@ if ($land_result->num_rows > 0) {
   die("Error: No land record found for this FAAS.");
 }
 
+$land_id = $land_data['land_id'] ?? 0; //fetch land_id
+
+echo "Land ID: " . htmlspecialchars($land_id);
+
 $land_query->close();
 
 // Fetch certification data using the land_id
@@ -104,25 +108,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $$field = $_POST[$field] ?? '';
   }
 
-  // === UPDATE INTO land ===
+  // Prepare the update statement
   $stmt = $conn->prepare("
-      UPDATE land SET 
-          oct_no = ?, survey_no = ?, north = ?, east = ?, south = ?, west = ?, boun_desc = ?, 
-          last_name = ?, first_name = ?, middle_name = ?, contact_no = ?, email = ?, house_street = ?, 
-          barangay = ?, district = ?, municipality = ?, province = ?, land_desc = ?, classification = ?, 
-          sub_class = ?, area = ?, actual_use = ?, unit_value = ?, market_value = ?, adjust_factor = ?, 
-          adjust_percent = ?, adjust_value = ?, adjust_mv = ?, assess_lvl = ?, assess_value = ?
-      WHERE faas_id = ?
-  ");
+    UPDATE land SET 
+        oct_no = ?, survey_no = ?, north = ?, east = ?, south = ?, west = ?, boun_desc = ?, 
+        last_name = ?, first_name = ?, middle_name = ?, contact_no = ?, email = ?, house_street = ?, 
+        barangay = ?, district = ?, municipality = ?, province = ?, land_desc = ?, classification = ?, 
+        sub_class = ?, area = ?, actual_use = ?, unit_value = ?, market_value = ?, adjust_factor = ?, 
+        adjust_percent = ?, adjust_value = ?, adjust_mv = ?, assess_lvl = ?, assess_value = ?
+    WHERE land_id = ?
+");
 
+  // Updated bind_param with `i` at the end for land_id
   $stmt->bind_param(
     "isssssssssssssssssssisddsdddddi",
     $oct_no,
     $survey_no,
-    $north_boundary,
-    $east_boundary,
-    $south_boundary,
-    $west_boundary,
+    $north,
+    $east,
+    $south,
+    $west,
     $boun_desc,
     $last_name,
     $first_name,
@@ -147,8 +152,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $adjust_mv,
     $assess_lvl,
     $assess_value,
-    $faas_id
+    $land_id // <- final parameter
   );
+
 
   if ($stmt->execute()) {
     // If the land update is successful, we proceed to update certification
@@ -158,11 +164,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     updateCertification($conn, $_POST);
 
     $p_id = htmlspecialchars($_GET['p_id'] ?? '');
-    echo "<script>
-            alert('Land record updated successfully!');
-            window.location.href = 'FAAS.php?id=$p_id';
-          </script>";
+
+    $_SESSION['update_success'] = true; // Set flag before redirect
+    header("Location: " . $_SERVER['PHP_SELF'] . "?p_id=" . urlencode($_GET['p_id'] ?? ''));
     exit();
+
   } else {
     echo "<script>alert('Error: " . addslashes($stmt->error) . "');</script>";
   }
@@ -172,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 function updateCertification($conn, $data)
 {
-  $land_id = $data['land_id'] ?? null; // Foreign key reference
+  $land_id = $data['land_id'] ?? null;
 
   $verified = $data['verified_by'] ?? null;
   $noted = $data['noted_by'] ?? null;
@@ -184,8 +190,8 @@ function updateCertification($conn, $data)
   $approved = $data['approved_by'] ?? null;
   $approvedDate = !empty($data['approval_date']) ? $data['approval_date'] : null;
 
-  $idle = isset($data['idleStatus']) && $data['idleStatus'] === 'yes' ? 1 : 0;
-  $contested = isset($data['contestedStatus']) && $data['contestedStatus'] === 'yes' ? 1 : 0;
+  $idle = isset($data['idleStatus']) && $data['idleStatus'] === '1' ? 1 : 0;
+  $contested = isset($data['contestedStatus']) && $data['contestedStatus'] === '1' ? 1 : 0;
 
   // Start building dynamic query
   $fields = ['verified', 'noted', 'recom_approval', 'plotted', 'appraised', 'approved', 'idle', 'contested'];
@@ -240,7 +246,6 @@ $conn->close();
 // Output both arrays to the browser console
 echo "<script>
         console.log('Land Data:', " . json_encode($land_data) . ");
-        console.log('Certification Data:', " . json_encode($cert_data) . ");
       </script>";
 ?>
 
@@ -304,14 +309,15 @@ echo "<script>
           <div class="col-md-6 mb-4">
             <div class="mb-3">
               <label for="octTctNumber" class="form-label">OCT/TCT Number</label>
-              <input type="text" id="octTctNumber" name="oct_no" class="form-control" placeholder="Enter OCT/TCT Number" disabled
-                value="<?php echo htmlspecialchars($land_data['oct_no']); ?>">
+              <input type="text" id="octTctNumber" name="oct_no" class="form-control" placeholder="Enter OCT/TCT Number"
+                disabled value="<?php echo htmlspecialchars($land_data['oct_no']); ?>">
             </div>
           </div>
           <div class="col-md-6 mb-4">
             <div class="mb-3">
               <label for="surveyNumber" class="form-label">Survey Number</label>
-              <input type="text" id="surveyNumber" name="survey_no" class="form-control" placeholder="Enter Survey Number" disabled
+              <input type="text" id="surveyNumber" name="survey_no" class="form-control"
+                placeholder="Enter Survey Number" disabled
                 value="<?php echo htmlspecialchars($land_data['survey_no']); ?>">
             </div>
           </div>
@@ -323,15 +329,15 @@ echo "<script>
           <div class="col-md-3 mb-4">
             <div class="mb-3">
               <label for="north" class="form-label">North</label>
-              <input type="text" id="north" name="north" class="form-control" placeholder="Enter North Boundary" disabled
-                value="<?php echo htmlspecialchars($land_data['north']); ?>">
+              <input type="text" id="north" name="north" class="form-control" placeholder="Enter North Boundary"
+                disabled value="<?php echo htmlspecialchars($land_data['north']); ?>">
             </div>
           </div>
           <div class="col-md-3 mb-4">
             <div class="mb-3">
               <label for="south" class="form-label">South</label>
-              <input type="text" id="south" name="south" class="form-control" placeholder="Enter South Boundary" disabled
-                value="<?php echo htmlspecialchars($land_data['south']); ?>">
+              <input type="text" id="south" name="south" class="form-control" placeholder="Enter South Boundary"
+                disabled value="<?php echo htmlspecialchars($land_data['south']); ?>">
             </div>
           </div>
           <div class="col-md-3 mb-4">
@@ -362,21 +368,23 @@ echo "<script>
           <div class="col-md-4 mb-4">
             <div class="mb-3">
               <label for="adminLastName" class="form-label">Last Name</label>
-              <input type="text" id="adminLastName" name="last_name" class="form-control" placeholder="Enter last name" disabled
-                value="<?php echo htmlspecialchars($land_data['last_name']); ?>">
+              <input type="text" id="adminLastName" name="last_name" class="form-control" placeholder="Enter last name"
+                disabled value="<?php echo htmlspecialchars($land_data['last_name']); ?>">
             </div>
           </div>
           <div class="col-md-4 mb-4">
             <div class="mb-3">
               <label for="adminFirstName" class="form-label">First Name</label>
-              <input type="text" id="adminFirstName" name="first_name" class="form-control" placeholder="Enter first name" disabled
+              <input type="text" id="adminFirstName" name="first_name" class="form-control"
+                placeholder="Enter first name" disabled
                 value="<?php echo htmlspecialchars($land_data['first_name']); ?>">
             </div>
           </div>
           <div class="col-md-4 mb-4">
             <div class="mb-3">
               <label for="adminMiddleName" class="form-label">Middle Name</label>
-              <input type="text" id="adminMiddleName" name="middle_name" class="form-control" placeholder="Enter middle name" disabled
+              <input type="text" id="adminMiddleName" name="middle_name" class="form-control"
+                placeholder="Enter middle name" disabled
                 value="<?php echo htmlspecialchars($land_data['middle_name']); ?>">
             </div>
           </div>
@@ -388,7 +396,8 @@ echo "<script>
           <div class="col-md-6 mb-4">
             <div class="mb-3">
               <label for="adminContact" class="form-label">Contact Number</label>
-              <input type="text" id="adminContact" name="contact_no" class="form-control" placeholder="Enter contact number" disabled
+              <input type="text" id="adminContact" name="contact_no" class="form-control"
+                placeholder="Enter contact number" disabled
                 value="<?php echo htmlspecialchars($land_data['contact_no']); ?>">
             </div>
           </div>
@@ -407,22 +416,23 @@ echo "<script>
           <div class="col-md-3 mb-4">
             <div class="mb-3">
               <label for="adminAddressNumber" class="form-label">House Number</label>
-              <input type="text" id="adminAddressNumber" name="house_street" class="form-control" placeholder="Enter house number" disabled
+              <input type="text" id="adminAddressNumber" name="house_street" class="form-control"
+                placeholder="Enter house number" disabled
                 value="<?php echo htmlspecialchars($land_data['house_street']); ?>">
             </div>
           </div>
           <div class="col-md-3 mb-4">
             <div class="mb-3">
               <label for="adminAddressBarangay" class="form-label">Barangay</label>
-              <input type="text" id="adminAddressBarangay" name="barangay" class="form-control" placeholder="Enter barangay" disabled
-                value="<?php echo htmlspecialchars($land_data['barangay']); ?>">
+              <input type="text" id="adminAddressBarangay" name="barangay" class="form-control"
+                placeholder="Enter barangay" disabled value="<?php echo htmlspecialchars($land_data['barangay']); ?>">
             </div>
           </div>
           <div class="col-md-3 mb-4">
             <div class="mb-3">
               <label for="adminAddressDistrict" class="form-label">District</label>
-              <input type="text" id="adminAddressDistrict" name="district" class="form-control" placeholder="Enter district" disabled
-                value="<?php echo htmlspecialchars($land_data['district']); ?>">
+              <input type="text" id="adminAddressDistrict" name="district" class="form-control"
+                placeholder="Enter district" disabled value="<?php echo htmlspecialchars($land_data['district']); ?>">
             </div>
           </div>
           <div class="col-md-6 mb-4">
@@ -436,8 +446,8 @@ echo "<script>
           <div class="col-md-6 mb-4">
             <div class="mb-3">
               <label for="adminAddressProvince" class="form-label">Province</label>
-              <input type="text" id="adminAddressProvince" name="province" class="form-control" placeholder="Enter province" disabled
-                value="<?php echo htmlspecialchars($land_data['province']); ?>">
+              <input type="text" id="adminAddressProvince" name="province" class="form-control"
+                placeholder="Enter province" disabled value="<?php echo htmlspecialchars($land_data['province']); ?>">
             </div>
           </div>
         </div>
@@ -449,14 +459,15 @@ echo "<script>
           <div class="col-md-6 col-12 mb-4">
             <div class="mb-3">
               <label for="description" class="form-label">Description</label>
-              <input type="text" id="description" name="land_desc" class="form-control" placeholder="Enter description" disabled
-                value="<?php echo htmlspecialchars($land_data['land_desc']); ?>">
+              <input type="text" id="description" name="land_desc" class="form-control" placeholder="Enter description"
+                disabled value="<?php echo htmlspecialchars($land_data['land_desc']); ?>">
             </div>
           </div>
           <div class="col-md-6 col-12 mb-4">
             <div class="mb-3">
               <label for="classification" class="form-label">Classification</label>
-              <input type="text" id="classification" name="classification" class="form-control" placeholder="Enter classification" disabled
+              <input type="text" id="classification" name="classification" class="form-control"
+                placeholder="Enter classification" disabled
                 value="<?php echo htmlspecialchars($land_data['classification']); ?>">
             </div>
           </div>
@@ -466,15 +477,15 @@ echo "<script>
           <div class="col-md-6 col-12 mb-4">
             <div class="mb-3">
               <label for="actualUse" class="form-label">Actual Use</label>
-              <input type="text" id="actualUse" name="actual_use" class="form-control" placeholder="Enter actual use" disabled
-                value="<?php echo htmlspecialchars($land_data['actual_use']); ?>">
+              <input type="text" id="actualUse" name="actual_use" class="form-control" placeholder="Enter actual use"
+                disabled value="<?php echo htmlspecialchars($land_data['actual_use']); ?>">
             </div>
           </div>
           <div class="col-md-6 col-12 mb-4">
             <div class="mb-3">
               <label for="subClass" class="form-label">Sub-Class</label>
-              <input type="text" id="subClass" name="sub_class" class="form-control" placeholder="Enter sub-class" disabled
-                value="<?php echo htmlspecialchars($land_data['sub_class']); ?>">
+              <input type="text" id="subClass" name="sub_class" class="form-control" placeholder="Enter sub-class"
+                disabled value="<?php echo htmlspecialchars($land_data['sub_class']); ?>">
             </div>
           </div>
         </div>
@@ -511,7 +522,7 @@ echo "<script>
             <div class="mb-3">
               <label for="marketValue" class="form-label">Market Value</label>
               <input type="text" id="marketValue" class="form-control" placeholder="Enter market value"
-                name="market_value" disabled value="<?php echo htmlspecialchars($land_data['market_value']); ?>">
+                name="market_value" readonly value="<?php echo htmlspecialchars($land_data['market_value']); ?>">
             </div>
           </div>
         </div>
@@ -523,7 +534,7 @@ echo "<script>
         <div class="row">
           <div class="col-md-12 mb-4">
             <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
-            <textarea id="adjustmentFactorModal" name="adjust_factor" class="form-control" rows="3"
+            <textarea id="adjustmentFactorModal" name="adjustment_factor" class="form-control" rows="3"
               placeholder="Enter adjustment factor"
               disabled><?php echo htmlspecialchars($land_data['adjust_factor']); ?></textarea>
           </div>
@@ -533,15 +544,17 @@ echo "<script>
           <div class="col-md-4 mb-4">
             <div class="mb-3">
               <label for="percentAdjustment" class="form-label">Adjustment Factor (%)</label>
-              <input type="text" id="percentAdjustment" class="form-control" placeholder="Enter adjustment factor"
-                disabled value="<?php echo htmlspecialchars($land_data['adjust_factor']); ?>">
+              <input type="text" id="percentAdjustment" name="percent_adjustment" class="form-control"
+                placeholder="Enter adjustment factor" disabled
+                value="<?php echo htmlspecialchars($land_data['adjust_percent']); ?>">
             </div>
           </div>
 
           <div class="col-md-4 mb-4">
             <div class="mb-3">
               <label for="valueAdjustment" class="form-label">Value Adjustment</label>
-              <input type="text" id="valueAdjustment" class="form-control" placeholder="Enter value adjustment" disabled
+              <input type="text" id="valueAdjustment" name="value_adjustment" class="form-control"
+                placeholder="Enter value adjustment" readonly
                 value="<?php echo htmlspecialchars($land_data['adjust_value']); ?>">
             </div>
           </div>
@@ -549,8 +562,9 @@ echo "<script>
           <div class="col-md-4 mb-4">
             <div class="mb-3">
               <label for="adjustedMarketValue" class="form-label">Adjusted Market Value</label>
-              <input type="text" id="adjustedMarketValue" class="form-control" placeholder="Enter adjusted market value"
-                disabled value="<?php echo htmlspecialchars($land_data['adjust_mv']); ?>">
+              <input type="text" id="adjustedMarketValue" name="adjusted_market_value" class="form-control"
+                placeholder="Enter adjusted market value" readonly
+                value="<?php echo htmlspecialchars($land_data['adjust_mv']); ?>">
             </div>
           </div>
 
@@ -562,7 +576,8 @@ echo "<script>
           <div class="col-md-6 mb-4">
             <div class="mb-3">
               <label for="assessmentLevel" class="form-label">Assessment Level</label>
-              <input type="text" id="assessmentLevel" class="form-control" placeholder="Enter assessment level" disabled
+              <input type="text" id="assessmentLevel" name="assessment_level" class="form-control"
+                placeholder="Enter assessment level" disabled
                 value="<?php echo htmlspecialchars($land_data['assess_lvl']); ?>">
             </div>
           </div>
@@ -571,13 +586,14 @@ echo "<script>
               <label for="recommendedAssessmentLevel" class="form-label">% Recommended Assessment Level</label>
               <input type="text" id="recommendedAssessmentLevel" class="form-control"
                 placeholder="Enter recommended assessment level" disabled
-                value="<?php echo htmlspecialchars($land_data['assess_lvl']); ?>">
+                value="loading...">
             </div>
           </div>
           <div class="col-md-6 mb-4">
             <div class="mb-3">
               <label for="assessedValue" class="form-label">Assessed Value</label>
-              <input type="text" id="assessedValue" class="form-control" placeholder="Enter assessed value" disabled
+              <input type="text" id="assessedValue" name="assessed_value" class="form-control"
+                placeholder="Enter assessed value" readonly
                 value="<?php echo htmlspecialchars($land_data['assess_value']); ?>">
             </div>
           </div>
@@ -691,13 +707,13 @@ echo "<script>
               <div class="mb-3">
                 <label class="form-label d-block">Contested</label>
                 <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="1"
-                    disabled <?= (isset($cert_data['contested']) && $cert_data['contested'] == 1) ? 'checked' : '' ?>>
+                  <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="1" disabled
+                    <?= (isset($cert_data['contested']) && $cert_data['contested'] == 1) ? 'checked' : '' ?>>
                   <label class="form-check-label" for="contestedYes">Yes</label>
                 </div>
                 <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="0"
-                    disabled <?= (!isset($cert_data['contested']) || $cert_data['contested'] == 0) ? 'checked' : '' ?>>
+                  <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="0" disabled
+                    <?= (!isset($cert_data['contested']) || $cert_data['contested'] == 0) ? 'checked' : '' ?>>
                   <label class="form-check-label" for="contestedNo">No</label>
                 </div>
               </div>
@@ -706,7 +722,7 @@ echo "<script>
         </div>
 
         <!-- Submit Button -->
-        <input type="submit" name="submit" value="Submit">
+        <input type="submit" name="submit" value="Submit" disabled>
 
       </form>
 
@@ -740,9 +756,11 @@ echo "<script>
         const editButton = document.getElementById('editRPUButton');
         const inputs = document.querySelectorAll('#rpu-identification-section input, #rpu-identification-section select, #rpu-identification-section textarea');
 
+        // Check current button state to toggle between Edit and Done
         const isEditing = editButton.textContent.trim() === 'Edit';
         editButton.textContent = isEditing ? 'Done' : 'Edit';
 
+        // IDs to exclude from being disabled
         const excludeIds = [
           "marketValue",
           "valueAdjustment",
@@ -752,11 +770,26 @@ echo "<script>
           "recommendedUnitValue"
         ];
 
+        // Loop through the inputs and enable/disable them based on the button state
         inputs.forEach(input => {
-          if (excludeIds.includes(input.id)) return;
+          if (excludeIds.includes(input.id)) return; // Skip the excluded inputs
           input.disabled = !isEditing;
+
+          // Enable/Disable radio buttons
+          if (input.type === 'radio') {
+            input.disabled = !isEditing;
+          }
         });
+
+        // Focus the first editable input field when starting edit mode
+        if (isEditing) {
+          const firstEditableInput = Array.from(inputs).find(input => !input.disabled);
+          if (firstEditableInput) {
+            firstEditableInput.focus();
+          }
+        }
       }
+
 
       // Attach event listener for edit button
       document.getElementById('editRPUButton').addEventListener('click', toggleEdit);
