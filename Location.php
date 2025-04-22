@@ -135,7 +135,7 @@ if ($conn->connect_error) {
           <!-- Dropdown -->
           <div class="dropdown ml-5">
             <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="locationTypeDropdown"
-              data-bs-toggle="dropdown" aria-expanded="false">
+              data-toggle="dropdown" aria-expanded="false">
               Municipality
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="locationTypeDropdown">
@@ -505,9 +505,8 @@ if ($conn->connect_error) {
     integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
     crossorigin="anonymous"></script>
   <!-- Bootstrap JS -->
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="Location.js"></script>
 
 </body>
