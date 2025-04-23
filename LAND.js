@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    fetch('LAND_get_data.php')
+    fetch('LAND.php?fetch=1')
         .then(res => res.json())
         .then(data => {
             populateSelect('classificationModal', data.classifications);
