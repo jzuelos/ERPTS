@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 16, 2025 at 03:50 PM
+-- Generation Time: Apr 23, 2025 at 05:34 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -78,8 +78,8 @@ CREATE TABLE `certification` (
 --
 
 INSERT INTO `certification` (`cert_id`, `verified`, `noted`, `recom_approval`, `recom_date`, `plotted`, `appraised`, `appraised_date`, `approved`, `approved_date`, `idle`, `contested`, `land_id`) VALUES
-(8, '', '', 'Jo Torio', '2025-04-16', '', '', '2025-04-16', 'MAXIMO P. MAGANA, JR, REA', '2025-04-16', 0, 0, 7),
-(9, 'Verifier 1', 'Noter 1', 'Recommender 2', '2025-04-16', 'Plotter 2', 'Appraiser 2', '2025-04-16', 'Approver 1', '2025-04-16', 0, 0, 41);
+(8, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-22', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-22', 'Lingon, Nestor Jacolbia', '2025-04-22', 1, 1, 6),
+(15, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-18', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-18', 'Lingon, Nestor Jacolbia', '2025-04-18', 0, 0, 53);
 
 -- --------------------------------------------------------
 
@@ -161,7 +161,10 @@ CREATE TABLE `land` (
   `land_id` int(50) NOT NULL,
   `oct_no` int(50) NOT NULL,
   `survey_no` varchar(250) NOT NULL,
-  `boundaries` varchar(250) NOT NULL,
+  `north` varchar(255) DEFAULT NULL,
+  `east` varchar(255) DEFAULT NULL,
+  `south` varchar(255) DEFAULT NULL,
+  `west` varchar(255) DEFAULT NULL,
   `boun_desc` varchar(250) NOT NULL,
   `last_name` varchar(250) NOT NULL,
   `first_name` varchar(250) NOT NULL,
@@ -193,10 +196,10 @@ CREATE TABLE `land` (
 -- Dumping data for table `land`
 --
 
-INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `boundaries`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`, `adjust_factor`, `adjust_percent`, `adjust_value`, `adjust_mv`, `assess_lvl`, `assess_value`, `faas_id`) VALUES
-(6, 46, 'PSU-98765', '', 'Containing an area of 1,000 square meters, more or less.', 'Dioneda', 'Renz', 'Balce', '09932007821', 'rdioneda4@gmail.com', '1', 'Purok 5', '', 'Sta. Elena', 'Camarines Norte', '', 'Residential', 'Rice Land', 1500, 'Farmland', 2000.00, 3000000.00, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 32),
-(7, 46, 'Lot 1234, Cad-5678', '', ' A rectangular lot with a frontage of 20 meters along Rizal Street, adjacent to commercial establishments.', 'Reyes', 'Carlos', 'Mendoza', '09171234567', 'carlos.reyes@email.com', '23-B', 'Mabini', '', 'San Fernando ', 'Pampanga', 'A 1,500 sq. m. residential lot along Rizal Street, fully fenced with road access and nearby utilities.', 'Residential', 'High-density Housing', 1500, 'Residential Property', 2000.00, 3000000.00, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 32),
-(41, 2147483647, '4235234', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 325, '', 500.00, 162500.00, '', 90.00, -16250.00, 146250.00, 75.00, 109687.50, 33);
+INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `north`, `east`, `south`, `west`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`, `adjust_factor`, `adjust_percent`, `adjust_value`, `adjust_mv`, `assess_lvl`, `assess_value`, `faas_id`) VALUES
+(6, 9000, '23400', '3129Lot', '2363Lot', '2314Lot', '2352Lot', 'Hsasde', 'asdfasdf', 'asdfasd', 'asdfasdf', '0923353353', 'fasd@gmail.com', 'asdf', 'Calabagas', '2', 'Daet', 'Camarines Norte', 'asdfasdfa', 'Residential', 'Apartment', 800, 'Building', 20.00, 16000.00, '', 80.00, -3200.00, 12800.00, 70.00, 8960.00, 32),
+(7, 90, '', NULL, NULL, NULL, NULL, '', '', '', '', '', '', '', '', '', '', '', '', '', '', 1500, '', 0.00, 0.00, '', 100.00, 0.00, 0.00, 0.00, 0.00, 32),
+(53, 90, '', NULL, NULL, NULL, NULL, '', '', '', '', '', '', '', '', '', '', '', '', '', '', 1500, '', 0.00, 0.00, '', 100.00, 0.00, 0.00, 0.00, 0.00, 32);
 
 -- --------------------------------------------------------
 
@@ -218,7 +221,7 @@ CREATE TABLE `land_use` (
 --
 
 INSERT INTO `land_use` (`lu_id`, `report_code`, `lu_code`, `lu_description`, `lu_al`, `lu_status`) VALUES
-(0, 'SC', 'SC234', '', 60.00, 'Active');
+(1, 'SC', 'SC234', '', 60.00, 'Active');
 
 -- --------------------------------------------------------
 
@@ -371,6 +374,30 @@ CREATE TABLE `region` (
 
 INSERT INTO `region` (`r_id`, `r_no`) VALUES
 (5, 'Region V');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `rpu_dec`
+--
+
+CREATE TABLE `rpu_dec` (
+  `dec_id` int(10) NOT NULL,
+  `arp_no` int(30) NOT NULL,
+  `pin` int(30) NOT NULL,
+  `land_id` int(50) NOT NULL,
+  `pro_assess` varchar(250) NOT NULL,
+  `pro_date` date NOT NULL,
+  `mun_assess` varchar(250) NOT NULL,
+  `mun_date` date NOT NULL,
+  `td_cancel` int(30) NOT NULL,
+  `previous_pin` int(30) NOT NULL,
+  `tax_year` date NOT NULL,
+  `entered_by` int(30) NOT NULL,
+  `entered_year` date NOT NULL,
+  `prev_own` varchar(250) NOT NULL,
+  `prev_assess` decimal(10,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -538,6 +565,12 @@ ALTER TABLE `region`
   ADD PRIMARY KEY (`r_id`);
 
 --
+-- Indexes for table `rpu_dec`
+--
+ALTER TABLE `rpu_dec`
+  ADD PRIMARY KEY (`dec_id`);
+
+--
 -- Indexes for table `rpu_idnum`
 --
 ALTER TABLE `rpu_idnum`
@@ -570,7 +603,7 @@ ALTER TABLE `brgy`
 -- AUTO_INCREMENT for table `certification`
 --
 ALTER TABLE `certification`
-  MODIFY `cert_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `cert_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `classification`
@@ -594,7 +627,13 @@ ALTER TABLE `faas`
 -- AUTO_INCREMENT for table `land`
 --
 ALTER TABLE `land`
-  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+
+--
+-- AUTO_INCREMENT for table `land_use`
+--
+ALTER TABLE `land_use`
+  MODIFY `lu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `municipality`
@@ -631,6 +670,12 @@ ALTER TABLE `p_info`
 --
 ALTER TABLE `region`
   MODIFY `r_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `rpu_dec`
+--
+ALTER TABLE `rpu_dec`
+  MODIFY `dec_id` int(10) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `rpu_idnum`
