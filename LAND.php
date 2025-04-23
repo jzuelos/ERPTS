@@ -523,120 +523,120 @@ $conn->close();
         </div>
       </div>
 
-<!-- Certification Section -->
-<h5 class="section-title mt-5">Certification</h5>
-<div class="container">
-  <div class="row">
-    <div class="col-12">
+      <!-- Certification Section -->
+      <h5 class="section-title mt-5">Certification</h5>
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
 
-      <!-- Verified By -->
-      <div class="row mb-3 align-items-center">
-        <label class="col-md-2 col-form-label">Verified By</label>
-        <div class="col-md-4">
-          <input type="text" class="form-control" placeholder="Enter Verifier" disabled>
-        </div>
-        <div class="col-md-3">
-          <button type="button" class="btn btn-outline-primary btn-sm w-100">Verify</button>
+            <!-- Verified By -->
+            <div class="row mb-3 align-items-center">
+              <label class="col-md-2 col-form-label">Verified By</label>
+              <div class="col-md-4">
+                <input type="text" class="form-control" placeholder="Enter Verifier" disabled>
+              </div>
+              <div class="col-md-3">
+                <button type="button" class="btn btn-outline-primary btn-sm w-100">Verify</button>
+              </div>
+            </div>
+
+            <!-- Plotted By -->
+            <div class="row mb-3 align-items-center">
+              <label class="col-md-2 col-form-label">Plotted By</label>
+              <div class="col-md-4">
+                <input type="text" class="form-control" placeholder="Enter Plotter" disabled>
+              </div>
+            </div>
+
+            <!-- Noted By -->
+            <div class="row mb-3 align-items-center">
+              <label class="col-md-2 col-form-label">Noted By</label>
+              <div class="col-md-4">
+                <input type="text" class="form-control" placeholder="Enter Noter" disabled>
+              </div>
+            </div>
+
+            <!-- Appraised By -->
+            <div class="row mb-3 align-items-center">
+              <label class="col-md-2 col-form-label">Appraised By</label>
+              <div class="col-md-4">
+                <input type="text" class="form-control" placeholder="Enter Appraiser" disabled>
+              </div>
+              <label class="col-md-1 col-form-label text-end">Date</label>
+              <div class="col-md-3">
+                <input type="date" class="form-control" disabled>
+              </div>
+            </div>
+
+            <!-- Recommending Approval -->
+            <div class="row mb-3 align-items-center">
+              <label class="col-md-2 col-form-label">Recommending Approval</label>
+              <div class="col-md-4">
+                <input type="text" class="form-control" placeholder="Enter Recommender" disabled>
+              </div>
+              <label class="col-md-1 col-form-label text-end">Date</label>
+              <div class="col-md-3">
+                <input type="date" class="form-control" disabled>
+              </div>
+            </div>
+
+            <!-- Approved By -->
+            <div class="row mb-3 align-items-center">
+              <label class="col-md-2 col-form-label">Approved By</label>
+              <div class="col-md-4">
+                <input type="text" class="form-control" placeholder="Enter Approver" disabled>
+              </div>
+              <label class="col-md-1 col-form-label text-end">Date</label>
+              <div class="col-md-3">
+                <input type="date" class="form-control" disabled>
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
 
-      <!-- Plotted By -->
-      <div class="row mb-3 align-items-center">
-        <label class="col-md-2 col-form-label">Plotted By</label>
-        <div class="col-md-4">
-          <input type="text" class="form-control" placeholder="Enter Plotter" disabled>
+
+      <!-- Miscellaneous Section -->
+      <h5 class="section-title mt-5">Miscellaneous</h5>
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <div class="mb-3">
+            <label class="form-label d-block">Idle</label>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="yes" disabled>
+              <label class="form-check-label" for="idleYes">Yes</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="no" disabled>
+              <label class="form-check-label" for="idleNo">No</label>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 mb-4">
+          <div class="mb-3">
+            <label class="form-label d-block">Contested</label>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="yes"
+                disabled>
+              <label class="form-check-label" for="contestedYes">Yes</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="no"
+                disabled>
+              <label class="form-check-label" for="contestedNo">No</label>
+            </div>
+          </div>
         </div>
       </div>
-
-      <!-- Noted By -->
-      <div class="row mb-3 align-items-center">
-        <label class="col-md-2 col-form-label">Noted By</label>
-        <div class="col-md-4">
-          <input type="text" class="form-control" placeholder="Enter Noter" disabled>
-        </div>
+      <!-- Print Button at Bottom Right -->
+      <div class="d-flex justify-content-end mt-4">
+        <button type="button" class="btn btn-outline-secondary py-2 px-4" style="font-size: 1.1rem;">
+          <i class="fas fa-print me-2"></i>Print
+        </button>
       </div>
-
-      <!-- Appraised By -->
-      <div class="row mb-3 align-items-center">
-        <label class="col-md-2 col-form-label">Appraised By</label>
-        <div class="col-md-4">
-          <input type="text" class="form-control" placeholder="Enter Appraiser" disabled>
-        </div>
-        <label class="col-md-1 col-form-label text-end">Date</label>
-        <div class="col-md-3">
-          <input type="date" class="form-control" disabled>
-        </div>
-      </div>
-
-      <!-- Recommending Approval -->
-      <div class="row mb-3 align-items-center">
-        <label class="col-md-2 col-form-label">Recommending Approval</label>
-        <div class="col-md-4">
-          <input type="text" class="form-control" placeholder="Enter Recommender" disabled>
-        </div>
-        <label class="col-md-1 col-form-label text-end">Date</label>
-        <div class="col-md-3">
-          <input type="date" class="form-control" disabled>
-        </div>
-      </div>
-
-      <!-- Approved By -->
-      <div class="row mb-3 align-items-center">
-        <label class="col-md-2 col-form-label">Approved By</label>
-        <div class="col-md-4">
-          <input type="text" class="form-control" placeholder="Enter Approver" disabled>
-        </div>
-        <label class="col-md-1 col-form-label text-end">Date</label>
-        <div class="col-md-3">
-          <input type="date" class="form-control" disabled>
-        </div>
-      </div>
-
     </div>
-  </div>
-</div>
-
-
-          <!-- Miscellaneous Section -->
-          <h5 class="section-title mt-5">Miscellaneous</h5>
-          <div class="row">
-            <div class="col-md-6 mb-4">
-              <div class="mb-3">
-                <label class="form-label d-block">Idle</label>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="yes" disabled>
-                  <label class="form-check-label" for="idleYes">Yes</label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="no" disabled>
-                  <label class="form-check-label" for="idleNo">No</label>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6 mb-4">
-              <div class="mb-3">
-                <label class="form-label d-block">Contested</label>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="yes"
-                    disabled>
-                  <label class="form-check-label" for="contestedYes">Yes</label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="no"
-                    disabled>
-                  <label class="form-check-label" for="contestedNo">No</label>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Print Button at Bottom Right -->
-          <div class="d-flex justify-content-end mt-4">
-            <button type="button" class="btn btn-outline-secondary py-2 px-4" style="font-size: 1.1rem;">
-              <i class="fas fa-print me-2"></i>Print
-            </button>
-          </div>
-        </div>
-      </div>
+    </div>
   </section>
 
 
@@ -764,21 +764,17 @@ $conn->close();
               </div>
               <div class="col-md-6 mb-4">
                 <label for="classificationModal" class="form-label">Classification</label>
-                <input type="text" id="classificationModal" name="classification" class="form-control"
-                  placeholder="Enter classification">
+                <select id="classificationModal" name="classification" class="form-select"></select>
               </div>
             </div>
-
             <div class="row">
               <div class="col-md-6 mb-4">
                 <label for="subClassModal" class="form-label">Sub-Class</label>
-                <input type="text" id="subClassModal" name="sub_class" class="form-control"
-                  placeholder="Enter sub-class">
+                <select id="subClassModal" name="sub_class" class="form-select"></select>
               </div>
               <div class="col-md-6 mb-4">
                 <label for="actualUseModal" class="form-label">Actual Use</label>
-                <input type="text" id="actualUseModal" name="actual_use" class="form-control"
-                  placeholder="Enter actual use">
+                <select id="actualUseModal" name="actual_use" class="form-select"></select>
               </div>
             </div>
 
@@ -876,74 +872,74 @@ $conn->close();
             </div>
           </div>
 
-<!-- Certification Section Modal -->
-<div class="section-wrap px-4 mb-5">
-  <h5 class="section-title mt-4">Certification</h5>
-  <div class="row gx-4">
-    <div class="col-md-12">
-      <!-- Verified By -->
-      <div class="d-flex align-items-center mb-3">
-        <label class="form-label mb-0 me-2" style="width: 140px;">Verified By</label>
-        <select class="form-select me-2" style="width: 30%;" name="verified_by">
-          <option selected disabled>Select verifier</option>
-          <option>Malapajo, Antonio Menorca</option>
-        </select>
-        <button type="button" class="btn btn-outline-primary" style="width: 100px;">Verify</button>
-      </div>
+          <!-- Certification Section Modal -->
+          <div class="section-wrap px-4 mb-5">
+            <h5 class="section-title mt-4">Certification</h5>
+            <div class="row gx-4">
+              <div class="col-md-12">
+                <!-- Verified By -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 me-2" style="width: 140px;">Verified By</label>
+                  <select class="form-select me-2" style="width: 30%;" name="verified_by">
+                    <option selected disabled>Select verifier</option>
+                    <option>Malapajo, Antonio Menorca</option>
+                  </select>
+                  <button type="button" class="btn btn-outline-primary" style="width: 100px;">Verify</button>
+                </div>
 
-      <!-- Plotted By -->
-      <div class="d-flex align-items-center mb-3">
-        <label class="form-label mb-0 me-2" style="width: 140px;">Plotted By</label>
-        <select class="form-select" style="width: 30%;" name="plotted_by">
-          <option selected disabled>Select plotter</option>
-          <option>Malapajo, Antonio Menorca</option>
-        </select>
-      </div>
+                <!-- Plotted By -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 me-2" style="width: 140px;">Plotted By</label>
+                  <select class="form-select" style="width: 30%;" name="plotted_by">
+                    <option selected disabled>Select plotter</option>
+                    <option>Malapajo, Antonio Menorca</option>
+                  </select>
+                </div>
 
-      <!-- Noted By -->
-      <div class="d-flex align-items-center mb-3">
-        <label class="form-label mb-0 me-2" style="width: 140px;">Noted By</label>
-        <select class="form-select" style="width: 30%;" name="noted_by">
-          <option selected disabled>Select noter</option>
-          <option>Lingon, Nestor Jacolbia</option>
-        </select>
-      </div>
+                <!-- Noted By -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 me-2" style="width: 140px;">Noted By</label>
+                  <select class="form-select" style="width: 30%;" name="noted_by">
+                    <option selected disabled>Select noter</option>
+                    <option>Lingon, Nestor Jacolbia</option>
+                  </select>
+                </div>
 
-      <!-- Appraised By -->
-      <div class="d-flex align-items-center mb-3">
-        <label class="form-label mb-0 me-2" style="width: 140px;">Appraised By</label>
-        <select class="form-select me-2" style="width: 30%;" name="appraised_by">
-          <option selected disabled>Select appraiser</option>
-          <option>Lingon, Nestor Jacolbia</option>
-        </select>
-        <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
-        <input type="date" class="form-control" name="appraisal_date" id="appraisalDate" style="width: 30%;">
-      </div>
+                <!-- Appraised By -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 me-2" style="width: 140px;">Appraised By</label>
+                  <select class="form-select me-2" style="width: 30%;" name="appraised_by">
+                    <option selected disabled>Select appraiser</option>
+                    <option>Lingon, Nestor Jacolbia</option>
+                  </select>
+                  <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
+                  <input type="date" class="form-control" name="appraisal_date" id="appraisalDate" style="width: 30%;">
+                </div>
 
-      <!-- Recommending Approval -->
-      <div class="d-flex align-items-center mb-3">
-        <label class="form-label mb-0 me-2" style="width: 140px;">Recommending Approval</label>
-        <select class="form-select me-2" style="width: 30%;" name="recommending_approval">
-          <option selected disabled>Select recommender</option>
-          <option>Malapajo, Antonio Menorca</option>
-        </select>
-        <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
-        <input type="date" class="form-control" name="recommendation_date" id="recommendationDate" style="width: 30%;">
-      </div>
+                <!-- Recommending Approval -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 me-2" style="width: 140px;">Recommending Approval</label>
+                  <select class="form-select me-2" style="width: 30%;" name="recommending_approval">
+                    <option selected disabled>Select recommender</option>
+                    <option>Malapajo, Antonio Menorca</option>
+                  </select>
+                  <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
+                  <input type="date" class="form-control" name="recommendation_date" id="recommendationDate" style="width: 30%;">
+                </div>
 
-      <!-- Approved By -->
-      <div class="d-flex align-items-center mb-3">
-        <label class="form-label mb-0 me-2" style="width: 140px;">Approved By</label>
-        <select class="form-select me-2" style="width: 30%;" name="approved_by">
-          <option selected disabled>Select approver</option>
-          <option>Lingon, Nestor Jacolbia</option>
-        </select>
-        <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
-        <input type="date" class="form-control" name="approval_date" id="approvalDate" style="width: 30%;">
-      </div>
-    </div>
-  </div>
-</div>
+                <!-- Approved By -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 me-2" style="width: 140px;">Approved By</label>
+                  <select class="form-select me-2" style="width: 30%;" name="approved_by">
+                    <option selected disabled>Select approver</option>
+                    <option>Lingon, Nestor Jacolbia</option>
+                  </select>
+                  <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
+                  <input type="date" class="form-control" name="approval_date" id="approvalDate" style="width: 30%;">
+                </div>
+              </div>
+            </div>
+          </div>
 
 
           <!-- Miscellaneous Section Modal -->
@@ -1000,7 +996,7 @@ $conn->close();
   </footer>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
 
       // Set today's date in the date input
       const today = new Date().toISOString().split('T')[0];
@@ -1059,10 +1055,12 @@ $conn->close();
         };
 
         fetch('FAASrpuID.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(arpData)
-        })
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(arpData)
+          })
           .then(response => response.json())
           .then(data => {
             alert(data.success ? 'Success' : 'Failed to insert data: ' + data.error);
@@ -1099,7 +1097,7 @@ $conn->close();
         // Debounced version of the input event to improve performance
         function debounce(func, wait) {
           let timeout;
-          return function () {
+          return function() {
             clearTimeout(timeout);
             timeout = setTimeout(func, wait);
           };
@@ -1165,7 +1163,7 @@ $conn->close();
         document.getElementById("assessmentLevelModal").addEventListener("input", calculateAssessedValue); //Event listener for assessment level input
 
         // Event listener for percentage adjustment input
-        percentAdjustmentInput.addEventListener('input', function () {
+        percentAdjustmentInput.addEventListener('input', function() {
           const marketValue = parseFloat(marketValueInput.value.replace(/,/g, '')) || 0; // Get current market value
           calculateValueAdjustment(marketValue); // Recalculate value adjustment
         });
@@ -1185,19 +1183,19 @@ $conn->close();
           // Highlight the area input if it's invalid (empty or non-positive)
           if (isNaN(area) || area <= 0) {
             areaInput.classList.add('is-invalid'); // Add 'is-invalid' class to highlight the field
-            areaInput.style.borderColor = 'red';   // Optional: Set the border color to red
+            areaInput.style.borderColor = 'red'; // Optional: Set the border color to red
           } else {
             areaInput.classList.remove('is-invalid');
-            areaInput.style.borderColor = '';      // Reset the border color if the input is valid
+            areaInput.style.borderColor = ''; // Reset the border color if the input is valid
           }
 
           // Highlight the unit value input if it's invalid (empty or non-positive)
           if (isNaN(unitValue) || unitValue <= 0) {
             unitValueInput.classList.add('is-invalid');
-            unitValueInput.style.borderColor = 'red';  // Set the border color to red
+            unitValueInput.style.borderColor = 'red'; // Set the border color to red
           } else {
             unitValueInput.classList.remove('is-invalid');
-            unitValueInput.style.borderColor = '';     // Reset the border color if the input is valid
+            unitValueInput.style.borderColor = ''; // Reset the border color if the input is valid
           }
         }
 
@@ -1210,7 +1208,7 @@ $conn->close();
       updateAreaUnit();
     });
 
-    window.addEventListener("beforeunload", function (e) {
+    window.addEventListener("beforeunload", function(e) {
       e.preventDefault(); // Required for some browsers
       e.returnValue = ""; // Show the default browser confirmation dialog
     });
@@ -1220,6 +1218,7 @@ $conn->close();
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"
     integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/5hb5g5/5hb5g5/5hb5g5/5hb5g5/5hb5g5" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="LAND.js"></script>
 </body>
 
 </html>
