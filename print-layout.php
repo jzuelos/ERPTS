@@ -336,6 +336,32 @@ if ($p_id > 0) {
 
         <table>
             <tr>
+                <th colspan="6" class="section-title">LAND APPRAISAL:</th>
+            </tr>
+            <tr>
+                <th>Classification</th>
+                <th>Sub-Class</th>
+                <th>Area</th>
+                <th>Actual Use</th>
+                <th>Unit Value</th>
+                <th>Market Value</th>
+            </tr>
+            <tr>
+                <td><?= htmlspecialchars($landRecord['classification'] ?? 'N/A') ?></td>
+                <td><?= htmlspecialchars($landRecord['sub_class'] ?? 'N/A') ?></td>
+                <td><?= htmlspecialchars($landRecord['area'] ?? 'N/A') ?></td>
+                <td><?= htmlspecialchars($landRecord['actual_use'] ?? 'N/A') ?></td>
+                <td><?= htmlspecialchars($landRecord['unit_value'] ?? 'N/A') ?></td>
+                <td><?= htmlspecialchars($landRecord['market_value'] ?? 'N/A') ?></td>
+            </tr>
+            <tr>
+                <th colspan="5">TOTAL:</th>
+                <td><b><?= htmlspecialchars($landRecord['market_value'] ?? 'N/A') ?></b></td>
+            </tr>
+        </table>
+
+        <table>
+            <tr>
                 <th colspan="8" class="section-title">PLANTS AND TREES APPRAISAL:</th>
             </tr>
             <tr>
@@ -536,11 +562,9 @@ if ($p_id > 0) {
 
 </body>
 <script>
-    // Automatically print after populating the fields
-    /* setTimeout(() => {
+    //Automatically print after populating the fields
+    setTimeout(() => {
          window.print();
      }, 500); // Adjust delay if needed
-     */
 </script>
-
 </html>
