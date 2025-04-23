@@ -538,18 +538,11 @@ $conn->close();
 
     <div class="card border-0 shadow p-4 rounded-3">
       <form>
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="editID" class="form-label">Edit ID</label>
-            <input type="text" class="form-control" id="editID" placeholder="Enter Edit ID" disabled>
-          </div>
-        </div>
-
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="taxDeclarationNumber" class="form-label">Identification Numbers (Tax Declaration Number)</label>
             <input type="text" class="form-control" id="taxDeclarationNumber" placeholder="Enter Tax Declaration Number"
-              disabled>
+              value="<?= isset($rpu_details['arp']) ? htmlspecialchars($rpu_details['arp']) : ''; ?>"  disabled>
           </div>
 
           <div class="col-12 mb-3">
@@ -614,7 +607,10 @@ $conn->close();
 
         <!-- Print Button at the Bottom Right -->
         <div class="text-right mt-4">
-          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="DRPprint()">Print</button>
+          <a href="print-layout.php?p_id=<?= urlencode($p_id); ?>&land_id=<?= urlencode($record['land_id']); ?>"
+            class="btn btn-sm btn-secondary" title="Print" target="_blank">
+            <i class="bi bi-printer"></i> Print
+          </a>
         </div>
       </form>
     </div>
@@ -997,14 +993,6 @@ $conn->close();
         });
       }
     }
-
-    function DRPprint() {
-      const printWindow = window.open('DRP.html', '_blank'); // '_blank' ensures the content opens in a new tab
-      printWindow.onload = function () {
-
-        printWindow.print();
-      };
-    }
   </script>
   <script>
     function toggleEdit() {
@@ -1088,8 +1076,6 @@ $conn->close();
   </script>
   <!-- Optional JavaScript -->
   <script src="http://localhost/ERPTS/FAAS.js"></script>
-  <script src="http://localhost/ERPTS/print-layout.js"></script>
-  <script src="http://localhost/ERPTS/printdata.js"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
