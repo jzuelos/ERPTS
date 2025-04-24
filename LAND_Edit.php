@@ -168,7 +168,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['update_success'] = true; // Set flag before redirect
     header("Location: " . $_SERVER['PHP_SELF'] . "?p_id=" . urlencode($_GET['p_id'] ?? ''));
     exit();
-
   } else {
     echo "<script>alert('Error: " . addslashes($stmt->error) . "');</script>";
   }
@@ -240,6 +239,18 @@ function updateCertification($conn, $data)
 
   $stmt->close();
 }
+
+// Fetch classification
+$classificationQuery = "SELECT c_id, c_description FROM classification WHERE c_status = 'Active'";
+$classificationResult = mysqli_query($conn, $classificationQuery);
+
+// Fetch sub-class
+$subClassQuery = "SELECT sc_id, sc_description FROM subclass WHERE sc_status = 'Active'";
+$subClassResult = mysqli_query($conn, $subClassQuery);
+
+// Fetch actual use
+$actualUseQuery = "SELECT lu_id, lu_description FROM land_use WHERE lu_status = 'Active'";
+$actualUseResult = mysqli_query($conn, $actualUseQuery);
 
 $conn->close();
 
@@ -454,7 +465,6 @@ echo "<script>
 
         <!-- Land Appraisal Section -->
         <h5 class="section-title mt-5">Land Appraisal</h5>
-
         <div class="row">
           <div class="col-md-6 col-12 mb-4">
             <div class="mb-3">
@@ -463,29 +473,51 @@ echo "<script>
                 disabled value="<?php echo htmlspecialchars($land_data['land_desc']); ?>">
             </div>
           </div>
+          <!-- Classification -->
           <div class="col-md-6 col-12 mb-4">
             <div class="mb-3">
               <label for="classification" class="form-label">Classification</label>
-              <input type="text" id="classification" name="classification" class="form-control"
-                placeholder="Enter classification" disabled
-                value="<?php echo htmlspecialchars($land_data['classification']); ?>">
+              <select id="classification" name="classification" class="form-select">
+                <option value="">Select Classification</option>
+                <?php while ($row = mysqli_fetch_assoc($classificationResult)): ?>
+                  <option value="<?php echo $row['c_description']; ?>"
+                    <?php echo ($land_data['classification'] == $row['c_description']) ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($row['c_description']); ?>
+                  </option>
+                <?php endwhile; ?>
+              </select>
             </div>
           </div>
         </div>
-
         <div class="row">
+          <!-- Actual Use -->
           <div class="col-md-6 col-12 mb-4">
             <div class="mb-3">
               <label for="actualUse" class="form-label">Actual Use</label>
-              <input type="text" id="actualUse" name="actual_use" class="form-control" placeholder="Enter actual use"
-                disabled value="<?php echo htmlspecialchars($land_data['actual_use']); ?>">
+              <select id="actualUse" name="actual_use" class="form-select">
+                <option value="">Select Actual Use</option>
+                <?php while ($row = mysqli_fetch_assoc($actualUseResult)): ?>
+                  <option value="<?php echo $row['lu_description']; ?>"
+                    <?php echo ($land_data['actual_use'] == $row['lu_description']) ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($row['lu_description']); ?>
+                  </option>
+                <?php endwhile; ?>
+              </select>
             </div>
           </div>
+          <!-- Sub-Class -->
           <div class="col-md-6 col-12 mb-4">
             <div class="mb-3">
               <label for="subClass" class="form-label">Sub-Class</label>
-              <input type="text" id="subClass" name="sub_class" class="form-control" placeholder="Enter sub-class"
-                disabled value="<?php echo htmlspecialchars($land_data['sub_class']); ?>">
+              <select id="subClass" name="sub_class" class="form-select">
+                <option value="">Select Sub-Class</option>
+                <?php while ($row = mysqli_fetch_assoc($subClassResult)): ?>
+                  <option value="<?php echo $row['sc_description']; ?>"
+                    <?php echo ($land_data['sub_class'] == $row['sc_description']) ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($row['sc_description']); ?>
+                  </option>
+                <?php endwhile; ?>
+              </select>
             </div>
           </div>
         </div>
@@ -750,7 +782,7 @@ echo "<script>
   </footer>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
 
       // Set today's date in the date input
       const today = new Date().toISOString().split('T')[0];
@@ -818,7 +850,7 @@ echo "<script>
       // Utility: Debounce
       function debounce(func, wait) {
         let timeout;
-        return function (...args) {
+        return function(...args) {
           clearTimeout(timeout);
           timeout = setTimeout(() => func.apply(this, args), wait);
         };
@@ -833,9 +865,10 @@ echo "<script>
         }
 
         const val = parseFloat(raw);
-        areaInput.value = hectareRadio.checked
-          ? (val / 10000).toFixed(4) // sqm → ha
-          : (val * 10000).toFixed(2); // ha → sqm
+        areaInput.value = hectareRadio.checked ?
+          (val / 10000).toFixed(4) // sqm → ha
+          :
+          (val * 10000).toFixed(2); // ha → sqm
 
         calculateMarketValue();
       }
