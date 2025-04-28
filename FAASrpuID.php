@@ -48,11 +48,15 @@ if ($check_result->num_rows > 0) {
         $update_stmt = $conn->prepare($update_sql);
         $update_stmt->bind_param("iissi", $arpNumber, $propertyNumber, $taxability, $effectivity, $existing_rpu_id);
 
+        file_put_contents('request_log.txt', "Existing RPU ID: $existing_rpu_id\n", FILE_APPEND); // Debugging log
+
         if ($update_stmt->execute()) {
             exit(json_encode(['success' => true, 'message' => 'rpu_idnum record updated successfully.']));
         } else {
             exit(json_encode(['success' => false, 'error' => 'Failed to update rpu_idnum.']));
         }
+    }else {
+        file_put_contents('request_log.txt', "No existing RPU ID found for faas_id: $faasId\n", FILE_APPEND); // Debugging log
     }
 }
 

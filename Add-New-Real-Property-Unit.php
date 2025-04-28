@@ -39,7 +39,7 @@
     $house_number = filter_input(INPUT_POST, 'house_number', FILTER_SANITIZE_NUMBER_INT);
     $block_number = filter_input(INPUT_POST, 'block_number', FILTER_SANITIZE_NUMBER_INT);
     $province = filter_input(INPUT_POST, 'province', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $city = filter_input(INPUT_POST, 'city', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $city = filter_input(INPUT_POST, 'municipality', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $district = filter_input(INPUT_POST, 'district', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $barangay = filter_input(INPUT_POST, 'barangay', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $house_tag = filter_input(INPUT_POST, 'house_tag_number', FILTER_SANITIZE_NUMBER_INT);

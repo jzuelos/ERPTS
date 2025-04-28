@@ -35,3 +35,31 @@
 {"faasId":"32","arpNumber":"2147483647","propertyNumber":"213","taxability":"special","effectivity":"2024"}
 {"faasId":"32","arpNumber":"2147483647","propertyNumber":"213","taxability":"special","effectivity":"2024"}
 {"faasId":"32","arpNumber":"2147483647","propertyNumber":"213","taxability":"special","effectivity":"2024"}
+{"faasId":"32","arpNumber":"2147483648","propertyNumber":"213","taxability":"special","effectivity":"2024"}
+{"faasId":"32","arpNumber":"2147483648","propertyNumber":"213","taxability":"special","effectivity":"2024"}
+{"faasId":"32","arpNumber":"2147483689","propertyNumber":"213","taxability":"special","effectivity":"2024"}
+{"faasId":"32","arpNumber":"2147483648","propertyNumber":"213","taxability":"special","effectivity":"2024"}
+{"faasId":"32","arpNumber":"2147483648","propertyNumber":"213","taxability":"taxable","effectivity":"2024"}
+{"faasId":"32","arpNumber":"2147483647","propertyNumber":"2134","taxability":"special","effectivity":"2025"}
+{"faasId":"32","arpNumber":"21474836446","propertyNumber":"2134","taxability":"special","effectivity":"2025"}
+{"faasId":"32","arpNumber":"21474837832","propertyNumber":"2134","taxability":"special","effectivity":"2025"}
+{"faasId":"32","arpNumber":"2147483689","propertyNumber":"2134","taxability":"special","effectivity":"2025"}
+{"faasId":"32","arpNumber":"2342523","propertyNumber":"5234523","taxability":"exempt","effectivity":"1904"}
+{"faasId":"32","arpNumber":"","propertyNumber":"234","taxability":"","effectivity":""}
+{"faasId":"32","arpNumber":"2345","propertyNumber":"23423","taxability":"exempt","effectivity":"1000"}
+{"faasId":"32","arpNumber":"3423","propertyNumber":"2342","taxability":"exempt","effectivity":"2354"}
+Existing RPU ID: 45
+{"faasId":"33","arpNumber":"2345","propertyNumber":"1234","taxability":"taxable","effectivity":"2023"}
+Existing RPU ID: 46
+{"faasId":"32","arpNumber":"12345","propertyNumber":"12345","taxability":"exempt","effectivity":"2456"}
+Existing RPU ID: 45
+{"faasId":"33","arpNumber":"2342","propertyNumber":"3456","taxability":"special","effectivity":"2024"}
+Existing RPU ID: 46
+{"faasId":"34","arpNumber":"2345","propertyNumber":"3245","taxability":"taxable","effectivity":"5423"}
+No existing RPU ID found for faas_id: 34
+{"faasId":"34","arpNumber":"12345","propertyNumber":"2345","taxability":"taxable","effectivity":"5423"}
+Existing RPU ID: 47
+{"faasId":"32","arpNumber":"","propertyNumber":"","taxability":"","effectivity":""}
+{"faasId":"35","arpNumber":"","propertyNumber":"","taxability":"","effectivity":""}
+{"faasId":"35","arpNumber":"312","propertyNumber":"2534","taxability":"exempt","effectivity":"5234"}
+No existing RPU ID found for faas_id: 35
