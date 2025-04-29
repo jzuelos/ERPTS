@@ -63,3 +63,9 @@ Existing RPU ID: 47
 {"faasId":"35","arpNumber":"","propertyNumber":"","taxability":"","effectivity":""}
 {"faasId":"35","arpNumber":"312","propertyNumber":"2534","taxability":"exempt","effectivity":"5234"}
 No existing RPU ID found for faas_id: 35
+{"faasId":"36","arpNumber":"42355323","propertyNumber":"42334","taxability":"exempt","effectivity":"2005"}
+No existing RPU ID found for faas_id: 36
+{"faasId":"36","arpNumber":"4235","propertyNumber":"2342","taxability":"taxable","effectivity":"3435"}
+No existing RPU ID found for faas_id: 36
+{"faasId":"36","arpNumber":"4235","propertyNumber":"4324","taxability":"taxable","effectivity":"4346"}
+No existing RPU ID found for faas_id: 36

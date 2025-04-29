@@ -176,6 +176,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 
     // Fetch land records
     $landRecords = fetchLandRecords($conn, $faas_id);
+    $land_id = isset($landRecords[0]['land_id']) ? $landRecords[0]['land_id'] : null;
   } else {
     echo "No data found for the given property ID.<br>";
   }
@@ -185,7 +186,63 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 } else {
   echo "Property ID not provided.<br>";
 }
+echo "<pre>";
+print_r($landRecords);
+echo "</pre>";
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $arp_no = $_POST['arp_no'] ?? 0;
+  $pro_assess = $_POST['pro_assess'] ?? '';
+  $pro_date = $_POST['pro_date'] ?? '';
+  $mun_assess = $_POST['mun_assess'] ?? '';
+  $mun_date = $_POST['mun_date'] ?? '';
+  $td_cancel = $_POST['td_cancel'] ?? 0;
+  $previous_pin = $_POST['previous_pin'] ?? 0;
+  $tax_year = $_POST['tax_year'] ?? '';
+  $entered_by = $_POST['entered_by'] ?? 0;
+  $entered_year = $_POST['entered_year'] ?? '';
+  $prev_own = $_POST['prev_own'] ?? '';
+  $prev_assess = $_POST['prev_assess'] ?? 0.00;
+
+  // Use previously fetched values
+  // $faas_id and $land_id are already defined earlier
+
+  $stmt = $conn->prepare("INSERT INTO rpu_dec (
+      arp_no, land_id, pro_assess, pro_date, mun_assess, mun_date,
+      td_cancel, previous_pin, tax_year, entered_by, entered_year,
+      prev_own, prev_assess, faas_id
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+  if ($stmt) {
+    $stmt->bind_param(
+      "iissssiiisisdi",
+      $arp_no,
+      $land_id,
+      $pro_assess,
+      $pro_date,
+      $mun_assess,
+      $mun_date,
+      $td_cancel,
+      $previous_pin,
+      $tax_year,
+      $entered_by,
+      $entered_year,
+      $prev_own,
+      $prev_assess,
+      $faas_id
+    );
+
+    if ($stmt->execute()) {
+      echo "Record saved successfully.";
+    } else {
+      echo "Execution error: " . $stmt->error;
+    }
+
+    $stmt->close();
+  } else {
+    echo "Preparation failed: " . $conn->error;
+  }
+}
 
 // General owners list
 $owners = fetchOwners($conn);
@@ -610,7 +667,6 @@ $conn->close();
     </div>
   </section>
 
-
   <!-- Modal for Declaration of Property -->
   <div class="modal fade" id="editDeclarationProperty" tabindex="-1" aria-labelledby="editDeclarationPropertyLabel"
     aria-hidden="true">
@@ -693,11 +749,6 @@ $conn->close();
                   placeholder="Enter Assessed Value">
               </div>
             </div>
-
-            <div class="col-md-6 mb-3">
-              <input type="submit" class="btn btn-primary" value="Save Changes">
-            </div>
-          </form>
         </div>
 
         <div class="modal-footer">
@@ -705,6 +756,7 @@ $conn->close();
           <button type="reset" class="btn btn-warning" onclick="resetForm()">Reset</button>
           <button type="submit" form="declarationForm" class="btn btn-primary">Save Changes</button>
         </div>
+        </form>
       </div>
     </div>
   </div>
