@@ -245,7 +245,7 @@ $classificationQuery = "SELECT c_id, c_description FROM classification WHERE c_s
 $classificationResult = mysqli_query($conn, $classificationQuery);
 
 // Fetch sub-class
-$subClassQuery = "SELECT sc_id, sc_description FROM subclass WHERE sc_status = 'Active'";
+$subClassQuery = "SELECT sc_id, sc_description, sc_uv FROM subclass WHERE sc_status = 'Active'";
 $subClassResult = mysqli_query($conn, $subClassQuery);
 
 // Fetch actual use
@@ -513,6 +513,7 @@ echo "<script>
                 <option value="">Select Sub-Class</option>
                 <?php while ($row = mysqli_fetch_assoc($subClassResult)): ?>
                   <option value="<?php echo $row['sc_description']; ?>"
+                    data-uv="<?php echo $row['sc_uv']; ?>"
                     <?php echo ($land_data['sub_class'] == $row['sc_description']) ? 'selected' : ''; ?>>
                     <?php echo htmlspecialchars($row['sc_description']); ?>
                   </option>
@@ -550,11 +551,31 @@ echo "<script>
               <div class="col-md-6 mb-3">
                 <label for="recom_unitValue" class="form-label">Recommended Unit Value</label>
                 <input type="text" id="recom_unitValue" class="form-control" placeholder="loading..."
-                  name="unit_value" disabled value="">
+                  name="recom_unit_value" readonly value="">
               </div>
             </div>
           </div>
         </div>
+
+        <script>
+          document.addEventListener("DOMContentLoaded", function() {
+            const subClassDropdown = document.getElementById("subClass");
+            const recomUnitValueInput = document.getElementById("recom_unitValue");
+
+            // Initial setting if something is preselected
+            const selectedOption = subClassDropdown.options[subClassDropdown.selectedIndex];
+            if (selectedOption && selectedOption.dataset.uv) {
+              recomUnitValueInput.value = selectedOption.dataset.uv;
+            }
+
+            // Listen for change
+            subClassDropdown.addEventListener("change", function() {
+              const selected = this.options[this.selectedIndex];
+              const unitValue = selected.getAttribute("data-uv") || "";
+              recomUnitValueInput.value = unitValue;
+            });
+          });
+        </script>
 
         <div class="row">
           <div class="col-md-4 mb-4">
