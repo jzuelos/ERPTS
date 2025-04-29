@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link rel="stylesheet" href="main_layout.css">
+  <link rel="stylesheet" href="Track.css">
   <title>Electronic Real Property Tax System</title>
 </head>
 
@@ -43,21 +44,21 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto"> <!-- Use ml-auto to align items to the right -->
+      <ul class="navbar-nav ml-auto">
         <li class="nav-item">
-          <a class="nav-link" href="Home.php">Home<span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="Home.php">Home</a>
         </li>
-        <li class="nav-item dropdown">
+        <li class="nav-item dropdown active">
           <a class="nav-link dropdown-toggle" href="RPU-Management.php" id="navbarDropdown" role="button"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             RPU Management
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="Real-Property-Unit-List.php">RPU List</a>
+            <a class="dropdown-item active" href="Real-Property-Unit-List.php">RPU List</a>
             <a class="dropdown-item" href="FAAS.php">FAAS</a>
-            <a class="dropdown-item" href="Tax-Declaration-List.php">Tax Declaration</a>
+            <a class="dropdown-item" href="Tax-Declaration.php">Tax Declaration</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item active" href="Track.php">Track Paper</a>
+            <a class="dropdown-item" href="Track.php">Track Paper</a>
           </div>
         </li>
         <li class="nav-item">
@@ -66,38 +67,80 @@
         <li class="nav-item">
           <a class="nav-link" href="Reports.php">Reports</a>
         </li>
-        <li class="nav-item" style="margin-left: 20px">
+        <li class="nav-item ml-3">
           <a href="logout.php" class="btn btn-danger">Log Out</a>
         </li>
       </ul>
     </div>
   </nav>
 
-  <!-- Main Body -->
-  <section class="u-align-left u-clearfix u-container-align-left u-section-2" id="carousel_a243">
-    <div class="u-clearfix u-sheet u-sheet-1">
-      <h3 class="u-text u-text-default u-text-1">Track Transaction Progress</h3>
-      <div class="u-custom-color-1 u-form u-radius u-form-1">
-        <form action="https://forms.nicepagesrv.com/v2/form/process"
-          class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form" source="email" name="form"
-          style="padding: 10px;">
-          <div class="u-form-group u-form-group-1">
-            <label for="text-cf0f" class="u-label">Enter Transaction ID</label>
-            <input type="text" placeholder="" id="text-cf0f" name="text" class="u-input u-input-rectangle">
-          </div>
-          <div class="u-align-right u-form-group u-form-submit">
-            <a href="#" class="u-border-none u-btn u-btn-submit u-button-style u-palette-1-base u-btn-1">Track</a>
-            <input type="submit" value="submit" class="u-form-control-hidden">
-          </div>
-          <div class="u-form-send-message u-form-send-success"> Thank you! Your message has been sent. </div>
-          <div class="u-form-send-error u-form-send-message"> Unable to send your message. Please fix errors then try
-            again. </div>
-          <input type="hidden" value="" name="recaptchaResponse">
-          <input type="hidden" name="formServices" value="">
-        </form>
+
+    <!--Main Content-->
+    <div class="container">
+    <h1><i class="fas fa-exchange-alt"></i> Transaction Dashboard</h1>
+
+    <div class="dashboard">
+      <div class="card">
+        <div>Total Transactions</div>
+        <div id="totalCount">0</div>
+      </div>
+      <div class="card">
+        <div>In Progress</div>
+        <div id="inProgressCount">0</div>
+      </div>
+      <div class="card">
+        <div>Completed</div>
+        <div id="completedCount">0</div>
       </div>
     </div>
-  </section>
+
+    <button class="btn btn-add" onclick="openModal()">
+      <i class="fas fa-plus"></i> Add Transaction
+    </button>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Transaction</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="transactionTable">
+        <!-- Rows will be injected here -->
+      </tbody>
+    </table>
+
+    <div class="recent-activity">
+      <h3><i class="fas fa-history"></i> Recent Transaction Activity</h3>
+      <div id="activityLog">
+        <!-- Logs appear here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" id="transactionModal">
+    <div class="modal-content">
+      <h3 id="modalTitle"><i class="fas fa-exchange-alt"></i> Add Transaction</h3>
+      <input type="text" id="nameInput" placeholder="Name">
+      <input type="text" id="transactionInput" placeholder="Transaction Description">
+      <select id="statusInput">
+        <option value="In Progress">In Progress</option>
+        <option value="Completed">Completed</option>
+      </select>
+      <div class="modal-actions">
+        <button class="btn btn-add" onclick="saveTransaction()">
+          <i class="fas fa-save"></i> Save
+        </button>
+        <button class="btn btn-cancel" onclick="closeModal()">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
@@ -108,6 +151,7 @@
 
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+   <script src="track.js"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
