@@ -88,17 +88,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 mb-4">
-                        <div class="d-flex">
-                            <div class="mr-3 text-primary-custom">
-                                <i class="fas fa-headset fa-2x"></i>
-                            </div>
-                            <div>
-                                <h5 class="font-weight-bold">24/7 Support</h5>
-                                <p>Our team is always ready to help</p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 
                 <div class="alert alert-light mt-4 border-left-primary-custom" style="border-left: 4px solid var(--primary);">

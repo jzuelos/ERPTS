@@ -74,69 +74,43 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
     </div>
   </nav>
 
-  <!-- Main Content -->
-  <main class="container my-5 d-flex justify-content-center align-items-center flex-column">
-    <section class="w-100" style="max-width: 1100px;">
-      <div class="status-container mb-4 text-center">
-        <h5 class="text-muted" style="font-size: 1.25rem;">Server Status: <span
-            class="text-success font-weight-bold">Online</span></h5>
-        <h3 class="text-secondary" style="font-size: 2rem;">Admin</h3>
-      </div>
+<!-- Main Content -->
+<main class="container my-5 d-flex justify-content-center align-items-center flex-column">
+  <section class="w-100" style="max-width: 1100px;">
+    <div class="status-container mb-4 text-center">
+      <h5 class="text-muted" style="font-size: 1.25rem;">Server Status: 
+        <span class="text-success font-weight-bold">Online</span>
+      </h5>
+      <h3 class="text-secondary" style="font-size: 2rem;">Admin</h3>
+    </div>
 
-      <div class="row justify-content-center">
-        <div class="col-md-3 mb-4">
-          <a href="User-Control.php" class="text-decoration-none">
-            <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
-              <div class="card-body d-flex align-items-center justify-content-center">
-                <i class="fas fa-user mr-4" style="font-size: 2rem;"></i>
-                <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">User Control</h5>
-              </div>
+    <div class="row justify-content-center">
+      <div class="col-md-4 mb-4">
+        <a href="Property.php" class="text-decoration-none">
+          <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+            <div class="card-body d-flex align-items-center justify-content-center">
+              <i class="fas fa-map mr-4" style="font-size: 2rem;"></i>
+              <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">Land</h5>
             </div>
-          </a>
-        </div>
-        <div class="col-md-3 mb-4">
-          <a href="Admin-Modify.php" class="text-decoration-none">
-            <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
-              <div class="card-body d-flex align-items-center justify-content-center">
-                <i class="fas fa-edit mr-4" style="font-size: 2rem;"></i>
-                <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">Sheet Modification</h5>
-              </div>
-            </div>
-          </a>
-        </div>
-        <div class="col-md-3 mb-4">
-          <a href="Location.php" class="text-decoration-none">
-            <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
-              <div class="card-body d-flex align-items-center justify-content-center">
-                <i class="fas fa-map-marker-alt mr-4" style="font-size: 2rem;"></i>
-                <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">Location</h5>
-              </div>
-            </div>
-          </a>
-        </div>
-        <div class="col-md-3 mb-4">
-          <a href="Own_list.php" class="text-decoration-none">
-            <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
-              <div class="card-body d-flex align-items-center justify-content-center">
-                <i class="fas fa-users mr-4" style="font-size: 2rem;"></i>
-                <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">Owners</h5>
-              </div>
-            </div>
-          </a>
-        </div>
-        <div class="col-md-3 mb-4">
-          <a href="PropertySelect.php" class="text-decoration-none">
-            <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
-              <div class="card-body d-flex align-items-center justify-content-center">
-                <i class="fas fa-users mr-4" style="font-size: 2rem;"></i>
-                <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">Property</h5>
-              </div>
-            </div>
-          </a>
-        </div>
+          </div>
+        </a>
       </div>
-    </section>
-  </main>
+      <div class="col-md-4 mb-4">
+        <a href="Certification.php" class="text-decoration-none">
+          <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+            <div class="card-body d-flex align-items-center justify-content-center">
+              <i class="fas fa-certificate mr-4" style="font-size: 2rem;"></i>
+              <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">Certification</h5>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+
+
 
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start">
