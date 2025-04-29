@@ -1,0 +1,18 @@
+.custom-spacing {
+    gap: 20px; /* Controls the space between elements */
+  }
+  
+  .custom-spacing .btn,
+  .custom-spacing .input-group,
+  .custom-spacing .dropdown {
+    margin-right: 10px; /* Add space between buttons and other elements */
+  }
+  
+  .custom-spacing .input-group {
+    width: 250px; /* Control the width of the search bar */
+  }
+  
+  .custom-spacing .dropdown .dropdown-toggle {
+    padding: 0.375rem 0.75rem; /* Adjust padding for the dropdown button */
+  }
+  
