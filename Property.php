@@ -450,7 +450,7 @@ if ($conn->connect_error) {
                 <div class="input-group-prepend">
                   <span class="input-group-text">₱</span>
                 </div>
-                <input type="number" class="form-control" id="unitValue" placeholder="Enter Unit Value" min="0" step="0.01" required>
+                <input type="number" class="form-control" id="SunitValue" name="sc_uv" placeholder="Enter Unit Value" min="0" step="0.01" required>
               </div>
             </div>
             <div class="form-group">
