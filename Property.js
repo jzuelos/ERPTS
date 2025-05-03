@@ -163,17 +163,6 @@ $(document).ready(function() {
   $("#subClassesModal .submit-btn").click(function(event) {
     event.preventDefault();
 
-    var sc_code = $("#subClassesCode").val();
-    var sc_description = $("#subClassesDescription").val();
-    var sc_uv = $("#SunitValue").val(); // Keep it as string for logging
-    var sc_status = $("input[name='subClassesStatus']:checked").val();
-  
-    console.log("Submitting values:");
-    console.log("sc_code:", sc_code);
-    console.log("sc_description:", sc_description);
-    console.log("sc_uv (raw):", sc_uv);
-    console.log("sc_status:", sc_status);
-
     var formData = {
       sc_code: $("#subClassesCode").val(),
       sc_description: $("#subClassesDescription").val(),
