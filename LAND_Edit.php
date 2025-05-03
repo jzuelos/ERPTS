@@ -241,7 +241,7 @@ function updateCertification($conn, $data)
 }
 
 // Fetch classification
-$classificationQuery = "SELECT c_id, c_description FROM classification WHERE c_status = 'Active'";
+$classificationQuery = "SELECT c_id, c_description, c_uv FROM classification WHERE c_status = 'Active'";
 $classificationResult = mysqli_query($conn, $classificationQuery);
 
 // Fetch sub-class
@@ -249,7 +249,7 @@ $subClassQuery = "SELECT sc_id, sc_description, sc_uv FROM subclass WHERE sc_sta
 $subClassResult = mysqli_query($conn, $subClassQuery);
 
 // Fetch actual use
-$actualUseQuery = "SELECT lu_id, lu_description FROM land_use WHERE lu_status = 'Active'";
+$actualUseQuery = "SELECT lu_id, lu_description, lu_al FROM land_use WHERE lu_status = 'Active'";
 $actualUseResult = mysqli_query($conn, $actualUseQuery);
 
 $conn->close();
@@ -497,7 +497,9 @@ echo "<script>
               <select id="actualUse" name="actual_use" class="form-select">
                 <option value="">Select Actual Use</option>
                 <?php while ($row = mysqli_fetch_assoc($actualUseResult)): ?>
-                  <option value="<?php echo $row['lu_description']; ?>"
+                  <option
+                    value="<?php echo $row['lu_description']; ?>"
+                    data-al="<?php echo $row['lu_al']; ?>"
                     <?php echo ($land_data['actual_use'] == $row['lu_description']) ? 'selected' : ''; ?>>
                     <?php echo htmlspecialchars($row['lu_description']); ?>
                   </option>
@@ -641,13 +643,35 @@ echo "<script>
                 value="<?php echo htmlspecialchars($land_data['assess_lvl']); ?>">
             </div>
           </div>
+          <!-- Recommended Assessment Level Field -->
           <div class="col-md-6 mb-4">
             <div class="mb-3">
               <label for="recommendedAssessmentLevel" class="form-label">% Recommended Assessment Level</label>
               <input type="text" id="recommendedAssessmentLevel" class="form-control"
-                placeholder="Enter recommended assessment level" disabled value="loading...">
+                placeholder="Enter recommended assessment level" disabled value="">
             </div>
           </div>
+
+          <script>
+            document.addEventListener("DOMContentLoaded", function() {
+              const actualUseDropdown = document.getElementById("actualUse");
+              const recomAssessLevelInput = document.getElementById("recommendedAssessmentLevel");
+
+              // Initial set if something is preselected
+              const selectedOption = actualUseDropdown.options[actualUseDropdown.selectedIndex];
+              if (selectedOption && selectedOption.dataset.al) {
+                recomAssessLevelInput.value = selectedOption.dataset.al + " %";
+              }
+
+              // Listen for changes
+              actualUseDropdown.addEventListener("change", function() {
+                const selected = this.options[this.selectedIndex];
+                const assessLevel = selected.getAttribute("data-al") || "";
+                recomAssessLevelInput.value = assessLevel ? assessLevel + " %" : "";
+              });
+            });
+          </script>
+
           <div class="col-md-6 mb-4">
             <div class="mb-3">
               <label for="assessedValue" class="form-label">Assessed Value</label>
