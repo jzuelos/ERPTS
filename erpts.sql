@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 23, 2025 at 05:34 PM
+-- Generation Time: May 03, 2025 at 01:14 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -78,8 +78,9 @@ CREATE TABLE `certification` (
 --
 
 INSERT INTO `certification` (`cert_id`, `verified`, `noted`, `recom_approval`, `recom_date`, `plotted`, `appraised`, `appraised_date`, `approved`, `approved_date`, `idle`, `contested`, `land_id`) VALUES
-(8, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-22', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-22', 'Lingon, Nestor Jacolbia', '2025-04-22', 1, 1, 6),
-(15, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-18', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-18', 'Lingon, Nestor Jacolbia', '2025-04-18', 0, 0, 53);
+(17, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-28', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-28', 'Lingon, Nestor Jacolbia', '2025-04-28', 0, 0, 55),
+(18, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-28', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-28', 'Lingon, Nestor Jacolbia', '2025-04-28', 0, 0, 56),
+(19, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-29', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-29', 'Lingon, Nestor Jacolbia', '2025-04-29', 0, 0, 57);
 
 -- --------------------------------------------------------
 
@@ -137,19 +138,16 @@ CREATE TABLE `faas` (
   `faas_id` int(50) NOT NULL,
   `propertyowner_id` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`propertyowner_id`)),
   `pro_id` int(50) DEFAULT NULL,
-  `rpu_idno` int(20) DEFAULT NULL,
-  `land_id` int(50) DEFAULT NULL,
-  `plants_id` int(50) DEFAULT NULL,
-  `valuation_id` int(50) DEFAULT NULL
+  `rpu_idno` int(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `faas`
 --
 
-INSERT INTO `faas` (`faas_id`, `propertyowner_id`, `pro_id`, `rpu_idno`, `land_id`, `plants_id`, `valuation_id`) VALUES
-(32, '[61]', 143, 45, NULL, NULL, NULL),
-(33, '[62,63]', 144, 46, NULL, NULL, NULL);
+INSERT INTO `faas` (`faas_id`, `propertyowner_id`, `pro_id`, `rpu_idno`) VALUES
+(33, '[62,63]', 144, 46),
+(36, '[66]', 147, NULL);
 
 -- --------------------------------------------------------
 
@@ -197,9 +195,9 @@ CREATE TABLE `land` (
 --
 
 INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `north`, `east`, `south`, `west`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`, `adjust_factor`, `adjust_percent`, `adjust_value`, `adjust_mv`, `assess_lvl`, `assess_value`, `faas_id`) VALUES
-(6, 9000, '23400', '3129Lot', '2363Lot', '2314Lot', '2352Lot', 'Hsasde', 'asdfasdf', 'asdfasd', 'asdfasdf', '0923353353', 'fasd@gmail.com', 'asdf', 'Calabagas', '2', 'Daet', 'Camarines Norte', 'asdfasdfa', 'Residential', 'Apartment', 800, 'Building', 20.00, 16000.00, '', 80.00, -3200.00, 12800.00, 70.00, 8960.00, 32),
-(7, 90, '', NULL, NULL, NULL, NULL, '', '', '', '', '', '', '', '', '', '', '', '', '', '', 1500, '', 0.00, 0.00, '', 100.00, 0.00, 0.00, 0.00, 0.00, 32),
-(53, 90, '', NULL, NULL, NULL, NULL, '', '', '', '', '', '', '', '', '', '', '', '', '', '', 1500, '', 0.00, 0.00, '', 100.00, 0.00, 0.00, 0.00, 0.00, 32);
+(55, 25634, '423', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 800, '', 20.00, 16000.00, '', 17.00, -13280.00, 2720.00, 100.00, 2720.00, 33),
+(56, 1234, '3412', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 432, '1', 34.00, 14688.00, '', 100.00, 0.00, 14688.00, 34.00, 4993.92, 33),
+(57, 3421, '4324', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'asdfasdfa', '', '', 800, '1', 200.00, 160000.00, '', 100.00, 0.00, 160000.00, 65.00, 104000.00, 36);
 
 -- --------------------------------------------------------
 
@@ -305,9 +303,9 @@ CREATE TABLE `propertyowner` (
 --
 
 INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`) VALUES
-(61, 143, 12, 1),
 (62, 144, 12, 1),
-(63, 144, 9, 1);
+(63, 144, 9, 1),
+(66, 147, 12, 1);
 
 -- --------------------------------------------------------
 
@@ -354,8 +352,8 @@ CREATE TABLE `p_info` (
 --
 
 INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`) VALUES
-(143, 12, 13, 8, 'Province 1', 'Daet', 'District 2', 'Bautista', 'Zalcedo', 6, 200, '55   ', 'affidavit'),
-(144, 12, 23, 0, 'Province 1', 'Daet', 'District 1', 'Kalamunding', '', 0, 302, '   ', 'affidavit, barangay');
+(144, 12, 23, 0, 'Province 1', 'Daet', 'District 1', 'Kalamunding', '', 0, 302, '   ', 'affidavit, barangay'),
+(147, 12, 23, 0, '54', '3', 'District 2', '67', '', 453, 3453, '   ', 'affidavit, barangay');
 
 -- --------------------------------------------------------
 
@@ -384,7 +382,6 @@ INSERT INTO `region` (`r_id`, `r_no`) VALUES
 CREATE TABLE `rpu_dec` (
   `dec_id` int(10) NOT NULL,
   `arp_no` int(30) NOT NULL,
-  `pin` int(30) NOT NULL,
   `land_id` int(50) NOT NULL,
   `pro_assess` varchar(250) NOT NULL,
   `pro_date` date NOT NULL,
@@ -396,8 +393,16 @@ CREATE TABLE `rpu_dec` (
   `entered_by` int(30) NOT NULL,
   `entered_year` date NOT NULL,
   `prev_own` varchar(250) NOT NULL,
-  `prev_assess` decimal(10,2) NOT NULL
+  `prev_assess` decimal(10,2) NOT NULL,
+  `faas_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `rpu_dec`
+--
+
+INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `land_id`, `pro_assess`, `pro_date`, `mun_assess`, `mun_date`, `td_cancel`, `previous_pin`, `tax_year`, `entered_by`, `entered_year`, `prev_own`, `prev_assess`, `faas_id`) VALUES
+(2, 2342, 55, 'fasdf', '2025-04-11', 'asdf', '2025-04-14', 0, 0, '0000-00-00', 234234, '0000-00-00', '34234', 42342.00, 33);
 
 -- --------------------------------------------------------
 
@@ -410,16 +415,16 @@ CREATE TABLE `rpu_idnum` (
   `arp` int(50) NOT NULL,
   `pin` int(50) NOT NULL,
   `taxability` varchar(20) NOT NULL,
-  `effectivity` varchar(255) NOT NULL
+  `effectivity` varchar(255) NOT NULL,
+  `faas_id` int(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `rpu_idnum`
 --
 
-INSERT INTO `rpu_idnum` (`rpu_id`, `arp`, `pin`, `taxability`, `effectivity`) VALUES
-(45, 2147483647, 213, 'special', '2024'),
-(46, 12345, 1234, 'taxable', '2023');
+INSERT INTO `rpu_idnum` (`rpu_id`, `arp`, `pin`, `taxability`, `effectivity`, `faas_id`) VALUES
+(46, 2342, 3456, 'special', '2024', 33);
 
 -- --------------------------------------------------------
 
@@ -568,13 +573,15 @@ ALTER TABLE `region`
 -- Indexes for table `rpu_dec`
 --
 ALTER TABLE `rpu_dec`
-  ADD PRIMARY KEY (`dec_id`);
+  ADD PRIMARY KEY (`dec_id`),
+  ADD KEY `faas_idrpudec` (`faas_id`);
 
 --
 -- Indexes for table `rpu_idnum`
 --
 ALTER TABLE `rpu_idnum`
-  ADD PRIMARY KEY (`rpu_id`);
+  ADD PRIMARY KEY (`rpu_id`),
+  ADD KEY `faas_idrpu` (`faas_id`);
 
 --
 -- Indexes for table `subclass`
@@ -603,7 +610,7 @@ ALTER TABLE `brgy`
 -- AUTO_INCREMENT for table `certification`
 --
 ALTER TABLE `certification`
-  MODIFY `cert_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `cert_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `classification`
@@ -621,13 +628,13 @@ ALTER TABLE `district`
 -- AUTO_INCREMENT for table `faas`
 --
 ALTER TABLE `faas`
-  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `land`
 --
 ALTER TABLE `land`
-  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT for table `land_use`
@@ -651,7 +658,7 @@ ALTER TABLE `owners_tb`
 -- AUTO_INCREMENT for table `propertyowner`
 --
 ALTER TABLE `propertyowner`
-  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
 
 --
 -- AUTO_INCREMENT for table `province`
@@ -663,7 +670,7 @@ ALTER TABLE `province`
 -- AUTO_INCREMENT for table `p_info`
 --
 ALTER TABLE `p_info`
-  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=145;
+  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=148;
 
 --
 -- AUTO_INCREMENT for table `region`
@@ -675,13 +682,13 @@ ALTER TABLE `region`
 -- AUTO_INCREMENT for table `rpu_dec`
 --
 ALTER TABLE `rpu_dec`
-  MODIFY `dec_id` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `dec_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `rpu_idnum`
 --
 ALTER TABLE `rpu_idnum`
-  MODIFY `rpu_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `rpu_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -709,7 +716,7 @@ ALTER TABLE `district`
 -- Constraints for table `faas`
 --
 ALTER TABLE `faas`
-  ADD CONSTRAINT `pro_id` FOREIGN KEY (`pro_id`) REFERENCES `p_info` (`p_id`);
+  ADD CONSTRAINT `pro_id` FOREIGN KEY (`pro_id`) REFERENCES `p_info` (`p_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `land`
@@ -734,6 +741,18 @@ ALTER TABLE `propertyowner`
 --
 ALTER TABLE `p_info`
   ADD CONSTRAINT `ownID_FK` FOREIGN KEY (`ownID_Fk`) REFERENCES `owners_tb` (`own_id`);
+
+--
+-- Constraints for table `rpu_dec`
+--
+ALTER TABLE `rpu_dec`
+  ADD CONSTRAINT `faas_idrpudec` FOREIGN KEY (`faas_id`) REFERENCES `faas` (`faas_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `rpu_idnum`
+--
+ALTER TABLE `rpu_idnum`
+  ADD CONSTRAINT `faas_idrpu` FOREIGN KEY (`faas_id`) REFERENCES `faas` (`faas_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
