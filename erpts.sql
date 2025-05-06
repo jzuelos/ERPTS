@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 03, 2025 at 01:14 PM
+-- Generation Time: May 06, 2025 at 05:36 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -219,7 +219,7 @@ CREATE TABLE `land_use` (
 --
 
 INSERT INTO `land_use` (`lu_id`, `report_code`, `lu_code`, `lu_description`, `lu_al`, `lu_status`) VALUES
-(1, 'SC', 'SC234', '', 60.00, 'Active');
+(2, 'SC', '43', 'SC', 65.00, 'Active');
 
 -- --------------------------------------------------------
 
@@ -402,7 +402,8 @@ CREATE TABLE `rpu_dec` (
 --
 
 INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `land_id`, `pro_assess`, `pro_date`, `mun_assess`, `mun_date`, `td_cancel`, `previous_pin`, `tax_year`, `entered_by`, `entered_year`, `prev_own`, `prev_assess`, `faas_id`) VALUES
-(2, 2342, 55, 'fasdf', '2025-04-11', 'asdf', '2025-04-14', 0, 0, '0000-00-00', 234234, '0000-00-00', '34234', 42342.00, 33);
+(26, 2342, 55, 'fasdf', '2025-05-02', 'dfasd', '2025-05-02', 0, 5423, '0000-00-00', 4325, '0000-00-00', 'fasdf', 42312.00, 33),
+(27, 2342, 56, 'fasdf', '2025-05-02', 'dfasd', '2025-05-02', 0, 5423, '0000-00-00', 4325, '0000-00-00', 'fasdf', 42312.00, 33);
 
 -- --------------------------------------------------------
 
@@ -439,6 +440,14 @@ CREATE TABLE `subclass` (
   `sc_uv` decimal(10,2) NOT NULL,
   `sc_status` enum('Active','Inactive') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `subclass`
+--
+
+INSERT INTO `subclass` (`sc_id`, `sc_code`, `sc_description`, `sc_uv`, `sc_status`) VALUES
+(1, 'RA', '34', 45.00, 'Active'),
+(2, 'RA', '45', 456.00, 'Active');
 
 -- --------------------------------------------------------
 
@@ -640,7 +649,7 @@ ALTER TABLE `land`
 -- AUTO_INCREMENT for table `land_use`
 --
 ALTER TABLE `land_use`
-  MODIFY `lu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `lu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `municipality`
@@ -682,13 +691,19 @@ ALTER TABLE `region`
 -- AUTO_INCREMENT for table `rpu_dec`
 --
 ALTER TABLE `rpu_dec`
-  MODIFY `dec_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `dec_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `rpu_idnum`
 --
 ALTER TABLE `rpu_idnum`
   MODIFY `rpu_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+
+--
+-- AUTO_INCREMENT for table `subclass`
+--
+ALTER TABLE `subclass`
+  MODIFY `sc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `users`
