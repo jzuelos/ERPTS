@@ -204,43 +204,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $prev_own = $_POST['prev_own'] ?? '';
   $prev_assess = $_POST['prev_assess'] ?? 0.00;
 
-  // Use previously fetched values
-  // $faas_id and $land_id are already defined earlier
+  // faas_id should be defined from earlier context
+  // Example: $faas_id = $_POST['faas_id']; or from previous logic
 
-  $stmt = $conn->prepare("INSERT INTO rpu_dec (
+  // Get all land_id values where faas_id matches
+  $land_stmt = $conn->prepare("SELECT land_id FROM land WHERE faas_id = ?");
+  if ($land_stmt) {
+    $land_stmt->bind_param("i", $faas_id);
+    $land_stmt->execute();
+    $result = $land_stmt->get_result();
+
+    $num_lands = $result->num_rows;
+    echo "Found $num_lands land records for faas_id $faas_id.<br>";
+
+    $insert_stmt = $conn->prepare("INSERT INTO rpu_dec (
       arp_no, land_id, pro_assess, pro_date, mun_assess, mun_date,
       td_cancel, previous_pin, tax_year, entered_by, entered_year,
       prev_own, prev_assess, faas_id
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-  if ($stmt) {
-    $stmt->bind_param(
-      "iissssiiisisdi",
-      $arp_no,
-      $land_id,
-      $pro_assess,
-      $pro_date,
-      $mun_assess,
-      $mun_date,
-      $td_cancel,
-      $previous_pin,
-      $tax_year,
-      $entered_by,
-      $entered_year,
-      $prev_own,
-      $prev_assess,
-      $faas_id
-    );
+    if ($insert_stmt) {
+      while ($row = $result->fetch_assoc()) {
+        $land_id = $row['land_id'];
 
-    if ($stmt->execute()) {
-      echo "Record saved successfully.";
-    } else {
-      echo "Execution error: " . $stmt->error;
+        $insert_stmt->bind_param(
+          "iissssiiisisdi",
+          $arp_no,
+          $land_id,
+          $pro_assess,
+          $pro_date,
+          $mun_assess,
+          $mun_date,
+          $td_cancel,
+          $previous_pin,
+          $tax_year,
+          $entered_by,
+          $entered_year,
+          $prev_own,
+          $prev_assess,
+          $faas_id
+        );
+
+        if (!$insert_stmt->execute()) {
+          echo "Insert failed for land_id $land_id: " . $insert_stmt->error . "<br>";
+        }
+      }
+
+      $insert_stmt->close();
+      $land_stmt->close();
+
+      // ✅ REDIRECT AFTER SUCCESSFUL POST
+      header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . urlencode($_GET['id']));
+      exit;
     }
-
-    $stmt->close();
-  } else {
-    echo "Preparation failed: " . $conn->error;
   }
 }
 
