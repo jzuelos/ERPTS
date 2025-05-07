@@ -190,7 +190,6 @@ echo "<pre>";
 print_r($landRecords);
 echo "</pre>";
 
-// Check for form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $arp_no = $_POST['arp_no'] ?? 0;
   $pro_assess = $_POST['pro_assess'] ?? '';
@@ -205,6 +204,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $prev_own = $_POST['prev_own'] ?? '';
   $prev_assess = $_POST['prev_assess'] ?? 0.00;
 
+  // Calculate total property value (market + assessed)
+  $totals = calculateTotalLandValues($conn, $faas_id);
+  $total_market_value = $totals['total_market_value'] ?? 0;
+  $total_assess_value = $totals['total_assess_value'] ?? 0;
+  $total_property_value = $total_market_value + $total_assess_value;
+
   // Check if the faas_id already exists in the rpu_dec table
   $check_stmt = $conn->prepare("SELECT * FROM rpu_dec WHERE faas_id = ?");
   if ($check_stmt) {
@@ -213,16 +218,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = $check_stmt->get_result();
 
     if ($result->num_rows > 0) {
-      // FAAS already exists, so update the record
+      // FAAS already exists → UPDATE
       $update_stmt = $conn->prepare("UPDATE rpu_dec SET
         arp_no = ?, pro_assess = ?, pro_date = ?, mun_assess = ?, mun_date = ?,
         td_cancel = ?, previous_pin = ?, tax_year = ?, entered_by = ?, entered_year = ?,
-        prev_own = ?, prev_assess = ?
+        prev_own = ?, prev_assess = ?, total_property_value = ?
         WHERE faas_id = ?");
 
       if ($update_stmt) {
         $update_stmt->bind_param(
-          "issssiiisisdi",
+          "issssiiisisdid",
           $arp_no,
           $pro_assess,
           $pro_date,
@@ -235,14 +240,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $entered_year,
           $prev_own,
           $prev_assess,
+          $total_property_value,
           $faas_id
         );
 
         if (!$update_stmt->execute()) {
           echo "Update failed: " . $update_stmt->error . "<br>";
         } else {
-          // ✅ Redirect with an alert after successful update
-          echo "<script>alert('Tax Declaration for FAAS ID $faas_id has been successfully updated.');</script>";
+          echo "<script>alert('Updated: Tax Declaration updated for FAAS ID $faas_id. Total Property Value: ₱" . number_format($total_property_value, 2) . "');</script>";
           header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . urlencode($_GET['id']));
           exit;
         }
@@ -252,16 +257,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "Update prepare failed: " . $conn->error;
       }
     } else {
-      // FAAS does not exist, so insert a new record
+      // FAAS does not exist → INSERT
       $insert_stmt = $conn->prepare("INSERT INTO rpu_dec (
         arp_no, pro_assess, pro_date, mun_assess, mun_date,
         td_cancel, previous_pin, tax_year, entered_by, entered_year,
-        prev_own, prev_assess, faas_id
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        prev_own, prev_assess, faas_id, total_property_value
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
       if ($insert_stmt) {
         $insert_stmt->bind_param(
-          "issssiiisisdi",
+          "issssiiisisdid",
           $arp_no,
           $pro_assess,
           $pro_date,
@@ -274,14 +279,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $entered_year,
           $prev_own,
           $prev_assess,
-          $faas_id
+          $faas_id,
+          $total_property_value
         );
 
         if (!$insert_stmt->execute()) {
           echo "Insert failed: " . $insert_stmt->error . "<br>";
         } else {
-          // ✅ Redirect with an alert after successful insert
-          echo "<script>alert('New Tax Declaration for FAAS ID $faas_id has been successfully added.');</script>";
+          echo "<script>alert('Added: New Tax Declaration added for FAAS ID $faas_id. Total Property Value: ₱" . number_format($total_property_value, 2) . "');</script>";
           header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . urlencode($_GET['id']));
           exit;
         }
