@@ -190,6 +190,7 @@ echo "<pre>";
 print_r($landRecords);
 echo "</pre>";
 
+// Check for form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $arp_no = $_POST['arp_no'] ?? 0;
   $pro_assess = $_POST['pro_assess'] ?? '';
@@ -204,33 +205,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $prev_own = $_POST['prev_own'] ?? '';
   $prev_assess = $_POST['prev_assess'] ?? 0.00;
 
-  // faas_id should be defined from earlier context
-  // Example: $faas_id = $_POST['faas_id']; or from previous logic
+  // Check if the faas_id already exists in the rpu_dec table
+  $check_stmt = $conn->prepare("SELECT * FROM rpu_dec WHERE faas_id = ?");
+  if ($check_stmt) {
+    $check_stmt->bind_param("i", $faas_id);
+    $check_stmt->execute();
+    $result = $check_stmt->get_result();
 
-  // Get all land_id values where faas_id matches
-  $land_stmt = $conn->prepare("SELECT land_id FROM land WHERE faas_id = ?");
-  if ($land_stmt) {
-    $land_stmt->bind_param("i", $faas_id);
-    $land_stmt->execute();
-    $result = $land_stmt->get_result();
+    if ($result->num_rows > 0) {
+      // FAAS already exists, so update the record
+      $update_stmt = $conn->prepare("UPDATE rpu_dec SET
+        arp_no = ?, pro_assess = ?, pro_date = ?, mun_assess = ?, mun_date = ?,
+        td_cancel = ?, previous_pin = ?, tax_year = ?, entered_by = ?, entered_year = ?,
+        prev_own = ?, prev_assess = ?
+        WHERE faas_id = ?");
 
-    $num_lands = $result->num_rows;
-    echo "Found $num_lands land records for faas_id $faas_id.<br>";
-
-    $insert_stmt = $conn->prepare("INSERT INTO rpu_dec (
-      arp_no, land_id, pro_assess, pro_date, mun_assess, mun_date,
-      td_cancel, previous_pin, tax_year, entered_by, entered_year,
-      prev_own, prev_assess, faas_id
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-    if ($insert_stmt) {
-      while ($row = $result->fetch_assoc()) {
-        $land_id = $row['land_id'];
-
-        $insert_stmt->bind_param(
-          "iissssiiisisdi",
+      if ($update_stmt) {
+        $update_stmt->bind_param(
+          "issssiiisisdi",
           $arp_no,
-          $land_id,
+          $pro_assess,
+          $pro_date,
+          $mun_assess,
+          $mun_date,
+          $td_cancel,
+          $previous_pin,
+          $tax_year,
+          $entered_by,
+          $entered_year,
+          $prev_own,
+          $prev_assess,
+          $faas_id
+        );
+
+        if (!$update_stmt->execute()) {
+          echo "Update failed: " . $update_stmt->error . "<br>";
+        } else {
+          // ✅ Redirect with an alert after successful update
+          echo "<script>alert('Tax Declaration for FAAS ID $faas_id has been successfully updated.');</script>";
+          header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . urlencode($_GET['id']));
+          exit;
+        }
+
+        $update_stmt->close();
+      } else {
+        echo "Update prepare failed: " . $conn->error;
+      }
+    } else {
+      // FAAS does not exist, so insert a new record
+      $insert_stmt = $conn->prepare("INSERT INTO rpu_dec (
+        arp_no, pro_assess, pro_date, mun_assess, mun_date,
+        td_cancel, previous_pin, tax_year, entered_by, entered_year,
+        prev_own, prev_assess, faas_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+      if ($insert_stmt) {
+        $insert_stmt->bind_param(
+          "issssiiisisdi",
+          $arp_no,
           $pro_assess,
           $pro_date,
           $mun_assess,
@@ -246,17 +278,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
 
         if (!$insert_stmt->execute()) {
-          echo "Insert failed for land_id $land_id: " . $insert_stmt->error . "<br>";
+          echo "Insert failed: " . $insert_stmt->error . "<br>";
+        } else {
+          // ✅ Redirect with an alert after successful insert
+          echo "<script>alert('New Tax Declaration for FAAS ID $faas_id has been successfully added.');</script>";
+          header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . urlencode($_GET['id']));
+          exit;
         }
+
+        $insert_stmt->close();
+      } else {
+        echo "Insert prepare failed: " . $conn->error;
       }
-
-      $insert_stmt->close();
-      $land_stmt->close();
-
-      // ✅ REDIRECT AFTER SUCCESSFUL POST
-      header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . urlencode($_GET['id']));
-      exit;
     }
+
+    $check_stmt->close();
+  } else {
+    echo "Prepare failed: " . $conn->error;
   }
 }
 
