@@ -28,3 +28,65 @@
   h5 {
     color: #343a40;
   }
+
+  /*Modal Status Dropdowns */
+  .form-select {
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    height: 45px;
+    appearance: none; /* Remove default dropdown arrow */
+  }
+
+  .form-select:focus {
+    background-color: #e9ecef;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+
+  /* Custom Icon and Background for Active Option */
+  .form-select .status-active {
+    background-color: #28a745;
+    color: white;
+  }
+
+  /* Custom Icon and Background for Inactive Option */
+  .form-select .status-inactive {
+    background-color: #dc3545;
+    color: white;
+  }
+
+  /* Style the icons */
+  .form-select i {
+    margin-right: 10px; /* Add space between the icon and text */
+  }
+
+  /* Hover Effect for Dropdown */
+  .form-select:hover {
+    background-color: #e2e6ea;
+  }
+
+  /* Remove default arrow */
+  .form-select option {
+    background-color: #fff;
+    color: #000;
+  }
+
+  /* Customize Dropdown Arrow */
+  .form-select:after {
+    content: "\f0d7"; /* Bootstrap's arrow icon */
+    font-family: "Font Awesome 5 Free";
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    font-weight: bold;
+    pointer-events: none;
+  }
+
+  /* Adjusting Arrow for Proper Position */
+  .form-select {
+    position: relative;
+    padding-right: 30px;
+  }
