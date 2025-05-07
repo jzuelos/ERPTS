@@ -24,6 +24,8 @@ if ($conn->connect_error) {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="Location.css">
   <title>Electronic Real Property Tax System</title>
@@ -145,7 +147,14 @@ if ($conn->connect_error) {
               <td>{$row['c_uv']}%</td>
               <td>{$statusBadge}</td>
               <td>
-                <button class='btn btn-sm btn-outline-primary me-1' title='Edit'>
+                <button class='btn btn-sm btn-outline-primary me-1 edit-btn'
+                data-table='classification'
+                data-code='{$row['c_code']}'
+                data-description='{$row['c_description']}'
+                data-assessment='{$row['c_uv']}'
+                data-status='{$row['c_status']}'
+                data-bs-toggle='modal'
+                data-bs-target='#editClassificationModal' title='Edit'>
                   <i class='fas fa-edit'></i>
                 </button>
                 <button class='btn btn-sm btn-outline-danger' title='Delete'>
@@ -188,7 +197,15 @@ if ($conn->connect_error) {
               <td>{$row['lu_al']}%</td>
               <td>{$statusBadge}</td>
               <td>
-                <button class='btn btn-sm btn-outline-primary me-1' title='Edit'>
+                <button class='btn btn-sm btn-outline-primary me-1 edit-btn'
+                data-table='actual_uses'
+                data-report-code='{$row['report_code']}'
+                data-code='{$row['lu_code']}'
+                data-description='{$row['lu_description']}'
+                data-assessment='{$row['lu_al']}'
+                data-status='{$row['lu_status']}'
+                data-bs-toggle='modal'
+                data-bs-target='#editActualUsesModal' title='Edit'>
                   <i class='fas fa-edit'></i>
                 </button>
                 <button class='btn btn-sm btn-outline-danger' title='Delete'>
@@ -228,7 +245,14 @@ if ($conn->connect_error) {
               <td>₱" . number_format($row['sc_uv'], 2) . "</td>
               <td>{$statusBadge}</td>
               <td>
-                <button class='btn btn-sm btn-outline-primary me-1' title='Edit'>
+                <button class='btn btn-sm btn-outline-primary me-1 edit-btn'
+                data-table='sub_classes'
+                data-code='{$row['sc_code']}'
+                data-description='{$row['sc_description']}'
+                data-assessment='{$row['sc_uv']}'
+                data-status='{$row['sc_status']}'
+                data-bs-toggle='modal'
+                data-bs-target='#editSubClassesModal' title='Edit'>
                   <i class='fas fa-edit'></i>
                 </button>
                 <button class='btn btn-sm btn-outline-danger' title='Delete'>
@@ -285,6 +309,148 @@ if ($conn->connect_error) {
   </main>
 
   <!--Modal Section-->
+<!-- Table Modal Section --> 
+<!-- Edit Classification Modal -->
+<div class="modal fade" id="editClassificationModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Classification</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-2">
+          <label for="editClassificationCode" class="form-label">Code</label>
+          <input type="text" class="form-control" id="editClassificationCode" readonly>
+        </div>
+        <div class="mb-2">
+          <label for="editClassificationDescription" class="form-label">Description</label>
+          <input type="text" class="form-control" id="editClassificationDescription">
+        </div>
+        <div class="mb-2">
+          <label for="editClassificationAssessment" class="form-label">Assessment Level (%)</label>
+          <input type="number" class="form-control" id="editClassificationAssessment" min="0" max="100" step="0.01">
+        </div>
+        <div class="mb-2">
+      <label for="editClassificationStatus" class="form-label">Status</label>
+      <div class="dropdown">
+        <select class="form-select" id="editClassificationStatus" aria-label="Select status">
+          <option value="Active" class="status-active">
+            <i class="bi bi-check-circle me-2"></i>Active
+          </option>
+          <option value="Inactive" class="status-inactive">
+            <i class="bi bi-x-circle me-2"></i>Inactive
+          </option>
+        </select>
+      </div>
+    </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="saveClassificationChanges">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Edit Actual Uses Modal -->
+<div class="modal fade" id="editActualUsesModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Actual Uses</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-2">
+          <label for="editReportCode" class="form-label">Report Code</label>
+          <input type="text" class="form-control" id="editReportCode" readonly>
+        </div>
+        <div class="mb-2">
+          <label for="editActualUsesCode" class="form-label">Code</label>
+          <input type="text" class="form-control" id="editActualUsesCode" readonly>
+        </div>
+        <div class="mb-2">
+          <label for="editActualUsesDescription" class="form-label">Description</label>
+          <input type="text" class="form-control" id="editActualUsesDescription">
+        </div>
+        <div class="mb-2">
+          <label for="editActualUsesAssessment" class="form-label">Assessment Level (%)</label>
+          <input type="number" class="form-control" id="editActualUsesAssessment" min="0" max="100" step="0.01">
+        </div>
+        <div class="mb-2">
+        <label for="editActualUsesStatus" class="form-label">Status</label>
+        <div class="dropdown">
+          <select class="form-select" id="editActualUsesStatus" aria-label="Select status">
+            <option value="Active" class="status-active">
+              <i class="bi bi-check-circle me-2"></i>Active
+            </option>
+            <option value="Inactive" class="status-inactive">
+              <i class="bi bi-x-circle me-2"></i>Inactive
+            </option>
+          </select>
+        </div>
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="saveActualUsesChanges">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+    <!-- Edit Sub-Classes Modal -->
+<div class="modal fade" id="editSubClassesModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Sub-Classes</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-2">
+          <label for="editSubClassesCode" class="form-label">Code</label>
+          <input type="text" class="form-control" id="editSubClassesCode" readonly>
+        </div>
+        <div class="mb-2">
+          <label for="editSubClassesDescription" class="form-label">Description</label>
+          <input type="text" class="form-control" id="editSubClassesDescription">
+        </div>
+        <div class="mb-2">
+          <label for="editSubClassesAssessment" class="form-label">Unit Value</label>
+          <input type="number" class="form-control" id="editSubClassesAssessment" min="0" step="0.01">
+        </div>
+        <div class="mb-2">
+        <label for="editSubClassesStatus" class="form-label">Status</label>
+        <div class="dropdown">
+          <select class="form-select" id="editSubClassesStatus" aria-label="Select status">
+            <option value="Active" class="status-active">
+              <i class="bi bi-check-circle me-2"></i>Active
+            </option>
+            <option value="Inactive" class="status-inactive">
+              <i class="bi bi-x-circle me-2"></i>Inactive
+            </option>
+          </select>
+        </div>
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="saveSubClassesChanges">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+    
+
+
+<!-- Add Property Category Modal -->
   <!-- Confirmation Modal -->
   <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -305,6 +471,7 @@ if ($conn->connect_error) {
       </div>
     </div>
   </div>
+
 
   <!-- Classification Form Modal -->
   <div class="modal fade" id="classificationModal" tabindex="-1" role="dialog" aria-labelledby="classificationModalLabel" aria-hidden="true">
@@ -474,6 +641,8 @@ if ($conn->connect_error) {
     </div>
   </div>
 
+
+
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start">
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
@@ -575,6 +744,168 @@ if ($conn->connect_error) {
         document.getElementById("subClassesTable").classList.remove("d-none");
       }
     }
+
+    //Table Edit Functionality
+// Handle edit button clicks for all modals
+document.querySelectorAll('.edit-btn').forEach(button => {
+  button.addEventListener('click', function () {
+    const table = this.getAttribute('data-table'); // Which table's modal we're working with
+
+    if (table === 'classification') {
+      // Edit Classification Modal
+      document.getElementById('editClassificationCode').value = this.getAttribute('data-code');
+      document.getElementById('editClassificationDescription').value = this.getAttribute('data-description');
+      document.getElementById('editClassificationAssessment').value = this.getAttribute('data-assessment');
+      document.getElementById('editClassificationStatus').value = this.getAttribute('data-status');
+    } else if (table === 'actual_uses') {
+      // Edit Actual Uses Modal
+      document.getElementById('editReportCode').value = this.getAttribute('data-reportcode');
+      document.getElementById('editActualUsesCode').value = this.getAttribute('data-code');
+      document.getElementById('editActualUsesDescription').value = this.getAttribute('data-description');
+      document.getElementById('editActualUsesAssessment').value = this.getAttribute('data-assessment');
+      document.getElementById('editActualUsesStatus').value = this.getAttribute('data-status');
+    } else if (table === 'sub_classes') {
+      // Edit Sub-Classes Modal
+      document.getElementById('editSubClassesCode').value = this.getAttribute('data-code');
+      document.getElementById('editSubClassesDescription').value = this.getAttribute('data-description');
+      document.getElementById('editSubClassesAssessment').value = this.getAttribute('data-unitvalue');
+      document.getElementById('editSubClassesStatus').value = this.getAttribute('data-status');
+    }
+  });
+});
+
+// Save Changes for Classification Table
+document.getElementById('saveClassificationChanges').addEventListener('click', function () {
+  const code = document.getElementById('editClassificationCode').value;
+  const description = document.getElementById('editClassificationDescription').value;
+  const assessment = document.getElementById('editClassificationAssessment').value;
+  const status = document.getElementById('editClassificationStatus').value;
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "update_classification.php", true);
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      alert("Classification updated successfully!");
+      // Optionally, reload the table or update the row dynamically
+    } else {
+      alert("Error saving Classification changes.");
+    }
+  };
+  xhr.send(`code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
+});
+
+// Save Changes for Actual Uses Table
+document.getElementById('saveActualUsesChanges').addEventListener('click', function () {
+  const reportCode = document.getElementById('editReportCode').value;
+  const actualUsesCode = document.getElementById('editActualUsesCode').value;
+  const description = document.getElementById('editActualUsesDescription').value;
+  const assessment = document.getElementById('editActualUsesAssessment').value;
+  const status = document.getElementById('editActualUsesStatus').value;
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "update_actual_uses.php", true);
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      alert("Actual Uses updated successfully!");
+      // Optionally, reload the table or update the row dynamically
+    } else {
+      alert("Error saving Actual Uses changes.");
+    }
+  };
+  xhr.send(`report_code=${reportCode}&actual_uses_code=${actualUsesCode}&description=${description}&assessment=${assessment}&status=${status}`);
+});
+
+// Save Changes for Sub-Classes Table
+document.getElementById('saveSubClassesChanges').addEventListener('click', function () {
+  const code = document.getElementById('editSubClassesCode').value;
+  const description = document.getElementById('editSubClassesDescription').value;
+  const unitValue = document.getElementById('editSubClassesAssessment').value;
+  const status = document.getElementById('editSubClassesStatus').value;
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "update_sub_classes.php", true);
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      alert("Sub-Class updated successfully!");
+      // Optionally, reload the table or update the row dynamically
+    } else {
+      alert("Error saving Sub-Class changes.");
+    }
+  };
+  xhr.send(`code=${code}&description=${description}&unit_value=${unitValue}&status=${status}`);
+});
+
+
+// Function to handle the "Edit" button click for all modals
+document.querySelectorAll('.edit-btn').forEach(button => {
+  button.addEventListener('click', function () {
+    // Get the table name (classification, actual_uses, or sub_classes) from the button's data-table attribute
+    const table = this.getAttribute('data-table');
+    
+    // Check populate the modal fields based on the table type
+    if (table === 'classification') {
+      // For Classification Table
+      document.getElementById('editClassificationCode').value = this.getAttribute('data-code');
+      document.getElementById('editClassificationDescription').value = this.getAttribute('data-description');
+      document.getElementById('editClassificationAssessment').value = this.getAttribute('data-assessment');
+      document.getElementById('editClassificationStatus').value = this.getAttribute('data-status');
+    } else if (table === 'actual_uses') {
+      // For Actual Uses Table
+      document.getElementById('editReportCode').value = this.getAttribute('data-reportcode');
+      document.getElementById('editActualUsesCode').value = this.getAttribute('data-code');
+      document.getElementById('editActualUsesDescription').value = this.getAttribute('data-description');
+      document.getElementById('editActualUsesAssessment').value = this.getAttribute('data-assessment');
+      document.getElementById('editActualUsesStatus').value = this.getAttribute('data-status');
+    } else if (table === 'sub_classes') {
+      // For Sub-Classes Table
+      document.getElementById('editSubClassesCode').value = this.getAttribute('data-code');
+      document.getElementById('editSubClassesDescription').value = this.getAttribute('data-description');
+      document.getElementById('editSubClassesAssessment').value = this.getAttribute('data-unitvalue');
+      document.getElementById('editSubClassesStatus').value = this.getAttribute('data-status');
+    }
+  });
+});
+
+// Function to save changes for the Classification Table
+document.getElementById('saveClassificationChanges').addEventListener('click', function () {
+  // Get data from classification table
+  const code = document.getElementById('editClassificationCode').value;
+  const description = document.getElementById('editClassificationDescription').value;
+  const assessment = document.getElementById('editClassificationAssessment').value;
+  const status = document.getElementById('editClassificationStatus').value;
+
+  // Display a success message
+  alert("Successfully saved changes to Classification.");
+});
+
+// Function to save changes for the Actual Uses Table
+document.getElementById('saveActualUsesChanges').addEventListener('click', function () {
+  // Get the data from actual uses table
+  const reportCode = document.getElementById('editReportCode').value;
+  const actualUsesCode = document.getElementById('editActualUsesCode').value;
+  const description = document.getElementById('editActualUsesDescription').value;
+  const assessment = document.getElementById('editActualUsesAssessment').value;
+  const status = document.getElementById('editActualUsesStatus').value;
+
+  // Display a success message
+  alert("Successfully saved changes to Actual Uses.");
+});
+
+// Function to save changes for the Sub-Classes Table
+document.getElementById('saveSubClassesChanges').addEventListener('click', function () {
+  // Get the data from sub-classes table
+  const code = document.getElementById('editSubClassesCode').value;
+  const description = document.getElementById('editSubClassesDescription').value;
+  const unitValue = document.getElementById('editSubClassesAssessment').value;
+  const status = document.getElementById('editSubClassesStatus').value;
+
+  // Display a success message
+  alert("Successfully saved changes to Sub-Classes.");
+});
+
   </script>
 </body>
 
