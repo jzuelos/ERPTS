@@ -22,9 +22,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KyZXEJr+8+6g5K4r53m5s3xmw1Is0J6wBd04YOeFvXOsZTgmYF9flT/qe6LZ9s+0" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="main_layout.css">
+  <link rel="stylesheet" href="header.css">
   <link rel="stylesheet" href="RPU-Management.css">
   <title>Electronic Real Property Tax System</title>
 </head>
@@ -33,59 +40,58 @@
   <!-- Header Navigation -->
   <?php include 'header.php'; ?>
 
-  <!-- Main Body -->
-  <section class="u-clearfix u-section-1" id="sec-9208" style="margin: 50px;">
-    <div class="u-clearfix u-sheet u-sheet-1">
-      <h2 class="u-custom-font u-heading-font u-text u-text-default u-text-1" style="font-size: 1.5rem;">Real Property
-        Unit Management</h2>
-      <div class="row" style="margin-top: 100px">
-        <div class="col-md-3 mb-4">
-          <div class="card u-custom-color-4 h-100 text-center rounded-3">
-            <a href="Real-Property-Unit-List.php" class="text-decoration-none text-dark">
-              <img src="images/1504969.png" class="card-img-top" alt="Real Property Units List"
-                style="max-height: 90px; object-fit: contain;">
-              <div class="card-body">
-                <h5 class="card-title" style="font-size: 1rem;">Real Property Units List</h5>
-              </div>
-            </a>
+<!-- RPU Management Section -->
+<main class="container my-5 d-flex justify-content-center align-items-center flex-column">
+  <section class="w-100" style="max-width: 1100px;">
+    <div class="status-container mb-4 text-center">
+      <h3 class="text-secondary" style="font-size: 2rem;">RPU Management</h3>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-md-3 mb-4">
+        <a href="Real-Property-Unit-List.php" class="text-decoration-none">
+          <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+            <div class="card-body d-flex align-items-center justify-content-center flex-column text-center">
+              <i class="fas fa-building mb-3" style="font-size: 2.5rem;"></i>
+              <h5 class="font-weight-bold mb-0" style="font-size: 1.2rem;">Real Property Units List</h5>
+            </div>
           </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="card u-custom-color-4 h-100 text-center rounded-3">
-            <a href="Real-Property-Unit-List.php" class="text-decoration-none text-dark">
-              <img src="images/2991113.png" class="card-img-top" alt="Field Appraisal and Assessment Sheets"
-                style="max-height: 90px; object-fit: contain;">
-              <div class="card-body">
-                <h5 class="card-title" style="font-size: 1rem;">Field Appraisal<br>and Assessment Sheets</h5>
-              </div>
-            </a>
+        </a>
+      </div>
+      <div class="col-md-3 mb-4">
+        <a href="Real-Property-Unit-List.php" class="text-decoration-none">
+          <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+            <div class="card-body d-flex align-items-center justify-content-center flex-column text-center">
+              <i class="fas fa-file-signature mb-3" style="font-size: 2.5rem;"></i>
+              <h5 class="font-weight-bold mb-0" style="font-size: 1.2rem;">Field Appraisal<br>and Assessment Sheets</h5>
+            </div>
           </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="card u-custom-color-4 h-100 text-center rounded-3">
-            <a href="Tax-Declaration-List.php" class="text-decoration-none text-dark">
-              <img src="images/1026130.png" class="card-img-top" alt="Tax Declaration List"
-                style="max-height: 90px; object-fit: contain;">
-              <div class="card-body">
-                <h5 class="card-title" style="font-size: 1rem;">Tax Declaration List</h5>
-              </div>
-            </a>
+        </a>
+      </div>
+      <div class="col-md-3 mb-4">
+        <a href="Tax-Declaration-List.php" class="text-decoration-none">
+          <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+            <div class="card-body d-flex align-items-center justify-content-center flex-column text-center">
+              <i class="fas fa-file-invoice-dollar mb-3" style="font-size: 2.5rem;"></i>
+              <h5 class="font-weight-bold mb-0" style="font-size: 1.2rem;">Tax Declaration List</h5>
+            </div>
           </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="card u-custom-color-4 h-100 text-center rounded-3">
-            <a href="Track.php" class="text-decoration-none text-dark">
-              <img src="images/5977954.png" class="card-img-top" alt="Paper Progress"
-                style="max-height: 90px; object-fit: contain;">
-              <div class="card-body">
-                <h5 class="card-title" style="font-size: 1rem;">Paper Progress</h5>
-              </div>
-            </a>
+        </a>
+      </div>
+      <div class="col-md-3 mb-4">
+        <a href="Track.php" class="text-decoration-none">
+          <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+            <div class="card-body d-flex align-items-center justify-content-center flex-column text-center">
+              <i class="fas fa-route mb-3" style="font-size: 2.5rem;"></i>
+              <h5 class="font-weight-bold mb-0" style="font-size: 1.2rem;">Paper Progress</h5>
+            </div>
           </div>
-        </div>
+        </a>
       </div>
     </div>
   </section>
+</main>
+
 
 
   <!-- Footer -->
@@ -107,6 +113,9 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
     integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  
 </body>
 
 </html>
