@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_id'])) {
   header("Location: index.php");
   exit;
 }
-  
+
 // Cache control headers
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
@@ -759,8 +759,13 @@ $conn->close();
 
         <!-- Print Button at the Bottom Right -->
         <div class="text-right mt-4">
-          <a href="DRP.php" class="btn btn-sm btn-secondary" title="Print" target="_blank">
-            <i class="bi bi-printer"></i> Print
+          <?php
+          // Get the property ID from the current URL (e.g., FAAS.php?id=140)
+          $p_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
+          ?>
+          <a href="DRP.php?p_id=<?= urlencode($p_id); ?>"
+            class="btn btn-sm btn-secondary ml-3" title="print" target="_blank">
+            <i class="bi bi-printer"></i>
           </a>
         </div>
       </form>
@@ -1245,20 +1250,20 @@ $conn->close();
     });
   </script>
 
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const toggle = document.getElementById("showToggle");
-    const tableContainer = document.getElementById("landTableContainer");
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const toggle = document.getElementById("showToggle");
+      const tableContainer = document.getElementById("landTableContainer");
 
-    toggle.addEventListener("change", function () {
-      if (toggle.checked) {
-        tableContainer.style.display = "block";
-      } else {
-        tableContainer.style.display = "none";
-      }
+      toggle.addEventListener("change", function() {
+        if (toggle.checked) {
+          tableContainer.style.display = "block";
+        } else {
+          tableContainer.style.display = "none";
+        }
+      });
     });
-  });
-</script>
+  </script>
 
 
   <!-- Bootstrap 5 JS Bundle (Popper included) -->
