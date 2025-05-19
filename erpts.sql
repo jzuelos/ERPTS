@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 19, 2025 at 03:35 AM
+-- Generation Time: May 20, 2025 at 12:14 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -402,7 +402,7 @@ CREATE TABLE `rpu_dec` (
 --
 
 INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `pro_assess`, `pro_date`, `mun_assess`, `mun_date`, `td_cancel`, `previous_pin`, `tax_year`, `entered_by`, `entered_year`, `prev_own`, `prev_assess`, `faas_id`, `total_property_value`) VALUES
-(28, 2342, 'fasdf', '0000-00-00', '', '0000-00-00', 0, 0, '0000-00-00', 0, '0000-00-00', '34234', 0.00, 33, 38401.00);
+(28, 2342, 'fasdf', '2025-05-13', 'fsdf', '2025-05-06', 234, 0, '2025-01-01', 0, '2025-01-01', '34234', 0.00, 33, 38401.00);
 
 -- --------------------------------------------------------
 
