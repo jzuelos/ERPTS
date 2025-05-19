@@ -508,12 +508,12 @@ if ($conn->connect_error) {
             </div>
 
             <div class="form-group">
-              <label for="unitValue">Unit Value</label>
+              <label for="unitValue">Assessment Level</label>
               <div class="input-group">
                 <div class="input-group-append">
-                  <span class="input-group-text">₱</span>
+                  <span class="input-group-text">%</span>
                 </div>
-                <input type="number" class="form-control" id="unitValue" name="c_uv" placeholder="Enter Unit Value" min="0" step="0.01" required>
+                <input type="number" class="form-control" id="unitValue" name="c_uv" placeholder="Enter Assessment Level" min="0" step="0.01" required>
               </div>
             </div>
 
