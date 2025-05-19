@@ -717,7 +717,7 @@ $conn->close();
 
         <!-- Print Button at the Bottom Right -->
         <div class="text-right mt-4">
-          <a href="print-layout.php?p_id=<?= urlencode($p_id); ?>&land_id=<?= urlencode($record['land_id']); ?>"
+          <a href="DRP.php"
             class="btn btn-sm btn-secondary" title="Print" target="_blank">
             <i class="bi bi-printer"></i> Print
           </a>
