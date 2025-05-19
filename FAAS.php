@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_id'])) {
   header("Location: index.php");
   exit;
 }
-
+  
 // Cache control headers
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
@@ -252,7 +252,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       if ($update_stmt) {
         $update_stmt->bind_param(
-          "issssiiisisdid",
+          "issssiissssdid",
           $arp_no,
           $pro_assess,
           $pro_date,
@@ -291,7 +291,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       if ($insert_stmt) {
         $insert_stmt->bind_param(
-          "issssiiisisdid",
+          "issssiissssdid",
           $arp_no,
           $pro_assess,
           $pro_date,
