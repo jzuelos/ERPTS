@@ -125,6 +125,22 @@ function calculateTotalLandValues($conn, $faas_id)
   return $result->fetch_assoc(); // returns associative array with total values
 }
 
+//Fetch RPU Declaration 1
+function fetchRPUDeclaration($conn, $faas_id)
+{
+  $stmt = $conn->prepare("
+    SELECT dec_id, arp_no, pro_assess, pro_date, mun_assess, mun_date,
+           td_cancel, previous_pin, tax_year, entered_by, entered_year,
+           prev_own, prev_assess, faas_id, total_property_value
+    FROM rpu_dec
+    WHERE faas_id = ?
+  ");
+
+  $stmt->bind_param("i", $faas_id);
+  $stmt->execute();
+  return $stmt->get_result()->fetch_assoc(); // returns associative array of the record
+}
+
 // MAIN: Begin processing
 $property = null;
 $owners = [];
@@ -147,7 +163,16 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
   if ($faas_info) {
     $faas_id = $faas_info['faas_id'];
 
-    // ✅ Calculate land values right after faas_id is known
+    //Fetch RPU Declaration 2
+    $rpu_declaration = fetchRPUDeclaration($conn, $faas_id);
+
+    if ($rpu_declaration) {
+      echo "<script>console.log('RPU Declaration:', " . json_encode($rpu_declaration) . ");</script>";
+    } else {
+      echo "<script>console.log('No RPU Declaration found for FAAS ID: $faas_id');</script>";
+    }
+
+    //Calculate land values right after faas_id is known
     $totals = calculateTotalLandValues($conn, $faas_id);
     $totalMarketValue = $totals['total_market_value'] ?? 0;
     $totalAssessedValue = $totals['total_assess_value'] ?? 0;
@@ -316,7 +341,7 @@ $conn->close();
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -661,7 +686,7 @@ $conn->close();
           <div class="col-md-6 mb-3">
             <label for="taxDeclarationNumber" class="form-label">Identification Numbers (Tax Declaration Number)</label>
             <input type="text" class="form-control" id="taxDeclarationNumber" placeholder="Enter Tax Declaration Number"
-              value="<?= isset($rpu_details['arp']) ? htmlspecialchars($rpu_details['arp']) : ''; ?>" disabled>
+              value="<?= htmlspecialchars($rpu_declaration['arp_no'] ?? '') ?>" disabled>
           </div>
 
           <div class="col-12 mb-3">
@@ -671,69 +696,77 @@ $conn->close();
           <div class="col-md-6 mb-3">
             <label for="provincialAssessor" class="form-label">Provincial Assessor</label>
             <input type="text" class="form-control" id="provincialAssessor" placeholder="Enter Provincial Assessor"
-              disabled>
+              value="<?= htmlspecialchars($rpu_declaration['pro_assess'] ?? '') ?>" disabled>
           </div>
           <div class="col-md-6 mb-3">
             <label for="provincialDate" class="form-label">Date</label>
-            <input type="date" class="form-control" id="provincialDate" placeholder="Select Date" disabled>
+            <input type="date" class="form-control" id="provincialDate" placeholder="Select Date"
+              value="<?= htmlspecialchars($rpu_declaration['pro_date'] ?? '') ?>" disabled>
           </div>
 
           <div class="col-md-6 mb-3">
             <label for="municipalAssessor" class="form-label">City/Municipal Assessor</label>
             <input type="text" class="form-control" id="municipalAssessor" placeholder="Enter City/Municipal Assessor"
-              disabled>
+              value="<?= htmlspecialchars($rpu_declaration['mun_assess'] ?? '') ?>" disabled>
           </div>
 
           <div class="col-md-6 mb-3">
             <label for="municipalDate" class="form-label">Date</label>
-            <input type="date" class="form-control" id="municipalDate" placeholder="Select Date" disabled>
+            <input type="date" class="form-control" id="municipalDate" placeholder="Select Date"
+              value="<?= htmlspecialchars($rpu_declaration['mun_date'] ?? '') ?>" disabled>
           </div>
 
           <div class="col-md-6 mb-3">
             <label for="cancelsTD" class="form-label">Cancels TD Number</label>
-            <input type="text" class="form-control" id="cancelsTD" placeholder="Enter Cancels TD Number" disabled>
+            <input type="text" class="form-control" id="cancelsTD" placeholder="Enter Cancels TD Number"
+              value="<?= htmlspecialchars($rpu_declaration['td_cancel'] ?? '') ?>" disabled>
           </div>
           <div class="col-md-6 mb-3">
             <label for="previousPin" class="form-label">Previous Pin</label>
-            <input type="text" class="form-control" id="previousPin" placeholder="Enter Previous Pin" disabled>
+            <input type="text" class="form-control" id="previousPin" placeholder="Enter Previous Pin"
+              value="<?= htmlspecialchars($rpu_declaration['previous_pin'] ?? '') ?>" disabled>
           </div>
 
           <div class="col-md-6 mb-3">
             <label for="taxYear" class="form-label">Tax Begin With Year</label>
-            <input type="number" class="form-control" id="taxYear" placeholder="Enter Year" disabled>
+            <input type="date" class="form-control" id="taxYear" placeholder="Enter Year"
+              value="<?= htmlspecialchars($rpu_declaration['tax_year'] ?? '') ?>" disabled>
           </div>
 
           <div class="col-md-6 mb-3">
-            <label for="enteredInRPAREForBy" class="form-label">enteredInRPAREForBy</label>
-            <input type="text" class="form-control" id="enteredInRPAREForBy" placeholder="Enter Value" disabled>
+            <label for="enteredInRPAREForBy" class="form-label">Entered in RPARE For By</label>
+            <input type="text" class="form-control" id="enteredInRPAREForBy" placeholder="Enter Value"
+              value="<?= htmlspecialchars($rpu_declaration['entered_by'] ?? '') ?>" disabled>
           </div>
           <div class="col-md-6 mb-3">
-            <label for="enteredInRPAREForYear" class="form-label">enteredInRPAREForYear</label>
-            <input type="number" class="form-control" id="enteredInRPAREForYear" placeholder="Enter Year" disabled>
+            <label for="enteredInRPAREForYear" class="form-label">Entered in RPARE For Year</label>
+            <input type="date" class="form-control" id="enteredInRPAREForYear" placeholder="Enter Year"
+              value="<?= htmlspecialchars($rpu_declaration['entered_year'] ?? '') ?>" disabled>
           </div>
 
           <div class="col-md-6 mb-3">
             <label for="previousOwner" class="form-label">Previous Owner</label>
-            <input type="text" class="form-control" id="previousOwner" placeholder="Enter Previous Owner" disabled>
+            <input type="text" class="form-control" id="previousOwner" placeholder="Enter Previous Owner"
+              value="<?= htmlspecialchars($rpu_declaration['prev_own'] ?? '') ?>" disabled>
           </div>
 
           <div class="col-md-6 mb-3">
             <label for="previousAssessedValue" class="form-label">Previous Assessed Value</label>
             <input type="text" class="form-control" id="previousAssessedValue" placeholder="Enter Assessed Value"
-              disabled>
+              value="<?= htmlspecialchars($rpu_declaration['prev_assess'] ?? '') ?>" disabled>
           </div>
         </div>
 
         <!-- Print Button at the Bottom Right -->
         <div class="text-right mt-4">
-          <a href="DRP.php"
-            class="btn btn-sm btn-secondary" title="Print" target="_blank">
+          <a href="DRP.php" class="btn btn-sm btn-secondary" title="Print" target="_blank">
             <i class="bi bi-printer"></i> Print
           </a>
         </div>
       </form>
     </div>
   </section>
+
 
   <!-- Modal for Declaration of Property -->
   <div class="modal fade" id="editDeclarationProperty" tabindex="-1" aria-labelledby="editDeclarationPropertyLabel"
@@ -744,15 +777,12 @@ $conn->close();
           <h5 class="modal-title" id="editDeclarationPropertyLabel">Edit Declaration of Property</h5>
         </div>
         <div class="modal-body">
-          <!-- Add the form ID here -->
           <form method="POST" action="" id="declarationForm">
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label for="taxDeclarationNumberModal" class="form-label">Identification Numbers (Tax Declaration
-                  Number)</label>
+                <label for="taxDeclarationNumberModal" class="form-label">Identification Numbers (Tax Declaration Number)</label>
                 <input type="text" class="form-control" id="taxDeclarationNumberModal" name="arp_no"
-                  value="<?= isset($rpu_details['arp']) ? htmlspecialchars($rpu_details['arp']) : ''; ?>"
-                  placeholder="Enter Tax Declaration Number">
+                  value="<?= htmlspecialchars($rpu_declaration['arp_no'] ?? '') ?>" placeholder="Enter Tax Declaration Number">
               </div>
 
               <div class="col-12 mb-3">
@@ -762,59 +792,62 @@ $conn->close();
               <div class="col-md-6 mb-3">
                 <label for="provincialAssessorModal" class="form-label">Provincial Assessor</label>
                 <input type="text" class="form-control" id="provincialAssessorModal" name="pro_assess"
-                  placeholder="Enter Provincial Assessor">
+                  value="<?= htmlspecialchars($rpu_declaration['pro_assess'] ?? '') ?>" placeholder="Enter Provincial Assessor">
               </div>
               <div class="col-md-6 mb-3">
                 <label for="provincialDateModal" class="form-label">Date</label>
-                <input type="date" class="form-control" id="provincialDateModal" name="pro_date">
+                <input type="date" class="form-control" id="provincialDateModal" name="pro_date"
+                  value="<?= htmlspecialchars($rpu_declaration['pro_date'] ?? '') ?>">
               </div>
 
               <div class="col-md-6 mb-3">
                 <label for="municipalAssessorModal" class="form-label">City/Municipal Assessor</label>
                 <input type="text" class="form-control" id="municipalAssessorModal" name="mun_assess"
-                  placeholder="Enter City/Municipal Assessor">
+                  value="<?= htmlspecialchars($rpu_declaration['mun_assess'] ?? '') ?>" placeholder="Enter City/Municipal Assessor">
               </div>
               <div class="col-md-6 mb-3">
                 <label for="municipalDateModal" class="form-label">Date</label>
-                <input type="date" class="form-control" id="municipalDateModal" name="mun_date">
+                <input type="date" class="form-control" id="municipalDateModal" name="mun_date"
+                  value="<?= htmlspecialchars($rpu_declaration['mun_date'] ?? '') ?>">
               </div>
 
               <div class="col-md-6 mb-3">
                 <label for="cancelsTDModal" class="form-label">Cancels TD Number</label>
                 <input type="text" class="form-control" id="cancelsTDModal" name="td_cancel"
-                  placeholder="Enter Cancels TD Number">
+                  value="<?= htmlspecialchars($rpu_declaration['td_cancel'] ?? '') ?>" placeholder="Enter Cancels TD Number">
               </div>
               <div class="col-md-6 mb-3">
                 <label for="previousPinModal" class="form-label">Previous Pin</label>
                 <input type="text" class="form-control" id="previousPinModal" name="previous_pin"
-                  placeholder="Enter Previous Pin">
+                  value="<?= htmlspecialchars($rpu_declaration['previous_pin'] ?? '') ?>" placeholder="Enter Previous Pin">
               </div>
 
               <div class="col-md-6 mb-3">
                 <label for="taxYearModal" class="form-label">Tax Begin With Year</label>
-                <input type="number" class="form-control" id="taxYearModal" name="tax_year" placeholder="Enter Year">
+                <input type="date" class="form-control" id="taxYearModal" name="tax_year"
+                  value="<?= htmlspecialchars($rpu_declaration['tax_year'] ?? '') ?>" placeholder="Enter Year">
               </div>
 
               <div class="col-md-6 mb-3">
                 <label for="enteredInRPAREForByModal" class="form-label">Entered in RPARE For By</label>
                 <input type="text" class="form-control" id="enteredInRPAREForByModal" name="entered_by"
-                  placeholder="Enter Value">
+                  value="<?= htmlspecialchars($rpu_declaration['entered_by'] ?? '') ?>" placeholder="Enter Value">
               </div>
               <div class="col-md-6 mb-3">
                 <label for="enteredInRPAREForYearModal" class="form-label">Entered in RPARE For Year</label>
-                <input type="number" class="form-control" id="enteredInRPAREForYearModal" name="entered_year"
-                  placeholder="Enter Year">
+                <input type="date" class="form-control" id="enteredInRPAREForYearModal" name="entered_year"
+                  value="<?= htmlspecialchars($rpu_declaration['entered_year'] ?? '') ?>" placeholder="Enter Year">
               </div>
 
               <div class="col-md-6 mb-3">
                 <label for="previousOwnerModal" class="form-label">Previous Owner</label>
                 <input type="text" class="form-control" id="previousOwnerModal" name="prev_own"
-                  placeholder="Enter Previous Owner">
+                  value="<?= htmlspecialchars($rpu_declaration['prev_own'] ?? '') ?>" placeholder="Enter Previous Owner">
               </div>
               <div class="col-md-6 mb-3">
                 <label for="previousAssessedValueModal" class="form-label">Previous Assessed Value</label>
                 <input type="text" class="form-control" id="previousAssessedValueModal" name="prev_assess"
-                  placeholder="Enter Assessed Value">
+                  value="<?= htmlspecialchars($rpu_declaration['prev_assess'] ?? '') ?>" placeholder="Enter Assessed Value">
               </div>
             </div>
         </div>
@@ -828,7 +861,6 @@ $conn->close();
       </div>
     </div>
   </div>
-
 
   <!-- LAND Section -->
   <section class="container my-5" id="land-section">
@@ -1043,7 +1075,7 @@ $conn->close();
   <script>
     // Function to capitalize the first letter of each word
     function capitalizeFirstLetter(element) {
-      element.value = element.value.replace(/\b\w/g, function (char) {
+      element.value = element.value.replace(/\b\w/g, function(char) {
         return char.toUpperCase();
       });
     }
@@ -1054,7 +1086,7 @@ $conn->close();
     }
 
     // Attach the function to the 'input' event of each relevant field after DOM is fully loaded
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
       // Apply capitalization to specific input fields in the owner info section and modal
       const fieldsToCapitalize = [
         'ownerName', 'firstName', 'middleName', 'lastName',
@@ -1065,7 +1097,7 @@ $conn->close();
       fieldsToCapitalize.forEach(fieldId => {
         const inputField = document.getElementById(fieldId);
         if (inputField) {
-          inputField.addEventListener("input", function () {
+          inputField.addEventListener("input", function() {
             capitalizeFirstLetter(inputField);
           });
         }
@@ -1074,7 +1106,7 @@ $conn->close();
       // Event listener for ARD Number to restrict input to numbers only
       const ardNumberField = document.getElementById("ardNumberModal");
       if (ardNumberField) {
-        ardNumberField.addEventListener("input", function () {
+        ardNumberField.addEventListener("input", function() {
           restrictToNumbers(ardNumberField);
         });
       }
@@ -1173,7 +1205,7 @@ $conn->close();
       // Store data including FAAS ID
       arpData = {
         faasId: faasId, // Correct FAAS ID extracted from page
-        arpNumber: arpNumber,
+        arpNumber: arpNumber, 
         propertyNumber: propertyNumber,
         taxability: taxability,
         effectivity: effectivity
@@ -1181,12 +1213,12 @@ $conn->close();
 
       // Send data to FAASrpuID.php
       fetch('FAASrpuID.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(arpData)
-      })
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(arpData)
+        })
         .then(response => response.json())
         .then(data => {
           if (data.success) {
@@ -1202,13 +1234,16 @@ $conn->close();
     }
   </script>
   <script>
-  document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
       const backToTopBtn = document.getElementById('backToTopBtn');
 
-    backToTopBtn.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
     });
-});
   </script>
 
 
@@ -1221,9 +1256,9 @@ $conn->close();
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 
-<button id="backToTopBtn" title="Back to Top">
-  <i class="fas fa-arrow-up"></i>
-</button>
+  <button id="backToTopBtn" title="Back to Top">
+    <i class="fas fa-arrow-up"></i>
+  </button>
 
 </body>
 
