@@ -113,8 +113,7 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Control</title>
     <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEJr+8+6g5K4r53m5s3xmw1Is0J6wBd04YOeFvXOsZTgmYF9flT/qe6LZ9s+0" crossorigin="anonymous">
@@ -128,50 +127,7 @@ $conn->close();
 </head>
 
 <body>
-    <!-- Header Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
-        <a class="navbar-brand">
-            <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50"
-                class="d-inline-block align-top" alt="">
-            Electronic Real Property Tax System
-        </a>
-
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="Home.php">Home</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="RPU-Management.php" id="navbarDropdown" role="button"
-                        aria-haspopup="true" aria-expanded="false">
-                        RPU Management
-                    </a>
-                    <!-- Dropdown menu -->
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="Real-Property-Unit-List.php">RPU List</a>
-                        <a class="dropdown-item" href="FAAS.php">FAAS</a>
-                        <a class="dropdown-item" href="Tax-Declaration.php">Tax Declaration</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="Track.php">Track Paper</a>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="Transaction.php">Transaction</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="Reports.php">Reports</a>
-                </li>
-                <li class="nav-item ml-3">
-                    <a href="logout.php" class="btn btn-danger">Log Out</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
+      <?php include 'header.php'; ?>
 
     <!-- Main Content -->
     <section class="section-user-management">
