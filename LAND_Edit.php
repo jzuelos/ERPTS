@@ -523,289 +523,288 @@ echo "<script>
               </select>
             </div>
           </div>
-        </div>
 
-        <div class="row">
-          <div class="col-md-4 mb-4">
-            <div class="mb-3">
-              <label for="area" class="form-label">Area</label>
-              <div class="input-group">
-                <input type="text" id="area" class="form-control" placeholder="Enter area in sq m" name="area" disabled
-                  value="<?php echo htmlspecialchars($land_data['area']); ?>">
-                <div class="input-group-text">
-                  <label><input type="radio" id="sqm" name="areaUnit" value="sqm" checked> Sq m</label>
-                  <label class="ms-2"><input type="radio" id="hectare" name="areaUnit" value="hectare" disabled>
-                    Ha</label>
+          <div class="row">
+            <div class="col-md-4 mb-4">
+              <div class="mb-3">
+                <label for="area" class="form-label">Area</label>
+                <div class="input-group">
+                  <input type="text" id="area" class="form-control" placeholder="Enter area in sq m" name="area" disabled
+                    value="<?php echo htmlspecialchars($land_data['area']); ?>">
+                  <div class="input-group-text">
+                    <label><input type="radio" id="sqm" name="areaUnit" value="sqm" checked> Sq m</label>
+                    <label class="ms-2"><input type="radio" id="hectare" name="areaUnit" value="hectare" disabled>
+                      Ha</label>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="row">
-          <div class="col-md-4 mb-4">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="unitValue" class="form-label">Unit Value</label>
-                <input type="text" id="unitValue" class="form-control" placeholder="Enter unit value" name="unit_value"
-                  disabled value="<?php echo htmlspecialchars($land_data['unit_value']); ?>">
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="recom_unitValue" class="form-label">Recommended Unit Value</label>
-                <input type="text" id="recom_unitValue" class="form-control" placeholder="loading..."
-                  name="recom_unit_value" readonly value="">
-              </div>
+          <div class="row">
+            <div class="col-md-4 mb-4">
+              <label for="unitValue" class="form-label">Unit Value</label>
+              <input type="text" id="unitValue" class="form-control" placeholder="Enter unit value" name="unit_value"
+                disabled value="<?php echo htmlspecialchars($land_data['unit_value']); ?>">
             </div>
-          </div>
-        </div>
-
-        <script>
-          document.addEventListener("DOMContentLoaded", function() {
-            const subClassDropdown = document.getElementById("subClass");
-            const recomUnitValueInput = document.getElementById("recom_unitValue");
-
-            // Initial setting if something is preselected
-            const selectedOption = subClassDropdown.options[subClassDropdown.selectedIndex];
-            if (selectedOption && selectedOption.dataset.uv) {
-              recomUnitValueInput.value = selectedOption.dataset.uv;
-            }
-
-            // Listen for change
-            subClassDropdown.addEventListener("change", function() {
-              const selected = this.options[this.selectedIndex];
-              const unitValue = selected.getAttribute("data-uv") || "";
-              recomUnitValueInput.value = unitValue;
-            });
-          });
-        </script>
-
-        <div class="row">
-          <div class="col-md-4 mb-4">
-            <div class="mb-3">
-              <label for="marketValue" class="form-label">Market Value</label>
-              <input type="text" id="marketValue" class="form-control" placeholder="Enter market value"
-                name="market_value" readonly value="<?php echo htmlspecialchars($land_data['market_value']); ?>">
-            </div>
-          </div>
-        </div>
-
-
-        <!-- Value Adjustment Factor Section -->
-        <h5 class="section-title mt-5">Value Adjustment Factor</h5>
-
-        <div class="row">
-          <div class="col-md-12 mb-4">
-            <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
-            <textarea id="adjustmentFactorModal" name="adjustment_factor" class="form-control" rows="3"
-              placeholder="Enter adjustment factor"
-              disabled><?php echo htmlspecialchars($land_data['adjust_factor']); ?></textarea>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-4 mb-4">
-            <div class="mb-3">
-              <label for="percentAdjustment" class="form-label">Adjustment Factor (%)</label>
-              <input type="text" id="percentAdjustment" name="percent_adjustment" class="form-control"
-                placeholder="Enter adjustment factor" disabled
-                value="<?php echo htmlspecialchars($land_data['adjust_percent']); ?>">
-            </div>
-          </div>
-
-          <div class="col-md-4 mb-4">
-            <div class="mb-3">
-              <label for="valueAdjustment" class="form-label">Value Adjustment</label>
-              <input type="text" id="valueAdjustment" name="value_adjustment" class="form-control"
-                placeholder="Enter value adjustment" readonly
-                value="<?php echo htmlspecialchars($land_data['adjust_value']); ?>">
-            </div>
-          </div>
-
-          <div class="col-md-4 mb-4">
-            <div class="mb-3">
-              <label for="adjustedMarketValue" class="form-label">Adjusted Market Value</label>
-              <input type="text" id="adjustedMarketValue" name="adjusted_market_value" class="form-control"
-                placeholder="Enter adjusted market value" readonly
-                value="<?php echo htmlspecialchars($land_data['adjust_mv']); ?>">
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Property Assessment Section -->
-        <h5 class="section-title mt-5">Property Assessment</h5>
-        <div class="row">
-          <div class="col-md-6 mb-4">
-            <div class="mb-3">
-              <label for="assessmentLevel" class="form-label">Assessment Level</label>
-              <input type="text" id="assessmentLevel" name="assessment_level" class="form-control"
-                placeholder="Enter assessment level" disabled
-                value="<?php echo htmlspecialchars($land_data['assess_lvl']); ?>">
-            </div>
-          </div>
-          <!-- Recommended Assessment Level Field -->
-          <div class="col-md-6 mb-4">
-            <div class="mb-3">
-              <label for="recommendedAssessmentLevel" class="form-label">% Recommended Assessment Level</label>
-              <input type="text" id="recommendedAssessmentLevel" class="form-control"
-                placeholder="Enter recommended assessment level" disabled value="">
+            <!-- Recommended Unit Value -->
+            <div class="col-md-4 mb-4">
+              <label for="recom_unitValue" class="form-label">Recommended Unit Value</label>
+              <input type="text" id="recom_unitValue" class="form-control"
+                name="recom_unit_value" placeholder="loading..." readonly>
             </div>
           </div>
 
           <script>
             document.addEventListener("DOMContentLoaded", function() {
-              const actualUseDropdown = document.getElementById("actualUse");
-              const recomAssessLevelInput = document.getElementById("recommendedAssessmentLevel");
+              const subClassDropdown = document.getElementById("subClass");
+              const recomUnitValueInput = document.getElementById("recom_unitValue");
 
-              // Initial set if something is preselected
-              const selectedOption = actualUseDropdown.options[actualUseDropdown.selectedIndex];
-              if (selectedOption && selectedOption.dataset.al) {
-                recomAssessLevelInput.value = selectedOption.dataset.al + " %";
+              function updateUnitValue() {
+                const selected = subClassDropdown.options[subClassDropdown.selectedIndex];
+                if (selected && selected.dataset.uv) {
+                  recomUnitValueInput.value = selected.dataset.uv;
+                } else {
+                  recomUnitValueInput.value = "";
+                }
               }
 
-              // Listen for changes
-              actualUseDropdown.addEventListener("change", function() {
-                const selected = this.options[this.selectedIndex];
-                const assessLevel = selected.getAttribute("data-al") || "";
-                recomAssessLevelInput.value = assessLevel ? assessLevel + " %" : "";
-              });
+              // Initial set
+              updateUnitValue();
+
+              // On change
+              subClassDropdown.addEventListener("change", updateUnitValue);
             });
           </script>
 
-          <div class="col-md-6 mb-4">
-            <div class="mb-3">
-              <label for="assessedValue" class="form-label">Assessed Value</label>
-              <input type="text" id="assessedValue" name="assessed_value" class="form-control"
-                placeholder="Enter assessed value" readonly
-                value="<?php echo htmlspecialchars($land_data['assess_value']); ?>">
-            </div>
-          </div>
-        </div>
 
-        <!-- Certification Section -->
-        <div class="section-wrap px-4 mb-5">
-          <h5 class="section-title mt-4">Certification</h5>
-          <div class="row gx-4">
-            <div class="col-md-12">
-              <!-- Verified By -->
-              <div class="d-flex align-items-center mb-3">
-                <label class="form-label mb-0 me-2" style="width: 140px;">Verified By</label>
-                <select class="form-select me-2" style="width: 30%;" name="verified_by" disabled>
-                  <option disabled <?= empty($cert_data['verified']) ? 'selected' : '' ?>>Select verifier</option>
-                  <option <?= ($cert_data['verified'] ?? '') === 'Malapajo, Antonio Menorca' ? 'selected' : '' ?>>
-                    Malapajo, Antonio Menorca
-                  </option>
-                </select>
-                <button type="button" class="btn btn-outline-primary" style="width: 100px;" disabled>Verify</button>
-              </div>
-
-              <!-- Plotted By -->
-              <div class="d-flex align-items-center mb-3">
-                <label class="form-label mb-0 me-2" style="width: 140px;">Plotted By</label>
-                <select class="form-select" style="width: 30%;" name="plotted_by" disabled>
-                  <option disabled <?= empty($cert_data['plotted']) ? 'selected' : '' ?>>Select plotter</option>
-                  <option <?= ($cert_data['plotted'] ?? '') === 'Malapajo, Antonio Menorca' ? 'selected' : '' ?>>
-                    Malapajo, Antonio Menorca
-                  </option>
-                </select>
-              </div>
-
-              <!-- Noted By -->
-              <div class="d-flex align-items-center mb-3">
-                <label class="form-label mb-0 me-2" style="width: 140px;">Noted By</label>
-                <select class="form-select" style="width: 30%;" name="noted_by" disabled>
-                  <option disabled <?= empty($cert_data['noted']) ? 'selected' : '' ?>>Select noter</option>
-                  <option <?= ($cert_data['noted'] ?? '') === 'Lingon, Nestor Jacolbia' ? 'selected' : '' ?>>
-                    Lingon, Nestor Jacolbia
-                  </option>
-                </select>
-              </div>
-
-              <!-- Appraised By -->
-              <div class="d-flex align-items-center mb-3">
-                <label class="form-label mb-0 me-2" style="width: 140px;">Appraised By</label>
-                <select class="form-select me-2" style="width: 30%;" name="appraised_by" disabled>
-                  <option disabled <?= empty($cert_data['appraised']) ? 'selected' : '' ?>>Select appraiser</option>
-                  <option <?= ($cert_data['appraised'] ?? '') === 'Lingon, Nestor Jacolbia' ? 'selected' : '' ?>>
-                    Lingon, Nestor Jacolbia
-                  </option>
-                </select>
-                <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
-                <input type="date" class="form-control" name="appraisal_date" id="appraisalDate" style="width: 30%;"
-                  disabled value="<?= htmlspecialchars($cert_data['appraised_date'] ?? '') ?>">
-              </div>
-
-              <!-- Recommending Approval -->
-              <div class="d-flex align-items-center mb-3">
-                <label class="form-label mb-0 me-2" style="width: 140px;">Recommending Approval</label>
-                <select class="form-select me-2" style="width: 30%;" name="recommending_approval" disabled>
-                  <option disabled <?= empty($cert_data['recom_approval']) ? 'selected' : '' ?>>Select recommender
-                  </option>
-                  <option <?= ($cert_data['recom_approval'] ?? '') === 'Malapajo, Antonio Menorca' ? 'selected' : '' ?>>
-                    Malapajo, Antonio Menorca
-                  </option>
-                </select>
-                <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
-                <input type="date" class="form-control" name="recommendation_date" id="recommendationDate"
-                  style="width: 30%;" disabled value="<?= htmlspecialchars($cert_data['recom_date'] ?? '') ?>">
-              </div>
-
-              <!-- Approved By -->
-              <div class="d-flex align-items-center mb-3">
-                <label class="form-label mb-0 me-2" style="width: 140px;">Approved By</label>
-                <select class="form-select me-2" style="width: 30%;" name="approved_by" disabled>
-                  <option disabled <?= empty($cert_data['approved']) ? 'selected' : '' ?>>Select approver</option>
-                  <option <?= ($cert_data['approved'] ?? '') === 'Lingon, Nestor Jacolbia' ? 'selected' : '' ?>>
-                    Lingon, Nestor Jacolbia
-                  </option>
-                </select>
-                <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
-                <input type="date" class="form-control" name="approval_date" id="approvalDate" style="width: 30%;"
-                  disabled value="<?= htmlspecialchars($cert_data['approved_date'] ?? '') ?>">
+          <div class="row">
+            <div class="col-md-4 mb-4">
+              <div class="mb-3">
+                <label for="marketValue" class="form-label">Market Value</label>
+                <input type="text" id="marketValue" class="form-control" placeholder="Enter market value"
+                  name="market_value" readonly value="<?php echo htmlspecialchars($land_data['market_value']); ?>">
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Miscellaneous Section -->
-        <div class="section-wrap px-4 mb-2 border rounded p-3">
-          <h5 class="section-title mt-3">Miscellaneous</h5>
+
+          <!-- Value Adjustment Factor Section -->
+          <h5 class="section-title mt-5">Value Adjustment Factor</h5>
+
+          <div class="row">
+            <div class="col-md-12 mb-4">
+              <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
+              <textarea id="adjustmentFactorModal" name="adjustment_factor" class="form-control" rows="3"
+                placeholder="Enter adjustment factor"
+                disabled><?php echo htmlspecialchars($land_data['adjust_factor']); ?></textarea>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4 mb-4">
+              <div class="mb-3">
+                <label for="percentAdjustment" class="form-label">Adjustment Factor (%)</label>
+                <input type="text" id="percentAdjustment" name="percent_adjustment" class="form-control"
+                  placeholder="Enter adjustment factor" disabled
+                  value="<?php echo htmlspecialchars($land_data['adjust_percent']); ?>">
+              </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+              <div class="mb-3">
+                <label for="valueAdjustment" class="form-label">Value Adjustment</label>
+                <input type="text" id="valueAdjustment" name="value_adjustment" class="form-control"
+                  placeholder="Enter value adjustment" readonly
+                  value="<?php echo htmlspecialchars($land_data['adjust_value']); ?>">
+              </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+              <div class="mb-3">
+                <label for="adjustedMarketValue" class="form-label">Adjusted Market Value</label>
+                <input type="text" id="adjustedMarketValue" name="adjusted_market_value" class="form-control"
+                  placeholder="Enter adjusted market value" readonly
+                  value="<?php echo htmlspecialchars($land_data['adjust_mv']); ?>">
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Property Assessment Section -->
+          <h5 class="section-title mt-5">Property Assessment</h5>
           <div class="row">
             <div class="col-md-6 mb-4">
               <div class="mb-3">
-                <label class="form-label d-block">Idle</label>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="1" disabled
-                    <?= (isset($cert_data['idle']) && $cert_data['idle'] == 1) ? 'checked' : '' ?>>
-                  <label class="form-check-label" for="idleYes">Yes</label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="0" disabled
-                    <?= (!isset($cert_data['idle']) || $cert_data['idle'] == 0) ? 'checked' : '' ?>>
-                  <label class="form-check-label" for="idleNo">No</label>
-                </div>
+                <label for="assessmentLevel" class="form-label">Assessment Level</label>
+                <input type="text" id="assessmentLevel" name="assessment_level" class="form-control"
+                  placeholder="Enter assessment level" disabled
+                  value="<?php echo htmlspecialchars($land_data['assess_lvl']); ?>">
               </div>
             </div>
+            <!-- Recommended Assessment Level Field -->
             <div class="col-md-6 mb-4">
               <div class="mb-3">
-                <label class="form-label d-block">Contested</label>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="1"
-                    disabled <?= (isset($cert_data['contested']) && $cert_data['contested'] == 1) ? 'checked' : '' ?>>
-                  <label class="form-check-label" for="contestedYes">Yes</label>
+                <label for="recommendedAssessmentLevel" class="form-label">% Recommended Assessment Level</label>
+                <input type="text" id="recommendedAssessmentLevel" class="form-control"
+                  placeholder="Enter recommended assessment level" disabled value="">
+              </div>
+            </div>
+
+            <script>
+              document.addEventListener("DOMContentLoaded", function() {
+                const actualUseDropdown = document.getElementById("actualUse");
+                const recomAssessLevelInput = document.getElementById("recommendedAssessmentLevel");
+
+                // Initial set if something is preselected
+                const selectedOption = actualUseDropdown.options[actualUseDropdown.selectedIndex];
+                if (selectedOption && selectedOption.dataset.al) {
+                  recomAssessLevelInput.value = selectedOption.dataset.al + " %";
+                }
+
+                // Listen for changes
+                actualUseDropdown.addEventListener("change", function() {
+                  const selected = this.options[this.selectedIndex];
+                  const assessLevel = selected.getAttribute("data-al") || "";
+                  recomAssessLevelInput.value = assessLevel ? assessLevel + " %" : "";
+                });
+              });
+            </script>
+
+            <div class="col-md-6 mb-4">
+              <div class="mb-3">
+                <label for="assessedValue" class="form-label">Assessed Value</label>
+                <input type="text" id="assessedValue" name="assessed_value" class="form-control"
+                  placeholder="Enter assessed value" readonly
+                  value="<?php echo htmlspecialchars($land_data['assess_value']); ?>">
+              </div>
+            </div>
+          </div>
+
+          <!-- Certification Section -->
+          <div class="section-wrap px-4 mb-5">
+            <h5 class="section-title mt-4">Certification</h5>
+            <div class="row gx-4">
+              <div class="col-md-12">
+                <!-- Verified By -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 me-2" style="width: 140px;">Verified By</label>
+                  <select class="form-select me-2" style="width: 30%;" name="verified_by" disabled>
+                    <option disabled <?= empty($cert_data['verified']) ? 'selected' : '' ?>>Select verifier</option>
+                    <option <?= ($cert_data['verified'] ?? '') === 'Malapajo, Antonio Menorca' ? 'selected' : '' ?>>
+                      Malapajo, Antonio Menorca
+                    </option>
+                  </select>
+                  <button type="button" class="btn btn-outline-primary" style="width: 100px;" disabled>Verify</button>
                 </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="0"
-                    disabled <?= (!isset($cert_data['contested']) || $cert_data['contested'] == 0) ? 'checked' : '' ?>>
-                  <label class="form-check-label" for="contestedNo">No</label>
+
+                <!-- Plotted By -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 me-2" style="width: 140px;">Plotted By</label>
+                  <select class="form-select" style="width: 30%;" name="plotted_by" disabled>
+                    <option disabled <?= empty($cert_data['plotted']) ? 'selected' : '' ?>>Select plotter</option>
+                    <option <?= ($cert_data['plotted'] ?? '') === 'Malapajo, Antonio Menorca' ? 'selected' : '' ?>>
+                      Malapajo, Antonio Menorca
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Noted By -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 me-2" style="width: 140px;">Noted By</label>
+                  <select class="form-select" style="width: 30%;" name="noted_by" disabled>
+                    <option disabled <?= empty($cert_data['noted']) ? 'selected' : '' ?>>Select noter</option>
+                    <option <?= ($cert_data['noted'] ?? '') === 'Lingon, Nestor Jacolbia' ? 'selected' : '' ?>>
+                      Lingon, Nestor Jacolbia
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Appraised By -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 me-2" style="width: 140px;">Appraised By</label>
+                  <select class="form-select me-2" style="width: 30%;" name="appraised_by" disabled>
+                    <option disabled <?= empty($cert_data['appraised']) ? 'selected' : '' ?>>Select appraiser</option>
+                    <option <?= ($cert_data['appraised'] ?? '') === 'Lingon, Nestor Jacolbia' ? 'selected' : '' ?>>
+                      Lingon, Nestor Jacolbia
+                    </option>
+                  </select>
+                  <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
+                  <input type="date" class="form-control" name="appraisal_date" id="appraisalDate" style="width: 30%;"
+                    disabled value="<?= htmlspecialchars($cert_data['appraised_date'] ?? '') ?>">
+                </div>
+
+                <!-- Recommending Approval -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 me-2" style="width: 140px;">Recommending Approval</label>
+                  <select class="form-select me-2" style="width: 30%;" name="recommending_approval" disabled>
+                    <option disabled <?= empty($cert_data['recom_approval']) ? 'selected' : '' ?>>Select recommender
+                    </option>
+                    <option <?= ($cert_data['recom_approval'] ?? '') === 'Malapajo, Antonio Menorca' ? 'selected' : '' ?>>
+                      Malapajo, Antonio Menorca
+                    </option>
+                  </select>
+                  <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
+                  <input type="date" class="form-control" name="recommendation_date" id="recommendationDate"
+                    style="width: 30%;" disabled value="<?= htmlspecialchars($cert_data['recom_date'] ?? '') ?>">
+                </div>
+
+                <!-- Approved By -->
+                <div class="d-flex align-items-center mb-3">
+                  <label class="form-label mb-0 me-2" style="width: 140px;">Approved By</label>
+                  <select class="form-select me-2" style="width: 30%;" name="approved_by" disabled>
+                    <option disabled <?= empty($cert_data['approved']) ? 'selected' : '' ?>>Select approver</option>
+                    <option <?= ($cert_data['approved'] ?? '') === 'Lingon, Nestor Jacolbia' ? 'selected' : '' ?>>
+                      Lingon, Nestor Jacolbia
+                    </option>
+                  </select>
+                  <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
+                  <input type="date" class="form-control" name="approval_date" id="approvalDate" style="width: 30%;"
+                    disabled value="<?= htmlspecialchars($cert_data['approved_date'] ?? '') ?>">
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Submit Button -->
-        <input type="submit" name="submit" value="Submit" disabled>
+          <!-- Miscellaneous Section -->
+          <div class="section-wrap px-4 mb-2 border rounded p-3">
+            <h5 class="section-title mt-3">Miscellaneous</h5>
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <div class="mb-3">
+                  <label class="form-label d-block">Idle</label>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="1" disabled
+                      <?= (isset($cert_data['idle']) && $cert_data['idle'] == 1) ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="idleYes">Yes</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="0" disabled
+                      <?= (!isset($cert_data['idle']) || $cert_data['idle'] == 0) ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="idleNo">No</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 mb-4">
+                <div class="mb-3">
+                  <label class="form-label d-block">Contested</label>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="1"
+                      disabled <?= (isset($cert_data['contested']) && $cert_data['contested'] == 1) ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="contestedYes">Yes</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="0"
+                      disabled <?= (!isset($cert_data['contested']) || $cert_data['contested'] == 0) ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="contestedNo">No</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <input type="submit" name="submit" value="Submit" disabled>
 
       </form>
 

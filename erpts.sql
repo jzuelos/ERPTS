@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 06, 2025 at 05:36 PM
+-- Generation Time: May 19, 2025 at 03:35 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -382,7 +382,6 @@ INSERT INTO `region` (`r_id`, `r_no`) VALUES
 CREATE TABLE `rpu_dec` (
   `dec_id` int(10) NOT NULL,
   `arp_no` int(30) NOT NULL,
-  `land_id` int(50) NOT NULL,
   `pro_assess` varchar(250) NOT NULL,
   `pro_date` date NOT NULL,
   `mun_assess` varchar(250) NOT NULL,
@@ -394,16 +393,16 @@ CREATE TABLE `rpu_dec` (
   `entered_year` date NOT NULL,
   `prev_own` varchar(250) NOT NULL,
   `prev_assess` decimal(10,2) NOT NULL,
-  `faas_id` int(11) NOT NULL
+  `faas_id` int(11) NOT NULL,
+  `total_property_value` decimal(15,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `rpu_dec`
 --
 
-INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `land_id`, `pro_assess`, `pro_date`, `mun_assess`, `mun_date`, `td_cancel`, `previous_pin`, `tax_year`, `entered_by`, `entered_year`, `prev_own`, `prev_assess`, `faas_id`) VALUES
-(26, 2342, 55, 'fasdf', '2025-05-02', 'dfasd', '2025-05-02', 0, 5423, '0000-00-00', 4325, '0000-00-00', 'fasdf', 42312.00, 33),
-(27, 2342, 56, 'fasdf', '2025-05-02', 'dfasd', '2025-05-02', 0, 5423, '0000-00-00', 4325, '0000-00-00', 'fasdf', 42312.00, 33);
+INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `pro_assess`, `pro_date`, `mun_assess`, `mun_date`, `td_cancel`, `previous_pin`, `tax_year`, `entered_by`, `entered_year`, `prev_own`, `prev_assess`, `faas_id`, `total_property_value`) VALUES
+(28, 2342, 'fasdf', '0000-00-00', '', '0000-00-00', 0, 0, '0000-00-00', 0, '0000-00-00', '34234', 0.00, 33, 38401.00);
 
 -- --------------------------------------------------------
 
@@ -691,7 +690,7 @@ ALTER TABLE `region`
 -- AUTO_INCREMENT for table `rpu_dec`
 --
 ALTER TABLE `rpu_dec`
-  MODIFY `dec_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `dec_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `rpu_idnum`

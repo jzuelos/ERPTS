@@ -10,30 +10,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['fetch'])) {
   $land_uses = $conn->query("SELECT lu_id, lu_description FROM land_use WHERE lu_status = 'Active'");
 
   $data = [
-      'classifications' => [],
-      'subclasses' => [],
-      'land_uses' => []
+    'classifications' => [],
+    'subclasses' => [],
+    'land_uses' => []
   ];
 
   while ($row = $classifications->fetch_assoc()) {
-      $data['classifications'][] = [
-          'id' => $row['c_id'],
-          'text' => "{$row['c_description']} ({$row['c_code']})"
-      ];
+    $data['classifications'][] = [
+      'id' => $row['c_id'],
+      'text' => "{$row['c_description']} ({$row['c_code']})"
+    ];
   }
 
   while ($row = $subclasses->fetch_assoc()) {
-      $data['subclasses'][] = [
-          'id' => $row['sc_id'],
-          'text' => "{$row['sc_description']} ({$row['sc_code']})"
-      ];
+    $data['subclasses'][] = [
+      'id' => $row['sc_id'],
+      'text' => "{$row['sc_description']} ({$row['sc_code']})"
+    ];
   }
 
   while ($row = $land_uses->fetch_assoc()) {
-      $data['land_uses'][] = [
-          'id' => $row['lu_id'],
-          'text' => $row['lu_description']
-      ];
+    $data['land_uses'][] = [
+      'id' => $row['lu_id'],
+      'text' => $row['lu_description']
+    ];
   }
 
   echo json_encode($data);
@@ -243,6 +243,51 @@ function insertCertification($conn, $data)
   }
 
   $stmt->close();
+}
+
+// Fetch classification
+$classificationQuery = "SELECT c_id, c_description, c_uv FROM classification WHERE c_status = 'Active'";
+$classificationResult = mysqli_query($conn, $classificationQuery);
+
+// Fetch sub-class
+$subClassQuery = "SELECT sc_id, sc_description, sc_uv FROM subclass WHERE sc_status = 'Active'";
+$subClassResult = mysqli_query($conn, $subClassQuery);
+
+// Fetch actual use
+$actualUseQuery = "SELECT lu_id, lu_description, lu_al FROM land_use WHERE lu_status = 'Active'";
+$actualUseResult = mysqli_query($conn, $actualUseQuery);
+
+// Fetch land data using faas_id
+$land_data = [];
+$land_query = $conn->prepare("SELECT * FROM land WHERE faas_id = ?");
+$land_query->bind_param("i", $faas_id);
+$land_query->execute();
+$land_result = $land_query->get_result();
+
+if ($land_result->num_rows > 0) {
+  $land_data = $land_result->fetch_assoc();
+} else {
+  die("Error: No land record found for this FAAS.");
+}
+
+$land_id = $land_data['land_id'] ?? 0; //fetch land_id
+
+echo "Land ID: " . htmlspecialchars($land_id);
+
+$land_query->close();
+
+// Fetch certification data using the land_id
+$cert_data = [];
+if (isset($land_data['land_id'])) {
+  $cert_query = $conn->prepare("SELECT * FROM certification WHERE land_id = ?");
+  $cert_query->bind_param("i", $land_data['land_id']);
+  $cert_query->execute();
+  $cert_result = $cert_query->get_result();
+
+  if ($cert_result->num_rows > 0) {
+    $cert_data = $cert_result->fetch_assoc();
+  }
+  $cert_query->close();
 }
 
 $conn->close();
@@ -803,19 +848,54 @@ $conn->close();
                 <input type="text" id="landDescModal" name="land_desc" class="form-control"
                   placeholder="Enter land description">
               </div>
-              <div class="col-md-6 mb-4">
-                <label for="classificationModal" class="form-label">Classification</label>
-                <select id="classificationModal" name="classification" class="form-select"></select>
+              <!-- Classification -->
+              <div class="col-md-6 col-12 mb-4">
+                <div class="mb-3">
+                  <label for="classification" class="form-label">Classification</label>
+                  <select id="classification" name="classification" class="form-select">
+                    <option value="">Select Classification</option>
+                    <?php while ($row = mysqli_fetch_assoc($classificationResult)): ?>
+                      <option value="<?php echo $row['c_description']; ?>"
+                        <?php echo ($land_data['classification'] == $row['c_description']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($row['c_description']); ?>
+                      </option>
+                    <?php endwhile; ?>
+                  </select>
+                </div>
               </div>
             </div>
             <div class="row">
-              <div class="col-md-6 mb-4">
-                <label for="subClassModal" class="form-label">Sub-Class</label>
-                <select id="subClassModal" name="sub_class" class="form-select"></select>
+              <!-- Actual Use -->
+              <div class="col-md-6 col-12 mb-4">
+                <div class="mb-3">
+                  <label for="actualUse" class="form-label">Actual Use</label>
+                  <select id="actualUse" name="actual_use" class="form-select">
+                    <option value="">Select Actual Use</option>
+                    <?php while ($row = mysqli_fetch_assoc($actualUseResult)): ?>
+                      <option value="<?php echo $row['lu_description']; ?>"
+                        data-al="<?php echo $row['lu_al']; ?>"
+                        <?php echo ($land_data['actual_use'] == $row['lu_description']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($row['lu_description']); ?>
+                      </option>
+                    <?php endwhile; ?>
+                  </select>
+                </div>
               </div>
-              <div class="col-md-6 mb-4">
-                <label for="actualUseModal" class="form-label">Actual Use</label>
-                <select id="actualUseModal" name="actual_use" class="form-select"></select>
+              <!-- Sub-Class -->
+              <div class="col-md-6 col-12 mb-4">
+                <div class="mb-3">
+                  <label for="subClass" class="form-label">Sub-Class</label>
+                  <select id="subClass" name="sub_class" class="form-select">
+                    <option value="">Select Sub-Class</option>
+                    <?php while ($row = mysqli_fetch_assoc($subClassResult)): ?>
+                      <option value="<?php echo $row['sc_description']; ?>"
+                        data-uv="<?php echo $row['sc_uv']; ?>"
+                        <?php echo ($land_data['sub_class'] == $row['sc_description']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($row['sc_description']); ?>
+                      </option>
+                    <?php endwhile; ?>
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -841,187 +921,236 @@ $conn->close();
 
             <div class="row">
               <div class="col-md-6 mb-4">
-                <label for="unitValueModal" class="form-label">Unit Value</label>
-                <input type="number" id="unitValueModal" name="unit_value" class="form-control"
-                  placeholder="Enter unit value">
+                <label for="unitValue" class="form-label">Unit Value</label>
+                <input type="text" id="unitValue" class="form-control" placeholder="Enter unit value" name="unit_value"
+                  disabled value="<?php echo htmlspecialchars($land_data['unit_value']); ?>">
               </div>
+              <div class="col-md-6 mb-6">
+                <label for="recom_unitValue" class="form-label">Recommended Unit Value</label>
+                <input type="text" id="recom_unitValue" class="form-control" placeholder="loading..."
+                  name="recom_unit_value" readonly value="">
+              </div>
+            </div>
+
+            <script>
+              document.addEventListener('DOMContentLoaded', function() {
+                const modal = document.getElementById('editLandModal');
+
+                modal.addEventListener('shown.bs.modal', function() {
+                  const subClassDropdown = modal.querySelector("#subClass");
+                  const recomUnitValueInput = modal.querySelector("#recom_unitValue");
+
+                  function updateUnitValue() {
+                    const selected = subClassDropdown.options[subClassDropdown.selectedIndex];
+                    const uv = selected?.dataset.uv || "";
+                    recomUnitValueInput.value = uv;
+                  }
+
+                  // Run on modal open
+                  updateUnitValue();
+
+                  // Avoid binding multiple times
+                  subClassDropdown.removeEventListener("change", updateUnitValue);
+                  subClassDropdown.addEventListener("change", updateUnitValue);
+                });
+              });
+            </script>
+
+            <div class="row">
               <div class="col-md-4 mb-4">
-                <label for="recommendedUnitValue" class="form-label">Recommended Unit Value</label>
-                <input type="number" id="recommendedUnitValue" name="recommended_unit_value" class="form-control"
-                  placeholder="loading..." disabled>
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-6 mb-4">
-                <label for="marketValueModal" class="form-label">Market Value</label>
-                <input type="number" id="marketValueModal" name="market_value" class="form-control"
-                  placeholder="Market value" readonly>
-              </div>
-            </div>
-          </div>
-
-          <!-- Value Adjustment Factor Section in Modal -->
-          <div class="section-wrap px-4 mb-5">
-            <h5 class="section-title mt-5">Value Adjustment Factor</h5>
-            <div class="row">
-              <div class="col-md-12 mb-4">
-                <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
-                <textarea id="adjustmentFactorModal" name="adjustment_factor" class="form-control" rows="3"
-                  placeholder="Enter adjustment factor"></textarea>
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-4 mb-4">
-                <label for="percentAdjustmentModal" class="form-label">% Adjustment</label>
-                <input type="text" id="percentAdjustmentModal" name="percent_adjustment" class="form-control"
-                  value="100">
-              </div>
-              <div class="col-md-4 mb-4">
-                <label for="valueAdjustmentModal" class="form-label">Value Adjustment</label>
-                <input type="text" id="valueAdjustmentModal" name="value_adjustment" class="form-control"
-                  placeholder="Enter value adjustment" readonly>
-              </div>
-              <div class="col-md-4 mb-4">
-                <label for="adjustedMarketValueModal" class="form-label">Adjusted Market Value</label>
-                <input type="text" id="adjustedMarketValueModal" name="adjusted_market_value" class="form-control"
-                  placeholder="Enter adjusted market value" readonly>
-              </div>
-            </div>
-          </div>
-
-          <!-- Property Assessment Section in Modal -->
-          <div class="section-wrap px-4 mb-5">
-            <h5 class="section-title mt-5">Property Assessment</h5>
-            <div class="row">
-              <div class="col-md-5 mb-4">
-                <label for="assessmentLevelModal" class="form-label">Assessment Level</label>
-                <input type="number" id="assessmentLevelModal" name="assessment_level" class="form-control"
-                  placeholder="Enter assessment level">
-              </div>
-              <div class="col-md-4 mb-4 ml-5">
-                <label for="recommendedAssessmentLevelModal" class="form-label">% Recommended Assessment Level</label>
-                <input type="number" id="recommendedAssessmentLevelModal" name="recommended_assessment_level"
-                  class="form-control" placeholder="loading..." readonly>
-              </div>
-              <div class="col-md-5 mb-4">
-                <label for="assessedValueModal" class="form-label">Assessed Value</label>
-                <input type="number" id="assessedValueModal" name="assessed_value" class="form-control"
-                  placeholder="Assessed Value" readonly>
-              </div>
-            </div>
-          </div>
-
-          <!-- Certification Section Modal -->
-          <div class="section-wrap px-4 mb-5">
-            <h5 class="section-title mt-4">Certification</h5>
-            <div class="row gx-4">
-              <div class="col-md-12">
-                <!-- Verified By -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 me-2" style="width: 140px;">Verified By</label>
-                  <select class="form-select me-2" style="width: 30%;" name="verified_by">
-                    <option selected disabled>Select verifier</option>
-                    <option>Malapajo, Antonio Menorca</option>
-                  </select>
-                  <button type="button" class="btn btn-outline-primary" style="width: 100px;">Verify</button>
-                </div>
-
-                <!-- Plotted By -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 me-2" style="width: 140px;">Plotted By</label>
-                  <select class="form-select" style="width: 30%;" name="plotted_by">
-                    <option selected disabled>Select plotter</option>
-                    <option>Malapajo, Antonio Menorca</option>
-                  </select>
-                </div>
-
-                <!-- Noted By -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 me-2" style="width: 140px;">Noted By</label>
-                  <select class="form-select" style="width: 30%;" name="noted_by">
-                    <option selected disabled>Select noter</option>
-                    <option>Lingon, Nestor Jacolbia</option>
-                  </select>
-                </div>
-
-                <!-- Appraised By -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 me-2" style="width: 140px;">Appraised By</label>
-                  <select class="form-select me-2" style="width: 30%;" name="appraised_by">
-                    <option selected disabled>Select appraiser</option>
-                    <option>Lingon, Nestor Jacolbia</option>
-                  </select>
-                  <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
-                  <input type="date" class="form-control" name="appraisal_date" id="appraisalDate" style="width: 30%;">
-                </div>
-
-                <!-- Recommending Approval -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 me-2" style="width: 140px;">Recommending Approval</label>
-                  <select class="form-select me-2" style="width: 30%;" name="recommending_approval">
-                    <option selected disabled>Select recommender</option>
-                    <option>Malapajo, Antonio Menorca</option>
-                  </select>
-                  <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
-                  <input type="date" class="form-control" name="recommendation_date" id="recommendationDate" style="width: 30%;">
-                </div>
-
-                <!-- Approved By -->
-                <div class="d-flex align-items-center mb-3">
-                  <label class="form-label mb-0 me-2" style="width: 140px;">Approved By</label>
-                  <select class="form-select me-2" style="width: 30%;" name="approved_by">
-                    <option selected disabled>Select approver</option>
-                    <option>Lingon, Nestor Jacolbia</option>
-                  </select>
-                  <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
-                  <input type="date" class="form-control" name="approval_date" id="approvalDate" style="width: 30%;">
-                </div>
-              </div>
-            </div>
-          </div>
-
-
-          <!-- Miscellaneous Section Modal -->
-          <div class="section-wrap px-4 mb-5 border rounded p-3">
-            <h5 class="section-title mt-5">Miscellaneous</h5>
-            <div class="row">
-              <div class="col-md-6 mb-4">
                 <div class="mb-3">
-                  <label class="form-label d-block">Idle</label>
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="yes">
-                    <label class="form-check-label" for="idleYes">Yes</label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="no" checked>
-                    <label class="form-check-label" for="idleNo">No</label>
-                  </div>
+                  <label for="marketValue" class="form-label">Market Value</label>
+                  <input type="text" id="marketValue" class="form-control" placeholder="Enter market value"
+                    name="market_value" readonly value="<?php echo htmlspecialchars($land_data['market_value']); ?>">
                 </div>
               </div>
-              <div class="col-md-6 mb-4">
-                <div class="mb-3">
-                  <label class="form-label d-block">Contested</label>
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="yes">
-                    <label class="form-check-label" for="contestedYes">Yes</label>
+            </div>
+
+            <!-- Value Adjustment Factor Section in Modal -->
+            <div class="section-wrap px-4 mb-5">
+              <h5 class="section-title mt-5">Value Adjustment Factor</h5>
+              <div class="row">
+                <div class="col-md-12 mb-4">
+                  <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
+                  <textarea id="adjustmentFactorModal" name="adjustment_factor" class="form-control" rows="3"
+                    placeholder="Enter adjustment factor"></textarea>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-4 mb-4">
+                  <label for="percentAdjustmentModal" class="form-label">% Adjustment</label>
+                  <input type="text" id="percentAdjustmentModal" name="percent_adjustment" class="form-control"
+                    value="100">
+                </div>
+                <div class="col-md-4 mb-4">
+                  <label for="valueAdjustmentModal" class="form-label">Value Adjustment</label>
+                  <input type="text" id="valueAdjustmentModal" name="value_adjustment" class="form-control"
+                    placeholder="Enter value adjustment" readonly>
+                </div>
+                <div class="col-md-4 mb-4">
+                  <label for="adjustedMarketValueModal" class="form-label">Adjusted Market Value</label>
+                  <input type="text" id="adjustedMarketValueModal" name="adjusted_market_value" class="form-control"
+                    placeholder="Enter adjusted market value" readonly>
+                </div>
+              </div>
+            </div>
+
+            <!-- Property Assessment Section in Modal -->
+            <div class="section-wrap px-4 mb-5">
+              <h5 class="section-title mt-5">Property Assessment</h5>
+              <div class="row">
+                <div class="col-md-5 mb-4">
+                  <label for="assessmentLevelModal" class="form-label">Assessment Level</label>
+                  <input type="number" id="assessmentLevelModal" name="assessment_level" class="form-control"
+                    placeholder="Enter assessment level">
+                </div>
+                <!-- Recommended Assessment Level -->
+                <div class="col-md-4 mb-4 ml-5">
+                  <label for="recommendedAssessmentLevelModal" class="form-label">% Recommended Assessment Level</label>
+                  <input type="number" id="recommendedAssessmentLevelModal" name="recommended_assessment_level"
+                    class="form-control" placeholder="loading..." readonly>
+                </div>
+
+                <script>
+                  document.addEventListener('DOMContentLoaded', function() {
+                    const modal = document.getElementById('editLandModal');
+
+                    modal.addEventListener('shown.bs.modal', function() {
+                      const actualUseDropdown = modal.querySelector("#actualUse");
+                      const recommendedAssessmentLevelInput = modal.querySelector("#recommendedAssessmentLevelModal");
+
+                      function updateAssessmentLevel() {
+                        const selected = actualUseDropdown.options[actualUseDropdown.selectedIndex];
+                        const assessmentLevel = selected?.dataset.al || "";
+                        recommendedAssessmentLevelInput.value = assessmentLevel;
+                      }
+
+                      // Update on load
+                      updateAssessmentLevel();
+
+                      // Listen for change
+                      actualUseDropdown.addEventListener("change", updateAssessmentLevel);
+                    });
+                  });
+                </script>
+
+                <div class="col-md-5 mb-4">
+                  <label for="assessedValueModal" class="form-label">Assessed Value</label>
+                  <input type="number" id="assessedValueModal" name="assessed_value" class="form-control"
+                    placeholder="Assessed Value" readonly>
+                </div>
+              </div>
+            </div>
+
+            <!-- Certification Section Modal -->
+            <div class="section-wrap px-4 mb-5">
+              <h5 class="section-title mt-4">Certification</h5>
+              <div class="row gx-4">
+                <div class="col-md-12">
+                  <!-- Verified By -->
+                  <div class="d-flex align-items-center mb-3">
+                    <label class="form-label mb-0 me-2" style="width: 140px;">Verified By</label>
+                    <select class="form-select me-2" style="width: 30%;" name="verified_by">
+                      <option selected disabled>Select verifier</option>
+                      <option>Malapajo, Antonio Menorca</option>
+                    </select>
+                    <button type="button" class="btn btn-outline-primary" style="width: 100px;">Verify</button>
                   </div>
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="no"
-                      checked>
-                    <label class="form-check-label" for="contestedNo">No</label>
+
+                  <!-- Plotted By -->
+                  <div class="d-flex align-items-center mb-3">
+                    <label class="form-label mb-0 me-2" style="width: 140px;">Plotted By</label>
+                    <select class="form-select" style="width: 30%;" name="plotted_by">
+                      <option selected disabled>Select plotter</option>
+                      <option>Malapajo, Antonio Menorca</option>
+                    </select>
+                  </div>
+
+                  <!-- Noted By -->
+                  <div class="d-flex align-items-center mb-3">
+                    <label class="form-label mb-0 me-2" style="width: 140px;">Noted By</label>
+                    <select class="form-select" style="width: 30%;" name="noted_by">
+                      <option selected disabled>Select noter</option>
+                      <option>Lingon, Nestor Jacolbia</option>
+                    </select>
+                  </div>
+
+                  <!-- Appraised By -->
+                  <div class="d-flex align-items-center mb-3">
+                    <label class="form-label mb-0 me-2" style="width: 140px;">Appraised By</label>
+                    <select class="form-select me-2" style="width: 30%;" name="appraised_by">
+                      <option selected disabled>Select appraiser</option>
+                      <option>Lingon, Nestor Jacolbia</option>
+                    </select>
+                    <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
+                    <input type="date" class="form-control" name="appraisal_date" id="appraisalDate" style="width: 30%;">
+                  </div>
+
+                  <!-- Recommending Approval -->
+                  <div class="d-flex align-items-center mb-3">
+                    <label class="form-label mb-0 me-2" style="width: 140px;">Recommending Approval</label>
+                    <select class="form-select me-2" style="width: 30%;" name="recommending_approval">
+                      <option selected disabled>Select recommender</option>
+                      <option>Malapajo, Antonio Menorca</option>
+                    </select>
+                    <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
+                    <input type="date" class="form-control" name="recommendation_date" id="recommendationDate" style="width: 30%;">
+                  </div>
+
+                  <!-- Approved By -->
+                  <div class="d-flex align-items-center mb-3">
+                    <label class="form-label mb-0 me-2" style="width: 140px;">Approved By</label>
+                    <select class="form-select me-2" style="width: 30%;" name="approved_by">
+                      <option selected disabled>Select approver</option>
+                      <option>Lingon, Nestor Jacolbia</option>
+                    </select>
+                    <label class="form-label mb-0 me-2" style="width: 60px;">Date</label>
+                    <input type="date" class="form-control" name="approval_date" id="approvalDate" style="width: 30%;">
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="reset" class="btn btn-warning">Reset</button>
-            <button type="submit" class="btn btn-primary" name="save_changes">Save Changes</button>
-          </div>
+            <!-- Miscellaneous Section Modal -->
+            <div class="section-wrap px-4 mb-5 border rounded p-3">
+              <h5 class="section-title mt-5">Miscellaneous</h5>
+              <div class="row">
+                <div class="col-md-6 mb-4">
+                  <div class="mb-3">
+                    <label class="form-label d-block">Idle</label>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="yes">
+                      <label class="form-check-label" for="idleYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="no" checked>
+                      <label class="form-check-label" for="idleNo">No</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                  <div class="mb-3">
+                    <label class="form-label d-block">Contested</label>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="yes">
+                      <label class="form-check-label" for="contestedYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="no"
+                        checked>
+                      <label class="form-check-label" for="contestedNo">No</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="reset" class="btn btn-warning">Reset</button>
+              <button type="submit" class="btn btn-primary" name="save_changes">Save Changes</button>
+            </div>
         </form> <!-- Form ends here -->
       </div>
     </div>
