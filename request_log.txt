@@ -71,3 +71,4 @@ No existing RPU ID found for faas_id: 36
 No existing RPU ID found for faas_id: 36
 {"faasId":"33","arpNumber":"2342","propertyNumber":"3456","taxability":"special","effectivity":"2024"}
 Existing RPU ID: 46
+{"faasId":"36","arpNumber":"","propertyNumber":"","taxability":"","effectivity":""}

@@ -767,7 +767,6 @@ $conn->close();
     </div>
   </section>
 
-
   <!-- Modal for Declaration of Property -->
   <div class="modal fade" id="editDeclarationProperty" tabindex="-1" aria-labelledby="editDeclarationPropertyLabel"
     aria-hidden="true">
@@ -1205,7 +1204,7 @@ $conn->close();
       // Store data including FAAS ID
       arpData = {
         faasId: faasId, // Correct FAAS ID extracted from page
-        arpNumber: arpNumber, 
+        arpNumber: arpNumber,
         propertyNumber: propertyNumber,
         taxability: taxability,
         effectivity: effectivity
