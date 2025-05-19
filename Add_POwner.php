@@ -55,7 +55,7 @@
 
       if ($stmt) {
         // Bind parameters
-        $stmt->bind_param("ssssissssss", $firstName, $middleName, $surname, $tinNumber, $houseNumber, $street, $barangay, $district, $city, $province, $ownInfo);
+        $stmt->bind_param("sssssssssss", $firstName, $middleName, $surname, $tinNumber, $houseNumber, $street, $barangay, $district, $city, $province, $ownInfo);
 
         // Execute the statement
         if ($stmt->execute()) {
