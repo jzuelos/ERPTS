@@ -900,7 +900,7 @@ $conn->close();
       </div>
 
       <!-- Value Table -->
-      <div class="table-responsive">
+      <div class="table-responsive" id="landTableContainer">
         <table class="table table-borderless text-center"> <!-- Added text-center here -->
           <thead class="border-bottom border-2">
             <tr class="border-bottom border-2">
@@ -1245,6 +1245,21 @@ $conn->close();
       });
     });
   </script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById("showToggle");
+    const tableContainer = document.getElementById("landTableContainer");
+
+    toggle.addEventListener("change", function () {
+      if (toggle.checked) {
+        tableContainer.style.display = "block";
+      } else {
+        tableContainer.style.display = "none";
+      }
+    });
+  });
+</script>
 
 
   <!-- Bootstrap 5 JS Bundle (Popper included) -->
