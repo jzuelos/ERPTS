@@ -169,8 +169,12 @@
 <div class="footer" style="padding: 10px; font-size: 15px; margin-top: -5px;">
     <p><span class="bold">IMPORTANT:</span> This declaration is issued only in connection with real property taxation and the validation herein is based on a schedule of market values prepared for the purpose. It should not be considered as title to the property.</p>
 </div>
-
-
 </body>
+<script>
+    //Automatically print after populating the fields
+    setTimeout(() => {
+         window.print();
+     }, 500); // Adjust delay if needed
+</script>
 </html>
 
