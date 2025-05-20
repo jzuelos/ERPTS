@@ -332,5 +332,4 @@ $land_properties = getLandProperties($conn, $faas_id);
         window.print();
     }, 500); // Adjust delay if needed
 </script>
-
 </html>

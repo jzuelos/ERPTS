@@ -49,8 +49,6 @@ if ($land_result->num_rows > 0) {
 
 $land_id = $land_data['land_id'] ?? 0; //fetch land_id
 
-echo "Land ID: " . htmlspecialchars($land_id);
-
 $land_query->close();
 
 // Fetch certification data using the land_id

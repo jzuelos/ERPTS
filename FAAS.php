@@ -153,7 +153,6 @@ $totalAssessedValue = 0;
 
 if (isset($_GET['id']) && !empty($_GET['id'])) {
   $property_id = intval($_GET['id']);
-  echo "<div style='margin-top:10px;'>&nbsp;&nbsp;&nbsp;&nbsp;Property ID: $property_id<br></div>";
 
   // Fetch main property
   $property = fetchProperty($conn, $property_id);
@@ -163,57 +162,30 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
   if ($faas_info) {
     $faas_id = $faas_info['faas_id'];
 
-    //Fetch RPU Declaration 2
+    // Fetch RPU Declaration
     $rpu_declaration = fetchRPUDeclaration($conn, $faas_id);
 
-    if ($rpu_declaration) {
-      echo "<script>console.log('RPU Declaration:', " . json_encode($rpu_declaration) . ");</script>";
-    } else {
-      echo "<script>console.log('No RPU Declaration found for FAAS ID: $faas_id');</script>";
-    }
-
-    //Calculate land values right after faas_id is known
+    // Calculate land values
     $totals = calculateTotalLandValues($conn, $faas_id);
     $totalMarketValue = $totals['total_market_value'] ?? 0;
     $totalAssessedValue = $totals['total_assess_value'] ?? 0;
 
-    echo "&nbsp;&nbsp;&nbsp;&nbsp;Faas ID: {$faas_info['faas_id']}<br>";
-    echo "&nbsp;&nbsp;&nbsp;&nbsp;Property Owner ID: {$faas_info['propertyowner_id']}<br>";
-
     // Fetch owner IDs
     $owner_ids = fetchPropertyOwnerIDs($conn, $property_id);
-    echo "&nbsp;&nbsp;&nbsp;&nbsp;Owner IDs: " . implode(", ", $owner_ids) . "<br>";
 
     // Fetch owner details
     if (!empty($owner_ids)) {
       $owners_details = fetchOwnersByIds($conn, $owner_ids);
-      echo "&nbsp;&nbsp;&nbsp;&nbsp;Found owners: " . count($owners_details) . "<br>";
-      foreach ($owners_details as $owner) {
-        echo "Owner ID: {$owner['own_id']}<br>";
-        echo "Owner Name: {$owner['owner_name']}<br>";
-        echo "First Name: {$owner['first_name']}<br>";
-        echo "Middle Name: {$owner['middle_name']}<br>";
-        echo "Last Name: {$owner['last_name']}<br><br>";
-      }
-    } else {
-      echo "No owners found for the given property.<br>";
     }
 
     // Fetch land records
     $landRecords = fetchLandRecords($conn, $faas_id);
     $land_id = isset($landRecords[0]['land_id']) ? $landRecords[0]['land_id'] : null;
-  } else {
-    echo "No data found for the given property ID.<br>";
   }
 
   // Fetch RPU details
   $rpu_details = fetchRPUDetails($conn, $property_id);
-} else {
-  echo "Property ID not provided.<br>";
 }
-echo "<pre>";
-print_r($landRecords);
-echo "</pre>";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $arp_no = $_POST['arp_no'] ?? 0;
@@ -883,11 +855,6 @@ $conn->close();
         $p_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
         ?>
         <div class="col-md-6 mb-3">
-          <?php if ($p_id): ?>
-            <p>Debug: p_id = <?= $p_id ?></p>
-          <?php else: ?>
-            <p>Debug: p_id is not set!</p>
-          <?php endif; ?>
           <a href="Land.php?p_id=<?= $p_id; ?>" class="btn w-100 py-2 text-white text-decoration-none"
             style="background-color: #379777; border-color: #2e8266;">
             <i class="fas fa-plus-circle me-2"></i>Add Land
