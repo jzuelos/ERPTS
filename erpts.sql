@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 20, 2025 at 12:14 AM
+-- Generation Time: May 20, 2025 at 05:39 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -95,6 +95,16 @@ CREATE TABLE `classification` (
   `c_uv` decimal(10,2) NOT NULL,
   `c_status` enum('Active','Inactive') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `classification`
+--
+
+INSERT INTO `classification` (`c_id`, `c_code`, `c_description`, `c_uv`, `c_status`) VALUES
+(5, '01', 'Residential', 20.00, 'Active'),
+(6, '02', 'Agricultural', 40.00, 'Active'),
+(7, '03', 'Commercial', 50.00, 'Active'),
+(8, '04', 'Industrial', 50.00, 'Active');
 
 -- --------------------------------------------------------
 
@@ -214,13 +224,6 @@ CREATE TABLE `land_use` (
   `lu_status` enum('Active','Inactive') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `land_use`
---
-
-INSERT INTO `land_use` (`lu_id`, `report_code`, `lu_code`, `lu_description`, `lu_al`, `lu_status`) VALUES
-(2, 'SC', '43', 'SC', 65.00, 'Active');
-
 -- --------------------------------------------------------
 
 --
@@ -264,7 +267,7 @@ CREATE TABLE `owners_tb` (
   `own_fname` varchar(20) NOT NULL,
   `own_mname` varchar(20) NOT NULL,
   `own_surname` varchar(20) NOT NULL,
-  `tin_no` int(20) NOT NULL,
+  `tin_no` varchar(20) NOT NULL,
   `house_no` varchar(20) NOT NULL,
   `street` varchar(30) NOT NULL,
   `barangay` varchar(30) NOT NULL,
@@ -279,11 +282,11 @@ CREATE TABLE `owners_tb` (
 --
 
 INSERT INTO `owners_tb` (`own_id`, `own_fname`, `own_mname`, `own_surname`, `tin_no`, `house_no`, `street`, `barangay`, `district`, `city`, `province`, `own_info`) VALUES
-(8, 'Renz', 'Balce', 'Dioneda', 0, '5', 'Purok', 'Bulala', 'District 1', 'Santa Elena', 'Camarines Norte', 'Telephone: 09922007821, Fax: , Email: rdioneda4@gmail.com, Website: '),
-(9, 'Jonard', 'Balce', 'Canaria', 0, '1', 'Purok 3', 'Alawihao', 'District 2', 'Santa elena', 'Camarines norte', 'Telephone: 09473846382, Fax: , Email: jonard@gmail.com, Website: '),
-(10, 'Rommel James', 'Balce', 'Gacho', 0, '3', 'Purok 2', 'Bagacay', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09738265234, Fax: , Email: rommel@gmail.com, Website: '),
-(11, 'John Lloyd', 'Balce', 'Zuelos', 0, '1', 'Purok 2', 'Kalamunding', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09643826422, Fax: , Email: jzuelos@gmail.com, Website: '),
-(12, 'Mark', 'Balce', 'Bertillo', 0, '3', 'Purok 1', 'Pasig', 'District 2', 'Daet', 'Camarines norte', 'Telephone: 09634618435, Fax: , Email: markbertillo@gmail.com, Website:');
+(9, 'Jonard', '', 'Canaria', '512-743-689-000', '1', 'Purok 3', 'Alawihao', 'District 2', 'Daet', 'Camarines norte', 'Telephone: 09473846382, Fax: , Email: jonard@gmail.com, Website: '),
+(10, 'Rommel James', '', 'Gacho', '834-526-174-000', '3', 'Purok 2', 'Bagacay', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09738265234, Fax: , Email: rommel@gmail.com, Website: '),
+(11, 'John Lloyd', '', 'Zuelos', '279-318-450-000', '1', 'Purok 2', 'Kalamunding', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09643826422, Fax: , Email: jzuelos@gmail.com, Website: '),
+(12, 'Mark', '', 'Bertillo', '961-407-235-000', '3', 'Purok 1', 'Pasig', 'District 2', 'Daet', 'Camarines norte', 'Telephone: 09634618435, Fax: , Email: markbertillo@gmail.com, Website:'),
+(13, 'Renz', 'Balce', 'Dioneda', '407-129-568-000', '5', 'Purok', 'Bulala', 'District 2', 'Santa elena', 'Camarines norte', 'Telephone: 09922007821, Fax: , Email: rdioneda4@gmail.com, Website: ');
 
 -- --------------------------------------------------------
 
@@ -352,8 +355,8 @@ CREATE TABLE `p_info` (
 --
 
 INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`) VALUES
-(144, 12, 23, 0, 'Province 1', 'Daet', 'District 1', 'Kalamunding', '', 0, 302, '   ', 'affidavit, barangay'),
-(147, 12, 23, 0, '54', '3', 'District 2', '67', '', 453, 3453, '   ', 'affidavit, barangay');
+(144, 12, 23, 0, 'Province 1', 'Daet', 'District 1', 'Barangay II', '', 0, 302, '   ', 'affidavit, barangay'),
+(147, 12, 23, 0, 'Camarines Norte', 'Daet', 'District 1', 'Barangay II', '', 453, 3453, '   ', 'affidavit, barangay');
 
 -- --------------------------------------------------------
 
@@ -624,7 +627,7 @@ ALTER TABLE `certification`
 -- AUTO_INCREMENT for table `classification`
 --
 ALTER TABLE `classification`
-  MODIFY `c_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `c_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `district`
@@ -660,7 +663,7 @@ ALTER TABLE `municipality`
 -- AUTO_INCREMENT for table `owners_tb`
 --
 ALTER TABLE `owners_tb`
-  MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `propertyowner`
