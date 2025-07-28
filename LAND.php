@@ -333,7 +333,7 @@ $conn->close();
       <div>
 
         <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
-          data-bs-target="#editLandModal">Edit</button>
+          data-bs-target="#editLandModal">Add</button>
       </div>
     </div>
 
@@ -720,13 +720,13 @@ $conn->close();
   </section>
 
 
-  <!-- Modal for Editing Land Details -->
+  <!-- Modal for Adding Land Details -->
   <div class="modal fade" id="editLandModal" tabindex="-1" aria-labelledby="editLandModalLabel" aria-hidden="true">
     <div class="modal-dialog" style="max-width: 55%; width: 55%;">
       <div class="modal-content">
         <form method="POST" action=""> <!-- Form starts here -->
           <div class="modal-header">
-            <h5 class="modal-title" id="editLandModalLabel">Edit Land Details</h5>
+            <h5 class="modal-title" id="editLandModalLabel">Add Land</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
 

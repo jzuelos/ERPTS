@@ -72,3 +72,35 @@ No existing RPU ID found for faas_id: 36
 {"faasId":"33","arpNumber":"2342","propertyNumber":"3456","taxability":"special","effectivity":"2024"}
 Existing RPU ID: 46
 {"faasId":"36","arpNumber":"","propertyNumber":"","taxability":"","effectivity":""}
+{"faasId":"36","arpNumber":"","propertyNumber":"","taxability":"","effectivity":""}
+{"faasId":"36","arpNumber":"3242","propertyNumber":"4234","taxability":"","effectivity":"4234"}
+{"faasId":"36","arpNumber":"3242","propertyNumber":"4234","taxability":"taxable","effectivity":"4234"}
+No existing RPU ID found for faas_id: 36
+{"faasId":"36","arpNumber":"4234","propertyNumber":"23423","taxability":"taxable","effectivity":"423423"}
+No existing RPU ID found for faas_id: 36
+{"faasId":"36","arpNumber":"432","propertyNumber":"4234","taxability":"taxable","effectivity":"234"}
+No existing RPU ID found for faas_id: 36
+{"faasId":"36","arpNumber":"324","propertyNumber":"234","taxability":"exempt","effectivity":"234"}
+No existing RPU ID found for faas_id: 36
+{"faasId":"33","arpNumber":"234243","propertyNumber":"3456","taxability":"special","effectivity":"2024"}
+Existing RPU ID: 46
+{"faasId":"36","arpNumber":"4234","propertyNumber":"4234","taxability":"exempt","effectivity":"23423"}
+No existing RPU ID found for faas_id: 36
+{"faasId":"33","arpNumber":"2342434234","propertyNumber":"3456","taxability":"special","effectivity":"2024"}
+Existing RPU ID: 46
+{"faasId":"33","arpNumber":"2342434234","propertyNumber":"34564234","taxability":"special","effectivity":"2024"}
+Existing RPU ID: 46
+{"faasId":"36","arpNumber":"4234","propertyNumber":"23423","taxability":"taxable","effectivity":"4234"}
+No existing RPU ID found for faas_id: 36
+{"faasId":"36","arpNumber":"32423","propertyNumber":"2342","taxability":"taxable","effectivity":"23423"}
+{"faasId":"33","arpNumber":"2147483647432","propertyNumber":"34564234","taxability":"special","effectivity":"2024"}
+Existing RPU ID: 46
+{"faasId":"36","arpNumber":"4234","propertyNumber":"42342","taxability":"","effectivity":"423423"}
+{"faasId":"36","arpNumber":"4234","propertyNumber":"42342","taxability":"taxable","effectivity":"423423"}
+{"faasId":"36","arpNumber":"4234","propertyNumber":"23423","taxability":"exempt","effectivity":"23423"}
+No existing RPU ID found for faas_id: 36
+{"faasId":"36","arpNumber":"4234","propertyNumber":"32434","taxability":"taxable","effectivity":"4234"}
+No existing RPU ID found for faas_id: 36
+Attempting INSERT into rpu_idnum with: arp=4234, pin=32434, taxability=taxable, effectivity=4234
+{"faasId":"36","arpNumber":"42342","propertyNumber":"23423","taxability":"taxable","effectivity":"42342"}
+{"faasId":"36","arpNumber":"42342","propertyNumber":"23423","taxability":"exempt","effectivity":"42342"}

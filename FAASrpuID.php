@@ -1,36 +1,33 @@
 <?php
-header('Content-Type: application/json'); // Ensure JSON response
+header('Content-Type: application/json');
 
-// Enable error logging
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('log_errors', 1);
 ini_set('error_log', 'php_errors.log');
 
-require_once 'database.php'; // Database connection
+require_once 'database.php';
 
 $conn = Database::getInstance();
 if ($conn->connect_error) {
     exit(json_encode(['success' => false, 'error' => 'Database connection failed.']));
 }
 
-// Read and decode JSON input
+// Get JSON input
 $data = json_decode(file_get_contents('php://input'), true);
-file_put_contents('request_log.txt', json_encode($data) . PHP_EOL, FILE_APPEND); // Log request data
+file_put_contents('request_log.txt', json_encode($data) . PHP_EOL, FILE_APPEND);
 
-// Validate input fields
 if (empty($data['arpNumber']) || empty($data['propertyNumber']) || empty($data['taxability']) || empty($data['effectivity']) || empty($data['faasId'])) {
     exit(json_encode(['success' => false, 'error' => 'Missing required fields.']));
 }
 
-// Assign values
 $arpNumber = $data['arpNumber'];
 $propertyNumber = $data['propertyNumber'];
 $taxability = $data['taxability'];
 $effectivity = $data['effectivity'];
-$faasId = $data['faasId']; // Get faas_id from request
+$faasId = $data['faasId'];
 
-// Step 1: Check if rpu_idno already exists in faas table
+// Step 1: Check if faas has rpu_idno
 $check_sql = "SELECT rpu_idno FROM faas WHERE faas_id = ?";
 $check_stmt = $conn->prepare($check_sql);
 $check_stmt->bind_param("i", $faasId);
@@ -43,49 +40,44 @@ if ($check_result->num_rows > 0) {
     $existing_rpu_id = $row['rpu_idno'];
 
     if (!empty($existing_rpu_id)) {
-        // Step 2: If rpu_idno exists, update rpu_idnum table
-        $update_sql = "UPDATE rpu_idnum SET arp = ?, pin = ?, taxability = ?, effectivity = ? WHERE rpu_id = ?";
+        // Step 2: Update rpu_idnum
+        $update_sql = "UPDATE rpu_idnum SET arp = ?, pin = ?, taxability = ?, effectivity = ?, faas_id = ? WHERE rpu_id = ?";
         $update_stmt = $conn->prepare($update_sql);
-        $update_stmt->bind_param("iissi", $arpNumber, $propertyNumber, $taxability, $effectivity, $existing_rpu_id);
-
-        file_put_contents('request_log.txt', "Existing RPU ID: $existing_rpu_id\n", FILE_APPEND); // Debugging log
+        $update_stmt->bind_param("iissii", $arpNumber, $propertyNumber, $taxability, $effectivity, $faasId, $existing_rpu_id);
 
         if ($update_stmt->execute()) {
-            exit(json_encode(['success' => true, 'message' => 'rpu_idnum record updated successfully.']));
+            exit(json_encode(['success' => true, 'message' => 'rpu_idnum updated.']));
         } else {
-            exit(json_encode(['success' => false, 'error' => 'Failed to update rpu_idnum.']));
+            exit(json_encode(['success' => false, 'error' => 'Update failed.']));
         }
-    }else {
-        file_put_contents('request_log.txt', "No existing RPU ID found for faas_id: $faasId\n", FILE_APPEND); // Debugging log
     }
 }
 
-// Step 3: If no existing rpu_idno, insert a new record in rpu_idnum
-$sql = "INSERT INTO rpu_idnum (arp, pin, taxability, effectivity) VALUES (?, ?, ?, ?)";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("iiss", $arpNumber, $propertyNumber, $taxability, $effectivity);
+// Step 3: Insert new rpu_idnum record
+$insert_sql = "INSERT INTO rpu_idnum (arp, pin, taxability, effectivity, faas_id) VALUES (?, ?, ?, ?, ?)";
+$insert_stmt = $conn->prepare($insert_sql);
+$insert_stmt->bind_param("iissi", $arpNumber, $propertyNumber, $taxability, $effectivity, $faasId);
 
-if (!$stmt->execute()) {
-    exit(json_encode(['success' => false, 'error' => 'Failed to insert into rpu_idnum.']));
+if (!$insert_stmt->execute()) {
+    exit(json_encode(['success' => false, 'error' => 'Insert into rpu_idnum failed.']));
 }
 
-// Get the last inserted rpu_id
-$rpu_id = $conn->insert_id;
-$stmt->close();
+$new_rpu_id = $conn->insert_id;
+$insert_stmt->close();
 
-// Step 4: Update faas table with new rpu_idno
-$sql2 = "UPDATE faas SET rpu_idno = ? WHERE faas_id = ?";
-$stmt2 = $conn->prepare($sql2);
-$stmt2->bind_param("ii", $rpu_id, $faasId);
+// Step 4: Update faas table with new rpu_id
+$update_faas_sql = "UPDATE faas SET rpu_idno = ? WHERE faas_id = ?";
+$update_faas_stmt = $conn->prepare($update_faas_sql);
+$update_faas_stmt->bind_param("ii", $new_rpu_id, $faasId);
 
-if (!$stmt2->execute()) {
-    exit(json_encode(['success' => false, 'error' => 'Failed to update faas table.']));
+if (!$update_faas_stmt->execute()) {
+    exit(json_encode(['success' => false, 'error' => 'Failed to update faas with new rpu_idno.']));
 }
 
-$stmt2->close();
+$update_faas_stmt->close();
 
-// Success response
 exit(json_encode([
     'success' => true,
-    'message' => 'Data inserted and faas table updated successfully.',
+    'message' => 'New rpu_idnum inserted and faas updated.',
+    'rpu_id' => $new_rpu_id
 ]));
