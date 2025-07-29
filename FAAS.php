@@ -83,6 +83,15 @@ function fetchFaasInfo($conn, $property_id)
   return $stmt->get_result()->fetch_assoc();
 }
 
+// Fetch faas_id from GET parameter(important echo DO NOT DELETE)
+$property_id = $_GET['id'] ?? null;
+$faas_info = fetchFaasInfo($conn, $property_id);
+if ($faas_info) {
+  $faas_id = $faas_info['faas_id'];
+
+  echo "<div id='faas-id'>Faas ID: " . htmlspecialchars($faas_id) . "</div>";
+}
+
 // Fetch RPU ID and details
 function fetchRPUDetails($conn, $property_id)
 {
@@ -735,8 +744,8 @@ $conn->close();
           // Get the property ID from the current URL (e.g., FAAS.php?id=140)
           $p_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
           ?>
-          <a href="DRP.php?p_id=<?= urlencode($p_id); ?>"
-            class="btn btn-sm btn-secondary ml-3" title="print" target="_blank">
+          <a href="DRP.php?p_id=<?= urlencode($p_id); ?>" class="btn btn-sm btn-secondary ml-3" title="print"
+            target="_blank">
             <i class="bi bi-printer"></i>
           </a>
         </div>
@@ -756,9 +765,11 @@ $conn->close();
           <form method="POST" action="" id="declarationForm">
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label for="taxDeclarationNumberModal" class="form-label">Identification Numbers (Tax Declaration Number)</label>
+                <label for="taxDeclarationNumberModal" class="form-label">Identification Numbers (Tax Declaration
+                  Number)</label>
                 <input type="text" class="form-control" id="taxDeclarationNumberModal" name="arp_no"
-                  value="<?= htmlspecialchars($rpu_declaration['arp_no'] ?? '') ?>" placeholder="Enter Tax Declaration Number">
+                  value="<?= htmlspecialchars($rpu_declaration['arp_no'] ?? '') ?>"
+                  placeholder="Enter Tax Declaration Number">
               </div>
 
               <div class="col-12 mb-3">
@@ -768,7 +779,8 @@ $conn->close();
               <div class="col-md-6 mb-3">
                 <label for="provincialAssessorModal" class="form-label">Provincial Assessor</label>
                 <input type="text" class="form-control" id="provincialAssessorModal" name="pro_assess"
-                  value="<?= htmlspecialchars($rpu_declaration['pro_assess'] ?? '') ?>" placeholder="Enter Provincial Assessor">
+                  value="<?= htmlspecialchars($rpu_declaration['pro_assess'] ?? '') ?>"
+                  placeholder="Enter Provincial Assessor">
               </div>
               <div class="col-md-6 mb-3">
                 <label for="provincialDateModal" class="form-label">Date</label>
@@ -779,7 +791,8 @@ $conn->close();
               <div class="col-md-6 mb-3">
                 <label for="municipalAssessorModal" class="form-label">City/Municipal Assessor</label>
                 <input type="text" class="form-control" id="municipalAssessorModal" name="mun_assess"
-                  value="<?= htmlspecialchars($rpu_declaration['mun_assess'] ?? '') ?>" placeholder="Enter City/Municipal Assessor">
+                  value="<?= htmlspecialchars($rpu_declaration['mun_assess'] ?? '') ?>"
+                  placeholder="Enter City/Municipal Assessor">
               </div>
               <div class="col-md-6 mb-3">
                 <label for="municipalDateModal" class="form-label">Date</label>
@@ -790,12 +803,14 @@ $conn->close();
               <div class="col-md-6 mb-3">
                 <label for="cancelsTDModal" class="form-label">Cancels TD Number</label>
                 <input type="text" class="form-control" id="cancelsTDModal" name="td_cancel"
-                  value="<?= htmlspecialchars($rpu_declaration['td_cancel'] ?? '') ?>" placeholder="Enter Cancels TD Number">
+                  value="<?= htmlspecialchars($rpu_declaration['td_cancel'] ?? '') ?>"
+                  placeholder="Enter Cancels TD Number">
               </div>
               <div class="col-md-6 mb-3">
                 <label for="previousPinModal" class="form-label">Previous Pin</label>
                 <input type="text" class="form-control" id="previousPinModal" name="previous_pin"
-                  value="<?= htmlspecialchars($rpu_declaration['previous_pin'] ?? '') ?>" placeholder="Enter Previous Pin">
+                  value="<?= htmlspecialchars($rpu_declaration['previous_pin'] ?? '') ?>"
+                  placeholder="Enter Previous Pin">
               </div>
 
               <div class="col-md-6 mb-3">
@@ -818,12 +833,14 @@ $conn->close();
               <div class="col-md-6 mb-3">
                 <label for="previousOwnerModal" class="form-label">Previous Owner</label>
                 <input type="text" class="form-control" id="previousOwnerModal" name="prev_own"
-                  value="<?= htmlspecialchars($rpu_declaration['prev_own'] ?? '') ?>" placeholder="Enter Previous Owner">
+                  value="<?= htmlspecialchars($rpu_declaration['prev_own'] ?? '') ?>"
+                  placeholder="Enter Previous Owner">
               </div>
               <div class="col-md-6 mb-3">
                 <label for="previousAssessedValueModal" class="form-label">Previous Assessed Value</label>
                 <input type="text" class="form-control" id="previousAssessedValueModal" name="prev_assess"
-                  value="<?= htmlspecialchars($rpu_declaration['prev_assess'] ?? '') ?>" placeholder="Enter Assessed Value">
+                  value="<?= htmlspecialchars($rpu_declaration['prev_assess'] ?? '') ?>"
+                  placeholder="Enter Assessed Value">
               </div>
             </div>
         </div>
@@ -1046,7 +1063,7 @@ $conn->close();
   <script>
     // Function to capitalize the first letter of each word
     function capitalizeFirstLetter(element) {
-      element.value = element.value.replace(/\b\w/g, function(char) {
+      element.value = element.value.replace(/\b\w/g, function (char) {
         return char.toUpperCase();
       });
     }
@@ -1057,7 +1074,7 @@ $conn->close();
     }
 
     // Attach the function to the 'input' event of each relevant field after DOM is fully loaded
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       // Apply capitalization to specific input fields in the owner info section and modal
       const fieldsToCapitalize = [
         'ownerName', 'firstName', 'middleName', 'lastName',
@@ -1068,7 +1085,7 @@ $conn->close();
       fieldsToCapitalize.forEach(fieldId => {
         const inputField = document.getElementById(fieldId);
         if (inputField) {
-          inputField.addEventListener("input", function() {
+          inputField.addEventListener("input", function () {
             capitalizeFirstLetter(inputField);
           });
         }
@@ -1077,7 +1094,7 @@ $conn->close();
       // Event listener for ARD Number to restrict input to numbers only
       const ardNumberField = document.getElementById("ardNumberModal");
       if (ardNumberField) {
-        ardNumberField.addEventListener("input", function() {
+        ardNumberField.addEventListener("input", function () {
           restrictToNumbers(ardNumberField);
         });
       }
@@ -1182,14 +1199,17 @@ $conn->close();
         effectivity: effectivity
       };
 
+      //Print data to console for debugging
+      console.log("Sending ARP Data:", arpData);
+
       // Send data to FAASrpuID.php
       fetch('FAASrpuID.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(arpData)
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(arpData)
+      })
         .then(response => response.json())
         .then(data => {
           if (data.success) {
@@ -1218,11 +1238,11 @@ $conn->close();
   </script>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       const toggle = document.getElementById("showToggle");
       const tableContainer = document.getElementById("landTableContainer");
 
-      toggle.addEventListener("change", function() {
+      toggle.addEventListener("change", function () {
         if (toggle.checked) {
           tableContainer.style.display = "block";
         } else {
