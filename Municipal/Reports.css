@@ -1,0 +1,92 @@
+
+/* General Body Styles */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa; 
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+/* Card Styles */
+.card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+  background-color: #ffffff;
+  padding: 30px;
+}
+
+/* Form Group Styles */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-check {
+  margin-bottom: 1rem; 
+}
+
+.form-check-label {
+  font-weight: 600;
+  color: #555; 
+}
+
+/* Input and Select Styles */
+.form-control {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 10px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #1d72b8; 
+  box-shadow: 0 0 5px rgba(29, 114, 184, 0.3);
+  outline: none;
+}
+
+/* Checkbox Styles */
+.form-check-input {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-top: 0.2rem; 
+  margin-right: 10px; 
+}
+
+.form-check-label {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 0; 
+}
+
+/* Date Input Styles */
+input[type="date"] {
+  font-family: inherit;
+}
+
+/* Divider Line */
+hr {
+  border-top: 1px solid #e0e0e0; 
+  margin: 20px 0;
+}
+
+/* Button Styles */
+.btn-primary {
+  background-color: #1d72b8;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #145a86;
+}
+
+/* Right-aligned Text for Buttons */
+.text-right {
+  margin-top: 20px;
+}
