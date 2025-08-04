@@ -21,8 +21,32 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-$sql = "SELECT * FROM rpu_dec";
+// JOIN to get p_id from p_info using faas_id and pro_id
+$sql = "
+  SELECT r.*, f.pro_id AS p_id
+  FROM rpu_dec r
+  LEFT JOIN faas f ON r.faas_id = f.faas_id
+  LEFT JOIN p_info p ON f.pro_id = p.p_id
+";
+
 $result = $conn->query($sql);
+
+// Fetch owners list
+function fetchOwners($conn)
+{
+  $sql = "
+  SELECT 
+    r.*, 
+    f.faas_id,
+    f.propertyowner_id,
+    f.pro_id AS p_id
+  FROM rpu_dec r
+  LEFT JOIN faas f ON r.faas_id = f.faas_id
+  LEFT JOIN p_info p ON f.pro_id = p.p_id
+";
+  $result = $conn->query($sql);
+  return $result->fetch_all(MYSQLI_ASSOC);
+}
 ?>
 
 <!doctype html>
@@ -88,13 +112,25 @@ $result = $conn->query($sql);
           <?php
           if ($result && $result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
+              $dec_id = $row['dec_id'];
+              $p_id = $row['p_id'];
+
+              // Debug output in HTML comments
+              echo "<!-- DEBUG: dec_id={$dec_id}, p_id={$p_id} -->";
+
               echo "<tr>";
-              echo "<td>" . htmlspecialchars($row['dec_id'] ?? '') . "</td>";
+              echo "<td>" . htmlspecialchars($dec_id ?? '') . "</td>";
               echo "<td>" . htmlspecialchars($row['owner'] ?? '') . "</td>";
               echo "<td>" . htmlspecialchars($row['arp_no'] ?? '') . "</td>";
               echo "<td>" . htmlspecialchars($row['total_property_value'] ?? '') . "</td>";
               echo "<td>" . htmlspecialchars($row['tax_year'] ?? '') . "</td>";
-              echo "<td><button class='btn btn-outline-primary btn-sm'>Edit</button></td>";
+
+              if (!empty($p_id)) {
+                echo "<td><a href='FAAS.php?id={$p_id}' class='btn btn-primary'>EDIT</a></td>";
+              } else {
+                echo "<td><span class='text-muted'>No Property</span></td>";
+              }
+
               echo "</tr>";
             }
           } else {
