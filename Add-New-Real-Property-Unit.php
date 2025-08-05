@@ -269,7 +269,7 @@
 
         <!-- Add Owner -->
         <div class="d-flex justify-content-end mt-4">
-          <a href="Add_POwner.php" class="btn btn-danger ml-2">Add Owner</a>
+          <a href="Add_POwner.php" class="btn btn-primary ml-2">Add Owner</a>
         </div>
 
         <form action="" id="propertyForm" method="POST" onsubmit="return validateForm();">
