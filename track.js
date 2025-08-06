@@ -14,7 +14,7 @@ function openModal(id = null) {
     document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus"></i> Add Transaction';
     document.getElementById('nameInput').value = '';
     document.getElementById('transactionInput').value = '';
-    document.getElementById('statusInput').value = 'In Progress';
+    document.getElementById('statusInput').value = 'stats';
     editId = null;
   }
 }

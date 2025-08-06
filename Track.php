@@ -90,18 +90,21 @@
   <div class="modal" id="transactionModal">
     <div class="modal-content">
       <h3 id="modalTitle"><i class="fas fa-exchange-alt"></i> Add Transaction</h3>
+      <input type="text" id="transactionID" placeholder="Transaction Code">
       <input type="text" id="nameInput" placeholder="Name">
       <input type="text" id="transactionInput" placeholder="Transaction Description">
-      <select id="statusInput">
+      <select id="statusInput" required>
+        <option value="stats"disabled selected hidden>Status</option>
+        <option value="Pending">Pending</option>
         <option value="In Progress">In Progress</option>
         <option value="Completed">Completed</option>
       </select>
       <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeModal()">
+          <i class="fas fa-times"></i> Cancel
+        </button>
         <button class="btn btn-add" onclick="saveTransaction()">
           <i class="fas fa-save"></i> Save
-        </button>
-        <button class="btn btn-cancel" onclick="closeModal()">
-          <i class="fas fa-times"></i> Cancel
         </button>
       </div>
     </div>
