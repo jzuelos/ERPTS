@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Bootstrap CSS -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -24,7 +24,7 @@
   <div id="selectedOwnerDisplay"></div> <!-- Display area for selected owner IDs -->
   <?php
   session_start(); // Start session at the top
-
+  
   // Prevent the browser from caching this page
   header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
   header("Cache-Control: post-check=0, pre-check=0", false);
@@ -77,7 +77,7 @@
           if ($stmt->execute()) {
             $property_id = $stmt->insert_id; // Get last inserted ID
             $_SESSION['last_property_id'] = $property_id; // Store it in session
-
+  
             // Insert owners into propertyowner table and collect propertyowner_ids
             $propertyowner_ids = [];
             if (!empty($selected_owner_ids)) {
@@ -267,6 +267,11 @@
           </tbody>
         </table>
 
+        <!-- Add Owner -->
+        <div class="d-flex justify-content-end mt-4">
+          <a href="Add_POwner.php" class="btn btn-primary ml-2">Add Owner</a>
+        </div>
+
         <form action="" id="propertyForm" method="POST" onsubmit="return validateForm();">
           <input type="hidden" name="selected_owner_ids" id="selected_owner_ids" />
 
@@ -342,11 +347,11 @@
               </select>
             </div>
 
-
             <!-- District (auto-filled) -->
             <div class="col-md-3">
               <label for="district" class="form-label">District</label>
-              <input type="text" class="form-control" id="district" name="district" readonly placeholder="Auto-filled from Municipality">
+              <input type="text" class="form-control" id="district" name="district" readonly
+                placeholder="Auto-filled from Municipality">
             </div>
 
             <!-- Barangay Dropdown -->
@@ -420,7 +425,6 @@
       </div>
     </div>
   </section>
-
 
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
