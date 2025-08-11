@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 20, 2025 at 05:39 AM
+-- Generation Time: Aug 11, 2025 at 07:44 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -96,16 +96,6 @@ CREATE TABLE `classification` (
   `c_status` enum('Active','Inactive') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `classification`
---
-
-INSERT INTO `classification` (`c_id`, `c_code`, `c_description`, `c_uv`, `c_status`) VALUES
-(5, '01', 'Residential', 20.00, 'Active'),
-(6, '02', 'Agricultural', 40.00, 'Active'),
-(7, '03', 'Commercial', 50.00, 'Active'),
-(8, '04', 'Industrial', 50.00, 'Active');
-
 -- --------------------------------------------------------
 
 --
@@ -157,7 +147,10 @@ CREATE TABLE `faas` (
 
 INSERT INTO `faas` (`faas_id`, `propertyowner_id`, `pro_id`, `rpu_idno`) VALUES
 (33, '[62,63]', 144, 46),
-(36, '[66]', 147, NULL);
+(36, '[66]', 147, 62),
+(38, '[]', 152, NULL),
+(39, '[]', 153, NULL),
+(40, '[67,68]', 154, NULL);
 
 -- --------------------------------------------------------
 
@@ -224,6 +217,13 @@ CREATE TABLE `land_use` (
   `lu_status` enum('Active','Inactive') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `land_use`
+--
+
+INSERT INTO `land_use` (`lu_id`, `report_code`, `lu_code`, `lu_description`, `lu_al`, `lu_status`) VALUES
+(2, 'SC', '43', 'SC', 65.00, 'Active');
+
 -- --------------------------------------------------------
 
 --
@@ -267,7 +267,7 @@ CREATE TABLE `owners_tb` (
   `own_fname` varchar(20) NOT NULL,
   `own_mname` varchar(20) NOT NULL,
   `own_surname` varchar(20) NOT NULL,
-  `tin_no` varchar(20) NOT NULL,
+  `tin_no` int(20) NOT NULL,
   `house_no` varchar(20) NOT NULL,
   `street` varchar(30) NOT NULL,
   `barangay` varchar(30) NOT NULL,
@@ -282,11 +282,11 @@ CREATE TABLE `owners_tb` (
 --
 
 INSERT INTO `owners_tb` (`own_id`, `own_fname`, `own_mname`, `own_surname`, `tin_no`, `house_no`, `street`, `barangay`, `district`, `city`, `province`, `own_info`) VALUES
-(9, 'Jonard', '', 'Canaria', '512-743-689-000', '1', 'Purok 3', 'Alawihao', 'District 2', 'Daet', 'Camarines norte', 'Telephone: 09473846382, Fax: , Email: jonard@gmail.com, Website: '),
-(10, 'Rommel James', '', 'Gacho', '834-526-174-000', '3', 'Purok 2', 'Bagacay', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09738265234, Fax: , Email: rommel@gmail.com, Website: '),
-(11, 'John Lloyd', '', 'Zuelos', '279-318-450-000', '1', 'Purok 2', 'Kalamunding', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09643826422, Fax: , Email: jzuelos@gmail.com, Website: '),
-(12, 'Mark', '', 'Bertillo', '961-407-235-000', '3', 'Purok 1', 'Pasig', 'District 2', 'Daet', 'Camarines norte', 'Telephone: 09634618435, Fax: , Email: markbertillo@gmail.com, Website:'),
-(13, 'Renz', 'Balce', 'Dioneda', '407-129-568-000', '5', 'Purok', 'Bulala', 'District 2', 'Santa elena', 'Camarines norte', 'Telephone: 09922007821, Fax: , Email: rdioneda4@gmail.com, Website: ');
+(8, 'Renz', 'Balce', 'Dioneda', 0, '5', 'Purok', 'Bulala', 'District 1', 'Santa Elena', 'Camarines Norte', 'Telephone: 09922007821, Fax: , Email: rdioneda4@gmail.com, Website: '),
+(9, 'Jonard', 'Balce', 'Canaria', 0, '1', 'Purok 3', 'Alawihao', 'District 2', 'Santa elena', 'Camarines norte', 'Telephone: 09473846382, Fax: , Email: jonard@gmail.com, Website: '),
+(10, 'Rommel James', 'Balce', 'Gacho', 0, '3', 'Purok 2', 'Bagacay', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09738265234, Fax: , Email: rommel@gmail.com, Website: '),
+(11, 'John Lloyd', 'Balce', 'Zuelos', 0, '1', 'Purok 2', 'Kalamunding', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09643826422, Fax: , Email: jzuelos@gmail.com, Website: '),
+(12, 'Mark', 'Balce', 'Bertillo', 0, '3', 'Purok 1', 'Pasig', 'District 2', 'Daet', 'Camarines norte', 'Telephone: 09634618435, Fax: , Email: markbertillo@gmail.com, Website:');
 
 -- --------------------------------------------------------
 
@@ -308,7 +308,9 @@ CREATE TABLE `propertyowner` (
 INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`) VALUES
 (62, 144, 12, 1),
 (63, 144, 9, 1),
-(66, 147, 12, 1);
+(66, 147, 12, 1),
+(67, 154, 12, 1),
+(68, 154, 9, 1);
 
 -- --------------------------------------------------------
 
@@ -355,8 +357,11 @@ CREATE TABLE `p_info` (
 --
 
 INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`) VALUES
-(144, 12, 23, 0, 'Province 1', 'Daet', 'District 1', 'Barangay II', '', 0, 302, '   ', 'affidavit, barangay'),
-(147, 12, 23, 0, 'Camarines Norte', 'Daet', 'District 1', 'Barangay II', '', 453, 3453, '   ', 'affidavit, barangay');
+(144, 12, 23, 0, 'Province 1', 'Daet', 'District 1', 'Kalamunding', '', 0, 302, '   ', 'affidavit, barangay'),
+(147, 12, 23, 0, '54', '3', 'District 2', '67', '', 453, 3453, '   ', 'affidavit, barangay'),
+(152, 0, 4324, 0, '54', '12', 'San Vicente', '73', '', 0, 42342, '   ', 'affidavit, barangay'),
+(153, 0, 41234, 0, '54', '3', 'District 2', '67', '', 0, 41234, '   ', 'affidavit, barangay'),
+(154, 0, 14123, 0, '54', '5', 'District 2', '67', '', 0, 31231, '   ', 'affidavit, barangay');
 
 -- --------------------------------------------------------
 
@@ -405,7 +410,8 @@ CREATE TABLE `rpu_dec` (
 --
 
 INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `pro_assess`, `pro_date`, `mun_assess`, `mun_date`, `td_cancel`, `previous_pin`, `tax_year`, `entered_by`, `entered_year`, `prev_own`, `prev_assess`, `faas_id`, `total_property_value`) VALUES
-(28, 2342, 'fasdf', '2025-05-13', 'fsdf', '2025-05-06', 234, 0, '2025-01-01', 0, '2025-01-01', '34234', 0.00, 33, 38401.00);
+(28, 2342, 'fasdf', '2025-08-13', '', '2025-07-29', 0, 0, '2025-08-05', 0, '2025-08-20', '34234', 0.00, 33, 38401.00),
+(29, 5345435, '', '0000-00-00', '', '0000-00-00', 0, 0, '0000-00-00', 0, '0000-00-00', '', 0.00, 36, 264000.00);
 
 -- --------------------------------------------------------
 
@@ -427,7 +433,8 @@ CREATE TABLE `rpu_idnum` (
 --
 
 INSERT INTO `rpu_idnum` (`rpu_id`, `arp`, `pin`, `taxability`, `effectivity`, `faas_id`) VALUES
-(46, 2342, 3456, 'special', '2024', 33);
+(46, 2147483647, 34564234, 'special', '2024', 33),
+(62, 42342, 23423, 'exempt', '42342', 36);
 
 -- --------------------------------------------------------
 
@@ -449,7 +456,8 @@ CREATE TABLE `subclass` (
 
 INSERT INTO `subclass` (`sc_id`, `sc_code`, `sc_description`, `sc_uv`, `sc_status`) VALUES
 (1, 'RA', '34', 45.00, 'Active'),
-(2, 'RA', '45', 456.00, 'Active');
+(2, 'RA', '45', 456.00, 'Active'),
+(3, '', '', 0.00, 'Active');
 
 -- --------------------------------------------------------
 
@@ -485,7 +493,6 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `last_name`, `first_name`, `middle_name`, `gender`, `birthdate`, `marital_status`, `tin`, `house_number`, `street`, `barangay`, `district`, `municipality`, `province`, `contact_number`, `email`, `status`, `user_type`) VALUES
-(8, 'RIP_FISHY12', '$2y$10$smEhcMQrkEwgF/Whm1BrDeT0ru.898kqGKwEjVl1HhkR7Bpj/vdP.', 'Zuelos', 'Jomel', 'Villacruel', 'Female', '2012-12-19', 'Married', '32423423', '32', 'Luzaragga', 'Kalamunding', '2', 'Labo', 'Camarines Norte', '09923648721', 'sbjomel19@gmail.com', 1, 'admin'),
 (9, 'admin', '$2y$10$cyc4ZGr2yJ6FhQWqomCbQuNbWB9ADdj0HQAFE2U4dU.fR9aRdteha', 'Admin', 'Admin', 'Admin', 'Male', '2001-11-11', 'Single', '000-123-456-789', '5', 'Purok', '66', '18', '14', 'Camarines Norte', '09123456789', 'admin@gmail.com', 1, 'admin'),
 (10, 'user', '$2y$10$XCD.AAvKsPiW0N5LsPJLNO8QlVaX3pcx2hBWCc5R3/951/g2tkTEi', 'User', 'User', 'User', 'Male', '2002-02-02', 'Single', '000-321-654-987', '1', 'Purok 2', '71', '18', '4', 'Camarines Norte', '09876543210', 'user@gmail.com', 1, 'user');
 
@@ -627,7 +634,7 @@ ALTER TABLE `certification`
 -- AUTO_INCREMENT for table `classification`
 --
 ALTER TABLE `classification`
-  MODIFY `c_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `c_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `district`
@@ -639,7 +646,7 @@ ALTER TABLE `district`
 -- AUTO_INCREMENT for table `faas`
 --
 ALTER TABLE `faas`
-  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `land`
@@ -663,13 +670,13 @@ ALTER TABLE `municipality`
 -- AUTO_INCREMENT for table `owners_tb`
 --
 ALTER TABLE `owners_tb`
-  MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `propertyowner`
 --
 ALTER TABLE `propertyowner`
-  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
+  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- AUTO_INCREMENT for table `province`
@@ -681,7 +688,7 @@ ALTER TABLE `province`
 -- AUTO_INCREMENT for table `p_info`
 --
 ALTER TABLE `p_info`
-  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=148;
+  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=155;
 
 --
 -- AUTO_INCREMENT for table `region`
@@ -693,19 +700,19 @@ ALTER TABLE `region`
 -- AUTO_INCREMENT for table `rpu_dec`
 --
 ALTER TABLE `rpu_dec`
-  MODIFY `dec_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `dec_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `rpu_idnum`
 --
 ALTER TABLE `rpu_idnum`
-  MODIFY `rpu_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `rpu_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT for table `subclass`
 --
 ALTER TABLE `subclass`
-  MODIFY `sc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `sc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -752,12 +759,6 @@ ALTER TABLE `municipality`
 --
 ALTER TABLE `propertyowner`
   ADD CONSTRAINT `property_id` FOREIGN KEY (`property_id`) REFERENCES `p_info` (`p_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `p_info`
---
-ALTER TABLE `p_info`
-  ADD CONSTRAINT `ownID_FK` FOREIGN KEY (`ownID_Fk`) REFERENCES `owners_tb` (`own_id`);
 
 --
 -- Constraints for table `rpu_dec`
