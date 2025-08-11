@@ -361,7 +361,6 @@ $conn->close();
         <?php foreach ($owners_details as $owner): ?>
           <div class="col-md-12 mb-4">
             <form>
-              <hr class="my-4">
               <div class="mb-3 w-50">
                 <label for="ownerName" class="form-label">Company or Owner</label>
                 <input type="text" class="form-control" id="ownerName"
@@ -432,40 +431,6 @@ $conn->close();
               <hr class="my-4">
             <?php endforeach; ?>
           </form>
-
-          <hr class="my-4">
-
-          <!-- Owner List Table (Selectable) -->
-          <h6 class="mb-3">Owner List</h6>
-          <table class="table table-bordered table-striped table-sm">
-            <thead class="table-dark">
-              <tr>
-                <th class="text-center">ID</th>
-                <th class="text-center">Selection</th>
-                <th class="text-center">Owner Name</th>
-                <th class="text-center">Address</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php if (!empty($owners)): ?>
-                <?php foreach ($owners as $owner): ?>
-                  <tr>
-                    <td class="text-center"><?php echo htmlspecialchars($owner['own_id']); ?></td>
-                    <td class="text-center">
-                      <input type="checkbox" name="owner_selection[]"
-                        value="<?php echo htmlspecialchars($owner['own_id']); ?>">
-                    </td>
-                    <td class="text-center"><?php echo htmlspecialchars($owner['owner_name']); ?></td>
-                    <td class="text-center"><?php echo htmlspecialchars($owner['address']); ?></td>
-                  </tr>
-                <?php endforeach; ?>
-              <?php else: ?>
-                <tr>
-                  <td colspan="4" class="text-center">No owner data found.</td>
-                </tr>
-              <?php endif; ?>
-            </tbody>
-          </table>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

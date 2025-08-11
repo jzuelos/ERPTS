@@ -69,10 +69,21 @@
 
       try {
         // Insert property data into p_info table
-        $stmt = $conn->prepare("INSERT INTO p_info (house_no, block_no, province, city, district, barangay, house_tag_no, land_area, desc_land, documents, ownID_Fk) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO p_info (house_no, block_no, province, city, district, barangay, house_tag_no, land_area, desc_land, documents) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         if ($stmt) {
-          $owner_id = !empty($selected_owner_ids) ? $selected_owner_ids[0] : null;
-          $stmt->bind_param("iissssiissi", $house_number, $block_number, $province, $city, $district, $barangay, $house_tag, $land_area, $desc_land, $documents, $owner_id);
+          $stmt->bind_param(
+            "iissssiiss",
+            $house_number,
+            $block_number,
+            $province,
+            $city,
+            $district,
+            $barangay,
+            $house_tag,
+            $land_area,
+            $desc_land,
+            $documents
+          );
 
           if ($stmt->execute()) {
             $property_id = $stmt->insert_id; // Get last inserted ID
@@ -94,9 +105,8 @@
                   if ($owner_stmt) {
                     $owner_stmt->bind_param("ii", $property_id, $owner_id);
                     if ($owner_stmt->execute()) {
-                      // Get the last inserted propertyowner_id
                       $propertyowner_id = $owner_stmt->insert_id;
-                      $propertyowner_ids[] = $propertyowner_id; // Collect owner IDs
+                      $propertyowner_ids[] = $propertyowner_id;
                     } else {
                       throw new Exception("Error inserting into propertyowner: " . $owner_stmt->error);
                     }
@@ -114,9 +124,7 @@
             // Now insert a single FAAS record with all the owner IDs as JSON
             $faas_stmt = $conn->prepare("INSERT INTO FAAS (pro_id, propertyowner_id) VALUES (?, ?)");
             if ($faas_stmt) {
-              // Convert the owner IDs array to JSON format
               $owners_json = json_encode($propertyowner_ids);
-
               $faas_stmt->bind_param("is", $property_id, $owners_json);
               if ($faas_stmt->execute()) {
                 echo "<p>Inserted into FAAS for property_id $property_id with owners: " . implode(", ", $propertyowner_ids) . ".</p>";

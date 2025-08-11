@@ -104,3 +104,4 @@ No existing RPU ID found for faas_id: 36
 Attempting INSERT into rpu_idnum with: arp=4234, pin=32434, taxability=taxable, effectivity=4234
 {"faasId":"36","arpNumber":"42342","propertyNumber":"23423","taxability":"taxable","effectivity":"42342"}
 {"faasId":"36","arpNumber":"42342","propertyNumber":"23423","taxability":"exempt","effectivity":"42342"}
+{"faasId":"33","arpNumber":"2147483647","propertyNumber":"34564234","taxability":"special","effectivity":"2024"}

@@ -65,7 +65,7 @@ if ($barangayResult->num_rows > 0) {
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Bootstrap CSS -->
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEJr+8+6g5K4r53m5s3xmw1Is0J6wBd04YOeFvXOsZTgmYF9flT/qe6LZ9s+0" crossorigin="anonymous">
@@ -84,7 +84,7 @@ if ($barangayResult->num_rows > 0) {
 
   <!-- Main Body -->
   <section class="container mt-5">
-  <div class="mb-4 d-flex justify-content-start">
+    <div class="mb-4 d-flex justify-content-start">
       <a href="Home.php" class="btn btn-outline-secondary btn-sm">
         <i class="fas fa-arrow-left"></i> Back
       </a>
@@ -123,18 +123,20 @@ if ($barangayResult->num_rows > 0) {
             </tr>
           </thead>
           <tbody id="tableBody">
-            <?php
-            // Display the fetched data in table rows
-            foreach ($propertyUnits as $unit) {
-              echo "<tr>
-                  <td>{$unit['p_id']}</td>
-                  <td>{$unit['owner']}</td>
-                  <td>{$unit['house_no']}, {$unit['barangay']}, {$unit['city']}, {$unit['province']}</td>
-                  <td>{$unit['land_area']}</td>
-                  <td><a href='FAAS.php?id={$unit['p_id']}' class='btn btn-primary'>EDIT</a></td>
-                </tr>";
-            }
-            ?>
+            <?php foreach ($propertyUnits as $unit):
+              $ownerRaw = isset($unit['owner']) ? $unit['owner'] : '';
+              $owner = trim((string) $ownerRaw) !== '' ? $ownerRaw : 'None';
+              ?>
+              <tr>
+                <td><?= $unit['p_id'] ?></td>
+                <td><?= htmlspecialchars($owner) ?></td>
+                <td>
+                  <?= htmlspecialchars("{$unit['house_no']}, {$unit['barangay']}, {$unit['city']}, {$unit['province']}") ?>
+                </td>
+                <td><?= $unit['land_area'] ?></td>
+                <td><a href="FAAS.php?id=<?= $unit['p_id'] ?>" class="btn btn-primary">EDIT</a></td>
+              </tr>
+            <?php endforeach; ?>
           </tbody>
         </table>
       </div>
@@ -154,7 +156,6 @@ if ($barangayResult->num_rows > 0) {
       </div>
     </div>
   </section>
-
 
   <!-- View All Modal -->
   <div class="modal fade" id="viewAllModal" tabindex="-1" aria-labelledby="viewAllModalLabel" aria-hidden="true">
@@ -186,12 +187,15 @@ if ($barangayResult->num_rows > 0) {
                 <?php
                 // Display the fetched data in modal table rows
                 foreach ($propertyUnits as $unit) {
+                  $ownerRaw = isset($unit['owner']) ? $unit['owner'] : '';
+                  $owner = trim((string) $ownerRaw) !== '' ? $ownerRaw : 'None';
+
                   echo "<tr>
-                      <td>{$unit['p_id']}</td>
-                      <td>{$unit['owner']}</td>
-                      <td>{$unit['house_no']}, {$unit['barangay']}, {$unit['city']}, {$unit['province']}</td>
-                      <td>{$unit['land_area']}</td>
-                    </tr>";
+                    <td>{$unit['p_id']}</td>
+                    <td>{$owner}</td>
+                    <td>{$unit['house_no']}, {$unit['barangay']}, {$unit['city']}, {$unit['province']}</td>
+                    <td>{$unit['land_area']}</td>
+                  </tr>";
                 }
                 ?>
               </tbody>
@@ -205,11 +209,10 @@ if ($barangayResult->num_rows > 0) {
     </div>
   </div>
 
-
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
-    <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span>
+      <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span>
     </div>
   </footer>
   <script>
