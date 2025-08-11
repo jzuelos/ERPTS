@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 07, 2025 at 09:45 PM
+-- Generation Time: Aug 11, 2025 at 07:44 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -148,7 +148,9 @@ CREATE TABLE `faas` (
 INSERT INTO `faas` (`faas_id`, `propertyowner_id`, `pro_id`, `rpu_idno`) VALUES
 (33, '[62,63]', 144, 46),
 (36, '[66]', 147, 62),
-(38, '[]', 152, NULL);
+(38, '[]', 152, NULL),
+(39, '[]', 153, NULL),
+(40, '[67,68]', 154, NULL);
 
 -- --------------------------------------------------------
 
@@ -306,7 +308,9 @@ CREATE TABLE `propertyowner` (
 INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`) VALUES
 (62, 144, 12, 1),
 (63, 144, 9, 1),
-(66, 147, 12, 1);
+(66, 147, 12, 1),
+(67, 154, 12, 1),
+(68, 154, 9, 1);
 
 -- --------------------------------------------------------
 
@@ -355,7 +359,9 @@ CREATE TABLE `p_info` (
 INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`) VALUES
 (144, 12, 23, 0, 'Province 1', 'Daet', 'District 1', 'Kalamunding', '', 0, 302, '   ', 'affidavit, barangay'),
 (147, 12, 23, 0, '54', '3', 'District 2', '67', '', 453, 3453, '   ', 'affidavit, barangay'),
-(152, 0, 4324, 0, '54', '12', 'San Vicente', '73', '', 0, 42342, '   ', 'affidavit, barangay');
+(152, 0, 4324, 0, '54', '12', 'San Vicente', '73', '', 0, 42342, '   ', 'affidavit, barangay'),
+(153, 0, 41234, 0, '54', '3', 'District 2', '67', '', 0, 41234, '   ', 'affidavit, barangay'),
+(154, 0, 14123, 0, '54', '5', 'District 2', '67', '', 0, 31231, '   ', 'affidavit, barangay');
 
 -- --------------------------------------------------------
 
@@ -404,7 +410,7 @@ CREATE TABLE `rpu_dec` (
 --
 
 INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `pro_assess`, `pro_date`, `mun_assess`, `mun_date`, `td_cancel`, `previous_pin`, `tax_year`, `entered_by`, `entered_year`, `prev_own`, `prev_assess`, `faas_id`, `total_property_value`) VALUES
-(28, 2342, 'fasdf', '0000-00-00', '', '0000-00-00', 0, 0, '0000-00-00', 0, '0000-00-00', '34234', 0.00, 33, 38401.00),
+(28, 2342, 'fasdf', '2025-08-13', '', '2025-07-29', 0, 0, '2025-08-05', 0, '2025-08-20', '34234', 0.00, 33, 38401.00),
 (29, 5345435, '', '0000-00-00', '', '0000-00-00', 0, 0, '0000-00-00', 0, '0000-00-00', '', 0.00, 36, 264000.00);
 
 -- --------------------------------------------------------
@@ -450,7 +456,8 @@ CREATE TABLE `subclass` (
 
 INSERT INTO `subclass` (`sc_id`, `sc_code`, `sc_description`, `sc_uv`, `sc_status`) VALUES
 (1, 'RA', '34', 45.00, 'Active'),
-(2, 'RA', '45', 456.00, 'Active');
+(2, 'RA', '45', 456.00, 'Active'),
+(3, '', '', 0.00, 'Active');
 
 -- --------------------------------------------------------
 
@@ -639,7 +646,7 @@ ALTER TABLE `district`
 -- AUTO_INCREMENT for table `faas`
 --
 ALTER TABLE `faas`
-  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `land`
@@ -669,7 +676,7 @@ ALTER TABLE `owners_tb`
 -- AUTO_INCREMENT for table `propertyowner`
 --
 ALTER TABLE `propertyowner`
-  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
+  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- AUTO_INCREMENT for table `province`
@@ -681,7 +688,7 @@ ALTER TABLE `province`
 -- AUTO_INCREMENT for table `p_info`
 --
 ALTER TABLE `p_info`
-  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=153;
+  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=155;
 
 --
 -- AUTO_INCREMENT for table `region`
@@ -705,7 +712,7 @@ ALTER TABLE `rpu_idnum`
 -- AUTO_INCREMENT for table `subclass`
 --
 ALTER TABLE `subclass`
-  MODIFY `sc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `sc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
