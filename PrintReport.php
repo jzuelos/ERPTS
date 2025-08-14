@@ -116,7 +116,6 @@ $properties = array(
 <body>
     <div class="header">
         <div class="title">Assessment Roll</div>
-        <div class="sub-header">Real Property Assessment</div>
     </div>
     
     <div class="location-container">
