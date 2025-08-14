@@ -4,7 +4,7 @@ $location_data = array(
     "province_city" => "CAMARINES NORTE",
     "municipality" => "DAET",
     "district" => "",
-    "barangay" => "ALAVIHAO"
+    "barangay" => "ALAWIHAO"
 );
 
 // Sample property data
