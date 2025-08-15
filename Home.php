@@ -219,7 +219,7 @@ $result = $conn->query($sql);
                     echo "<td>" . htmlspecialchars($owner_names) . "</td>";
                     echo "<td>" . htmlspecialchars($row['arp_no'] ?? '') . "</td>";
                     echo "<td>" . htmlspecialchars($row['total_property_value'] ?? '') . "</td>";
-                    echo "<td>" . htmlspecialchars($row['tax_year'] ?? '') . "</td>";
+                    echo "<td>" . (!empty($row['tax_year']) ? htmlspecialchars(date('Y', strtotime($row['tax_year']))) : '') . "</td>";
                   }
                 }
                 ?>

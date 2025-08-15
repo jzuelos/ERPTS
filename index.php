@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['error'] = "Username or password cannot be empty!";
     } else {
         // Query the database to check if the user exists
-        $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
+       $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND status = 1 LIMIT 1");
 
         if ($stmt) {
             $stmt->bind_param("s", $username);
