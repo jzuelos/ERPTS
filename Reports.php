@@ -2,211 +2,172 @@
 <html lang="en">
 
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <!-- Bootstrap CSS -->
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <!-- Bootstrap & Font Awesome CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-KyZXEJr+8+6g5K4r53m5s3xmw1Is0J6wBd04YOeFvXOsZTgmYF9flT/qe6LZ9s+0" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
-    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="header.css">
   <link rel="stylesheet" href="Reports.css">
   <title>Electronic Real Property Tax System</title>
-  <style>
-    /* Additional styles for sticky header and footer */
-    html,
-    body {
-      height: 100%;
-    }
 
-    body {
-      display: flex;
-      flex-direction: column;
-    }
+  <?php
+  include 'database.php';
+  $conn = Database::getInstance();
 
-    .content-wrapper {
-      flex: 1 0 auto;
-      padding-top: 70px;
-      /* Adjust based on your header height */
-    }
+  // Fetch active classifications
+  $classification_stmt = $conn->prepare("SELECT c_id, c_description FROM classification WHERE c_status = 'Active'");
+  $classification_stmt->execute();
+  $classification_result = $classification_stmt->get_result();
 
-    .footer {
-      flex-shrink: 0;
-    }
+  // Fetch provinces
+  $stmt = $conn->prepare("SELECT province_id, province_name FROM province");
+  $stmt->execute();
+  $regions_result = $stmt->get_result();
 
-    /* Ensure header is sticky */
-    .navbar {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      z-index: 1000;
-    }
-  </style>
+  // Fetch active municipalities
+  $municipalities_stmt = $conn->prepare("SELECT m_id, m_description FROM municipality WHERE m_status = 'Active'");
+  $municipalities_stmt->execute();
+  $municipalities_result = $municipalities_stmt->get_result();
+
+  // Fetch active districts
+  $districts_stmt = $conn->prepare("SELECT district_id, description FROM district WHERE status = 'Active'");
+  $districts_stmt->execute();
+  $districts_result = $districts_stmt->get_result();
+
+  // Fetch active barangays
+  $barangays_stmt = $conn->prepare("SELECT brgy_id, brgy_name FROM brgy WHERE status = 'Active'");
+  $barangays_stmt->execute();
+  $barangays_result = $barangays_stmt->get_result();
+  ?>
 </head>
 
 <body>
-  <!-- Header Navigation -->
+  <!-- Header -->
   <?php include 'header.php'; ?>
 
-  <!-- Main Content Wrapper -->
-  <div class="content-wrapper">
-    <section class="container">
-      <div class="card p-4 mt-4">
-        <form>
-          <div class="mb-4 d-flex justify-content-start">
-            <a href="Home.php" class="btn btn-outline-secondary btn-sm">
-              <i class="fas fa-arrow-left"></i> Back
-            </a>
-          </div>
-          <!-- Filter by Classification -->
-          <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input" id="classificationCheck">
-            <label class="form-check-label font-weight-bold" for="classificationCheck">Filter by: Classification</label>
-          </div>
-          <div class="form-group">
-            <label for="classificationSelect">Classification</label>
-            <select class="form-control w-25" id="classificationSelect">
-              <option>Residential</option>
-              <option>Credential</option>
-              <option>Industrial</option>
-              <option>Agricultural</option>
-              <option>Timberland</option>
-              <option>Mineral Lands</option>
-              <option>Special Property</option>
+  <div class="content-wrapper container mt-5">
+    <div class="card p-4">
+      <form>
+        <!-- Back button -->
+        <div class="mb-4">
+          <a href="Home.php" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Back
+          </a>
+        </div>
+
+        <!-- Filter by Classification -->
+        <div class="form-group form-check">
+          <input type="checkbox" class="form-check-input" id="classificationCheck">
+          <label class="form-check-label fw-bold" for="classificationCheck">Filter by: Classification</label>
+        </div>
+        <div class="form-group">
+          <label for="classificationSelect">Classification</label>
+          <select class="form-control w-25" id="classificationSelect" disabled>
+            <option value="" disabled selected>Select Classification</option>
+            <?php
+            if ($classification_result && $classification_result->num_rows > 0) {
+              while ($row = $classification_result->fetch_assoc()) {
+                echo "<option value='" . htmlspecialchars($row['c_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['c_description'], ENT_QUOTES) . "</option>";
+              }
+            } else {
+              echo "<option disabled>No active classifications</option>";
+            }
+            ?>
+          </select>
+        </div>
+        <hr>
+
+        <!-- Filter by Location -->
+        <div class="form-group form-check">
+          <input type="checkbox" class="form-check-input" id="locationCheck">
+          <label class="form-check-label fw-bold" for="locationCheck">Filter by: Location</label>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="provinceSelect">Province</label>
+            <select class="form-control" id="provinceSelect" disabled>
+              <option value="" disabled selected>Select Province</option>
+              <?php while ($row = $regions_result->fetch_assoc()) {
+                echo "<option value='" . htmlspecialchars($row['province_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['province_name'], ENT_QUOTES) . "</option>";
+              } ?>
             </select>
           </div>
-          <hr>
 
-          <?php
-          // Include the database connection
-          include 'database.php';
-          $conn = Database::getInstance();
-
-          // Fetch active provinces
-          $stmt = $conn->prepare("SELECT province_id, province_name FROM province");  
-          $stmt->execute();
-          $regions_result = $stmt->get_result();
-
-          // Fetch active municipalities
-          $municipalities_stmt = $conn->prepare("SELECT m_id, m_description FROM municipality WHERE m_status = 'Active'");
-          $municipalities_stmt->execute();
-          $municipalities_result = $municipalities_stmt->get_result();
-
-          // Fetch active districts
-          $districts_stmt = $conn->prepare("SELECT district_id, description FROM district WHERE status = 'Active'");
-          $districts_stmt->execute();
-          $districts_result = $districts_stmt->get_result();
-
-          // Fetch active barangays
-          $barangays_stmt = $conn->prepare("SELECT brgy_id, brgy_name FROM brgy WHERE status = 'Active'");
-          $barangays_stmt->execute();
-          $barangays_result = $barangays_stmt->get_result();
-          ?>
-
-          <!-- Filter by Location -->
-          <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input" id="locationCheck">
-            <label class="form-check-label font-weight-bold" for="locationCheck">Filter by: Location</label>
+          <div class="form-group col-md-6">
+            <label for="citySelect">Municipality/City</label>
+            <select class="form-control" id="citySelect" disabled>
+              <option value="" disabled selected>Select Municipality</option>
+              <?php while ($row = $municipalities_result->fetch_assoc()) {
+                echo "<option value='" . htmlspecialchars($row['m_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['m_description'], ENT_QUOTES) . "</option>";
+              } ?>
+            </select>
           </div>
-          <div class="form-row">
-            <!-- Province Dropdown -->
-            <div class="form-group col-md-6">
-              <label for="provinceSelect">Province</label>
-              <select class="form-control" id="provinceSelect">
-                <option value="" disabled selected>Select Province</option>
-                <?php
-                while ($row = $regions_result->fetch_assoc()) {
-                  echo "<option value='" . htmlspecialchars($row['province_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['province_name'], ENT_QUOTES) . "</option>";
+
+          <div class="form-group col-md-6">
+            <label for="districtSelect">District</label>
+            <select class="form-control" id="districtSelect" disabled>
+              <option value="" disabled selected>Select District</option>
+              <?php
+              if ($districts_result && $districts_result->num_rows > 0) {
+                while ($row = $districts_result->fetch_assoc()) {
+                  echo "<option value='" . htmlspecialchars($row['district_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['description'], ENT_QUOTES) . "</option>";
                 }
-                ?>
-              </select>
-            </div>
+              } else {
+                echo "<option disabled>No active districts</option>";
+              }
+              ?>
+            </select>
+          </div>
 
-            <!-- Municipality/City Dropdown -->
-            <div class="form-group col-md-6">
-              <label for="citySelect">Municipality/City</label>
-              <select class="form-control" id="citySelect">
-                <option value="" disabled selected>Select Municipality</option>
-                <?php
-                while ($row = $municipalities_result->fetch_assoc()) {
-                  echo "<option value='" . htmlspecialchars($row['m_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['m_description'], ENT_QUOTES) . "</option>";
+          <div class="form-group col-md-6">
+            <label for="barangaySelect">Barangay</label>
+            <select class="form-control" id="barangaySelect" disabled>
+              <option value="" disabled selected>Select Barangay</option>
+              <?php
+              if ($barangays_result && $barangays_result->num_rows > 0) {
+                while ($row = $barangays_result->fetch_assoc()) {
+                  echo "<option value='" . htmlspecialchars($row['brgy_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['brgy_name'], ENT_QUOTES) . "</option>";
                 }
-                ?>
-              </select>
-            </div>
-
-            <!-- District Dropdown -->
-            <div class="form-group col-md-6">
-              <label for="districtSelect">District</label>
-              <select class="form-control" id="districtSelect">
-                <option value="" disabled selected>Select District</option>
-                <?php
-                if ($districts_result && $districts_result->num_rows > 0) {
-                  while ($row = $districts_result->fetch_assoc()) {
-                    echo "<option value='" . htmlspecialchars($row['district_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['description'], ENT_QUOTES) . "</option>";
-                  }
-                } else {
-                  echo "<option disabled>No active districts</option>";
-                }
-                ?>
-              </select>
-            </div>
-
-            <!-- Barangay Dropdown -->
-            <div class="form-group col-md-6">
-              <label for="barangaySelect">Barangay</label>
-              <select class="form-control" id="barangaySelect">
-                <option value="" disabled selected>Select Barangay</option>
-                <?php
-                if ($barangays_result && $barangays_result->num_rows > 0) {
-                  while ($row = $barangays_result->fetch_assoc()) {
-                    echo "<option value='" . htmlspecialchars($row['brgy_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['brgy_name'], ENT_QUOTES) . "</option>";
-                  }
-                } else {
-                  echo "<option disabled>No active barangays</option>";
-                }
-                ?>
-              </select>
-            </div>
+              } else {
+                echo "<option disabled>No active barangays</option>";
+              }
+              ?>
+            </select>
           </div>
-          <hr>
+        </div>
+        <hr>
 
+        <!-- Filter by Date -->
+        <div class="form-group form-check">
+          <input type="checkbox" class="form-check-input" id="dateCheck">
+          <label class="form-check-label fw-bold" for="dateCheck">Filter by: Date Created</label>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="fromDate">From:</label>
+            <input type="date" class="form-control" id="fromDate" disabled>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="toDate">To:</label>
+            <input type="date" class="form-control" id="toDate" disabled>
+          </div>
+        </div>
 
-          <!-- Filter by Date -->
-          <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input" id="dateCheck">
-            <label class="form-check-label font-weight-bold" for="dateCheck">Filter by: Date Created</label>
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="fromDate">From:</label>
-              <input type="date" class="form-control" id="fromDate">
-            </div>
-            <div class="form-group col-md-6">
-              <label for="toDate">To:</label>
-              <input type="date" class="form-control" id="toDate">
-            </div>
-          </div>
+        <!-- Print All -->
+        <div class="form-group form-check">
+          <input type="checkbox" class="form-check-input" id="printAllCheck">
+          <label class="form-check-label fw-bold" for="printAllCheck">Print ALL (No Filtering)</label>
+        </div>
 
-          <!-- Print All Checkbox -->
-          <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input" id="printAllCheck">
-            <label class="form-check-label font-weight-bold" for="printAllCheck">Print ALL (No Filtering)</label>
-          </div>
-
-          <!-- Submit Button -->
-          <div class="text-right">
-            <a href="#" class="btn btn-primary" target="_blank">PRINT</a>
-          </div>
-        </form>
-      </div>
-    </section>
+        <!-- Submit -->
+        <div class="text-right">
+          <a href="#" class="btn btn-primary" target="_blank">PRINT</a>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- Footer -->
@@ -216,89 +177,60 @@
     </div>
   </footer>
 
-  <!-- Optional JavaScript -->
-  <scripts src="reports.js">
-    </script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
-    <script src="Location.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
-      integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-      crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
-      integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-      crossorigin="anonymous"></script>
+  <!-- JS -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-      <script>
-document.addEventListener("DOMContentLoaded", function () {
-  const printAllCheckbox = document.getElementById("printAllCheck");
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const printAllCheckbox = document.getElementById("printAllCheck");
+      const classificationCheckbox = document.getElementById("classificationCheck");
+      const locationCheckbox = document.getElementById("locationCheck");
+      const dateCheckbox = document.getElementById("dateCheck");
 
-  const classificationCheckbox = document.getElementById("classificationCheck");
-  const locationCheckbox = document.getElementById("locationCheck");
-  const dateCheckbox = document.getElementById("dateCheck");
+      const classificationSelect = document.getElementById("classificationSelect");
+      const provinceSelect = document.getElementById("provinceSelect");
+      const citySelect = document.getElementById("citySelect");
+      const districtSelect = document.getElementById("districtSelect");
+      const barangaySelect = document.getElementById("barangaySelect");
+      const fromDate = document.getElementById("fromDate");
+      const toDate = document.getElementById("toDate");
 
-  const classificationSelect = document.getElementById("classificationSelect");
+      function updateStates() {
+        if (printAllCheckbox.checked) {
+          classificationCheckbox.disabled = true;
+          locationCheckbox.disabled = true;
+          dateCheckbox.disabled = true;
+          classificationSelect.disabled = true;
+          provinceSelect.disabled = true;
+          citySelect.disabled = true;
+          districtSelect.disabled = true;
+          barangaySelect.disabled = true;
+          fromDate.disabled = true;
+          toDate.disabled = true;
+        } else {
+          classificationCheckbox.disabled = false;
+          locationCheckbox.disabled = false;
+          dateCheckbox.disabled = false;
 
-  const provinceSelect = document.getElementById("provinceSelect");
-  const citySelect = document.getElementById("citySelect");
-  const districtSelect = document.getElementById("districtSelect");
-  const barangaySelect = document.getElementById("barangaySelect");
+          classificationSelect.disabled = !classificationCheckbox.checked;
 
-  const fromDate = document.getElementById("fromDate");
-  const toDate = document.getElementById("toDate");
+          const loc = locationCheckbox.checked;
+          provinceSelect.disabled = !loc;
+          citySelect.disabled = !loc;
+          districtSelect.disabled = !loc;
+          barangaySelect.disabled = !loc;
 
-  const filterCheckboxes = [classificationCheckbox, locationCheckbox, dateCheckbox];
-  const dropdowns = [
-    classificationSelect,
-    provinceSelect,
-    citySelect,
-    districtSelect,
-    barangaySelect,
-    fromDate,
-    toDate
-  ];
+          const date = dateCheckbox.checked;
+          fromDate.disabled = !date;
+          toDate.disabled = !date;
+        }
+      }
 
-  function updateStates() {
-    if (printAllCheckbox.checked) {
-      // Disable everything
-      filterCheckboxes.forEach(cb => cb.disabled = true);
-      dropdowns.forEach(drop => drop.disabled = true);
-    } else {
-      // Enable checkboxes
-      filterCheckboxes.forEach(cb => cb.disabled = false);
-
-      // Enable dropdowns based on checkbox status
-      classificationSelect.disabled = !classificationCheckbox.checked;
-
-      const loc = locationCheckbox.checked;
-      provinceSelect.disabled = !loc;
-      citySelect.disabled = !loc;
-      districtSelect.disabled = !loc;
-      barangaySelect.disabled = !loc;
-
-      const date = dateCheckbox.checked;
-      fromDate.disabled = !date;
-      toDate.disabled = !date;
-    }
-  }
-
-  // Attach listeners
-  printAllCheckbox.addEventListener("change", updateStates);
-  filterCheckboxes.forEach(cb => cb.addEventListener("change", updateStates));
-
-  // Initial state: don't disable anything
-  dropdowns.forEach(drop => drop.disabled = false);
-  filterCheckboxes.forEach(cb => cb.disabled = false);
-});
-
-
-  window.addEventListener("beforeunload", function (e) {
-  e.preventDefault();
-  e.returnValue = ""; // Show the default browser confirmation dialog
-});
-
-</script>
-
+      printAllCheckbox.addEventListener("change", updateStates);
+      classificationCheckbox.addEventListener("change", updateStates);
+      locationCheckbox.addEventListener("change", updateStates);
+      dateCheckbox.addEventListener("change", updateStates);
+    });
+  </script>
 </body>
-
 </html>
