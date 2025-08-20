@@ -24,29 +24,67 @@ function closeModal() {
 }
 
 function saveTransaction() {
-  const name = document.getElementById('nameInput').value;
-  const transaction = document.getElementById('transactionInput').value;
-  const status = document.getElementById('statusInput').value;
+  // Get input values
+  let t_code = document.getElementById("transactionID").value.trim();
+  let t_name = document.getElementById("nameInput").value.trim();
+  let t_description = document.getElementById("transactionInput").value.trim();
+  let t_status = document.getElementById("statusInput").value;
 
-  if (!name || !transaction) {
-    alert('Please fill all fields.');
+  // Basic validation
+  if (!t_code || !t_name || !t_description || !t_status) {
+    alert("Please fill out all fields.");
     return;
   }
 
-  if (editId !== null) {
-    const tx = transactions.find(t => t.id === editId);
-    tx.name = name;
-    tx.transaction = transaction;
-    tx.status = status;
-    logActivity(`Updated transaction #${tx.id}`);
-  } else {
-    const id = Date.now();
-    transactions.push({ id, name, transaction, status });
-    logActivity(`Added new transaction #${id}`);
-  }
+  // Prepare data
+  let formData = new FormData();
+  formData.append("action", "saveTransaction"); // action identifier
+  formData.append("t_code", t_code);
+  formData.append("t_name", t_name);
+  formData.append("t_description", t_description);
+  formData.append("t_status", t_status);
 
-  closeModal();
-  updateTable();
+  // Send request
+  fetch("trackFunctions.php", {
+    method: "POST",
+    body: formData
+  })
+    .then(response => {
+      // Make sure we parse valid JSON
+      return response.json().catch(() => {
+        throw new Error("Invalid JSON response from server");
+      });
+    })
+    .then(data => {
+      if (data.success) {
+        alert("Transaction saved successfully!");
+
+        // Reset form fields
+        document.getElementById("transactionID").value = "";
+        document.getElementById("nameInput").value = "";
+        document.getElementById("transactionInput").value = "";
+        document.getElementById("statusInput").selectedIndex = 0;
+
+        // Close modal (Bootstrap 5 requires creating instance if not exists)
+        let modalEl = document.getElementById('transactionModal');
+        let modal = bootstrap.Modal.getInstance(modalEl);
+        if (!modal) {
+          modal = new bootstrap.Modal(modalEl);
+        }
+        modal.hide();
+
+        // Optionally reload transaction list
+        if (typeof loadTransactions === "function") {
+          loadTransactions();
+        }
+      } else {
+        alert("Error: " + (data.message || "Unknown error"));
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      alert("Something went wrong while saving.");
+    });
 }
 
 function deleteTransaction(id) {
@@ -64,7 +102,7 @@ function updateTable() {
   transactions.forEach(tx => {
     const row = document.createElement('tr');
     const statusClass = tx.status === 'Completed' ? 'status-completed' : 'status-in-progress';
-    
+
     row.innerHTML = `
       <td>#${tx.id}</td>
       <td>${tx.name}</td>
@@ -87,9 +125,9 @@ function updateTable() {
 
 function updateCounts() {
   document.getElementById('totalCount').innerText = transactions.length;
-  document.getElementById('inProgressCount').innerText = 
+  document.getElementById('inProgressCount').innerText =
     transactions.filter(t => t.status === 'In Progress').length;
-  document.getElementById('completedCount').innerText = 
+  document.getElementById('completedCount').innerText =
     transactions.filter(t => t.status === 'Completed').length;
 }
 
@@ -101,7 +139,7 @@ function logActivity(message) {
     <i class="fas fa-circle"></i>
     <span>${new Date().toLocaleString()}: ${message}</span>
   `;
-  
+
   // Limit to 10 most recent activities
   if (log.children.length >= 10) {
     log.removeChild(log.lastChild);
@@ -110,7 +148,7 @@ function logActivity(message) {
 }
 
 // Initialize with some sample data if needed
-window.onload = function() {
+window.onload = function () {
   // Sample data (optional)
   /*
   transactions = [
