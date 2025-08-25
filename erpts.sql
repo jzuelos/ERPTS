@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 11, 2025 at 07:44 PM
+-- Generation Time: Aug 25, 2025 at 09:37 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -80,7 +80,7 @@ CREATE TABLE `certification` (
 INSERT INTO `certification` (`cert_id`, `verified`, `noted`, `recom_approval`, `recom_date`, `plotted`, `appraised`, `appraised_date`, `approved`, `approved_date`, `idle`, `contested`, `land_id`) VALUES
 (17, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-28', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-28', 'Lingon, Nestor Jacolbia', '2025-04-28', 0, 0, 55),
 (18, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-28', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-28', 'Lingon, Nestor Jacolbia', '2025-04-28', 0, 0, 56),
-(19, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-29', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-29', 'Lingon, Nestor Jacolbia', '2025-04-29', 0, 0, 57);
+(19, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-08-18', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-08-18', 'Lingon, Nestor Jacolbia', '2025-08-18', 0, 0, 57);
 
 -- --------------------------------------------------------
 
@@ -95,6 +95,14 @@ CREATE TABLE `classification` (
   `c_uv` decimal(10,2) NOT NULL,
   `c_status` enum('Active','Inactive') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `classification`
+--
+
+INSERT INTO `classification` (`c_id`, `c_code`, `c_description`, `c_uv`, `c_status`) VALUES
+(5, 'CO213', 'Residential', 3245.00, 'Active'),
+(6, 'AG34', 'Agricultural', 50.00, 'Inactive');
 
 -- --------------------------------------------------------
 
@@ -150,7 +158,8 @@ INSERT INTO `faas` (`faas_id`, `propertyowner_id`, `pro_id`, `rpu_idno`) VALUES
 (36, '[66]', 147, 62),
 (38, '[]', 152, NULL),
 (39, '[]', 153, NULL),
-(40, '[67,68]', 154, NULL);
+(40, '[67,68]', 154, NULL),
+(41, '[69,70,71]', 155, NULL);
 
 -- --------------------------------------------------------
 
@@ -200,7 +209,7 @@ CREATE TABLE `land` (
 INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `north`, `east`, `south`, `west`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`, `adjust_factor`, `adjust_percent`, `adjust_value`, `adjust_mv`, `assess_lvl`, `assess_value`, `faas_id`) VALUES
 (55, 25634, '423', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 800, '', 20.00, 16000.00, '', 17.00, -13280.00, 2720.00, 100.00, 2720.00, 33),
 (56, 1234, '3412', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 432, '1', 34.00, 14688.00, '', 100.00, 0.00, 14688.00, 34.00, 4993.92, 33),
-(57, 3421, '4324', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'asdfasdfa', '', '', 800, '1', 200.00, 160000.00, '', 100.00, 0.00, 160000.00, 65.00, 104000.00, 36);
+(57, 3421, '4324', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'asdfasdfa', 'Residential', '', 800, '', 200.00, 160000.00, '', 100.00, 0.00, 160000.00, 65.00, 104000.00, 36);
 
 -- --------------------------------------------------------
 
@@ -310,7 +319,10 @@ INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`) 
 (63, 144, 9, 1),
 (66, 147, 12, 1),
 (67, 154, 12, 1),
-(68, 154, 9, 1);
+(68, 154, 9, 1),
+(69, 155, 12, 1),
+(70, 155, 9, 1),
+(71, 155, 8, 1);
 
 -- --------------------------------------------------------
 
@@ -361,7 +373,8 @@ INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `c
 (147, 12, 23, 0, '54', '3', 'District 2', '67', '', 453, 3453, '   ', 'affidavit, barangay'),
 (152, 0, 4324, 0, '54', '12', 'San Vicente', '73', '', 0, 42342, '   ', 'affidavit, barangay'),
 (153, 0, 41234, 0, '54', '3', 'District 2', '67', '', 0, 41234, '   ', 'affidavit, barangay'),
-(154, 0, 14123, 0, '54', '5', 'District 2', '67', '', 0, 31231, '   ', 'affidavit, barangay');
+(154, 0, 14123, 0, '54', '5', 'District 2', '67', '', 0, 31231, '   ', 'affidavit, barangay'),
+(155, 0, 132, 0, '54', '3', 'District 2', '68', '', 0, 3123, '   ', 'affidavit, barangay');
 
 -- --------------------------------------------------------
 
@@ -462,6 +475,34 @@ INSERT INTO `subclass` (`sc_id`, `sc_code`, `sc_description`, `sc_uv`, `sc_statu
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `transactions`
+--
+
+CREATE TABLE `transactions` (
+  `transaction_id` int(11) NOT NULL,
+  `transaction_code` varchar(50) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `status` enum('Pending','In Progress','Completed') DEFAULT 'Pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `transactions`
+--
+
+INSERT INTO `transactions` (`transaction_id`, `transaction_code`, `name`, `description`, `status`, `created_at`, `updated_at`) VALUES
+(1, '002', 'test 1', 'test1', 'In Progress', '2025-08-20 14:43:32', '2025-08-20 14:43:32'),
+(2, '001', 'test 2', 'test 2', 'Pending', '2025-08-20 14:45:05', '2025-08-20 14:45:05'),
+(3, '003', 'test 3', 'test 3', 'Completed', '2025-08-20 14:46:42', '2025-08-20 14:46:42'),
+(4, '004', 'test 4', 'test 4', 'Pending', '2025-08-20 14:56:05', '2025-08-20 14:56:05'),
+(5, '005', 'name 5', 'test 5', 'Completed', '2025-08-20 15:00:40', '2025-08-20 15:00:40'),
+(6, '423', 'fsdaf', 'sdfg', 'In Progress', '2025-08-22 14:24:10', '2025-08-22 14:24:10');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -494,7 +535,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `last_name`, `first_name`, `middle_name`, `gender`, `birthdate`, `marital_status`, `tin`, `house_number`, `street`, `barangay`, `district`, `municipality`, `province`, `contact_number`, `email`, `status`, `user_type`) VALUES
 (9, 'admin', '$2y$10$cyc4ZGr2yJ6FhQWqomCbQuNbWB9ADdj0HQAFE2U4dU.fR9aRdteha', 'Admin', 'Admin', 'Admin', 'Male', '2001-11-11', 'Single', '000-123-456-789', '5', 'Purok', '66', '18', '14', 'Camarines Norte', '09123456789', 'admin@gmail.com', 1, 'admin'),
-(10, 'user', '$2y$10$XCD.AAvKsPiW0N5LsPJLNO8QlVaX3pcx2hBWCc5R3/951/g2tkTEi', 'User', 'User', 'User', 'Male', '2002-02-02', 'Single', '000-321-654-987', '1', 'Purok 2', '71', '18', '4', 'Camarines Norte', '09876543210', 'user@gmail.com', 1, 'user');
+(10, 'user', '$2y$10$UkziCYNQ.FmUuB3V./d2xelvMkyVO8lvCCd9Yf/CvGMAZJ/jk9LB.', 'User', 'User', 'User', 'Male', '2002-02-02', 'Single', '000-321-654-987', '1', 'Purok 2', '71', '18', '4', 'Camarines Norte', '09876543210', 'user@gmail.com', 1, 'user');
 
 --
 -- Indexes for dumped tables
@@ -608,6 +649,12 @@ ALTER TABLE `subclass`
   ADD PRIMARY KEY (`sc_id`);
 
 --
+-- Indexes for table `transactions`
+--
+ALTER TABLE `transactions`
+  ADD PRIMARY KEY (`transaction_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -634,7 +681,7 @@ ALTER TABLE `certification`
 -- AUTO_INCREMENT for table `classification`
 --
 ALTER TABLE `classification`
-  MODIFY `c_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `c_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `district`
@@ -646,7 +693,7 @@ ALTER TABLE `district`
 -- AUTO_INCREMENT for table `faas`
 --
 ALTER TABLE `faas`
-  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT for table `land`
@@ -676,7 +723,7 @@ ALTER TABLE `owners_tb`
 -- AUTO_INCREMENT for table `propertyowner`
 --
 ALTER TABLE `propertyowner`
-  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
 
 --
 -- AUTO_INCREMENT for table `province`
@@ -688,7 +735,7 @@ ALTER TABLE `province`
 -- AUTO_INCREMENT for table `p_info`
 --
 ALTER TABLE `p_info`
-  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=155;
+  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=156;
 
 --
 -- AUTO_INCREMENT for table `region`
@@ -713,6 +760,12 @@ ALTER TABLE `rpu_idnum`
 --
 ALTER TABLE `subclass`
   MODIFY `sc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `transactions`
+--
+ALTER TABLE `transactions`
+  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `users`
