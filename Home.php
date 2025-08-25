@@ -1,6 +1,14 @@
 <?php
 session_start(); // Start session at the top
 
+// Redirect to login if not logged in
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+  header("Location: index.php");
+  exit;
+}
+
+$first_name = $_SESSION['first_name'] ?? 'Guest';
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -64,6 +72,9 @@ $result = $conn->query($sql);
   <!-- Main Body -->
   <div class="container-fluid p-0 main-content" style="margin-top: 20px;">
     <div class="row px-4">
+      <h2 class="fw-bold fst-italic text-black">
+        Welcome, <?php echo htmlspecialchars($first_name); ?>!
+      </h2>
       <!-- Left Column: Stats + Table -->
       <div class="col-lg-8">
         <!-- Stats Cards Container -->

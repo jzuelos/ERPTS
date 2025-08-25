@@ -8,53 +8,57 @@ require_once 'database.php'; // Include your database connection
 
 $conn = Database::getInstance();
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+  die("Connection failed: " . $conn->connect_error);
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Capture and sanitize form data
-    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+  // Capture and sanitize form data
+  $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+  $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
-    // Check if username and password are not empty
-    if (empty($username) || empty($password)) {
-        $_SESSION['error'] = "Username or password cannot be empty!";
-    } else {
-        // Query the database to check if the user exists
-       $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND status = 1 LIMIT 1");
+  // Check if username and password are not empty
+  if (empty($username) || empty($password)) {
+    $_SESSION['error'] = "Username or password cannot be empty!";
+  } else {
+    // Query the database to check if the user exists
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
 
-        if ($stmt) {
-            $stmt->bind_param("s", $username);
-            $stmt->execute();
-            $result = $stmt->get_result();
+    if ($stmt) {
+      $stmt->bind_param("s", $username);
+      $stmt->execute();
+      $result = $stmt->get_result();
 
-            if ($result && $result->num_rows > 0) {
-                $user = $result->fetch_assoc();
+      if ($result && $result->num_rows > 0) {
+        $user = $result->fetch_assoc();
 
-                // Verify the password
-                if (password_verify($password, $user['password'])) {
-                    // Set session variables on successful login
-                    $_SESSION['user_id'] = $user['user_id'];
-                    $_SESSION['username'] = $user['username'];
-                    $_SESSION['user_type'] = $user['user_type'];
-                    $_SESSION['logged_in'] = true;
+        // First check if account is active
+        if ($user['status'] == 1) {
+          // Active account → check password
+          if (password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['user_type'] = $user['user_type'];
+            $_SESSION['first_name'] = $user['first_name'];  // ✅ Store first_name in session
+            $_SESSION['logged_in'] = true;
 
-                    // Redirect to the home page or dashboard
-                    header("Location: Home.php");
-                    exit();
-                } else {
-                    // Incorrect password
-                    $_SESSION['error'] = "Incorrect password!";
-                }
-            } else {
-                // Username does not exist
-                $_SESSION['error'] = "Username does not exist!";
-            }
-            $stmt->close();
+            header("Location: Home.php");
+            exit();
+          } else {
+            $_SESSION['error'] = "Incorrect password!";
+          }
         } else {
-            $_SESSION['error'] = "Error preparing statement: " . $conn->error;
+          // Inactive account
+          $_SESSION['error'] = "Your account is inactive. Please contact the administrator.";
         }
+      } else {
+        $_SESSION['error'] = "Username does not exist!";
+      }
+      $stmt->close();
+    } else {
+      $_SESSION['error'] = "Error preparing statement: " . $conn->error;
     }
+
+  }
 }
 $conn->close();
 ?>
@@ -70,7 +74,7 @@ $conn->close();
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="index.css"> <!-- Custom CSS -->
@@ -80,37 +84,39 @@ $conn->close();
 <body>
   <!-- Main Content -->
   <div class="container d-flex justify-content-center align-items-center vh-100">
-<!-- Log In Card -->
-<div class="card-container d-flex flex-row">
-  <div class="card login-card">
-    <div class="logo-container">
-      <img src="images/coconut_.__1_-removebg-preview1.png" alt="ERPTS Logo" class="logo">
-    </div>
-    <h2 class="text-center">LOG IN</h2>
-
-    <!-- Display error message if login fails -->
-    <?php if (isset($_SESSION['error'])): ?>
-      <p style="color: red;"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
-    <?php endif; ?>
-
-    <form method="POST">
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" class="form-control rounded-pill" required>
-      </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <div class="position-relative">
-          <input type="password" id="password" name="password" class="form-control rounded-pill" required>
-          <button type="button" id="togglePassword" class="btn btn-link" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #000000; cursor: pointer;">
-            <i class="fa fa-eye" id="eyeIcon"></i>
-          </button>
+    <!-- Log In Card -->
+    <div class="card-container d-flex flex-row">
+      <div class="card login-card">
+        <div class="logo-container">
+          <img src="images/coconut_.__1_-removebg-preview1.png" alt="ERPTS Logo" class="logo">
         </div>
+        <h2 class="text-center">LOG IN</h2>
+
+        <!-- Display error message if login fails -->
+        <?php if (isset($_SESSION['error'])): ?>
+          <p style="color: red;"><?php echo $_SESSION['error'];
+          unset($_SESSION['error']); ?></p>
+        <?php endif; ?>
+
+        <form method="POST">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" class="form-control rounded-pill" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="position-relative">
+              <input type="password" id="password" name="password" class="form-control rounded-pill" required>
+              <button type="button" id="togglePassword" class="btn btn-link"
+                style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #000000; cursor: pointer;">
+                <i class="fa fa-eye" id="eyeIcon"></i>
+              </button>
+            </div>
+          </div>
+          <a href="">Forgot Password?</a>
+          <button type="submit" class="btn btn-dark w-100 mt-4">Log In</button>
+        </form>
       </div>
-      <a href="">Forgot Password?</a>
-      <button type="submit" class="btn btn-dark w-100 mt-4">Log In</button>
-    </form>
-  </div>
 
 
       <!-- Welcome Box -->
@@ -118,7 +124,8 @@ $conn->close();
         <h4 class="text-center mt-4">Welcome to ERPTS</h4>
         <p>From the Assessor’s Module you can:</p>
         <ul>
-          <li>Search for information in Owner’s Declaration (OD), Assessor’s Field Sheet/FAAS, Tax Declaration (TD), or RPTOP.</li>
+          <li>Search for information in Owner’s Declaration (OD), Assessor’s Field Sheet/FAAS, Tax Declaration (TD), or
+            RPTOP.</li>
           <li>Encode new real property information.</li>
         </ul>
         <p>To begin:</p>
