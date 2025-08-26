@@ -29,8 +29,12 @@ $query_properties = "SELECT COUNT(*) AS total_properties FROM p_info";
 $result_properties = $conn->query($query_properties);
 $total_properties = $result_properties->fetch_assoc()['total_properties'];
 
+// Fetch counts for land
+$query_land = "SELECT COUNT(*) AS total_land FROM land";
+$result_land = $conn->query($query_land);
+$land_count = $result_land->fetch_assoc()['total_land'];
+
 // Dummy data
-$land_count = 1250;
 $building_count = 843;
 $plant_count = 327;
 
