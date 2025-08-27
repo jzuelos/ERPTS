@@ -210,11 +210,11 @@
   
 /* Fix z-index so modal is always on top */
 .modal {
-  z-index: 1055 !important;
+  z-index: 2000 !important;
 }
 
 .modal-backdrop {
-  z-index: 1050 !important;
+  z-index: 1990 !important;
 }
 
 /* Center modal content */
