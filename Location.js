@@ -30,7 +30,27 @@ function openLocationFormModal(locationName) {
 }
 
 // Bind the function to the modal show event for the confirmation modal
-$('#confirmationModal').on('show.bs.modal', openConfirmationModal);
+document.querySelectorAll('.openConfirmationBtn').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.preventDefault(); // Prevent page jump
+
+    const locationName = this.dataset.name; // Get the data-name attribute
+
+    // Update confirmation modal text
+    document.getElementById('confirmationQuestion').textContent =
+      `Will you encode the ${locationName} details?`;
+
+    // Show confirmation modal
+    const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+    confirmationModal.show();
+
+    // Set confirm button behavior
+    document.getElementById('confirmBtn').onclick = function () {
+      confirmationModal.hide();
+      openLocationFormModal(locationName); // Open respective form modal
+    };
+  });
+});
 
 
 $(document).ready(function () {
@@ -54,12 +74,13 @@ $('#submitBarangayFormBtn').on('click', function(e) {
   e.preventDefault(); // Prevent default form submission
 
   // Collect form data
-  let formData = {
-    m_id: $('#locationDropdown').val(),  // Get the selected municipality ID
+let formData = {
+    m_id: $('#locationDropdown').val(),
     brgy_code: $('#barangayCode').val(),
     brgy_name: $('#barangayName').val(),
-    status: $('input[name="status"]:checked').val()
-  };
+    status: $('input[name="statusBarangay"]:checked').val() // updated name
+};
+
 
   // Send data to PHP file for database insertion using AJAX
   $.ajax({
@@ -203,12 +224,13 @@ $('#submitMunicipalityFormBtn').on('click', function(e) {
     return;  // Stop the form submission
   }
 
-  let formData = {
-    region_id: regionId,  // Use region_id from dropdown
+let formData = {
+    region_id: $('#region').val(),
     municipality_code: $('#municipalityCode').val(),
     municipality_description: $('#municipalityDescription').val(),
-    status: $('input[name="status"]:checked').val()
-  };
+    status: $('input[name="statusMunicipality"]:checked').val() // updated name
+};
+
 
   // Send data to PHP file for database insertion using AJAX
   $.ajax({

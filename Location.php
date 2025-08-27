@@ -25,8 +25,6 @@ if ($conn->connect_error) {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-KyZXEJr+8+6g5K4r53m5s3xmw1Is0J6wBd04YOeFvXOsZTgmYF9flT/qe6LZ9s+0" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="header.css">
@@ -34,7 +32,7 @@ if ($conn->connect_error) {
   <title>Electronic Real Property Tax System</title>
 </head>
 
-<body>
+<body>  
   <?php include 'header.php'; ?>
 
   <!-- Main Body -->
@@ -253,208 +251,197 @@ if ($conn->connect_error) {
 
     <!-- Location Selection Options -->
     <div class="row justify-content-center">
-      <!-- Municipality -->
-      <div class="col-md-4 col-sm-6 mb-4 d-flex justify-content-center">
-        <a href="#" class="card border-0 shadow-lg p-5 text-center location-card h-100" data-toggle="modal" data-target="#confirmationModal" data-name="Municipality">
-          <div class="d-flex flex-column align-items-center">
-            <i class="fas fa-city icon-style mb-3" style="font-size: 3rem;"></i>
-            <h5 class="font-weight-bold" style="font-size: 1.5rem;">Municipality</h5>
-          </div>
-        </a>
-      </div>
-
-      <!-- District -->
-      <div class="col-md-4 col-sm-6 mb-4 d-flex justify-content-center">
-        <a href="#" class="card border-0 shadow-lg p-5 text-center location-card h-100" data-toggle="modal" data-target="#confirmationModal" data-name="District">
-          <div class="d-flex flex-column align-items-center">
-            <i class="fas fa-map-marked-alt icon-style mb-3" style="font-size: 3rem;"></i>
-            <h5 class="font-weight-bold" style="font-size: 1.5rem;">District</h5>
-          </div>
-        </a>
-      </div>
-
-      <!-- Barangay -->
-      <div class="col-md-4 col-sm-6 mb-4 d-flex justify-content-center">
-        <a href="#" class="card border-0 shadow-lg p-5 text-center location-card h-100" data-toggle="modal" data-target="#confirmationModal" data-name="Barangay">
-          <div class="d-flex flex-column align-items-center">
-            <i class="fas fa-home icon-style mb-3" style="font-size: 3rem;"></i>
-            <h5 class="font-weight-bold" style="font-size: 1.5rem;">Barangay</h5>
-          </div>
-        </a>
-      </div>
+    <!-- Municipality -->
+    <div class="col-md-4 col-sm-6 mb-4 d-flex justify-content-center">
+      <a href="#" class="card border-0 shadow-lg p-5 text-center location-card h-100 openConfirmationBtn" data-name="Municipality">
+        <div class="d-flex flex-column align-items-center">
+          <i class="fas fa-city icon-style mb-3" style="font-size: 3rem;"></i>
+          <h5 class="font-weight-bold" style="font-size: 1.5rem;">Municipality</h5>
+        </div>
+      </a>
     </div>
+
+    <!-- District -->
+    <div class="col-md-4 col-sm-6 mb-4 d-flex justify-content-center">
+      <a href="#" class="card border-0 shadow-lg p-5 text-center location-card h-100 openConfirmationBtn" data-name="District">
+        <div class="d-flex flex-column align-items-center">
+          <i class="fas fa-map-marked-alt icon-style mb-3" style="font-size: 3rem;"></i>
+          <h5 class="font-weight-bold" style="font-size: 1.5rem;">District</h5>
+        </div>
+      </a>
+    </div>
+
+    <!-- Barangay -->
+    <div class="col-md-4 col-sm-6 mb-4 d-flex justify-content-center">
+      <a href="#" class="card border-0 shadow-lg p-5 text-center location-card h-100 openConfirmationBtn" data-name="Barangay">
+        <div class="d-flex flex-column align-items-center">
+          <i class="fas fa-home icon-style mb-3" style="font-size: 3rem;"></i>
+          <h5 class="font-weight-bold" style="font-size: 1.5rem;">Barangay</h5>
+        </div>
+      </a>
+    </div>
+  </div>
   </main>
 
-  <!--Modal Section-->
-  <!-- Confirmation Modal -->
-  <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="confirmationModalLabel">Confirm Location</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <p id="confirmationQuestion">Will you encode the [Location Name] details?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" id="confirmBtn">Confirm</button>
-        </div>
+<!--Modal Section-->
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Confirm Location</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmationQuestion">Will you encode the [Location Name] details?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirmBtn">Confirm</button>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Barangay Form Modal -->
-  <div class="modal fade" id="barangayModal" tabindex="-1" role="dialog" aria-labelledby="barangayModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="barangayModalLabel">Enter Barangay Details</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <!-- Form to enter Barangay details -->
-          <form id="barangayForm">
-            <div class="form-group">
-              <label for="locationDropdown">District/Municipality/City</label>
-              <select class="form-control" id="locationDropdown" required>
-                <option value="" selected disabled>Fetching Data...</option>
-              </select>
+<!-- Barangay Modal -->
+<div class="modal fade" id="barangayModal" tabindex="-1" aria-labelledby="barangayModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="barangayModalLabel">Enter Barangay Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="barangayForm">
+          <div class="form-group">
+            <label for="locationDropdown">District/Municipality/City</label>
+            <select class="form-control" id="locationDropdown" required>
+              <option value="" selected disabled>Fetching Data...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="barangayCode">Barangay Code</label>
+            <input type="text" class="form-control" id="barangayCode" placeholder="Enter Barangay Code" required>
+          </div>
+          <div class="form-group">
+            <label for="barangayName">Name of Barangay</label>
+            <input type="text" class="form-control" id="barangayName" placeholder="Enter Name of Barangay" required>
+          </div>
+          <div class="form-group">
+            <label>Status</label><br>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="statusBarangay" id="statusActive" value="Active" required>
+              <label class="form-check-label" for="statusActive">Active</label>
             </div>
-
-            <div class="form-group">
-              <label for="barangayCode">Barangay Code</label>
-              <input type="text" class="form-control" id="barangayCode" placeholder="Enter Barangay Code" required>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="statusBarangay" id="statusInactive" value="Inactive">
+              <label class="form-check-label" for="statusInactive">Inactive</label>
             </div>
-
-            <div class="form-group">
-              <label for="barangayName">Name of Barangay</label>
-              <input type="text" class="form-control" id="barangayName" placeholder="Enter Name of Barangay" required>
-            </div>
-
-            <div class="form-group">
-              <label>Status</label><br>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="status" id="statusActive" value="Active" required>
-                <label class="form-check-label" for="statusActive">Active</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="status" id="statusInactive" value="Inactive">
-                <label class="form-check-label" for="statusInactive">Inactive</label>
-              </div>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-          <button type="reset" class="btn btn-warning" id="resetFormBtn">Reset</button>
-          <button type="submit" class="btn btn-primary" id="submitBarangayFormBtn">Submit</button>
-        </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-warning" id="resetBarangayFormBtn">Reset</button>
+        <button type="submit" class="btn btn-primary" id="submitBarangayFormBtn">Submit</button>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Municipality Modal -->
-  <div class="modal fade" id="municipalityModal" tabindex="-1" role="dialog" aria-labelledby="municipalityModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="municipalityModalLabel">Municipality Details</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form id="municipalityForm">
-            <div class="form-group">
-              <label for="region">Region</label>
-              <select class="form-control" id="region">
-                <option value="" selected disabled>Fetching Data...</option>
-              </select>
+<!-- Municipality Modal -->
+<div class="modal fade" id="municipalityModal" tabindex="-1" aria-labelledby="municipalityModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="municipalityModalLabel">Municipality Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="municipalityForm">
+          <div class="form-group">
+            <label for="region">Region</label>
+            <select class="form-control" id="region" required>
+              <option value="" selected disabled>Fetching Data...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="municipalityCode">Code</label>
+            <input type="text" class="form-control" id="municipalityCode" placeholder="Enter Code" required>
+          </div>
+          <div class="form-group">
+            <label for="municipalityDescription">Description</label>
+            <input type="text" class="form-control" id="municipalityDescription" placeholder="Enter Description" required>
+          </div>
+          <div class="form-group">
+            <label>Status</label><br>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="statusMunicipality" id="municipalityActive" value="Active" required>
+              <label class="form-check-label" for="municipalityActive">Active</label>
             </div>
-            <div class="form-group">
-              <label for="municipalityCode">Code</label>
-              <input type="text" class="form-control" id="municipalityCode" placeholder="Enter Code" value="">
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="statusMunicipality" id="municipalityInactive" value="Inactive">
+              <label class="form-check-label" for="municipalityInactive">Inactive</label>
             </div>
-            <div class="form-group">
-              <label for="municipalityDescription">Description</label>
-              <input type="text" class="form-control" id="municipalityDescription" placeholder="Enter Description" value="">
-            </div>
-            <div class="form-group">
-              <label>Status</label><br>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="status" id="municipalityActive" value="active" required>
-                <label class="form-check-label" for="municipalityActive">Active</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="status" id="municipalityInactive" value="inactive">
-                <label class="form-check-label" for="municipalityInactive">Inactive</label>
-              </div>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-          <button type="reset" class="btn btn-warning" id="resetMunicipalityFormBtn">Reset</button>
-          <button type="submit" class="btn btn-primary" id="submitMunicipalityFormBtn">Submit</button>
-        </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-warning" id="resetMunicipalityFormBtn">Reset</button>
+        <button type="submit" class="btn btn-primary" id="submitMunicipalityFormBtn">Submit</button>
       </div>
     </div>
   </div>
+</div>
 
-
-  <!--District Modal -->
-  <div class="modal fade" id="districtModal" tabindex="-1" role="dialog" aria-labelledby="districtModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="districtModalLabel">District Details</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form id="districtForm">
-            <div class="form-group">
-              <label for="municipality">Municipality / City</label>
-              <select class="form-control" id="municipality">
-                <option value="" selected disabled>Loading...</option>
-              </select>
+<!-- District Modal -->
+<div class="modal fade" id="districtModal" tabindex="-1" aria-labelledby="districtModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="districtModalLabel">District Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="districtForm">
+          <div class="form-group">
+            <label for="municipality">Municipality / City</label>
+            <select class="form-control" id="municipality" required>
+              <option value="" selected disabled>Loading...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="districtCode">Code</label>
+            <input type="text" class="form-control" id="districtCode" placeholder="Enter Code" required>
+          </div>
+          <div class="form-group">
+            <label for="districtDescription">Description</label>
+            <input type="text" class="form-control" id="districtDescription" placeholder="Enter Description" required>
+          </div>
+          <div class="form-group">
+            <label>Status</label><br>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="statusDistrict" id="districtActive" value="Active" required>
+              <label class="form-check-label" for="districtActive">Active</label>
             </div>
-            <div class="form-group">
-              <label for="code">Code</label>
-              <input type="text" class="form-control" id="districtCode" placeholder="Enter Code" value="">
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="statusDistrict" id="districtInactive" value="Inactive">
+              <label class="form-check-label" for="districtInactive">Inactive</label>
             </div>
-            <div class="form-group">
-              <label for="description">Description</label>
-              <input type="text" class="form-control" id="districtDescription" placeholder="Enter Description" value="">
-            </div>
-            <div class="form-group">
-              <label>Status</label><br>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="status" id="active" value="active" required>
-                <label class="form-check-label" for="active">Active</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="status" id="inactive" value="inactive">
-                <label class="form-check-label" for="inactive">Inactive</label>
-              </div>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-          <button type="reset" class="btn btn-warning" id="resetFormBtn">Reset</button>
-          <button type="submit" class="btn btn-primary" id="submitDistrictFormBtn">Submit</button>
-        </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-warning" id="resetDistrictFormBtn">Reset</button>
+        <button type="submit" class="btn btn-primary" id="submitDistrictFormBtn">Submit</button>
       </div>
     </div>
   </div>
+</div>
+
+
 
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start">
@@ -464,15 +451,12 @@ if ($conn->connect_error) {
   </footer>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
   <!-- Bootstrap JS -->
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
-  <script src="Location.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>            
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>           
+  <script src="Location.js"></script>
 </body>
 
 </html>
