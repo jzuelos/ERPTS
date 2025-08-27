@@ -86,10 +86,12 @@
               <?php
               if ($classification_result && $classification_result->num_rows > 0) {
                 while ($row = $classification_result->fetch_assoc()) {
-                  echo "<option value='" . htmlspecialchars($row['c_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['c_description'], ENT_QUOTES) . "</option>";
+                  // use c_description as both the value and the text shown
+                  echo "<option value='" . htmlspecialchars($row['c_description'], ENT_QUOTES) . "'>"
+                    . htmlspecialchars($row['c_description'], ENT_QUOTES) . "</option>";
                 }
               } else {
-                echo "<option disabled>No active classifications</option>";
+                echo "<option disabled>No classifications found</option>";
               }
               ?>
             </select>
@@ -107,7 +109,8 @@
               <select class="form-control" id="provinceSelect" disabled>
                 <option value="" disabled selected>Select Province</option>
                 <?php while ($row = $regions_result->fetch_assoc()) {
-                  echo "<option value='" . htmlspecialchars($row['province_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['province_name'], ENT_QUOTES) . "</option>";
+                  echo "<option value='" . htmlspecialchars($row['province_name'], ENT_QUOTES) . "'>"
+                    . htmlspecialchars($row['province_name'], ENT_QUOTES) . "</option>";
                 } ?>
               </select>
             </div>
@@ -117,7 +120,8 @@
               <select class="form-control" id="citySelect" disabled>
                 <option value="" disabled selected>Select Municipality</option>
                 <?php while ($row = $municipalities_result->fetch_assoc()) {
-                  echo "<option value='" . htmlspecialchars($row['m_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['m_description'], ENT_QUOTES) . "</option>";
+                  echo "<option value='" . htmlspecialchars($row['m_description'], ENT_QUOTES) . "'>"
+                    . htmlspecialchars($row['m_description'], ENT_QUOTES) . "</option>";
                 } ?>
               </select>
             </div>
@@ -129,10 +133,11 @@
                 <?php
                 if ($districts_result && $districts_result->num_rows > 0) {
                   while ($row = $districts_result->fetch_assoc()) {
-                    echo "<option value='" . htmlspecialchars($row['district_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['description'], ENT_QUOTES) . "</option>";
+                    echo "<option value='" . htmlspecialchars($row['description'], ENT_QUOTES) . "'>"
+                      . htmlspecialchars($row['description'], ENT_QUOTES) . "</option>";
                   }
                 } else {
-                  echo "<option disabled>No active districts</option>";
+                  echo "<option disabled>No districts</option>";
                 }
                 ?>
               </select>
@@ -145,10 +150,11 @@
                 <?php
                 if ($barangays_result && $barangays_result->num_rows > 0) {
                   while ($row = $barangays_result->fetch_assoc()) {
-                    echo "<option value='" . htmlspecialchars($row['brgy_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['brgy_name'], ENT_QUOTES) . "</option>";
+                    echo "<option value='" . htmlspecialchars($row['brgy_name'], ENT_QUOTES) . "'>"
+                      . htmlspecialchars($row['brgy_name'], ENT_QUOTES) . "</option>";
                   }
                 } else {
-                  echo "<option disabled>No active barangays</option>";
+                  echo "<option disabled>No barangays</option>";
                 }
                 ?>
               </select>
@@ -191,7 +197,7 @@
 
           <!-- Submit -->
           <div class="text-right">
-            <a href="#" class="btn btn-primary" target="_blank">PRINT</a>
+            <a href="#" id="printBtn" class="btn btn-primary" target="_blank">PRINT</a>
           </div>
         </form>
       </div>
@@ -275,29 +281,30 @@
 
       // Collect parameters on PRINT button click
       printBtn.addEventListener("click", function(e) {
-        e.preventDefault(); // stop actual print for now
+        e.preventDefault();
 
-        let params = {};
+        let params = new URLSearchParams();
 
         if (printAllCheckbox.checked) {
-          params["print_all"] = true;
+          params.append("print_all", "1");
         } else {
           if (classificationCheckbox.checked && classificationSelect.value) {
-            params["classification_id"] = classificationSelect.value;
+            params.append("classification", classificationSelect.value);
           }
           if (locationCheckbox.checked) {
-            if (provinceSelect.value) params["province_id"] = provinceSelect.value;
-            if (citySelect.value) params["municipality_id"] = citySelect.value;
-            if (districtSelect.value) params["district_id"] = districtSelect.value;
-            if (barangaySelect.value) params["barangay_id"] = barangaySelect.value;
+            if (provinceSelect.value) params.append("province", provinceSelect.value);
+            if (citySelect.value) params.append("municipality", citySelect.value);
+            if (districtSelect.value) params.append("district", districtSelect.value);
+            if (barangaySelect.value) params.append("barangay", barangaySelect.value);
           }
           if (dateCheckbox.checked) {
-            if (fromDate.value) params["from_date"] = fromDate.value;
-            if (toDate.value) params["to_date"] = toDate.value;
+            if (fromDate.value) params.append("from_date", fromDate.value);
+            if (toDate.value) params.append("to_date", toDate.value);
           }
         }
 
-        console.log("Collected Parameters:", params); // For now, just show them
+        // redirect to PHP page with params
+        window.open("print_report.php?" + params.toString(), "_blank");
       });
 
       printAllCheckbox.addEventListener("change", updateStates);
