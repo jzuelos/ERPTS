@@ -48,7 +48,8 @@
   <!-- Header -->
   <?php include 'header.php'; ?>
 
-  <div class="content-wrapper container mt-5">
+  <div class="form-center-wrapper">
+  <div class="center-form-wrapper">
     <div class="card p-4">
       <form>
         <!-- Back button -->
@@ -169,13 +170,14 @@
       </form>
     </div>
   </div>
+  </div>
 
   <!-- Footer -->
-  <footer class="footer bg-light text-center text-lg-start">
-    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
-      <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span>
-    </div>
-  </footer>
+<footer>
+  <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+    © 2024 Electronic Real Property Tax System. All Rights Reserved.
+  </div>
+</footer>
 
   <!-- JS -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
