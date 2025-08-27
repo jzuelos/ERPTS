@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 25, 2025 at 09:37 PM
+-- Generation Time: Aug 27, 2025 at 08:58 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -80,7 +80,7 @@ CREATE TABLE `certification` (
 INSERT INTO `certification` (`cert_id`, `verified`, `noted`, `recom_approval`, `recom_date`, `plotted`, `appraised`, `appraised_date`, `approved`, `approved_date`, `idle`, `contested`, `land_id`) VALUES
 (17, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-28', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-28', 'Lingon, Nestor Jacolbia', '2025-04-28', 0, 0, 55),
 (18, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-28', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-28', 'Lingon, Nestor Jacolbia', '2025-04-28', 0, 0, 56),
-(19, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-08-18', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-08-18', 'Lingon, Nestor Jacolbia', '2025-08-18', 0, 0, 57);
+(19, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-08-27', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-08-27', 'Lingon, Nestor Jacolbia', '2025-08-27', 0, 0, 57);
 
 -- --------------------------------------------------------
 
@@ -199,17 +199,19 @@ CREATE TABLE `land` (
   `adjust_mv` decimal(10,2) NOT NULL,
   `assess_lvl` decimal(10,2) NOT NULL,
   `assess_value` decimal(10,2) NOT NULL,
-  `faas_id` int(50) NOT NULL
+  `faas_id` int(50) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `land`
 --
 
-INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `north`, `east`, `south`, `west`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`, `adjust_factor`, `adjust_percent`, `adjust_value`, `adjust_mv`, `assess_lvl`, `assess_value`, `faas_id`) VALUES
-(55, 25634, '423', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 800, '', 20.00, 16000.00, '', 17.00, -13280.00, 2720.00, 100.00, 2720.00, 33),
-(56, 1234, '3412', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 432, '1', 34.00, 14688.00, '', 100.00, 0.00, 14688.00, 34.00, 4993.92, 33),
-(57, 3421, '4324', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'asdfasdfa', 'Residential', '', 800, '', 200.00, 160000.00, '', 100.00, 0.00, 160000.00, 65.00, 104000.00, 36);
+INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `north`, `east`, `south`, `west`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`, `adjust_factor`, `adjust_percent`, `adjust_value`, `adjust_mv`, `assess_lvl`, `assess_value`, `faas_id`, `created_at`, `updated_at`) VALUES
+(55, 25634, '423', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 800, '', 20.00, 16000.00, '', 17.00, -13280.00, 2720.00, 100.00, 2720.00, 33, '2025-08-27 16:41:18', '2025-08-27 16:41:18'),
+(56, 1234, '3412', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 432, '1', 34.00, 14688.00, '', 100.00, 0.00, 14688.00, 34.00, 4993.92, 33, '2025-08-27 16:41:18', '2025-08-27 16:41:18'),
+(57, 3421, '4321', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'asdfasdfa', 'Residential', '', 800, '', 200.00, 160000.00, '', 100.00, 0.00, 160000.00, 65.00, 104000.00, 36, '2025-08-27 16:41:18', '2025-08-27 16:42:32');
 
 -- --------------------------------------------------------
 
