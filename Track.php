@@ -26,8 +26,6 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-KyZXEJr+8+6g5K4r53m5s3xmw1Is0J6wBd04YOeFvXOsZTgmYF9flT/qe6LZ9s+0" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="header.css">
@@ -87,15 +85,14 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
   </div>
 
   <!-- Modal -->
-  <div class="modal" id="transactionModal">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title"><i class="fas fa-exchange-alt"></i> Add Transaction</h3>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-
-        <div class="modal-body">
+<div class="modal fade" id="transactionModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle"><i class="fas fa-exchange-alt"></i> Add Transaction</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
           <input type="text" id="transactionID" name="t_code" class="form-control mb-2" placeholder="Transaction Code">
           <input type="text" id="nameInput" name="t_name" class="form-control mb-2" placeholder="Name">
           <input type="text" id="transactionInput" name="t_description" class="form-control mb-2" placeholder="Transaction Description">
@@ -107,20 +104,19 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
             <option value="Completed">Completed</option>
           </select>
         </div>
-
-        <div class="modal-footer">
-          <div class="d-flex w-100 gap-2">
-            <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">
-              <i class="fas fa-times"></i> Cancel
-            </button>
-            <button type="button" class="btn btn-success w-50" onclick="saveTransaction()">
-              <i class="fas fa-save"></i> Save
-            </button>
-          </div>
+      <div class="modal-footer">
+        <div class="d-flex w-100 gap-2">
+          <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+          <button type="button" class="btn btn-success w-50" onclick="saveTransaction()">
+            <i class="fas fa-save"></i> Save
+          </button>
         </div>
       </div>
     </div>
   </div>
+</div>
 
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">

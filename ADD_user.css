@@ -44,7 +44,8 @@ input:focus {
     outline: none;
 }
 
-button {
+/* ✅ Apply ONLY to form buttons */
+form button {
     margin-top: 20px;
     padding: 10px;
     background-color: #459577;
@@ -57,14 +58,42 @@ button {
     transition: background-color 0.3s, transform 0.3s;
 }
 
-button:hover {
+form button:hover {
     background-color: #38776b;
     transform: scale(1.05);
 }
 
-button:focus {
+form button:focus {
     outline: none;
     box-shadow: none;
+}
+
+/* ✅ Keep admin-dashboard-btn consistent everywhere */
+.admin-dashboard-btn {
+    min-width: 150px;
+    height: 45px;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block; /* works same on <a>, <button>, <input> */
+}
+
+.admin-dashboard-btn:hover {
+    background-color: #e0a800 !important;
+    color: white !important;
+}
+
+.admin-dashboard-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(224, 168, 0, 0.4);
+}
+
+.admin-dashboard-btn:disabled {
+    background-color: #d6d6d6;
+    color: #888888;
+    cursor: not-allowed;
 }
 
 .form-check {
@@ -75,42 +104,6 @@ button:focus {
     margin-left: 5px; 
 }
 
-
 .col-form-label {
     margin-bottom: 5px; 
 }
-
-
-.navbar {
-    padding: 8px 16px; 
-}
-
-.navbar-brand {
-    display: flex;
-    align-items: center;
-}
-
-.navbar-brand img {
-    margin-right: 10px; 
-}
-
-.navbar-nav {
-    display: flex;
-    align-items: center; 
-}
-
-.navbar-nav .nav-item {
-    padding: 0 3px; 
-}
-
-.navbar-nav .nav-link {
-    font-size: 15px;
-    padding: 8px 10px; 
-}
-
-.btn-danger {
-    margin-top: 0; 
-    line-height: 1.5;
-    border: 10px;
-}
-

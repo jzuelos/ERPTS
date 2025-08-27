@@ -1,62 +1,95 @@
 let transactions = [];
 let editId = null;
+let transactionModal = null;
+
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize the Bootstrap modal
+    const modalElement = document.getElementById('transactionModal');
+    if (modalElement) {
+        transactionModal = new bootstrap.Modal(modalElement);
+    }
+});
 
 function openModal(id = null) {
-  document.getElementById('transactionModal').style.display = 'flex';
-  if (id !== null) {
-    const tx = transactions.find(t => t.id === id);
-    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Transaction';
-    document.getElementById('nameInput').value = tx.name;
-    document.getElementById('transactionInput').value = tx.transaction;
-    document.getElementById('statusInput').value = tx.status;
-    editId = id;
-  } else {
-    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus"></i> Add Transaction';
-    document.getElementById('nameInput').value = '';
-    document.getElementById('transactionInput').value = '';
-    document.getElementById('statusInput').value = 'stats';
-    editId = null;
-  }
+    if (!transactionModal) {
+        // Initialize modal if not already done
+        const modalElement = document.getElementById('transactionModal');
+        if (modalElement) {
+            transactionModal = new bootstrap.Modal(modalElement);
+        } else {
+            console.error('Modal element not found');
+            return;
+        }
+    }
+    
+    if (id !== null) {
+        const tx = transactions.find(t => t.id === id);
+        if (tx) {
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Transaction';
+            document.getElementById('transactionID').value = tx.t_code || '';
+            document.getElementById('nameInput').value = tx.name || '';
+            document.getElementById('transactionInput').value = tx.transaction || '';
+            document.getElementById('statusInput').value = tx.status || '';
+            editId = id;
+        }
+    } else {
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus"></i> Add Transaction';
+        document.getElementById('transactionID').value = '';
+        document.getElementById('nameInput').value = '';
+        document.getElementById('transactionInput').value = '';
+        document.getElementById('statusInput').selectedIndex = 0;
+        editId = null;
+    }
+    
+    // Show the modal using Bootstrap's method
+    transactionModal.show();
 }
 
 function closeModal() {
-  document.getElementById('transactionModal').style.display = 'none';
+    if (transactionModal) {
+        transactionModal.hide();
+    }
 }
 
 function saveTransaction() {
-      // Get input values
-      let t_code = document.getElementById("transactionID").value.trim();
-      let t_name = document.getElementById("nameInput").value.trim();
-      let t_description = document.getElementById("transactionInput").value.trim();
-      let t_status = document.getElementById("statusInput").value;
+    // Get input values
+    let t_code = document.getElementById("transactionID").value.trim();
+    let t_name = document.getElementById("nameInput").value.trim();
+    let t_description = document.getElementById("transactionInput").value.trim();
+    let t_status = document.getElementById("statusInput").value;
 
-      // Basic validation
-      if (!t_code || !t_name || !t_description || !t_status) {
+    // Basic validation
+    if (!t_code || !t_name || !t_description || !t_status) {
         alert("Please fill out all fields.");
         return;
-      }
+    }
 
-      // Prepare data
-      let formData = new FormData();
-      formData.append("action", "saveTransaction"); // action identifier
-      formData.append("t_code", t_code);
-      formData.append("t_name", t_name);
-      formData.append("t_description", t_description);
-      formData.append("t_status", t_status);
+    // Prepare data
+    let formData = new FormData();
+    formData.append("action", editId ? "updateTransaction" : "saveTransaction");
+    formData.append("t_code", t_code);
+    formData.append("t_name", t_name);
+    formData.append("t_description", t_description);
+    formData.append("t_status", t_status);
+    
+    if (editId) {
+        formData.append("id", editId);
+    }
 
-      // Send request
-      fetch("trackFunctions.php", {
-          method: "POST",
-          body: formData
-        })
-        .then(response => {
-          // Make sure we parse valid JSON
-          return response.json().catch(() => {
+    // Send request
+    fetch("trackFunctions.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => {
+        return response.json().catch(() => {
             throw new Error("Invalid JSON response from server");
-          });
-        })
-        .then(data => {
-          if (data.success) {
+        });
+    })
+    .then(data => {
+        if (data.success) {
             alert("Transaction saved successfully!");
 
             // Reset form fields
@@ -65,27 +98,24 @@ function saveTransaction() {
             document.getElementById("transactionInput").value = "";
             document.getElementById("statusInput").selectedIndex = 0;
 
-            // Close modal (Bootstrap 5 requires creating instance if not exists)
-            let modalEl = document.getElementById('transactionModal');
-            let modal = bootstrap.Modal.getInstance(modalEl);
-            if (!modal) {
-              modal = new bootstrap.Modal(modalEl);
+            // Close modal
+            if (transactionModal) {
+                transactionModal.hide();
             }
-            modal.hide();
 
             // Optionally reload transaction list
             if (typeof loadTransactions === "function") {
-              loadTransactions();
+                loadTransactions();
             }
-          } else {
+        } else {
             alert("Error: " + (data.message || "Unknown error"));
-          }
-        })
-        .catch(error => {
-          console.error("Error:", error);
-          alert("Something went wrong while saving.");
-        });
-    }
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Something went wrong while saving.");
+    });
+}
     
 function deleteTransaction(id) {
   if (confirm('Are you sure you want to delete this transaction?')) {
@@ -103,20 +133,20 @@ function updateTable() {
     const row = document.createElement('tr');
     const statusClass = tx.status === 'Completed' ? 'status-completed' : 'status-in-progress';
     
-    row.innerHTML = `
-      <td>#${tx.id}</td>
-      <td>${tx.name}</td>
-      <td>${tx.transaction}</td>
-      <td><span class="status-badge ${statusClass}">${tx.status}</span></td>
-      <td>
-        <button class="btn btn-edit" onclick="openModal(${tx.id})">
-          <i class="fas fa-edit"></i> Edit
-        </button>
-        <button class="btn btn-delete" onclick="deleteTransaction(${tx.id})">
-          <i class="fas fa-trash"></i> Delete
-        </button>
-      </td>
-    `;
+      row.innerHTML = `
+        <td>${tx.t_code || '#' + tx.id}</td>
+        <td>${tx.name}</td>
+        <td>${tx.transaction}</td>
+        <td><span class="status-badge ${statusClass}">${tx.status}</span></td>
+        <td>
+          <button class="btn btn-edit" onclick="openModal(${tx.id})">
+            <i class="fas fa-edit"></i> Edit
+          </button>
+          <button class="btn btn-delete" onclick="deleteTransaction(${tx.id})">
+            <i class="fas fa-trash"></i> Delete
+          </button>
+        </td>
+      `;
     table.appendChild(row);
   });
 
