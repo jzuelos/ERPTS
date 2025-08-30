@@ -108,10 +108,17 @@
               <label for="provinceSelect">Province</label>
               <select class="form-control" id="provinceSelect" disabled>
                 <option value="" disabled selected>Select Province</option>
-                <?php while ($row = $regions_result->fetch_assoc()) {
-                  echo "<option value='" . htmlspecialchars($row['province_name'], ENT_QUOTES) . "'>"
-                    . htmlspecialchars($row['province_name'], ENT_QUOTES) . "</option>";
-                } ?>
+                <?php
+                // Check if there are no provinces in the regions_result
+                if ($regions_result->num_rows === 0) {
+                  echo "<option disabled>No provinces found</option>";
+                } else {
+                  while ($row = $regions_result->fetch_assoc()) {
+                    echo "<option value='" . htmlspecialchars($row['province_name'], ENT_QUOTES) . "'>"
+                      . htmlspecialchars($row['province_name'], ENT_QUOTES) . "</option>";
+                  }
+                }
+                ?>
               </select>
             </div>
 
@@ -119,10 +126,17 @@
               <label for="citySelect">Municipality/City</label>
               <select class="form-control" id="citySelect" disabled>
                 <option value="" disabled selected>Select Municipality</option>
-                <?php while ($row = $municipalities_result->fetch_assoc()) {
-                  echo "<option value='" . htmlspecialchars($row['m_description'], ENT_QUOTES) . "'>"
-                    . htmlspecialchars($row['m_description'], ENT_QUOTES) . "</option>";
-                } ?>
+                <?php
+                // Check if there are no municipalities in the municipalities_result
+                if ($municipalities_result->num_rows === 0) {
+                  echo "<option disabled>No municipalities found</option>";
+                } else {
+                  while ($row = $municipalities_result->fetch_assoc()) {
+                    echo "<option value='" . htmlspecialchars($row['m_description'], ENT_QUOTES) . "'>"
+                      . htmlspecialchars($row['m_description'], ENT_QUOTES) . "</option>";
+                  }
+                }
+                ?>
               </select>
             </div>
 
@@ -170,20 +184,12 @@
           <div class="form-row">
             <div class="form-group col-md-6">
               <label for="fromDate">From:</label>
-              <input type="date"
-                class="form-control"
-                id="fromDate"
-                disabled
-                min="<?php echo $minDate; ?>"
+              <input type="date" class="form-control" id="fromDate" disabled min="<?php echo $minDate; ?>"
                 max="<?php echo $maxDate; ?>">
             </div>
             <div class="form-group col-md-6">
               <label for="toDate">To:</label>
-              <input type="date"
-                class="form-control"
-                id="toDate"
-                disabled
-                min="<?php echo $minDate; ?>"
+              <input type="date" class="form-control" id="toDate" disabled min="<?php echo $minDate; ?>"
                 max="<?php echo $maxDate; ?>">
             </div>
           </div>
@@ -215,7 +221,7 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       const printAllCheckbox = document.getElementById("printAllCheck");
       const classificationCheckbox = document.getElementById("classificationCheck");
       const locationCheckbox = document.getElementById("locationCheck");
@@ -232,6 +238,7 @@
       const printBtn = document.querySelector(".btn.btn-primary");
 
       function updateStates() {
+        // Disable filters based on Print All checkbox state
         if (printAllCheckbox.checked) {
           classificationCheckbox.disabled = true;
           locationCheckbox.disabled = true;
@@ -260,28 +267,39 @@
           fromDate.disabled = !date;
           toDate.disabled = !date;
         }
+
+        // Disable "Print All" if any filter is checked
+        if (classificationCheckbox.checked || locationCheckbox.checked || dateCheckbox.checked) {
+          printAllCheckbox.disabled = true;
+        } else {
+          printAllCheckbox.disabled = false;
+        }
       }
 
       // Validate date ranges visually
-      toDate.addEventListener("change", function() {
+      toDate.addEventListener("change", function () {
         toDate.classList.remove("is-invalid");
         if (fromDate.value && toDate.value < fromDate.value) {
           toDate.classList.add("is-invalid");
-          toDate.value = "";
         }
       });
 
-      fromDate.addEventListener("change", function() {
+      fromDate.addEventListener("change", function () {
         fromDate.classList.remove("is-invalid");
         if (toDate.value && fromDate.value > toDate.value) {
           fromDate.classList.add("is-invalid");
-          fromDate.value = "";
         }
       });
 
       // Collect parameters on PRINT button click
-      printBtn.addEventListener("click", function(e) {
+      printBtn.addEventListener("click", function (e) {
         e.preventDefault();
+
+        // Validate date ranges before continuing
+        if (fromDate.classList.contains("is-invalid") || toDate.classList.contains("is-invalid")) {
+          alert("Please fix the date range before proceeding.");
+          return; // Stop further execution if dates are invalid
+        }
 
         let params = new URLSearchParams();
 
@@ -303,14 +321,22 @@
           }
         }
 
-        // redirect to PHP page with params
-        window.open("print_report.php?" + params.toString(), "_blank");
+        // Prevent empty print
+        if (!printAllCheckbox.checked && !params.toString()) {
+          alert("Please select at least one filter or print all.");
+          return; // Stop the process if no filters are selected
+        }
+
+        // Redirect to PHP page with parameters
+        window.open("report-print.php?" + params.toString(), "_blank");
       });
 
       printAllCheckbox.addEventListener("change", updateStates);
       classificationCheckbox.addEventListener("change", updateStates);
       locationCheckbox.addEventListener("change", updateStates);
       dateCheckbox.addEventListener("change", updateStates);
+
+      updateStates();
     });
   </script>
 </body>

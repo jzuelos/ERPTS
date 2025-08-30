@@ -1,63 +1,200 @@
 <?php
+// Include the database connection
 include 'database.php';
 $conn = Database::getInstance();
 
-// Base query (select all if no filters)
-$query = "SELECT * FROM land WHERE 1=1";
+// Retrieve the filters from the URL query string
+$print_all = isset($_GET['print_all']) ? $_GET['print_all'] : null;
+$classification = isset($_GET['classification']) ? $_GET['classification'] : null;
+$province = isset($_GET['province']) ? $_GET['province'] : null;
+$municipality = isset($_GET['municipality']) ? $_GET['municipality'] : null;
+$district = isset($_GET['district']) ? $_GET['district'] : null;
+$barangay = isset($_GET['barangay']) ? $_GET['barangay'] : null;
+$from_date = isset($_GET['from_date']) ? $_GET['from_date'] : null;
+$to_date = isset($_GET['to_date']) ? $_GET['to_date'] : null;
 
-// Apply filters
-if (!empty($_GET['classification'])) {
-    $classification = $conn->real_escape_string($_GET['classification']);
-    $query .= " AND classification = '$classification'";
-}
-if (!empty($_GET['province'])) {
-    $province = $conn->real_escape_string($_GET['province']);
-    $query .= " AND province_name = '$province'";
-}
-if (!empty($_GET['municipality'])) {
-    $municipality = $conn->real_escape_string($_GET['municipality']);
-    $query .= " AND municipality_name = '$municipality'";
-}
-if (!empty($_GET['district'])) {
-    $district = $conn->real_escape_string($_GET['district']);
-    $query .= " AND district_name = '$district'";
-}
-if (!empty($_GET['barangay'])) {
-    $barangay = $conn->real_escape_string($_GET['barangay']);
-    $query .= " AND barangay_name = '$barangay'";
-}
-if (!empty($_GET['from_date']) && !empty($_GET['to_date'])) {
-    $from = $conn->real_escape_string($_GET['from_date']);
-    $to = $conn->real_escape_string($_GET['to_date']);
-    $query .= " AND DATE(created_at) BETWEEN '$from' AND '$to'";
-}
+// Build the SQL query based on the filters
+$sql = "SELECT * FROM land WHERE 1=1"; // Base query
 
-// If "Print ALL" is checked, ignore filters
-if (!empty($_GET['print_all'])) {
-    $query = "SELECT * FROM land";
+// Apply filters if present
+if ($classification) {
+    $sql .= " AND classification = ?";
+}
+if ($province) {
+    $sql .= " AND province = ?";
+}
+if ($municipality) {
+    $sql .= " AND municipality = ?";
+}
+if ($district) {
+    $sql .= " AND district = ?";
+}
+if ($barangay) {
+    $sql .= " AND barangay = ?";
+}
+if ($from_date && $to_date) {
+    $sql .= " AND created_at BETWEEN ? AND ?";
 }
 
-$result = $conn->query($query);
+// Prepare the statement
+$stmt = $conn->prepare($sql);
 
-// Simple display
-echo "<h2>Report</h2>";
-echo "<table border='1' cellpadding='5' cellspacing='0'>";
-if ($result && $result->num_rows > 0) {
-    $fields = $result->fetch_fields();
-    echo "<tr>";
-    foreach ($fields as $field) {
-        echo "<th>" . htmlspecialchars($field->name) . "</th>";
-    }
-    echo "</tr>";
+// Bind parameters dynamically
+$types = '';
+$params = [];
 
-    while ($row = $result->fetch_assoc()) {
-        echo "<tr>";
-        foreach ($row as $val) {
-            echo "<td>" . htmlspecialchars($val) . "</td>";
+if ($classification) {
+    $types .= 's';
+    $params[] = $classification;
+}
+if ($province) {
+    $types .= 's';
+    $params[] = $province;
+}
+if ($municipality) {
+    $types .= 's';
+    $params[] = $municipality;
+}
+if ($district) {
+    $types .= 's';
+    $params[] = $district;
+}
+if ($barangay) {
+    $types .= 's';
+    $params[] = $barangay;
+}
+if ($from_date && $to_date) {
+    $types .= 'ss';
+    $params[] = $from_date;
+    $params[] = $to_date;
+}
+
+$stmt->bind_param($types, ...$params);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Fetch the data
+if ($result->num_rows > 0) {
+    // Fetch data and generate the dynamic table
+    echo '<!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>Assessment Roll</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 30px;
         }
-        echo "</tr>";
+
+        h1 {
+          text-align: center;
+          margin-bottom: 10px;
+          font-size: 24px;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 12px;
+        }
+
+        th, td {
+          border: 1px solid #000;
+          padding: 6px;
+          text-align: left;
+          vertical-align: top;
+        }
+
+        th {
+          background-color: #f0f0f0;
+        }
+
+        .sub-header th {
+          text-align: center;
+        }
+
+        .nowrap {
+          white-space: nowrap;
+        }
+
+        .location-header td {
+          border: none;
+          padding: 4px 6px;
+          font-weight: bold;
+        }
+
+        .location-header {
+          margin-bottom: 5px;
+        }
+      </style>
+    </head>
+    <body>
+    
+    <h1>ASSESSMENT ROLL</h1>
+
+    <table class="location-header">
+      <tr>
+        <td><strong>PROVINCE/CITY:</strong> ' . htmlspecialchars($province) . '</td>
+        <td><strong>MUNICIPALITY:</strong> ' . htmlspecialchars($municipality) . '</td>
+        <td><strong>DISTRICT:</strong> ' . htmlspecialchars($district) . '</td>
+        <td style="text-align: right;"><strong>BARANGAY:</strong> ' . htmlspecialchars($barangay) . '</td>
+      </tr>
+    </table>
+
+    <table>
+      <thead>
+        <tr class="sub-header">
+          <th rowspan="2">PROPERTY OWNER</th>
+          <th rowspan="2">PROPERTY INDEX NO.</th>
+          <th rowspan="2">ARP NO.</th>
+          <th rowspan="2">OWNER\'S ADDRESS & TEL. NOS.</th>
+          <th rowspan="2">KIND</th>
+          <th rowspan="2">CLASS</th>
+          <th rowspan="2">LOCATION OF PROPERTY</th>
+          <th rowspan="2">ASSESSED VALUE</th>
+          <th rowspan="2">TAXABILITY</th>
+          <th rowspan="2">EFFECTIVITY</th>
+          <th colspan="3">CANCELS</th>
+          <th colspan="4">CANCELLED BY</th>
+        </tr>
+        <tr class="sub-header">
+          <th class="nowrap">UPDATE CODE</th>
+          <th class="nowrap">ARP NO.</th>
+          <th class="nowrap">ASSESSED VALUE</th>
+          <th class="nowrap">UPDATE CODE</th>
+          <th class="nowrap">ARP NO.</th>
+          <th class="nowrap">ASSESSED VALUE</th>
+          <th class="nowrap">REF NO.</th>
+        </tr>
+      </thead>
+      <tbody>';
+
+    // Loop through each row and display the data dynamically
+    while ($row = $result->fetch_assoc()) {
+        echo '<tr>';
+        echo '<td>' . htmlspecialchars($row['owner_name']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['property_index']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['arp_no']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['owner_address']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['kind']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['classification']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['location']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['assessed_value']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['taxability']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['effectivity']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['cancel_update_code']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['cancel_arp_no']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['cancel_assessed_value']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['cancel_update_code_by']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['cancel_arp_no_by']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['cancel_assessed_value_by']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['cancel_ref_no']) . '</td>';
+        echo '</tr>';
     }
+
+    echo '</tbody></table></body></html>';
 } else {
-    echo "<tr><td colspan='100%'>No records found</td></tr>";
+    echo "<p>No records found for the given filters.</p>";
 }
-echo "</table>";
+?>
