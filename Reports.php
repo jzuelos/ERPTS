@@ -50,7 +50,7 @@
   $barangays_result = $barangays_stmt->get_result();
 
   // Fetch min and max created_at from your table (example: land table)
-  $date_range_stmt = $conn->prepare("SELECT MIN(DATE(created_at)) as min_date, MAX(DATE(created_at)) as max_date FROM land");
+  $date_range_stmt = $conn->prepare("SELECT MIN(DATE(created_at)) as min_date, MAX(DATE(created_at)) as max_date FROM p_info");
   $date_range_stmt->execute();
   $date_range_result = $date_range_stmt->get_result()->fetch_assoc();
 
