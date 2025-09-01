@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function openModal(id = null) {
     if (!transactionModal) {
-        // Initialize modal if not already done
         const modalElement = document.getElementById('transactionModal');
         if (modalElement) {
             transactionModal = new bootstrap.Modal(modalElement);
@@ -23,7 +22,7 @@ function openModal(id = null) {
             return;
         }
     }
-    
+
     if (id !== null) {
         const tx = transactions.find(t => t.id === id);
         if (tx) {
@@ -42,8 +41,7 @@ function openModal(id = null) {
         document.getElementById('statusInput').selectedIndex = 0;
         editId = null;
     }
-    
-    // Show the modal using Bootstrap's method
+
     transactionModal.show();
 }
 
@@ -54,75 +52,99 @@ function closeModal() {
 }
 
 function saveTransaction() {
-    // Get input values
-    let t_code = document.getElementById("transactionID").value.trim();
-    let t_name = document.getElementById("nameInput").value.trim();
-    let t_description = document.getElementById("transactionInput").value.trim();
-    let t_status = document.getElementById("statusInput").value;
+  const t_code = document.getElementById("transactionID").value.trim();
+  const t_name = document.getElementById("nameInput").value.trim();
+  const t_description = document.getElementById("transactionInput").value.trim();
+  const t_status = document.getElementById("statusInput").value;
 
-    // Basic validation
-    if (!t_code || !t_name || !t_description || !t_status) {
-        alert("Please fill out all fields.");
-        return;
-    }
+  if (!t_code || !t_name || !t_description || !t_status) {
+    alert("Please fill out all fields.");
+    return;
+  }
 
-    // Prepare data
-    let formData = new FormData();
-    formData.append("action", editId ? "updateTransaction" : "saveTransaction");
-    formData.append("t_code", t_code);
-    formData.append("t_name", t_name);
-    formData.append("t_description", t_description);
-    formData.append("t_status", t_status);
-    
-    if (editId) {
-        formData.append("id", editId);
-    }
+  const formData = new FormData();
+  formData.append("action", editId ? "updateTransaction" : "saveTransaction");
+  formData.append("t_code", t_code);
+  formData.append("t_name", t_name);
+  formData.append("t_description", t_description);
+  formData.append("t_status", t_status);
 
-    // Send request
-    fetch("trackFunctions.php", {
-        method: "POST",
-        body: formData
+  // IMPORTANT: backend expects "transaction_id" (not "id")
+  if (editId) {
+    formData.append("transaction_id", editId);
+  }
+
+  fetch("trackFunctions.php", { method: "POST", body: formData })
+    .then(async (response) => {
+      const text = await response.text();
+      console.log("RAW server response:", text); // <- check this in DevTools if anything goes wrong
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error("Server did not return JSON. Raw: " + text);
+      }
+      return data;
     })
-    .then(response => {
-        return response.json().catch(() => {
-            throw new Error("Invalid JSON response from server");
-        });
+    .then((data) => {
+      if (data.success) {
+        alert(editId ? "Transaction updated!" : "Transaction saved!");
+        // Reset fields
+        document.getElementById("transactionID").value = "";
+        document.getElementById("nameInput").value = "";
+        document.getElementById("transactionInput").value = "";
+        document.getElementById("statusInput").selectedIndex = 0;
+
+        if (transactionModal) transactionModal.hide();
+
+        if (typeof loadTransactions === "function") loadTransactions();
+      } else {
+        alert("Error: " + (data.message || "Unknown error"));
+      }
     })
-    .then(data => {
-        if (data.success) {
-            alert("Transaction saved successfully!");
-
-            // Reset form fields
-            document.getElementById("transactionID").value = "";
-            document.getElementById("nameInput").value = "";
-            document.getElementById("transactionInput").value = "";
-            document.getElementById("statusInput").selectedIndex = 0;
-
-            // Close modal
-            if (transactionModal) {
-                transactionModal.hide();
-            }
-
-            // Optionally reload transaction list
-            if (typeof loadTransactions === "function") {
-                loadTransactions();
-            }
-        } else {
-            alert("Error: " + (data.message || "Unknown error"));
-        }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        alert("Something went wrong while saving.");
+    .catch((err) => {
+      console.error(err);
+      alert("Something went wrong while saving.");
     });
 }
-    
+
+function loadTransactions() {
+    fetch("trackFunctions.php?action=getTransactions")
+    .then(response => response.json())
+    .then(data => {
+        transactions = data.map(tx => ({
+            id: parseInt(tx.transaction_id),   // backend ID
+            t_code: tx.transaction_code,
+            name: tx.name,
+            transaction: tx.description,
+            status: tx.status
+        }));
+        updateTable();
+    })
+    .catch(error => console.error("Error loading transactions:", error));
+}
+
 function deleteTransaction(id) {
-  if (confirm('Are you sure you want to delete this transaction?')) {
-    transactions = transactions.filter(t => t.id !== id);
-    logActivity(`Deleted transaction #${id}`);
-    updateTable();
-  }
+    if (confirm('Are you sure you want to delete this transaction?')) {
+        let formData = new FormData();
+        formData.append("action", "deleteTransaction");
+        formData.append("transaction_id", id);
+
+        fetch("trackFunctions.php", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Transaction deleted successfully!");
+                loadTransactions(); // refresh from DB
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(error => console.error("Error deleting transaction:", error));
+    }
 }
 
 function updateTable() {
@@ -179,13 +201,5 @@ function logActivity(message) {
 
 // Initialize with some sample data if needed
 window.onload = function() {
-  // Sample data (optional)
-  /*
-  transactions = [
-    { id: 1001, name: 'John Doe', transaction: 'Website Development', status: 'In Progress' },
-    { id: 1002, name: 'Jane Smith', transaction: 'Mobile App Design', status: 'Completed' },
-    { id: 1003, name: 'Acme Corp', transaction: 'SEO Services', status: 'In Progress' }
-  ];
-  updateTable();
-  */
+    loadTransactions();
 };
