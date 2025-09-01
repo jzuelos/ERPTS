@@ -4,51 +4,51 @@ let transactionModal = null;
 
 
 // Initialize when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the Bootstrap modal
-    const modalElement = document.getElementById('transactionModal');
-    if (modalElement) {
-        transactionModal = new bootstrap.Modal(modalElement);
-    }
+document.addEventListener('DOMContentLoaded', function () {
+  // Initialize the Bootstrap modal
+  const modalElement = document.getElementById('transactionModal');
+  if (modalElement) {
+    transactionModal = new bootstrap.Modal(modalElement);
+  }
 });
 
 function openModal(id = null) {
-    if (!transactionModal) {
-        const modalElement = document.getElementById('transactionModal');
-        if (modalElement) {
-            transactionModal = new bootstrap.Modal(modalElement);
-        } else {
-            console.error('Modal element not found');
-            return;
-        }
-    }
-
-    if (id !== null) {
-        const tx = transactions.find(t => t.id === id);
-        if (tx) {
-            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Transaction';
-            document.getElementById('transactionID').value = tx.t_code || '';
-            document.getElementById('nameInput').value = tx.name || '';
-            document.getElementById('transactionInput').value = tx.transaction || '';
-            document.getElementById('statusInput').value = tx.status || '';
-            editId = id;
-        }
+  if (!transactionModal) {
+    const modalElement = document.getElementById('transactionModal');
+    if (modalElement) {
+      transactionModal = new bootstrap.Modal(modalElement);
     } else {
-        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus"></i> Add Transaction';
-        document.getElementById('transactionID').value = '';
-        document.getElementById('nameInput').value = '';
-        document.getElementById('transactionInput').value = '';
-        document.getElementById('statusInput').selectedIndex = 0;
-        editId = null;
+      console.error('Modal element not found');
+      return;
     }
+  }
 
-    transactionModal.show();
+  if (id !== null) {
+    const tx = transactions.find(t => t.id === id);
+    if (tx) {
+      document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Transaction';
+      document.getElementById('transactionID').value = tx.t_code || '';
+      document.getElementById('nameInput').value = tx.name || '';
+      document.getElementById('transactionInput').value = tx.transaction || '';
+      document.getElementById('statusInput').value = tx.status || '';
+      editId = id;
+    }
+  } else {
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus"></i> Add Transaction';
+    document.getElementById('transactionID').value = '';
+    document.getElementById('nameInput').value = '';
+    document.getElementById('transactionInput').value = '';
+    document.getElementById('statusInput').selectedIndex = 0;
+    editId = null;
+  }
+
+  transactionModal.show();
 }
 
 function closeModal() {
-    if (transactionModal) {
-        transactionModal.hide();
-    }
+  if (transactionModal) {
+    transactionModal.hide();
+  }
 }
 
 function saveTransaction() {
@@ -88,6 +88,11 @@ function saveTransaction() {
     })
     .then((data) => {
       if (data.success) {
+        logActivity(editId
+          ? `Updated transaction #${editId} (${t_name})`
+          : `Added new transaction (${t_name})`
+        );
+
         alert(editId ? "Transaction updated!" : "Transaction saved!");
         // Reset fields
         document.getElementById("transactionID").value = "";
@@ -109,42 +114,42 @@ function saveTransaction() {
 }
 
 function loadTransactions() {
-    fetch("trackFunctions.php?action=getTransactions")
+  fetch("trackFunctions.php?action=getTransactions")
     .then(response => response.json())
     .then(data => {
-        transactions = data.map(tx => ({
-            id: parseInt(tx.transaction_id),   // backend ID
-            t_code: tx.transaction_code,
-            name: tx.name,
-            transaction: tx.description,
-            status: tx.status
-        }));
-        updateTable();
+      transactions = data.map(tx => ({
+        id: parseInt(tx.transaction_id),   // backend ID
+        t_code: tx.transaction_code,
+        name: tx.name,
+        transaction: tx.description,
+        status: tx.status
+      }));
+      updateTable();
     })
     .catch(error => console.error("Error loading transactions:", error));
 }
 
 function deleteTransaction(id) {
-    if (confirm('Are you sure you want to delete this transaction?')) {
-        let formData = new FormData();
-        formData.append("action", "deleteTransaction");
-        formData.append("transaction_id", id);
+  if (confirm('Are you sure you want to delete this transaction?')) {
+    let formData = new FormData();
+    formData.append("action", "deleteTransaction");
+    formData.append("transaction_id", id);
 
-        fetch("trackFunctions.php", {
-            method: "POST",
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert("Transaction deleted successfully!");
-                loadTransactions(); // refresh from DB
-            } else {
-                alert("Error: " + data.message);
-            }
-        })
-        .catch(error => console.error("Error deleting transaction:", error));
-    }
+    fetch("trackFunctions.php", {
+      method: "POST",
+      body: formData
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert("Transaction deleted successfully!");
+          loadTransactions(); // refresh from DB
+        } else {
+          alert("Error: " + data.message);
+        }
+      })
+      .catch(error => console.error("Error deleting transaction:", error));
+  }
 }
 
 function updateTable() {
@@ -154,8 +159,8 @@ function updateTable() {
   transactions.forEach(tx => {
     const row = document.createElement('tr');
     const statusClass = tx.status === 'Completed' ? 'status-completed' : 'status-in-progress';
-    
-      row.innerHTML = `
+
+    row.innerHTML = `
         <td>${tx.t_code || '#' + tx.id}</td>
         <td>${tx.name}</td>
         <td>${tx.transaction}</td>
@@ -177,9 +182,9 @@ function updateTable() {
 
 function updateCounts() {
   document.getElementById('totalCount').innerText = transactions.length;
-  document.getElementById('inProgressCount').innerText = 
+  document.getElementById('inProgressCount').innerText =
     transactions.filter(t => t.status === 'In Progress').length;
-  document.getElementById('completedCount').innerText = 
+  document.getElementById('completedCount').innerText =
     transactions.filter(t => t.status === 'Completed').length;
 }
 
@@ -191,7 +196,7 @@ function logActivity(message) {
     <i class="fas fa-circle"></i>
     <span>${new Date().toLocaleString()}: ${message}</span>
   `;
-  
+
   // Limit to 10 most recent activities
   if (log.children.length >= 10) {
     log.removeChild(log.lastChild);
@@ -200,6 +205,6 @@ function logActivity(message) {
 }
 
 // Initialize with some sample data if needed
-window.onload = function() {
-    loadTransactions();
+window.onload = function () {
+  loadTransactions();
 };
