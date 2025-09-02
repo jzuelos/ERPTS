@@ -63,16 +63,23 @@
   <!-- Header -->
   <?php include 'header.php'; ?>
 
-  <div class="form-center-wrapper">
-    <div class="center-form-wrapper">
-      <div class="card p-4">
-        <form>
-          <!-- Back button -->
-          <div class="mb-4">
-            <a href="Home.php" class="btn btn-outline-secondary btn-sm">
-              <i class="fas fa-arrow-left"></i> Back
-            </a>
-          </div>
+<div class="form-center-wrapper">
+  <div class="center-form-wrapper">
+    <div class="card p-4">
+
+      <!-- Back button OUTSIDE the form -->
+      <div class="mb-3">
+        <a href="Home.php" class="btn btn-outline-secondary btn-sm">
+          <i class="fas fa-arrow-left"></i> Back
+        </a>
+      </div>
+
+      <form>
+        <!-- Header Section -->
+        <div class="form-header d-flex align-items-center mb-4">
+          <h4 class="fw-bold m-0">PROPERTY BY CLASSIFICATION AGRICULTURAL (AG)</h4>
+        </div>
+
 
           <!-- Filter by Classification -->
           <div class="form-group form-check">
