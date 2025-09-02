@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 27, 2025 at 08:58 PM
+-- Generation Time: Sep 02, 2025 at 11:27 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -363,20 +363,22 @@ CREATE TABLE `p_info` (
   `house_tag_no` int(10) NOT NULL,
   `land_area` int(50) NOT NULL,
   `desc_land` varchar(50) NOT NULL,
-  `documents` varchar(30) NOT NULL
+  `documents` varchar(30) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `p_info`
 --
 
-INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`) VALUES
-(144, 12, 23, 0, 'Province 1', 'Daet', 'District 1', 'Kalamunding', '', 0, 302, '   ', 'affidavit, barangay'),
-(147, 12, 23, 0, '54', '3', 'District 2', '67', '', 453, 3453, '   ', 'affidavit, barangay'),
-(152, 0, 4324, 0, '54', '12', 'San Vicente', '73', '', 0, 42342, '   ', 'affidavit, barangay'),
-(153, 0, 41234, 0, '54', '3', 'District 2', '67', '', 0, 41234, '   ', 'affidavit, barangay'),
-(154, 0, 14123, 0, '54', '5', 'District 2', '67', '', 0, 31231, '   ', 'affidavit, barangay'),
-(155, 0, 132, 0, '54', '3', 'District 2', '68', '', 0, 3123, '   ', 'affidavit, barangay');
+INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`, `created_at`, `updated_at`) VALUES
+(144, 12, 23, 0, 'Province 1', 'Daet', 'District 1', 'Kalamunding', '', 0, 302, '   ', 'affidavit, barangay', '2025-08-31 19:01:44', '2025-08-31 19:01:44'),
+(147, 12, 23, 0, '54', '3', 'District 2', '67', '', 453, 3453, '   ', 'affidavit, barangay', '2025-08-31 19:01:44', '2025-08-31 19:01:44'),
+(152, 0, 4324, 0, '54', '12', 'San Vicente', '73', '', 0, 42342, '   ', 'affidavit, barangay', '2025-08-31 19:01:44', '2025-08-31 19:01:44'),
+(153, 0, 41234, 0, '54', '3', 'District 2', '67', '', 0, 41234, '   ', 'affidavit, barangay', '2025-08-31 19:01:44', '2025-08-31 19:01:44'),
+(154, 0, 14123, 0, '54', '5', 'District 2', '67', '', 0, 31231, '   ', 'affidavit, barangay', '2025-08-31 19:01:44', '2025-08-31 19:01:44'),
+(155, 0, 132, 0, '54', '3', 'District 2', '68', '', 0, 3123, '   ', 'affidavit, barangay', '2025-08-31 19:01:44', '2025-08-31 19:01:44');
 
 -- --------------------------------------------------------
 
