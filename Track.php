@@ -61,9 +61,9 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
     <table class="table table-borderless table-striped align-middle">
   <thead class="table-light">
     <tr>
-      <th>ID</th>
+      <th>Transaction ID</th>
       <th>Name</th>
-      <th>Transaction</th>
+      <th>Description</th>
       <th>Status</th>
       <th>Actions</th>
     </tr>
