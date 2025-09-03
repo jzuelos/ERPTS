@@ -82,41 +82,67 @@ $conn->close();
 </head>
 
 <body>
-  <!-- Main Content -->
-  <div class="container d-flex justify-content-center align-items-center vh-100">
-    <!-- Log In Card -->
-    <div class="card-container d-flex flex-row">
-      <div class="card login-card">
-        <div class="logo-container">
-          <img src="images/coconut_.__1_-removebg-preview1.png" alt="ERPTS Logo" class="logo">
-        </div>
-        <h2 class="text-center">LOG IN</h2>
-
-        <!-- Display error message if login fails -->
-        <?php if (isset($_SESSION['error'])): ?>
-          <p style="color: red;"><?php echo $_SESSION['error'];
-          unset($_SESSION['error']); ?></p>
-        <?php endif; ?>
-
-        <form method="POST">
-          <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" class="form-control rounded-pill" required>
-          </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <div class="position-relative">
-              <input type="password" id="password" name="password" class="form-control rounded-pill" required>
-              <button type="button" id="togglePassword" class="btn btn-link"
-                style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #000000; cursor: pointer;">
-                <i class="fa fa-eye" id="eyeIcon"></i>
-              </button>
-            </div>
-          </div>
-          <a href="ResetPassword.php">Forgot Password?</a>
-          <button type="submit" class="btn btn-dark w-100 mt-4">Log In</button>
-        </form>
+<!-- Main Content -->
+<div class="container d-flex justify-content-center align-items-center vh-100">
+  <!-- Reset Password Card -->
+  <div class="card-container d-flex flex-row">
+    <div class="card login-card">
+      <div class="logo-container">
+        <img src="images/coconut_.__1_-removebg-preview1.png" alt="ERPTS Logo" class="logo">
       </div>
+      <h2 class="text-center">Reset Password</h2>
+
+      <!-- Step 1: Enter Email -->
+      <form id="emailForm" onsubmit="return false;">
+        <div class="form-group">
+          <label for="email">Enter your Email</label>
+          <input type="email" id="email" name="email" class="form-control rounded-pill">
+        </div>
+        <button type="button" class="btn btn-dark w-100 mt-4" id="sendCodeBtn">Send Code</button>
+      </form>
+
+      <!-- Step 2: Enter Code -->
+      <form id="codeForm" style="display: none;" onsubmit="return false;">
+        <div class="form-group">
+          <label for="code">Enter Verification Code</label>
+          <input type="text" id="code" name="code" class="form-control rounded-pill" required>
+        </div>
+        <button type="button" class="btn btn-dark w-100 mt-4" id="enterCodeBtn">Enter Code</button>
+      </form>
+
+      <!-- Step 3: New Password -->
+      <form id="passwordForm" style="display: none;" onsubmit="return false;">
+        <div class="form-group">
+          <label for="newPassword">New Password</label>
+          <div class="position-relative">
+            <input type="password" id="newPassword" name="newPassword" class="form-control rounded-pill" required>
+            <button type="button" class="btn btn-link togglePassword" data-target="newPassword"
+              style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #000; cursor: pointer;">
+              <i class="fa fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <div class="position-relative">
+            <input type="password" id="confirmPassword" name="confirmPassword" class="form-control rounded-pill" required>
+            <button type="button" class="btn btn-link togglePassword" data-target="confirmPassword"
+              style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #000; cursor: pointer;">
+              <i class="fa fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-dark w-100 mt-4" id="setPasswordBtn">Set Password</button>
+      </form>
+
+      <!-- Back to Login -->
+      <div class="text-center mt-3">
+        <a href="index.php">Back to Login</a>
+      </div>
+    </div>
+
 
 
       <!-- Welcome Box -->
@@ -139,6 +165,49 @@ $conn->close();
       </div>
     </div>
   </div>
+
+  <script>
+   document.addEventListener("DOMContentLoaded", function () {
+    const emailForm = document.getElementById("emailForm");
+    const codeForm = document.getElementById("codeForm");
+    const passwordForm = document.getElementById("passwordForm");
+
+    document.getElementById("sendCodeBtn").addEventListener("click", function (e) {
+      e.preventDefault();
+      emailForm.style.display = "none";
+      codeForm.style.display = "block";
+    });
+
+    document.getElementById("enterCodeBtn").addEventListener("click", function (e) {
+      e.preventDefault();
+      codeForm.style.display = "none";
+      passwordForm.style.display = "block";
+    });
+
+    document.getElementById("setPasswordBtn").addEventListener("click", function (e) {
+      e.preventDefault();
+      // redirect after setting password
+      window.location.href = "index.php";
+    });
+
+    // Toggle password visibility
+    document.querySelectorAll(".togglePassword").forEach(button => {
+      button.addEventListener("click", function () {
+        const targetId = this.getAttribute("data-target");
+        const input = document.getElementById(targetId);
+        if (input.type === "password") {
+          input.type = "text";
+          this.querySelector("i").classList.remove("fa-eye");
+          this.querySelector("i").classList.add("fa-eye-slash");
+        } else {
+          input.type = "password";
+          this.querySelector("i").classList.remove("fa-eye-slash");
+          this.querySelector("i").classList.add("fa-eye");
+        }
+      });
+    });
+  });
+</script>
 
   <!-- Optional JavaScript -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
