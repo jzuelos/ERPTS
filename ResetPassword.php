@@ -1,24 +1,47 @@
 <?php
-session_start(); // Start session at the top
-
+session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once 'database.php'; // Include your database connection
+// ✅ Clear session if user clicks Back to Login
+if (isset($_GET['clear'])) {
+  $_SESSION = [];
+  if (ini_get("session.use_cookies")) {
+    $params = session_get_cookie_params();
+    setcookie(
+      session_name(),
+      '',
+      time() - 42000,
+      $params["path"],
+      $params["domain"],
+      $params["secure"],
+      $params["httponly"]
+    );
+  }
+  session_destroy();
+
+  header("Location: index.php");
+  exit();
+}
+
+require_once 'database.php';
+
+// ✅ Load PHPMailer
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+require 'vendor/autoload.php';
 
 $conn = Database::getInstance();
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  // Capture and sanitize form data
+// ========== STEP 1: EMAIL SUBMISSION ==========
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['email'])) {
   $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
 
   if (!empty($email)) {
-    // Query the database to check if the email exists and is active
     $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? AND status = 1 LIMIT 1");
-
     if ($stmt) {
       $stmt->bind_param("s", $email);
       $stmt->execute();
@@ -26,22 +49,100 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
       if ($result && $result->num_rows > 0) {
         $user = $result->fetch_assoc();
-
-        // ✅ Email found & active account
         $_SESSION['reset_email'] = $user['email'];
 
-        // Redirect to step 2
-        header("Location: reset_password.php?step=2");
-        exit();
+        // ✅ Generate verification code
+        $code = random_int(100000, 999999);
+        $_SESSION['verification_code'] = $code;
+
+        // ✅ Send email with PHPMailer
+        $mail = new PHPMailer(true);
+        try {
+          $mail->isSMTP();
+          $mail->Host = 'smtp.gmail.com';
+          $mail->SMTPAuth = true;
+          $mail->Username = 'zereljm09@gmail.com'; // Gmail
+          $mail->Password = 'uext teee qekk pwsg';   // Gmail App Password
+          $mail->SMTPSecure = 'tls';
+          $mail->Port = 587;
+
+          $mail->setFrom('zereljm09@gmail.com', 'ERPTS');
+          $mail->addAddress($user['email']);
+
+          $mail->isHTML(true);
+          $mail->Subject = 'Your Password Reset Code';
+          $mail->Body = "
+          <div style='font-family: Arial, sans-serif; font-size:14px; color:#333;'>
+            <p>Dear {$user['email']},</p>
+
+            <p>We received a request to reset the password for your <strong>Electronic Real Property Tax System (ERPTS)</strong> account.</p>
+
+            <p>Your verification code is:</p>
+
+            <h2 style='text-align:center; background:#f4f4f4; padding:10px; border-radius:5px; display:inline-block;'>
+              {$code}
+            </h2>
+
+            <p>This code will expire in <strong>5 minutes</strong>. If you did not request a password reset, please ignore this email.  
+            For your security, do not share this code with anyone.</p>
+
+            <br>
+            <p>Best regards,<br>
+            <strong>ERPTS Support Team</strong></p>
+          </div>
+        ";
+
+          $mail->send();
+        } catch (Exception $e) {
+          error_log("Mailer Error: " . $mail->ErrorInfo);
+        }
+
+        $_SESSION['step'] = 2;
       } else {
-        // 🚨 Invalid email or inactive account
         $_SESSION['invalid_email'] = true;
-        // no redirect — just reload current page
       }
       $stmt->close();
     }
   }
 }
+
+// ========== STEP 2: CODE VERIFICATION ==========
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['code'])) {
+  $enteredCode = trim($_POST['code']);
+  if (!empty($_SESSION['verification_code']) && $enteredCode == $_SESSION['verification_code']) {
+    $_SESSION['step'] = 3; // unlock password form
+  } else {
+    $_SESSION['code_error'] = true;
+    $_SESSION['step'] = 2;
+  }
+}
+
+// ========== STEP 3: PASSWORD RESET ==========
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['newPassword'], $_POST['confirmPassword'])) {
+  $newPassword = $_POST['newPassword'];
+  $confirmPassword = $_POST['confirmPassword'];
+
+  if ($newPassword === $confirmPassword && !empty($_SESSION['reset_email'])) {
+    $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+
+    $stmt = $conn->prepare("UPDATE users SET password = ? WHERE email = ?");
+    if ($stmt) {
+      $stmt->bind_param("ss", $hashedPassword, $_SESSION['reset_email']);
+      if ($stmt->execute()) {
+        // ✅ Success: clear session and redirect
+        session_unset();
+        session_destroy();
+        header("Location: index.php?reset=success");
+        exit();
+      }
+      $stmt->close();
+    }
+  } else {
+    $_SESSION['password_error'] = true;
+    $_SESSION['step'] = 3;
+  }
+}
+
 $conn->close();
 ?>
 
@@ -49,24 +150,18 @@ $conn->close();
 <html lang="en">
 
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-  <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
-    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    crossorigin="anonymous">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-
   <link rel="stylesheet" href="main_layout.css">
-  <link rel="stylesheet" href="index.css"> <!-- Custom CSS -->
+  <link rel="stylesheet" href="index.css">
   <title>Electronic Real Property Tax System</title>
 </head>
 
 <body>
-  <!-- Main Content -->
   <div class="container d-flex justify-content-center align-items-center vh-100">
-    <!-- Reset Password Card -->
     <div class="card-container d-flex flex-row">
       <div class="card login-card">
         <div class="logo-container">
@@ -74,64 +169,87 @@ $conn->close();
         </div>
         <h2 class="text-center">Reset Password</h2>
 
+        <!-- Step Indicator -->
+        <div class="d-flex justify-content-center mb-4">
+          <div class="d-flex flex-column align-items-center mx-3" style="width:100px;">
+            <span
+              class="badge badge-pill <?php echo (empty($_SESSION['step']) || $_SESSION['step'] == 1) ? 'badge-dark' : 'badge-secondary'; ?>">1</span>
+            <small class="text-center">Email</small>
+          </div>
+          <div class="d-flex flex-column align-items-center mx-3" style="width:100px;">
+            <span
+              class="badge badge-pill <?php echo (!empty($_SESSION['step']) && $_SESSION['step'] == 2) ? 'badge-dark' : 'badge-secondary'; ?>">2</span>
+            <small class="text-center">Verify Code</small>
+          </div>
+          <div class="d-flex flex-column align-items-center mx-3" style="width:100px;">
+            <span
+              class="badge badge-pill <?php echo (!empty($_SESSION['step']) && $_SESSION['step'] == 3) ? 'badge-dark' : 'badge-secondary'; ?>">3</span>
+            <small class="text-center">New Password</small>
+          </div>
+        </div>
+
         <!-- Step 1: Enter Email -->
-        <form id="emailForm" method="POST" action="">
+        <form id="emailForm" method="POST" action=""
+          style="<?php echo (empty($_SESSION['step']) || $_SESSION['step'] == 1) ? '' : 'display:none;'; ?>">
           <div class="form-group">
             <label for="email">Enter your Email</label>
             <input type="email" id="email" name="email"
               class="form-control rounded-pill <?php echo !empty($_SESSION['invalid_email']) ? 'is-invalid' : ''; ?>"
               value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
-            <div class="invalid-feedback">
-              Please enter a valid active email.
-            </div>
+            <div class="invalid-feedback">Please enter a valid active email.</div>
           </div>
-          <button type="submit" class="btn btn-dark w-100 mt-4" id="sendCodeBtn">Send Code</button>
+          <button type="submit" class="btn btn-dark w-100 mt-3">Send Code</button>
         </form>
 
         <!-- Step 2: Enter Code -->
-        <form id="codeForm" style="display: none;" onsubmit="return false;">
+        <form id="codeForm" method="POST" action=""
+          style="<?php echo (!empty($_SESSION['step']) && $_SESSION['step'] == 2) ? '' : 'display:none;'; ?>">
           <div class="form-group">
             <label for="code">Enter Verification Code</label>
-            <input type="text" id="code" name="code" class="form-control rounded-pill" required>
+            <input type="text" id="code" name="code"
+              class="form-control rounded-pill <?php echo !empty($_SESSION['code_error']) ? 'is-invalid' : ''; ?>"
+              required>
+            <div class="invalid-feedback">Invalid verification code.</div>
           </div>
-          <button type="button" class="btn btn-dark w-100 mt-4" id="enterCodeBtn">Enter Code</button>
+          <button type="submit" class="btn btn-dark w-100 mt-4">Enter Code</button>
         </form>
 
         <!-- Step 3: New Password -->
-        <form id="passwordForm" style="display: none;" onsubmit="return false;">
+        <form id="passwordForm" method="POST" action=""
+          style="<?php echo (!empty($_SESSION['step']) && $_SESSION['step'] == 3) ? '' : 'display:none;'; ?>">
           <div class="form-group">
             <label for="newPassword">New Password</label>
-            <div class="position-relative">
+            <div class="input-group">
               <input type="password" id="newPassword" name="newPassword" class="form-control rounded-pill" required>
-              <button type="button" class="btn btn-link togglePassword" data-target="newPassword"
-                style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #000; cursor: pointer;">
-                <i class="fa fa-eye"></i>
-              </button>
+              <div class="input-group-append">
+                <span class="input-group-text bg-white border-0">
+                  <i class="fas fa-eye togglePassword" data-target="newPassword" style="cursor:pointer;"></i>
+                </span>
+              </div>
             </div>
           </div>
 
           <div class="form-group">
             <label for="confirmPassword">Confirm Password</label>
-            <div class="position-relative">
+            <div class="input-group">
               <input type="password" id="confirmPassword" name="confirmPassword" class="form-control rounded-pill"
                 required>
-              <button type="button" class="btn btn-link togglePassword" data-target="confirmPassword"
-                style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #000; cursor: pointer;">
-                <i class="fa fa-eye"></i>
-              </button>
+              <div class="input-group-append">
+                <span class="input-group-text bg-white border-0">
+                  <i class="fas fa-eye togglePassword" data-target="confirmPassword" style="cursor:pointer;"></i>
+                </span>
+              </div>
             </div>
           </div>
 
-          <button type="button" class="btn btn-dark w-100 mt-4" id="setPasswordBtn">Set Password</button>
+          <button type="submit" class="btn btn-dark w-100 mt-4">Set Password</button>
         </form>
 
-        <!-- Back to Login -->
         <div class="text-center mt-3">
-          <a href="index.php">Back to Login</a>
+          <a href="ResetPassword.php?clear=1">Cancel</a>
         </div>
       </div>
 
-      <!-- Welcome Box -->
       <div class="welcome-box">
         <h4 class="text-center mt-4">Welcome to ERPTS</h4>
         <p>From the Assessor’s Module you can:</p>
@@ -152,54 +270,34 @@ $conn->close();
     </div>
   </div>
 
-  <?php unset($_SESSION['invalid_email']); ?>
-
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      const codeForm = document.getElementById("codeForm");
-      const passwordForm = document.getElementById("passwordForm");
-
-      document.getElementById("enterCodeBtn").addEventListener("click", function (e) {
-        e.preventDefault();
-        codeForm.style.display = "none";
-        passwordForm.style.display = "block";
-      });
-
-      document.getElementById("setPasswordBtn").addEventListener("click", function (e) {
-        e.preventDefault();
-        // redirect after setting password
-        window.location.href = "index.php";
-      });
-
       // Toggle password visibility
-      document.querySelectorAll(".togglePassword").forEach(button => {
-        button.addEventListener("click", function () {
+      document.querySelectorAll(".togglePassword").forEach(icon => {
+        icon.addEventListener("click", function () {
           const targetId = this.getAttribute("data-target");
           const input = document.getElementById(targetId);
           if (input.type === "password") {
             input.type = "text";
-            this.querySelector("i").classList.remove("fa-eye");
-            this.querySelector("i").classList.add("fa-eye-slash");
+            this.classList.replace("fa-eye", "fa-eye-slash");
           } else {
             input.type = "password";
-            this.querySelector("i").classList.remove("fa-eye-slash");
-            this.querySelector("i").classList.add("fa-eye");
+            this.classList.replace("fa-eye-slash", "fa-eye");
           }
         });
       });
     });
   </script>
 
-  <!-- Optional JavaScript -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-    crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
 </body>
 
 </html>
+<?php
+// cleanup temporary flags
+unset($_SESSION['invalid_email']);
+unset($_SESSION['code_error']);
+unset($_SESSION['password_error']);
+?>
