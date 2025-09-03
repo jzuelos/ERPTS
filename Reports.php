@@ -77,7 +77,7 @@
       <form>
         <!-- Header Section -->
         <div class="form-header d-flex align-items-center mb-4">
-          <h4 class="fw-bold m-0">PROPERTY BY CLASSIFICATION AGRICULTURAL (AG)</h4>
+          <h4 class="fw-bold mb-3">PROPERTY BY CLASSIFICATION AGRICULTURAL (AG)</h4>
         </div>
 
 
