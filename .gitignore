@@ -361,3 +361,10 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Composer dependencies
+/vendor/
+
+# Composer lock file should be committed, but vendor ignored
+# If you want to ignore lock file too, uncomment the next line
+# /composer.lock
