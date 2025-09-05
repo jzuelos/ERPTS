@@ -8,10 +8,17 @@ if ($conn->connect_error) {
 
 // GET ALL
 if (isset($_GET['action']) && $_GET['action'] === 'getTransactions') {
-    $result = $conn->query("SELECT * FROM transactions ORDER BY transaction_id DESC");
+    header('Content-Type: application/json; charset=utf-8');
+    $result = $conn->query("
+        SELECT transaction_id, transaction_code, name, contact_number, description, status, created_at, updated_at
+        FROM transactions
+        ORDER BY transaction_id DESC
+    ");
     $rows = [];
-    while ($row = $result->fetch_assoc()) {
-        $rows[] = $row;
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $rows[] = $row;
+        }
     }
     echo json_encode($rows);
     exit;
@@ -23,15 +30,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
     // CREATE
     if ($action === 'saveTransaction') {
-        // Match field names to your JS (t_code, t_name, t_description, t_status)
         $transaction_code = $_POST['t_code'];
         $name             = $_POST['t_name'];
+        $contact          = $_POST['t_contact']; // ✅ maps to contact_number column
         $description      = $_POST['t_description'];
         $status           = $_POST['t_status'];
 
-        $stmt = $conn->prepare("INSERT INTO transactions (transaction_code, name, description, status, created_at, updated_at) 
-                                VALUES (?, ?, ?, ?, NOW(), NOW())");
-        $stmt->bind_param("ssss", $transaction_code, $name, $description, $status);
+        $stmt = $conn->prepare("INSERT INTO transactions 
+            (transaction_code, name, contact_number, description, status, created_at, updated_at) 
+            VALUES (?, ?, ?, ?, ?, NOW(), NOW())");
+        $stmt->bind_param("sssss", $transaction_code, $name, $contact, $description, $status);
 
         if ($stmt->execute()) {
             echo json_encode(["success" => true, "message" => "Transaction added successfully!"]);
@@ -46,13 +54,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $transaction_id   = $_POST['transaction_id'];
         $transaction_code = $_POST['t_code'];
         $name             = $_POST['t_name'];
+        $contact          = $_POST['t_contact']; // ✅ maps to contact_number column
         $description      = $_POST['t_description'];
         $status           = $_POST['t_status'];
 
         $stmt = $conn->prepare("UPDATE transactions 
-                                SET transaction_code=?, name=?, description=?, status=?, updated_at=NOW() 
-                                WHERE transaction_id=?");
-        $stmt->bind_param("ssssi", $transaction_code, $name, $description, $status, $transaction_id);
+            SET transaction_code=?, name=?, contact_number=?, description=?, status=?, updated_at=NOW() 
+            WHERE transaction_id=?");
+        $stmt->bind_param("sssssi", $transaction_code, $name, $contact, $description, $status, $transaction_id);
 
         if ($stmt->execute()) {
             echo json_encode(["success" => true, "message" => "Transaction updated successfully!"]);
