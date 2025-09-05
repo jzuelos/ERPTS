@@ -34,15 +34,21 @@
   $stmt->execute();
   $regions_result = $stmt->get_result();
 
+
   // Fetch municipalities
   $municipalities_stmt = $conn->prepare("SELECT m_id, m_description FROM municipality");
   $municipalities_stmt->execute();
   $municipalities_result = $municipalities_stmt->get_result();
 
   // Fetch districts
-  $districts_stmt = $conn->prepare("SELECT district_id, description FROM district");
+  $districts_stmt = $conn->prepare("SELECT district_id, description, m_id FROM district");
   $districts_stmt->execute();
   $districts_result = $districts_stmt->get_result();
+
+  $districts = [];
+  while ($row = $districts_result->fetch_assoc()) {
+    $districts[] = $row;
+  }
 
   // Fetch barangays
   $barangays_stmt = $conn->prepare("SELECT brgy_id, brgy_name FROM brgy");
@@ -63,22 +69,22 @@
   <!-- Header -->
   <?php include 'header.php'; ?>
 
-<div class="form-center-wrapper">
-  <div class="center-form-wrapper">
-    <div class="card p-4">
+  <div class="form-center-wrapper">
+    <div class="center-form-wrapper">
+      <div class="card p-4">
 
-      <!-- Back button OUTSIDE the form -->
-      <div class="mb-3">
-        <a href="Home.php" class="btn btn-outline-secondary btn-sm">
-          <i class="fas fa-arrow-left"></i> Back
-        </a>
-      </div>
-
-      <form>
-        <!-- Header Section -->
-        <div class="form-header d-flex align-items-center mb-4">
-          <h4 class="fw-bold mb-3">PROPERTY BY CLASSIFICATION AGRICULTURAL (AG)</h4>
+        <!-- Back button OUTSIDE the form -->
+        <div class="mb-3">
+          <a href="Home.php" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Back
+          </a>
         </div>
+
+        <form>
+          <!-- Header Section -->
+          <div class="form-header d-flex align-items-center mb-4">
+            <h4 class="fw-bold mb-3">PROPERTY BY CLASSIFICATION AGRICULTURAL (AG)</h4>
+          </div>
 
 
           <!-- Filter by Classification -->
@@ -93,7 +99,6 @@
               <?php
               if ($classification_result && $classification_result->num_rows > 0) {
                 while ($row = $classification_result->fetch_assoc()) {
-                  // use c_description as both the value and the text shown
                   echo "<option value='" . htmlspecialchars($row['c_description'], ENT_QUOTES) . "'>"
                     . htmlspecialchars($row['c_description'], ENT_QUOTES) . "</option>";
                 }
@@ -116,7 +121,6 @@
               <select class="form-control" id="provinceSelect" disabled>
                 <option value="" disabled selected>Select Province</option>
                 <?php
-                // Check if there are no provinces in the regions_result
                 if ($regions_result->num_rows === 0) {
                   echo "<option disabled>No provinces found</option>";
                 } else {
@@ -130,38 +134,33 @@
             </div>
 
             <div class="form-group col-md-6">
-              <label for="citySelect">Municipality/City</label>
-              <select class="form-control" id="citySelect" disabled>
-                <option value="" disabled selected>Select Municipality</option>
-                <?php
-                // Check if there are no municipalities in the municipalities_result
-                if ($municipalities_result->num_rows === 0) {
-                  echo "<option disabled>No municipalities found</option>";
-                } else {
-                  while ($row = $municipalities_result->fetch_assoc()) {
-                    echo "<option value='" . htmlspecialchars($row['m_description'], ENT_QUOTES) . "'>"
-                      . htmlspecialchars($row['m_description'], ENT_QUOTES) . "</option>";
+              <!-- Municipality -->
+              <div class="mb-3">
+                <label for="citySelect" class="form-label">Municipality</label>
+                <select class="form-control" id="citySelect">
+                  <option value="" disabled selected>Select Municipality</option>
+                  <?php
+                  if ($municipalities_result->num_rows > 0) {
+                    while ($row = $municipalities_result->fetch_assoc()) {
+                      echo "<option value='" . htmlspecialchars($row['m_id'], ENT_QUOTES) . "'>"
+                        . htmlspecialchars($row['m_description'], ENT_QUOTES) . "</option>";
+                    }
+                  } else {
+                    echo "<option disabled>No municipalities found</option>";
                   }
-                }
-                ?>
-              </select>
+                  ?>
+                </select>
+              </div>
             </div>
 
             <div class="form-group col-md-6">
-              <label for="districtSelect">District</label>
-              <select class="form-control" id="districtSelect" disabled>
-                <option value="" disabled selected>Select District</option>
-                <?php
-                if ($districts_result && $districts_result->num_rows > 0) {
-                  while ($row = $districts_result->fetch_assoc()) {
-                    echo "<option value='" . htmlspecialchars($row['description'], ENT_QUOTES) . "'>"
-                      . htmlspecialchars($row['description'], ENT_QUOTES) . "</option>";
-                  }
-                } else {
-                  echo "<option disabled>No districts</option>";
-                }
-                ?>
-              </select>
+              <!-- District -->
+              <div class="mb-3">
+                <label for="districtSelect" class="form-label">District</label>
+                <select class="form-control" id="districtSelect" disabled>
+                  <option value="" disabled selected>Select District</option>
+                </select>
+              </div>
             </div>
 
             <div class="form-group col-md-6">
@@ -227,7 +226,11 @@
   <!-- JS -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
   <script>
+    // Embed PHP districts into JS
+    const districts = <?php echo json_encode($districts); ?>;
+
     document.addEventListener("DOMContentLoaded", function () {
       const printAllCheckbox = document.getElementById("printAllCheck");
       const classificationCheckbox = document.getElementById("classificationCheck");
@@ -245,7 +248,6 @@
       const printBtn = document.querySelector(".btn.btn-primary");
 
       function updateStates() {
-        // Disable filters based on Print All checkbox state
         if (printAllCheckbox.checked) {
           classificationCheckbox.disabled = true;
           locationCheckbox.disabled = true;
@@ -275,13 +277,39 @@
           toDate.disabled = !date;
         }
 
-        // Disable "Print All" if any filter is checked
         if (classificationCheckbox.checked || locationCheckbox.checked || dateCheckbox.checked) {
           printAllCheckbox.disabled = true;
         } else {
           printAllCheckbox.disabled = false;
         }
       }
+
+      // Auto-load districts based on selected municipality
+      citySelect.addEventListener("change", function () {
+        const m_id = this.value;
+        districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
+        districtSelect.disabled = true;
+
+        if (m_id) {
+          const filtered = districts.filter(d => d.m_id == m_id);
+
+          if (filtered.length > 0) {
+            districtSelect.innerHTML = ""; // clear placeholder
+            filtered.forEach(d => {
+              let opt = document.createElement("option");
+              opt.value = d.district_id;   // store ID, safer for DB
+              opt.textContent = d.description;
+              districtSelect.appendChild(opt);
+            });
+
+            // ✅ Auto-select the first district
+            districtSelect.selectedIndex = 0;
+
+            // ✅ Lock the field (disable so user cannot change)
+            districtSelect.disabled = true;
+          }
+        }
+      });
 
       // Validate date ranges visually
       toDate.addEventListener("change", function () {
@@ -302,10 +330,9 @@
       printBtn.addEventListener("click", function (e) {
         e.preventDefault();
 
-        // Validate date ranges before continuing
         if (fromDate.classList.contains("is-invalid") || toDate.classList.contains("is-invalid")) {
           alert("Please fix the date range before proceeding.");
-          return; // Stop further execution if dates are invalid
+          return;
         }
 
         let params = new URLSearchParams();
@@ -328,13 +355,11 @@
           }
         }
 
-        // Prevent empty print
         if (!printAllCheckbox.checked && !params.toString()) {
           alert("Please select at least one filter or print all.");
-          return; // Stop the process if no filters are selected
+          return;
         }
 
-        // Redirect to PHP page with parameters
         window.open("report-print.php?" + params.toString(), "_blank");
       });
 
