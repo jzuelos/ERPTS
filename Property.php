@@ -1,16 +1,57 @@
 <?php
-session_start(); // Start session at the top
-
+session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once 'database.php'; // Include your database connection
-
+require_once 'database.php';
 $conn = Database::getInstance();
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
+
+// Handle AJAX updates
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+  $action = $_POST['action'];
+
+  if ($action === 'update_classification') {
+    $code = $_POST['code'];
+    $description = $_POST['description'];
+    $assessment = $_POST['assessment'];
+    $status = $_POST['status'];
+
+    $stmt = $conn->prepare("UPDATE classification SET c_description=?, c_uv=?, c_status=? WHERE c_code=?");
+    $stmt->bind_param("sdss", $description, $assessment, $status, $code);
+    echo $stmt->execute() ? "success" : "error";
+    exit;
+  }
+
+  if ($action === 'update_actual_uses') {
+    $reportCode = $_POST['reportCode'];
+    $code = $_POST['code'];
+    $description = $_POST['description'];
+    $assessment = $_POST['assessment'];
+    $status = $_POST['status'];
+
+    $stmt = $conn->prepare("UPDATE land_use SET lu_description=?, lu_al=?, lu_status=? WHERE report_code=? AND lu_code=?");
+    $stmt->bind_param("sdsss", $description, $assessment, $status, $reportCode, $code);
+    echo $stmt->execute() ? "success" : "error";
+    exit;
+  }
+
+  if ($action === 'update_sub_classes') {
+    $code = $_POST['code'];
+    $description = $_POST['description'];
+    $assessment = $_POST['assessment'];
+    $status = $_POST['status'];
+
+    $stmt = $conn->prepare("UPDATE subclass SET sc_description=?, sc_uv=?, sc_status=? WHERE sc_code=?");
+    $stmt->bind_param("sdss", $description, $assessment, $status, $code);
+    echo $stmt->execute() ? "success" : "error";
+    exit;
+  }
+}
 ?>
+
 
 <!doctype html>
 <html lang="en">
@@ -21,7 +62,7 @@ if ($conn->connect_error) {
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Bootstrap CSS -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -36,9 +77,9 @@ if ($conn->connect_error) {
 
 <body>
   <!-- Header Navigation -->
-    <?php include 'header.php'; ?>
+  <?php include 'header.php'; ?>
 
-    
+
   <!-- Main Body -->
   <main class="container my-5">
     <!-- Back Button (Positioned to the top left) -->
@@ -73,7 +114,8 @@ if ($conn->connect_error) {
               Classification
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="categoryTypeDropdown">
-              <li><a class="dropdown-item" href="#" onclick="changeCategoryType('Classification')">Classification</a></li>
+              <li><a class="dropdown-item" href="#" onclick="changeCategoryType('Classification')">Classification</a>
+              </li>
               <li><a class="dropdown-item" href="#" onclick="changeCategoryType('ActualUses')">Actual Uses</a></li>
               <li><a class="dropdown-item" href="#" onclick="changeCategoryType('SubClasses')">Sub-Classes</a></li>
             </ul>
@@ -241,7 +283,8 @@ if ($conn->connect_error) {
     <div class="row justify-content-center">
       <!-- Classification -->
       <div class="col-md-4 col-sm-6 mb-4 d-flex justify-content-center">
-        <a href="#" class="card border-0 shadow-lg p-5 text-center location-card h-100" data-toggle="modal" data-target="#confirmationModal" data-name="Classification" data-form="classificationModal">
+        <a href="#" class="card border-0 shadow-lg p-5 text-center location-card h-100" data-toggle="modal"
+          data-target="#confirmationModal" data-name="Classification" data-form="classificationModal">
           <div class="d-flex flex-column align-items-center">
             <i class="fas fa-layer-group icon-style mb-3" style="font-size: 3rem;"></i>
             <h5 class="font-weight-bold" style="font-size: 1.5rem;">Classification</h5>
@@ -251,7 +294,8 @@ if ($conn->connect_error) {
 
       <!-- Actual Uses -->
       <div class="col-md-4 col-sm-6 mb-4 d-flex justify-content-center">
-        <a href="#" class="card border-0 shadow-lg p-5 text-center location-card h-100" data-toggle="modal" data-target="#confirmationModal" data-name="Actual Uses" data-form="actUsesModal">
+        <a href="#" class="card border-0 shadow-lg p-5 text-center location-card h-100" data-toggle="modal"
+          data-target="#confirmationModal" data-name="Actual Uses" data-form="actUsesModal">
           <div class="d-flex flex-column align-items-center">
             <i class="fas fa-tag icon-style mb-3" style="font-size: 3rem;"></i>
             <h5 class="font-weight-bold" style="font-size: 1.5rem;">Actual Uses</h5>
@@ -261,7 +305,8 @@ if ($conn->connect_error) {
 
       <!-- Sub-Classes -->
       <div class="col-md-4 col-sm-6 mb-4 d-flex justify-content-center">
-        <a href="#" class="card border-0 shadow-lg p-5 text-center location-card h-100" data-toggle="modal" data-target="#confirmationModal" data-name="Sub-Classes" data-form="subClassesModal">
+        <a href="#" class="card border-0 shadow-lg p-5 text-center location-card h-100" data-toggle="modal"
+          data-target="#confirmationModal" data-name="Sub-Classes" data-form="subClassesModal">
           <div class="d-flex flex-column align-items-center">
             <i class="fas fa-sitemap icon-style mb-3" style="font-size: 3rem;"></i>
             <h5 class="font-weight-bold" style="font-size: 1.5rem;">Sub-Classes</h5>
@@ -272,150 +317,151 @@ if ($conn->connect_error) {
   </main>
 
   <!--Modal Section-->
-<!-- Table Modal Section --> 
-<!-- Edit Classification Modal -->
-<div class="modal fade" id="editClassificationModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Edit Classification</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-2">
-          <label for="editClassificationCode" class="form-label">Code</label>
-          <input type="text" class="form-control" id="editClassificationCode" readonly>
+  <!-- Table Modal Section -->
+  <!-- Edit Classification Modal -->
+  <div class="modal fade" id="editClassificationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Classification</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="mb-2">
-          <label for="editClassificationDescription" class="form-label">Description</label>
-          <input type="text" class="form-control" id="editClassificationDescription">
+        <div class="modal-body">
+          <div class="mb-2">
+            <label for="editClassificationCode" class="form-label">Code</label>
+            <input type="text" class="form-control" id="editClassificationCode" readonly>
+          </div>
+          <div class="mb-2">
+            <label for="editClassificationDescription" class="form-label">Description</label>
+            <input type="text" class="form-control" id="editClassificationDescription">
+          </div>
+          <div class="mb-2">
+            <label for="editClassificationAssessment" class="form-label">Assessment Level (%)</label>
+            <input type="number" class="form-control" id="editClassificationAssessment" min="0" max="100" step="0.01">
+          </div>
+          <div class="mb-2">
+            <label for="editClassificationStatus" class="form-label">Status</label>
+            <div class="dropdown">
+              <select class="form-select" id="editClassificationStatus" aria-label="Select status">
+                <option value="Active" class="status-active">
+                  <i class="bi bi-check-circle me-2"></i>Active
+                </option>
+                <option value="Inactive" class="status-inactive">
+                  <i class="bi bi-x-circle me-2"></i>Inactive
+                </option>
+              </select>
+            </div>
+          </div>
         </div>
-        <div class="mb-2">
-          <label for="editClassificationAssessment" class="form-label">Assessment Level (%)</label>
-          <input type="number" class="form-control" id="editClassificationAssessment" min="0" max="100" step="0.01">
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="saveClassificationChanges">Save Changes</button>
         </div>
-        <div class="mb-2">
-      <label for="editClassificationStatus" class="form-label">Status</label>
-      <div class="dropdown">
-        <select class="form-select" id="editClassificationStatus" aria-label="Select status">
-          <option value="Active" class="status-active">
-            <i class="bi bi-check-circle me-2"></i>Active
-          </option>
-          <option value="Inactive" class="status-inactive">
-            <i class="bi bi-x-circle me-2"></i>Inactive
-          </option>
-        </select>
-      </div>
-    </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="saveClassificationChanges">Save Changes</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- Edit Actual Uses Modal -->
-<div class="modal fade" id="editActualUsesModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Edit Actual Uses</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-2">
-          <label for="editReportCode" class="form-label">Report Code</label>
-          <input type="text" class="form-control" id="editReportCode" readonly>
-        </div>
-        <div class="mb-2">
-          <label for="editActualUsesCode" class="form-label">Code</label>
-          <input type="text" class="form-control" id="editActualUsesCode" readonly>
-        </div>
-        <div class="mb-2">
-          <label for="editActualUsesDescription" class="form-label">Description</label>
-          <input type="text" class="form-control" id="editActualUsesDescription">
-        </div>
-        <div class="mb-2">
-          <label for="editActualUsesAssessment" class="form-label">Assessment Level (%)</label>
-          <input type="number" class="form-control" id="editActualUsesAssessment" min="0" max="100" step="0.01">
-        </div>
-        <div class="mb-2">
-        <label for="editActualUsesStatus" class="form-label">Status</label>
-        <div class="dropdown">
-          <select class="form-select" id="editActualUsesStatus" aria-label="Select status">
-            <option value="Active" class="status-active">
-              <i class="bi bi-check-circle me-2"></i>Active
-            </option>
-            <option value="Inactive" class="status-inactive">
-              <i class="bi bi-x-circle me-2"></i>Inactive
-            </option>
-          </select>
-        </div>
-      </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="saveActualUsesChanges">Save Changes</button>
       </div>
     </div>
   </div>
-</div>
 
 
-
-    <!-- Edit Sub-Classes Modal -->
-<div class="modal fade" id="editSubClassesModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Edit Sub-Classes</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-2">
-          <label for="editSubClassesCode" class="form-label">Code</label>
-          <input type="text" class="form-control" id="editSubClassesCode" readonly>
+  <!-- Edit Actual Uses Modal -->
+  <div class="modal fade" id="editActualUsesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Actual Uses</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="mb-2">
-          <label for="editSubClassesDescription" class="form-label">Description</label>
-          <input type="text" class="form-control" id="editSubClassesDescription">
+        <div class="modal-body">
+          <div class="mb-2">
+            <label for="editReportCode" class="form-label">Report Code</label>
+            <input type="text" class="form-control" id="editReportCode" readonly>
+          </div>
+          <div class="mb-2">
+            <label for="editActualUsesCode" class="form-label">Code</label>
+            <input type="text" class="form-control" id="editActualUsesCode" readonly>
+          </div>
+          <div class="mb-2">
+            <label for="editActualUsesDescription" class="form-label">Description</label>
+            <input type="text" class="form-control" id="editActualUsesDescription">
+          </div>
+          <div class="mb-2">
+            <label for="editActualUsesAssessment" class="form-label">Assessment Level (%)</label>
+            <input type="number" class="form-control" id="editActualUsesAssessment" min="0" max="100" step="0.01">
+          </div>
+          <div class="mb-2">
+            <label for="editActualUsesStatus" class="form-label">Status</label>
+            <div class="dropdown">
+              <select class="form-select" id="editActualUsesStatus" aria-label="Select status">
+                <option value="Active" class="status-active">
+                  <i class="bi bi-check-circle me-2"></i>Active
+                </option>
+                <option value="Inactive" class="status-inactive">
+                  <i class="bi bi-x-circle me-2"></i>Inactive
+                </option>
+              </select>
+            </div>
+          </div>
         </div>
-        <div class="mb-2">
-          <label for="editSubClassesAssessment" class="form-label">Unit Value</label>
-          <input type="number" class="form-control" id="editSubClassesAssessment" min="0" step="0.01">
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="saveActualUsesChanges">Save Changes</button>
         </div>
-        <div class="mb-2">
-        <label for="editSubClassesStatus" class="form-label">Status</label>
-        <div class="dropdown">
-          <select class="form-select" id="editSubClassesStatus" aria-label="Select status">
-            <option value="Active" class="status-active">
-              <i class="bi bi-check-circle me-2"></i>Active
-            </option>
-            <option value="Inactive" class="status-inactive">
-              <i class="bi bi-x-circle me-2"></i>Inactive
-            </option>
-          </select>
-        </div>
-      </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="saveSubClassesChanges">Save Changes</button>
       </div>
     </div>
   </div>
-</div>
 
 
-    
+
+  <!-- Edit Sub-Classes Modal -->
+  <div class="modal fade" id="editSubClassesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Sub-Classes</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-2">
+            <label for="editSubClassesCode" class="form-label">Code</label>
+            <input type="text" class="form-control" id="editSubClassesCode" readonly>
+          </div>
+          <div class="mb-2">
+            <label for="editSubClassesDescription" class="form-label">Description</label>
+            <input type="text" class="form-control" id="editSubClassesDescription">
+          </div>
+          <div class="mb-2">
+            <label for="editSubClassesAssessment" class="form-label">Unit Value</label>
+            <input type="number" class="form-control" id="editSubClassesAssessment" min="0" step="0.01">
+          </div>
+          <div class="mb-2">
+            <label for="editSubClassesStatus" class="form-label">Status</label>
+            <div class="dropdown">
+              <select class="form-select" id="editSubClassesStatus" aria-label="Select status">
+                <option value="Active" class="status-active">
+                  <i class="bi bi-check-circle me-2"></i>Active
+                </option>
+                <option value="Inactive" class="status-inactive">
+                  <i class="bi bi-x-circle me-2"></i>Inactive
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="saveSubClassesChanges">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
-<!-- Add Property Category Modal -->
+
+
+
+  <!-- Add Property Category Modal -->
   <!-- Confirmation Modal -->
-  <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -437,7 +483,8 @@ if ($conn->connect_error) {
 
 
   <!-- Classification Form Modal -->
-  <div class="modal fade" id="classificationModal" tabindex="-1" role="dialog" aria-labelledby="classificationModalLabel" aria-hidden="true">
+  <div class="modal fade" id="classificationModal" tabindex="-1" role="dialog"
+    aria-labelledby="classificationModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -451,7 +498,8 @@ if ($conn->connect_error) {
             <input type="hidden" name="form_type" value="classification">
             <div class="form-group">
               <label for="classificationCode">Code</label>
-              <input type="text" class="form-control" id="classificationCode" name="c_code" placeholder="Enter Classification Code" required>
+              <input type="text" class="form-control" id="classificationCode" name="c_code"
+                placeholder="Enter Classification Code" required>
             </div>
 
             <div class="form-group">
@@ -473,18 +521,21 @@ if ($conn->connect_error) {
                 <div class="input-group-append">
                   <span class="input-group-text">%</span>
                 </div>
-                <input type="number" class="form-control" id="unitValue" name="c_uv" placeholder="Enter Assessment Level" min="0" step="0.01" required>
+                <input type="number" class="form-control" id="unitValue" name="c_uv"
+                  placeholder="Enter Assessment Level" min="0" step="0.01" required>
               </div>
             </div>
 
             <div class="form-group">
               <label>Status</label><br>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="c_status" id="classificationActive" value="Active" required checked>
+                <input class="form-check-input" type="radio" name="c_status" id="classificationActive" value="Active"
+                  required checked>
                 <label class="form-check-label" for="classificationActive">Active</label>
               </div>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="c_status" id="classificationInactive" value="Inactive">
+                <input class="form-check-input" type="radio" name="c_status" id="classificationInactive"
+                  value="Inactive">
                 <label class="form-check-label" for="classificationInactive">Inactive</label>
               </div>
             </div>
@@ -499,7 +550,8 @@ if ($conn->connect_error) {
   </div>
 
   <!-- Actual Uses Form Modal -->
-  <div class="modal fade" id="actUsesModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
+  <div class="modal fade" id="actUsesModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -529,13 +581,14 @@ if ($conn->connect_error) {
             </div>
             <div class="form-group">
               <label for="reportAssessmentLevel">Assessment Level (%)</label>
-              <input type="number" class="form-control" id="reportAssessmentLevel"
-                placeholder="Enter Assessment Level" min="0" max="100" step="0.01" required>
+              <input type="number" class="form-control" id="reportAssessmentLevel" placeholder="Enter Assessment Level"
+                min="0" max="100" step="0.01" required>
             </div>
             <div class="form-group">
               <label>Status</label><br>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="reportStatus" id="reportActive" value="Active" required checked>
+                <input class="form-check-input" type="radio" name="reportStatus" id="reportActive" value="Active"
+                  required checked>
                 <label class="form-check-label" for="reportActive">Active</label>
               </div>
               <div class="form-check form-check-inline">
@@ -555,7 +608,8 @@ if ($conn->connect_error) {
 
 
   <!-- Sub-Classes Modal -->
-  <div class="modal fade" id="subClassesModal" tabindex="-1" role="dialog" aria-labelledby="subClassesModalLabel" aria-hidden="true">
+  <div class="modal fade" id="subClassesModal" tabindex="-1" role="dialog" aria-labelledby="subClassesModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -572,7 +626,8 @@ if ($conn->connect_error) {
             </div>
             <div class="form-group">
               <label for="subClassesDescription">Description</label>
-              <input type="text" class="form-control" id="subClassesDescription" placeholder="Enter Description" required>
+              <input type="text" class="form-control" id="subClassesDescription" placeholder="Enter Description"
+                required>
             </div>
             <div class="form-group">
               <label for="unitValue">Unit Value</label>
@@ -580,17 +635,20 @@ if ($conn->connect_error) {
                 <div class="input-group-prepend">
                   <span class="input-group-text">₱</span>
                 </div>
-                <input type="number" class="form-control" id="SunitValue" name="sc_uv" placeholder="Enter Unit Value" min="0" step="0.01" required>
+                <input type="number" class="form-control" id="SunitValue" name="sc_uv" placeholder="Enter Unit Value"
+                  min="0" step="0.01" required>
               </div>
             </div>
             <div class="form-group">
               <label>Status</label><br>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="subClassesStatus" id="subClassesActive" value="Active" required checked>
+                <input class="form-check-input" type="radio" name="subClassesStatus" id="subClassesActive"
+                  value="Active" required checked>
                 <label class="form-check-label" for="subClassesActive">Active</label>
               </div>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="subClassesStatus" id="subClassesInactive" value="Inactive">
+                <input class="form-check-input" type="radio" name="subClassesStatus" id="subClassesInactive"
+                  value="Inactive">
                 <label class="form-check-label" for="subClassesInactive">Inactive</label>
               </div>
             </div>
@@ -624,81 +682,70 @@ if ($conn->connect_error) {
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      let selectedForm = "";
+  document.addEventListener("DOMContentLoaded", function () {
+    let selectedForm = "";
 
-
-      document.querySelectorAll(".location-card").forEach((card) => {
-        card.addEventListener("click", function(event) {
-          event.preventDefault();
-
-
-          const categoryName = this.getAttribute("data-name");
-          selectedForm = this.getAttribute("data-form");
-
-
-          document.getElementById("categoryName").textContent = categoryName;
-
-
-          $("#confirmationModal").modal("show");
-        });
-      });
-
-
-      document.getElementById("confirmBtn").addEventListener("click", function() {
-        $("#confirmationModal").modal("hide");
-        setTimeout(() => {
-          $("#" + selectedForm).modal("show");
-        }, 500);
+    // Handle location card click → open confirmation modal
+    document.querySelectorAll(".location-card").forEach((card) => {
+      card.addEventListener("click", function (event) {
+        event.preventDefault();
+        const categoryName = this.getAttribute("data-name");
+        selectedForm = this.getAttribute("data-form");
+        document.getElementById("categoryName").textContent = categoryName;
+        $("#confirmationModal").modal("show");
       });
     });
 
+    // Confirm selection → show the correct modal
+    document.getElementById("confirmBtn").addEventListener("click", function () {
+      $("#confirmationModal").modal("hide");
+      setTimeout(() => {
+        $("#" + selectedForm).modal("show");
+      }, 500);
+    });
 
-    document.addEventListener("DOMContentLoaded", function() {
-      document.getElementById("cancelBtn").addEventListener("click", function() {
-        $("#confirmationModal").modal("hide");
+    // Cancel button inside confirmation modal
+    document.getElementById("cancelBtn").addEventListener("click", function () {
+      $("#confirmationModal").modal("hide");
+    });
+
+    // Reset button inside any modal → reset the form
+    document.querySelectorAll(".reset-btn").forEach((button) => {
+      button.addEventListener("click", function () {
+        const modal = this.closest(".modal");
+        const form = modal.querySelector("form");
+        if (form) form.reset();
       });
+    });
 
-
-      document.querySelectorAll(".reset-btn").forEach((button) => {
-        button.addEventListener("click", function() {
-          const modal = this.closest(".modal");
-          const form = modal.querySelector("form");
-          if (form) form.reset();
-        });
-      });
-
-      document.querySelectorAll(".submit-btn").forEach((button) => {
-        button.addEventListener("click", function() {
-          const modal = this.closest(".modal");
-          const form = modal.querySelector("form");
-
-          if (form && form.checkValidity()) {
-            alert("Form submitted: " + form.id);
-            $(modal).modal("hide");
-          } else {
-            form.reportValidity();
-          }
-        });
-      });
-
-      document.querySelectorAll(".close").forEach((button) => {
-        button.addEventListener("click", function() {
-          const modal = this.closest(".modal");
+    // Submit button inside any modal
+    document.querySelectorAll(".submit-btn").forEach((button) => {
+      button.addEventListener("click", function () {
+        const modal = this.closest(".modal");
+        const form = modal.querySelector("form");
+        if (form && form.checkValidity()) {
+          alert("Form submitted: " + form.id);
           $(modal).modal("hide");
-        });
+        } else {
+          form.reportValidity();
+        }
       });
     });
 
-    function changeCategoryType(type) {
+    // Close button inside any modal
+    document.querySelectorAll(".close").forEach((button) => {
+      button.addEventListener("click", function () {
+        const modal = this.closest(".modal");
+        $(modal).modal("hide");
+      });
+    });
 
+    // Change category dropdown
+    window.changeCategoryType = function (type) {
       document.getElementById("classificationTable").classList.add("d-none");
       document.getElementById("actualUsesTable").classList.add("d-none");
       document.getElementById("subClassesTable").classList.add("d-none");
-
-
       document.getElementById("categoryTypeDropdown").textContent = type;
-
 
       if (type === "Classification") {
         document.getElementById("classificationTable").classList.remove("d-none");
@@ -707,170 +754,102 @@ if ($conn->connect_error) {
       } else if (type === "SubClasses") {
         document.getElementById("subClassesTable").classList.remove("d-none");
       }
-    }
+    };
 
-    //Table Edit Functionality
-// Handle edit button clicks for all modals
-document.querySelectorAll('.edit-btn').forEach(button => {
-  button.addEventListener('click', function () {
-    const table = this.getAttribute('data-table'); // Which table's modal we're working with
+    // =========================
+    // EDIT BUTTONS
+    // =========================
+    document.querySelectorAll('.edit-btn').forEach(button => {
+      button.addEventListener('click', function () {
+        const table = this.getAttribute('data-table');
 
-    if (table === 'classification') {
-      // Edit Classification Modal
-      document.getElementById('editClassificationCode').value = this.getAttribute('data-code');
-      document.getElementById('editClassificationDescription').value = this.getAttribute('data-description');
-      document.getElementById('editClassificationAssessment').value = this.getAttribute('data-assessment');
-      document.getElementById('editClassificationStatus').value = this.getAttribute('data-status');
-    } else if (table === 'actual_uses') {
-      // Edit Actual Uses Modal
-      document.getElementById('editReportCode').value = this.getAttribute('data-reportcode');
-      document.getElementById('editActualUsesCode').value = this.getAttribute('data-code');
-      document.getElementById('editActualUsesDescription').value = this.getAttribute('data-description');
-      document.getElementById('editActualUsesAssessment').value = this.getAttribute('data-assessment');
-      document.getElementById('editActualUsesStatus').value = this.getAttribute('data-status');
-    } else if (table === 'sub_classes') {
-      // Edit Sub-Classes Modal
-      document.getElementById('editSubClassesCode').value = this.getAttribute('data-code');
-      document.getElementById('editSubClassesDescription').value = this.getAttribute('data-description');
-      document.getElementById('editSubClassesAssessment').value = this.getAttribute('data-unitvalue');
-      document.getElementById('editSubClassesStatus').value = this.getAttribute('data-status');
-    }
+        if (table === 'classification') {
+          document.getElementById('editClassificationCode').value = this.getAttribute('data-code');
+          document.getElementById('editClassificationDescription').value = this.getAttribute('data-description');
+          document.getElementById('editClassificationAssessment').value = this.getAttribute('data-assessment');
+          document.getElementById('editClassificationStatus').value = this.getAttribute('data-status');
+        } else if (table === 'actual_uses') {
+          document.getElementById('editReportCode').value = this.getAttribute('data-reportcode');
+          document.getElementById('editActualUsesCode').value = this.getAttribute('data-code');
+          document.getElementById('editActualUsesDescription').value = this.getAttribute('data-description');
+          document.getElementById('editActualUsesAssessment').value = this.getAttribute('data-assessment');
+          document.getElementById('editActualUsesStatus').value = this.getAttribute('data-status');
+        } else if (table === 'sub_classes') {
+          document.getElementById('editSubClassesCode').value = this.getAttribute('data-code');
+          document.getElementById('editSubClassesDescription').value = this.getAttribute('data-description');
+          document.getElementById('editSubClassesAssessment').value = this.getAttribute('data-unitvalue');
+          document.getElementById('editSubClassesStatus').value = this.getAttribute('data-status');
+        }
+      });
+    });
+
+    // =========================
+    // SAVE CHANGES (AJAX)
+    // =========================
+    document.getElementById('saveClassificationChanges').addEventListener('click', function () {
+      const code = document.getElementById('editClassificationCode').value;
+      const description = document.getElementById('editClassificationDescription').value;
+      const assessment = document.getElementById('editClassificationAssessment').value;
+      const status = document.getElementById('editClassificationStatus').value;
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", window.location.href, true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onload = function () {
+        if (xhr.status === 200 && xhr.responseText.trim() === "success") {
+          alert("Classification updated successfully!");
+          location.reload();
+        } else {
+          alert("Error saving Classification changes: " + xhr.responseText);
+        }
+      };
+      xhr.send(`action=update_classification&code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
+    });
+
+    document.getElementById('saveActualUsesChanges').addEventListener('click', function () {
+      const reportCode = document.getElementById('editReportCode').value;
+      const code = document.getElementById('editActualUsesCode').value;
+      const description = document.getElementById('editActualUsesDescription').value;
+      const assessment = document.getElementById('editActualUsesAssessment').value;
+      const status = document.getElementById('editActualUsesStatus').value;
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", window.location.href, true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onload = function () {
+        if (xhr.status === 200 && xhr.responseText.trim() === "success") {
+          alert("Actual Uses updated successfully!");
+          location.reload();
+        } else {
+          alert("Error saving Actual Uses changes: " + xhr.responseText);
+        }
+      };
+      xhr.send(`action=update_actual_uses&reportCode=${reportCode}&code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
+    });
+
+    document.getElementById('saveSubClassesChanges').addEventListener('click', function () {
+      const code = document.getElementById('editSubClassesCode').value;
+      const description = document.getElementById('editSubClassesDescription').value;
+      const assessment = document.getElementById('editSubClassesAssessment').value;
+      const status = document.getElementById('editSubClassesStatus').value;
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", window.location.href, true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onload = function () {
+        if (xhr.status === 200 && xhr.responseText.trim() === "success") {
+          alert("Sub-Classes updated successfully!");
+          location.reload();
+        } else {
+          alert("Error saving Sub-Classes changes: " + xhr.responseText);
+        }
+      };
+      xhr.send(`action=update_sub_classes&code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
+    });
+
   });
-});
+</script>
 
-// Save Changes for Classification Table
-document.getElementById('saveClassificationChanges').addEventListener('click', function () {
-  const code = document.getElementById('editClassificationCode').value;
-  const description = document.getElementById('editClassificationDescription').value;
-  const assessment = document.getElementById('editClassificationAssessment').value;
-  const status = document.getElementById('editClassificationStatus').value;
-
-  const xhr = new XMLHttpRequest();
-  xhr.open("POST", "update_classification.php", true);
-  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-  xhr.onload = function () {
-    if (xhr.status === 200) {
-      alert("Classification updated successfully!");
-      // Optionally, reload the table or update the row dynamically
-    } else {
-      alert("Error saving Classification changes.");
-    }
-  };
-  xhr.send(`code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
-});
-
-// Save Changes for Actual Uses Table
-document.getElementById('saveActualUsesChanges').addEventListener('click', function () {
-  const reportCode = document.getElementById('editReportCode').value;
-  const actualUsesCode = document.getElementById('editActualUsesCode').value;
-  const description = document.getElementById('editActualUsesDescription').value;
-  const assessment = document.getElementById('editActualUsesAssessment').value;
-  const status = document.getElementById('editActualUsesStatus').value;
-
-  const xhr = new XMLHttpRequest();
-  xhr.open("POST", "update_actual_uses.php", true);
-  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-  xhr.onload = function () {
-    if (xhr.status === 200) {
-      alert("Actual Uses updated successfully!");
-      // Optionally, reload the table or update the row dynamically
-    } else {
-      alert("Error saving Actual Uses changes.");
-    }
-  };
-  xhr.send(`report_code=${reportCode}&actual_uses_code=${actualUsesCode}&description=${description}&assessment=${assessment}&status=${status}`);
-});
-
-// Save Changes for Sub-Classes Table
-document.getElementById('saveSubClassesChanges').addEventListener('click', function () {
-  const code = document.getElementById('editSubClassesCode').value;
-  const description = document.getElementById('editSubClassesDescription').value;
-  const unitValue = document.getElementById('editSubClassesAssessment').value;
-  const status = document.getElementById('editSubClassesStatus').value;
-
-  const xhr = new XMLHttpRequest();
-  xhr.open("POST", "update_sub_classes.php", true);
-  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-  xhr.onload = function () {
-    if (xhr.status === 200) {
-      alert("Sub-Class updated successfully!");
-      // Optionally, reload the table or update the row dynamically
-    } else {
-      alert("Error saving Sub-Class changes.");
-    }
-  };
-  xhr.send(`code=${code}&description=${description}&unit_value=${unitValue}&status=${status}`);
-});
-
-
-// Function to handle the "Edit" button click for all modals
-document.querySelectorAll('.edit-btn').forEach(button => {
-  button.addEventListener('click', function () {
-    // Get the table name (classification, actual_uses, or sub_classes) from the button's data-table attribute
-    const table = this.getAttribute('data-table');
-    
-    // Check populate the modal fields based on the table type
-    if (table === 'classification') {
-      // For Classification Table
-      document.getElementById('editClassificationCode').value = this.getAttribute('data-code');
-      document.getElementById('editClassificationDescription').value = this.getAttribute('data-description');
-      document.getElementById('editClassificationAssessment').value = this.getAttribute('data-assessment');
-      document.getElementById('editClassificationStatus').value = this.getAttribute('data-status');
-    } else if (table === 'actual_uses') {
-      // For Actual Uses Table
-      document.getElementById('editReportCode').value = this.getAttribute('data-reportcode');
-      document.getElementById('editActualUsesCode').value = this.getAttribute('data-code');
-      document.getElementById('editActualUsesDescription').value = this.getAttribute('data-description');
-      document.getElementById('editActualUsesAssessment').value = this.getAttribute('data-assessment');
-      document.getElementById('editActualUsesStatus').value = this.getAttribute('data-status');
-    } else if (table === 'sub_classes') {
-      // For Sub-Classes Table
-      document.getElementById('editSubClassesCode').value = this.getAttribute('data-code');
-      document.getElementById('editSubClassesDescription').value = this.getAttribute('data-description');
-      document.getElementById('editSubClassesAssessment').value = this.getAttribute('data-unitvalue');
-      document.getElementById('editSubClassesStatus').value = this.getAttribute('data-status');
-    }
-  });
-});
-
-// Function to save changes for the Classification Table
-document.getElementById('saveClassificationChanges').addEventListener('click', function () {
-  // Get data from classification table
-  const code = document.getElementById('editClassificationCode').value;
-  const description = document.getElementById('editClassificationDescription').value;
-  const assessment = document.getElementById('editClassificationAssessment').value;
-  const status = document.getElementById('editClassificationStatus').value;
-
-  // Display a success message
-  alert("Successfully saved changes to Classification.");
-});
-
-// Function to save changes for the Actual Uses Table
-document.getElementById('saveActualUsesChanges').addEventListener('click', function () {
-  // Get the data from actual uses table
-  const reportCode = document.getElementById('editReportCode').value;
-  const actualUsesCode = document.getElementById('editActualUsesCode').value;
-  const description = document.getElementById('editActualUsesDescription').value;
-  const assessment = document.getElementById('editActualUsesAssessment').value;
-  const status = document.getElementById('editActualUsesStatus').value;
-
-  // Display a success message
-  alert("Successfully saved changes to Actual Uses.");
-});
-
-// Function to save changes for the Sub-Classes Table
-document.getElementById('saveSubClassesChanges').addEventListener('click', function () {
-  // Get the data from sub-classes table
-  const code = document.getElementById('editSubClassesCode').value;
-  const description = document.getElementById('editSubClassesDescription').value;
-  const unitValue = document.getElementById('editSubClassesAssessment').value;
-  const status = document.getElementById('editSubClassesStatus').value;
-
-  // Display a success message
-  alert("Successfully saved changes to Sub-Classes.");
-});
-
-  </script>
 </body>
 
 </html>
