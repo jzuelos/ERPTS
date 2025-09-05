@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const ownerSearchForm = document.getElementById('ownerSearchForm');
     const selectedOwnerDisplay = document.getElementById('selectedOwnerDisplay'); // Display area for selected owner IDs
 
-    // Function to update the display of selected owner IDs
+    // Update display
     function updateSelectedOwners() {
         // Get selected IDs from checkboxes
         const selectedIds = Array.from(document.querySelectorAll('input[name="selected_ids[]"]:checked')).map(cb => cb.value);
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('selected_owner_ids').value = selectedIds.join(','); // Store as a comma-separated string
     }
 
-    // Owner search form submission
+    // Owner Search
     ownerSearchForm.addEventListener("submit", async function (event) {
         event.preventDefault(); // Prevent page reload
 
@@ -25,18 +25,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const formData = new FormData(ownerSearchForm);
 
         try {
-            // Send data using fetch API
+            // Send response to the server
             const response = await fetch("http://localhost/ERPTS/func_sOwn.php", {
                 method: "POST",
                 body: formData
             });
 
-            const result = await response.text(); // Get the server response
+            const result = await response.text(); // Get response
 
-            // Inject the result into the table body for displaying
+            // Display Result
             document.getElementById("resultsBody").innerHTML = result;
 
-            // Update the display of selected owners after loading new results
+            // Update Display
             updateSelectedOwners();
 
         } catch (error) {
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Event listener for checkboxes to update selected IDs display
+    // checkboxes to update selected IDs display
     document.addEventListener('change', function (event) {
         if (event.target.matches('input[name="selected_ids[]"]')) {
             updateSelectedOwners(); // Update the selected owners display on checkbox change
@@ -64,17 +64,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 function performSearch() {
-    // Define the search functionality here
+    // search functionality here
     alert("Search function executed");
-    // Add logic to retrieve and display search results
+    // retrieve and display search results
 }
 
-// Function to clear the owner search form
+// clear the owner search form
 function clearOwnerSearchForm() {
     document.getElementById('owner_search').value = ''; // Clear the owner search input
 }
 
-// Function to clear the main property addition form
+//  clear the main property addition form
 function clearMainForm() {
     // Clear input fields for the main form
     document.getElementById('house_number').value = '';
@@ -107,8 +107,7 @@ function validateDocumentsForm() {
     }
 }
 
-// Function to handle the change event for the municipality select element
-// and update the district input field accordingly
+// Function to handle the change event for the municipality select element and update the district input field accordingly
 document.addEventListener('DOMContentLoaded', function () {
     const municipalitySelect = document.getElementById('municipality');
     const districtInput = document.getElementById('district');

@@ -133,12 +133,12 @@ if ($conn->connect_error) {
                     </span>
                   </td>
                   <td>
-                    <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" title="Delete">
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
+            <button class="btn btn-sm btn-outline-primary me-1" title="Edit" data-bs-toggle="modal" data-bs-target="#editModal">
+              <i class="fas fa-edit"></i>
+            </button>
+          <button class="btn btn-sm btn-outline-danger" title="Delete" data-bs-toggle="modal" data-bs-target="#GlobalDeleteModal">
+            <i class="fas fa-trash-alt"></i>
+          </button>
                   </td>
                 </tr>
               <?php } ?>
@@ -168,12 +168,12 @@ if ($conn->connect_error) {
                     </span>
                   </td>
                   <td>
-                    <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" title="Delete">
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
+            <button class="btn btn-sm btn-outline-primary me-1" title="Edit District" data-bs-toggle="modal" data-bs-target="#DistrictEditModal">
+              <i class="fas fa-edit"></i>
+            </button>
+              <button class="btn btn-sm btn-outline-danger" title="Delete" data-bs-toggle="modal" data-bs-target="#GlobalDeleteModal">
+              <i class="fas fa-trash-alt"></i>
+            </button>
                   </td>
                 </tr>
               <?php } ?>
@@ -203,12 +203,12 @@ if ($conn->connect_error) {
                     </span>
                   </td>
                   <td>
-                    <button class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" title="Delete">
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
+            <button class="btn btn-sm btn-outline-primary me-1" title="Edit Barangay" data-bs-toggle="modal" data-bs-target="#BarangayEditModal">
+              <i class="fas fa-edit"></i>
+            </button>
+          <button class="btn btn-sm btn-outline-danger" title="Delete" data-bs-toggle="modal" data-bs-target="#GlobalDeleteModal">
+            <i class="fas fa-trash-alt"></i>
+          </button>
                   </td>
                 </tr>
               <?php } ?>
@@ -284,6 +284,213 @@ if ($conn->connect_error) {
   </main>
 
 <!--Modal Section-->
+
+<!-- Municipality Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Edit Municipality</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <form id="editForm">
+          <div class="mb-3">
+            <label class="form-label">Region</label>
+            <input type="text" class="form-control" value="V" readonly>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Code</label>
+            <input type="text" class="form-control" maxlength="4" pattern="\d{4}" placeholder="Enter Code" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Municipality</label>
+            <select class="form-select" required>
+              <option value="" selected disabled>Select Municipality</option>
+              <option>Basud</option>
+              <option>Capalonga</option>
+              <option>Daet</option>
+              <option>Jose Panganiban</option>
+              <option>Labo</option>
+              <option>Mercedes</option>
+              <option>Paracale</option>
+              <option>San Lorenzo Ruiz</option>
+              <option>San Vicente</option>
+              <option>Santa Elena</option>
+              <option>Talisay</option>
+              <option>Vinzons</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Status</label>
+            <select class="form-select" required>
+              <option value="" selected disabled>Select Status</option>
+              <option>Active</option>
+              <option>Inactive</option>
+            </select>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" form="editForm" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- District Edit Modal -->
+<div class="modal fade" id="DistrictEditModal" tabindex="-1" aria-labelledby="DistrictEditModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="DistrictEditModalLabel">Edit District</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <form id="DistrictEditForm">
+
+          <div class="mb-3">
+            <label class="form-label">Municipality/City</label>
+            <select class="form-select" name="municipality" required>
+              <option value="" disabled selected>Select Municipality/City</option>
+              <option>Basud</option>
+              <option>Capalonga</option>
+              <option>Daet</option>
+              <option>Jose Panganiban</option>
+              <option>Labo</option>
+              <option>Mercedes</option>
+              <option>Paracale</option>
+              <option>San Lorenzo Ruiz</option>
+              <option>San Vicente</option>
+              <option>Santa Elena</option>
+              <option>Talisay</option>
+              <option>Vinzons</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">District Code</label>
+            <input type="text" class="form-control" name="code" maxlength="4" pattern="\d{4}" placeholder="Enter Code" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-control" name="description" placeholder="Enter description" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Status</label>
+            <select class="form-select" name="status" required>
+              <option value="" disabled selected>Select Status</option>
+              <option>Active</option>
+              <option>Inactive</option>
+            </select>
+          </div>
+
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" form="DistrictEditForm" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+          
+<!-- Barangay Edit Modal -->
+<div class="modal fade" id="BarangayEditModal" tabindex="-1" aria-labelledby="BarangayEditModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="BarangayEditModalLabel">Edit Barangay</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <form id="BarangayEditForm">
+
+          <div class="mb-3">
+            <label class="form-label">District / Municipality / City</label>
+            <select class="form-select" name="district" required>
+              <option value="" disabled selected>Select District / Municipality / City</option>
+              <option>Basud</option>
+              <option>Capalonga</option>
+              <option>Daet</option>
+              <option>Jose Panganiban</option>
+              <option>Labo</option>
+              <option>Mercedes</option>
+              <option>Paracale</option>
+              <option>San Lorenzo Ruiz</option>
+              <option>San Vicente</option>
+              <option>Santa Elena</option>
+              <option>Talisay</option>
+              <option>Vinzons</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Barangay Code</label>
+            <input type="text" class="form-control" name="barangay_code" maxlength="9" pattern="\d{9}" placeholder="Enter Code" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Name of Barangay</label>
+            <input type="text" class="form-control" name="barangay_name" placeholder="Enter Barangay name" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Status</label>
+            <select class="form-select" name="status" required>
+              <option value="" disabled selected>Select Status</option>
+              <option>Active</option>
+              <option>Inactive</option>
+            </select>
+          </div>
+
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" form="BarangayEditForm" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete modal for Tables -->
+<div class="modal fade" id="GlobalDeleteModal" tabindex="-1" aria-labelledby="GlobalDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title text-danger" id="GlobalDeleteModalLabel">Confirm Deletion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <p>Are you sure you want to <strong class="text-danger">delete this record</strong>? This action cannot be undone.</p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Confirmation Modal -->
 <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
   <div class="modal-dialog">
