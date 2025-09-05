@@ -37,7 +37,8 @@ if ($conn->connect_error) {
 }
 
 // Function to send verification code
-function sendVerificationCode($userEmail, $code) {
+function sendVerificationCode($userEmail, $code)
+{
   $mail = new PHPMailer(true);
   try {
     $mail->isSMTP();
@@ -109,7 +110,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['email'])) {
       $stmt->close();
     }
   }
+
+  // ✅ Redirect after Step 1 to prevent refresh resend
+  header("Location: ResetPassword.php");
+  exit();
 }
+
 
 // ========== RESEND CODE ==========
 if (isset($_POST['resend'])) {
@@ -122,6 +128,10 @@ if (isset($_POST['resend'])) {
     $_SESSION['step'] = 2;
     $_SESSION['resent'] = true;
   }
+
+  // ✅ Redirect after resend to prevent duplicate sends on refresh
+  header("Location: ResetPassword.php");
+  exit();
 }
 
 // ========== STEP 2: CODE VERIFICATION ==========
@@ -138,6 +148,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['code'])) {
       $_SESSION['step'] = 2;
     }
   }
+
+  // ✅ Redirect after verification attempt to prevent re-posting on refresh
+  header("Location: ResetPassword.php");
+  exit();
 }
 
 // ========== STEP 3: PASSWORD RESET ==========
@@ -145,7 +159,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['newPassword'], $_POST[
   $newPassword = $_POST['newPassword'];
   $confirmPassword = $_POST['confirmPassword'];
 
-  if ($newPassword === $confirmPassword && !empty($_SESSION['reset_email'])) {
+  // ✅ Strong password rules
+  $errors = [];
+  if (strlen($newPassword) < 8) {
+    $errors[] = "Password must be at least 8 characters long.";
+  }
+  if (!preg_match('/[A-Z]/', $newPassword)) {
+    $errors[] = "Password must contain at least one uppercase letter.";
+  }
+  if (!preg_match('/[a-z]/', $newPassword)) {
+    $errors[] = "Password must contain at least one lowercase letter.";
+  }
+  if (!preg_match('/[0-9]/', $newPassword)) {
+    $errors[] = "Password must contain at least one number.";
+  }
+  if (!preg_match('/[\W_]/', $newPassword)) {
+    $errors[] = "Password must contain at least one special character.";
+  }
+
+  if ($newPassword !== $confirmPassword) {
+    $errors[] = "Passwords do not match.";
+  }
+
+  if (empty($errors) && !empty($_SESSION['reset_email'])) {
     $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
 
     $stmt = $conn->prepare("UPDATE users SET password = ? WHERE email = ?");
@@ -161,8 +197,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['newPassword'], $_POST[
       $stmt->close();
     }
   } else {
-    $_SESSION['password_error'] = true;
+    $_SESSION['password_error'] = $errors; // save all errors
     $_SESSION['step'] = 3;
+    header("Location: ResetPassword.php");
+    exit();
   }
 }
 
@@ -175,7 +213,8 @@ $conn->close();
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
+    crossorigin="anonymous">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="index.css">
@@ -194,21 +233,25 @@ $conn->close();
         <!-- Step Indicator -->
         <div class="d-flex justify-content-center mb-4">
           <div class="d-flex flex-column align-items-center mx-3" style="width:100px;">
-            <span class="badge badge-pill <?php echo (empty($_SESSION['step']) || $_SESSION['step'] == 1) ? 'badge-dark' : 'badge-secondary'; ?>">1</span>
+            <span
+              class="badge badge-pill <?php echo (empty($_SESSION['step']) || $_SESSION['step'] == 1) ? 'badge-dark' : 'badge-secondary'; ?>">1</span>
             <small class="text-center">Email</small>
           </div>
           <div class="d-flex flex-column align-items-center mx-3" style="width:100px;">
-            <span class="badge badge-pill <?php echo (!empty($_SESSION['step']) && $_SESSION['step'] == 2) ? 'badge-dark' : 'badge-secondary'; ?>">2</span>
+            <span
+              class="badge badge-pill <?php echo (!empty($_SESSION['step']) && $_SESSION['step'] == 2) ? 'badge-dark' : 'badge-secondary'; ?>">2</span>
             <small class="text-center">Verify Code</small>
           </div>
           <div class="d-flex flex-column align-items-center mx-3" style="width:100px;">
-            <span class="badge badge-pill <?php echo (!empty($_SESSION['step']) && $_SESSION['step'] == 3) ? 'badge-dark' : 'badge-secondary'; ?>">3</span>
+            <span
+              class="badge badge-pill <?php echo (!empty($_SESSION['step']) && $_SESSION['step'] == 3) ? 'badge-dark' : 'badge-secondary'; ?>">3</span>
             <small class="text-center">New Password</small>
           </div>
         </div>
 
         <!-- Step 1: Enter Email -->
-        <form id="emailForm" method="POST" action="" style="<?php echo (empty($_SESSION['step']) || $_SESSION['step'] == 1) ? '' : 'display:none;'; ?>">
+        <form id="emailForm" method="POST" action=""
+          style="<?php echo (empty($_SESSION['step']) || $_SESSION['step'] == 1) ? '' : 'display:none;'; ?>">
           <div class="form-group">
             <label for="email">Enter your Email</label>
             <input type="email" id="email" name="email"
@@ -220,18 +263,20 @@ $conn->close();
         </form>
 
         <!-- Step 2: Enter Code -->
-        <form id="codeForm" method="POST" action="" style="<?php echo (!empty($_SESSION['step']) && $_SESSION['step'] == 2) ? '' : 'display:none;'; ?>">
+        <form id="codeForm" method="POST" action=""
+          style="<?php echo (!empty($_SESSION['step']) && $_SESSION['step'] == 2) ? '' : 'display:none;'; ?>">
           <div class="form-group">
             <label for="code">Enter Verification Code</label>
             <input type="text" id="code" name="code"
-              class="form-control rounded-pill <?php echo !empty($_SESSION['code_error']) ? 'is-invalid' : ''; ?>" required>
+              class="form-control rounded-pill <?php echo !empty($_SESSION['code_error']) ? 'is-invalid' : ''; ?>"
+              required>
             <div class="invalid-feedback">
-              <?php 
-                if (!empty($_SESSION['code_error']) && $_SESSION['code_error'] === "expired") {
-                  echo "Verification code has expired. Please request a new one.";
-                } else {
-                  echo "Invalid verification code.";
-                }
+              <?php
+              if (!empty($_SESSION['code_error']) && $_SESSION['code_error'] === "expired") {
+                echo "Verification code has expired. Please request a new one.";
+              } else {
+                echo "Invalid verification code.";
+              }
               ?>
             </div>
           </div>
@@ -248,12 +293,13 @@ $conn->close();
             <button type="submit" class="btn btn-link mb-3">Resend Code</button>
           </form>
           <?php if (!empty($_SESSION['resent'])): ?>
-            <p class="text-success text-center">A new code has been sent to your email.</p>
+            <p class="alert alert-success text-center fade-message">A new code has been sent to your email.</p>
           <?php endif; ?>
         <?php endif; ?>
 
         <!-- Step 3: New Password -->
-        <form id="passwordForm" method="POST" action="" style="<?php echo (!empty($_SESSION['step']) && $_SESSION['step'] == 3) ? '' : 'display:none;'; ?>">
+        <form id="passwordForm" method="POST" action=""
+          style="<?php echo (!empty($_SESSION['step']) && $_SESSION['step'] == 3) ? '' : 'display:none;'; ?>">
           <div class="form-group">
             <label for="newPassword">New Password</label>
             <div class="input-group">
@@ -269,16 +315,26 @@ $conn->close();
           <div class="form-group">
             <label for="confirmPassword">Confirm Password</label>
             <div class="input-group">
-              <input type="password" id="confirmPassword" name="confirmPassword" class="form-control rounded-pill" required>
+              <input type="password" id="confirmPassword" name="confirmPassword" class="form-control rounded-pill"
+                required>
               <div class="input-group-append">
                 <span class="input-group-text bg-white border-0">
                   <i class="fas fa-eye togglePassword" data-target="confirmPassword" style="cursor:pointer;"></i>
                 </span>
               </div>
+              <?php if (!empty($_SESSION['password_error'])): ?>
+                <div class="alert alert-danger mt-2 fade-message">
+                  <ul class="mb-0">
+                    <?php foreach ($_SESSION['password_error'] as $error): ?>
+                      <li><?php echo htmlspecialchars($error); ?></li>
+                    <?php endforeach; ?>
+                  </ul>
+                </div>
+              <?php endif; ?>
             </div>
           </div>
 
-          <button type="submit" class="btn btn-dark w-100 mt-4">Set Password</button>
+          <button type="submit" class="btn btn-dark w-100 mt-3">Set Password</button>
         </form>
 
         <div class="text-center mt-2">
@@ -290,7 +346,8 @@ $conn->close();
         <h4 class="text-center mt-4">Welcome to ERPTS</h4>
         <p>From the Assessor’s Module you can:</p>
         <ul>
-          <li>Search for information in Owner’s Declaration (OD), Assessor’s Field Sheet/FAAS, Tax Declaration (TD), or RPTOP.</li>
+          <li>Search for information in Owner’s Declaration (OD), Assessor’s Field Sheet/FAAS, Tax Declaration (TD), or
+            RPTOP.</li>
           <li>Encode new real property information.</li>
         </ul>
         <p>To begin:</p>
@@ -340,6 +397,15 @@ $conn->close();
         }
         updateCountdown();
       <?php endif; ?>
+
+      // Auto-hide error/success messages after 5s
+      document.querySelectorAll(".fade-message").forEach(function (msg) {
+        setTimeout(() => {
+          msg.style.transition = "opacity 0.5s ease";
+          msg.style.opacity = "0";
+          setTimeout(() => msg.remove(), 500);
+        }, 5000);
+      });
     });
   </script>
 
