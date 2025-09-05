@@ -2,7 +2,6 @@ let transactions = [];
 let editId = null;
 let transactionModal = null;
 
-
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function () {
   // Initialize the Bootstrap modal
@@ -29,6 +28,7 @@ function openModal(id = null) {
       document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Transaction';
       document.getElementById('transactionID').value = tx.t_code || '';
       document.getElementById('nameInput').value = tx.name || '';
+      document.getElementById('contactInput').value = tx.contact || '';   // NEW
       document.getElementById('transactionInput').value = tx.transaction || '';
       document.getElementById('statusInput').value = tx.status || '';
       editId = id;
@@ -37,6 +37,7 @@ function openModal(id = null) {
     document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus"></i> Add Transaction';
     document.getElementById('transactionID').value = '';
     document.getElementById('nameInput').value = '';
+    document.getElementById('contactInput').value = '';                   // NEW
     document.getElementById('transactionInput').value = '';
     document.getElementById('statusInput').selectedIndex = 0;
     editId = null;
@@ -54,10 +55,11 @@ function closeModal() {
 function saveTransaction() {
   const t_code = document.getElementById("transactionID").value.trim();
   const t_name = document.getElementById("nameInput").value.trim();
+  const t_contact = document.getElementById("contactInput").value.trim(); // NEW
   const t_description = document.getElementById("transactionInput").value.trim();
   const t_status = document.getElementById("statusInput").value;
 
-  if (!t_code || !t_name || !t_description || !t_status) {
+  if (!t_code || !t_name || !t_contact || !t_description || !t_status) {
     alert("Please fill out all fields.");
     return;
   }
@@ -66,6 +68,7 @@ function saveTransaction() {
   formData.append("action", editId ? "updateTransaction" : "saveTransaction");
   formData.append("t_code", t_code);
   formData.append("t_name", t_name);
+  formData.append("t_contact", t_contact); // NEW
   formData.append("t_description", t_description);
   formData.append("t_status", t_status);
 
@@ -97,6 +100,7 @@ function saveTransaction() {
         // Reset fields
         document.getElementById("transactionID").value = "";
         document.getElementById("nameInput").value = "";
+        document.getElementById("contactInput").value = ""; // NEW
         document.getElementById("transactionInput").value = "";
         document.getElementById("statusInput").selectedIndex = 0;
 
@@ -121,6 +125,7 @@ function loadTransactions() {
         id: parseInt(tx.transaction_id),   // backend ID
         t_code: tx.transaction_code,
         name: tx.name,
+        contact: tx.contact_number,       // NEW
         transaction: tx.description,
         status: tx.status
       }));
@@ -163,6 +168,7 @@ function updateTable() {
     row.innerHTML = `
         <td>${tx.t_code || '#' + tx.id}</td>
         <td>${tx.name}</td>
+        <td>${tx.contact || ''}</td> <!-- NEW -->
         <td>${tx.transaction}</td>
         <td><span class="status-badge ${statusClass}">${tx.status}</span></td>
         <td>

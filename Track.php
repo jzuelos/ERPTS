@@ -59,61 +59,52 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
     </button>
 
     <table class="table table-borderless table-striped align-middle">
-  <thead class="table-light">
-    <tr>
-      <th>Transaction ID</th>
-      <th>Name</th>
-      <th>Description</th>
-      <th>Status</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody id="transactionTable">
-    <tr>
-      <td>1001</td>
-      <td>John Doe</td>
-      <td>Certification</td>
-      <td><span class="status-badge status-in-progress">In Progress</span></td>
-      <td>
-        <button class="btn btn-sm btn-primary" onclick="openModal(1001)">
-          <i class="fas fa-edit"></i> Edit
-        </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteTransaction(1001)">
-          <i class="fas fa-trash"></i> Delete
-        </button>
-      </td>
-    </tr>
-    <tr>
-      <td>1002</td>
-      <td>Jane Smith</td>
-      <td>Certification</td>
-      <td><span class="status-badge status-completed">Completed</span></td>
-      <td>
-        <button class="btn btn-sm btn-primary" onclick="openModal(1002)">
-          <i class="fas fa-edit"></i> Edit
-        </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteTransaction(1002)">
-          <i class="fas fa-trash"></i> Delete
-        </button>
-      </td>
-    </tr>
-    <tr>
-      <td>1003</td>
-      <td>Acme Corp</td>
-      <td>Certification</td>
-      <td><span class="status-badge status-in-progress">In Progress</span></td>
-      <td>
-        <button class="btn btn-sm btn-primary" onclick="openModal(1003)">
-          <i class="fas fa-edit"></i> Edit
-        </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteTransaction(1003)">
-          <i class="fas fa-trash"></i> Delete
-        </button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+      <thead class="table-light">
+        <tr>
+          <th>Transaction ID</th>
+          <th>Name</th>
+          <th>Contact Number</th> <!-- New Column -->
+          <th>Description</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="transactionTable">
+        <?php
+        require_once "database.php";
+        $conn = Database::getInstance();
 
+        // Fetch all transactions
+        $sql = "SELECT transaction_id, transaction_code, name, contact_number, description, status 
+          FROM transactions ORDER BY transaction_id DESC";
+        $result = $conn->query($sql);
+
+        if ($result && $result->num_rows > 0) {
+          while ($row = $result->fetch_assoc()) {
+            $statusClass = strtolower(str_replace(' ', '-', $row['status'])); // e.g., "In Progress" → "in-progress"
+
+            echo "<tr>
+              <td>{$row['transaction_id']}</td>
+              <td>{$row['name']}</td>
+              <td>{$row['contact_number']}</td>
+              <td>{$row['description']}</td>
+              <td><span class='status-badge status-{$statusClass}'>{$row['status']}</span></td>
+              <td>
+                <button class='btn btn-sm btn-primary' onclick='openModal(\"{$row['transaction_id']}\")'>
+                  <i class='fas fa-edit'></i> Edit
+                </button>
+                <button class='btn btn-sm btn-danger' onclick='deleteTransaction(\"{$row['transaction_id']}\")'>
+                  <i class='fas fa-trash'></i> Delete
+                </button>
+              </td>
+            </tr>";
+          }
+        } else {
+          echo "<tr><td colspan='6' class='text-center'>No transactions found</td></tr>";
+        }
+        ?>
+      </tbody>
+    </table>
 
     <div class="recent-activity">
       <h3><i class="fas fa-history"></i> Recent Transaction Activity</h3>
@@ -124,16 +115,24 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
   </div>
 
   <!-- Modal -->
-<div class="modal fade" id="transactionModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title" id="modalTitle"><i class="fas fa-exchange-alt"></i> Add Transaction</h3>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
+  <div class="modal fade" id="transactionModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="modalTitle">
+            <i class="fas fa-exchange-alt"></i> Add Transaction
+          </h3>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
           <input type="text" id="transactionID" name="t_code" class="form-control mb-2" placeholder="Transaction Code">
+
           <input type="text" id="nameInput" name="t_name" class="form-control mb-2" placeholder="Name">
+
+          <!-- ✅ New Contact Number field -->
+          <input type="text" id="contactInput" name="t_contact" class="form-control mb-2" placeholder="Contact Number">
+
           <input type="text" id="transactionInput" name="t_description" class="form-control mb-2" placeholder="Transaction Description">
 
           <select id="statusInput" name="t_status" class="form-select mb-2" required>
@@ -143,19 +142,20 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
             <option value="Completed">Completed</option>
           </select>
         </div>
-      <div class="modal-footer">
-        <div class="d-flex w-100 gap-2">
-          <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">
-            <i class="fas fa-times"></i> Cancel
-          </button>
-          <button type="button" class="btn btn-success w-50" onclick="saveTransaction()">
-            <i class="fas fa-save"></i> Save
-          </button>
+
+        <div class="modal-footer">
+          <div class="d-flex w-100 gap-2">
+            <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">
+              <i class="fas fa-times"></i> Cancel
+            </button>
+            <button type="button" class="btn btn-success w-50" onclick="saveTransaction()">
+              <i class="fas fa-save"></i> Save
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
