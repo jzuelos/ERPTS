@@ -348,3 +348,25 @@ function changeLocationType(type) {
       break;
   }
 }
+
+//Delete Function for Main Table
+document.addEventListener("DOMContentLoaded", () => {
+  let rowToDelete = null;
+
+  // Delete button click
+  document.querySelectorAll(".btn-outline-danger").forEach(btn => {
+    btn.addEventListener("click", function () {
+      rowToDelete = this.closest("tr"); // get the row
+    });
+  });
+
+  // Confirm delete
+  document.getElementById("confirmDelete").addEventListener("click", () => {
+    if (rowToDelete) {
+      rowToDelete.remove(); // remove row from table
+      rowToDelete = null;
+    }
+    const modal = bootstrap.Modal.getInstance(document.getElementById("GlobalDeleteModal"));
+    modal.hide();
+  });
+});

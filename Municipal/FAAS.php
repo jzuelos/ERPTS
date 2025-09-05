@@ -387,7 +387,7 @@ $conn->close();
   </section>
 
 
-  <!-- Modal for Editing Owner's Information -->
+  <!-- Owner's Information Modal -->
   <div class="modal fade" id="editOwnerModal" tabindex="-1" aria-labelledby="editOwnerModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -395,7 +395,7 @@ $conn->close();
           <h5 class="modal-title" id="editOwnerModalLabel">Edit Owner's Information</h5>
         </div>
         <div class="modal-body">
-          <!-- Owner Info (Editable) -->
+          <!-- Owner Info -->
           <form id="editOwnerForm">
             <!-- Loop through each owner and display their info for editing -->
             <?php foreach ($owners_details as $owner): ?>
@@ -426,7 +426,7 @@ $conn->close();
 
           <hr class="my-4">
 
-          <!-- Owner List Table (Selectable) -->
+          <!-- Owner List Table -->
           <h6 class="mb-3">Owner List</h6>
           <table class="table table-bordered table-striped table-sm">
             <thead class="table-dark">
@@ -540,7 +540,7 @@ $conn->close();
     </div>
   </section>
 
-  <!--Modal for Property Information-->
+  <!-- Property Information Modal -->
   <div class="modal fade" id="editPropertyModal" tabindex="-1" aria-labelledby="editPropertyModalLabel"
     aria-hidden="true">
     <div class="modal-dialog">
@@ -596,7 +596,6 @@ $conn->close();
   <!--RPU Identification Numbers-->
   <section class="container mt-5" id="rpu-identification-section">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <!-- Title and Edit Button -->
       <h4 class="mb-0">RPU Identification Numbers</h4>
       <button type="button" class="btn btn-outline-primary btn-sm" id="editRPUButton"
         onclick="toggleEdit()">Edit</button>
@@ -605,14 +604,14 @@ $conn->close();
     <div class="card border-0 shadow p-4 rounded-3">
       <form>
         <div class="row">
-          <!-- ARP Number Input (Number only) -->
+          <!-- ARP Number Input -->
           <div class="col-md-6 mb-3">
             <label for="arpNumber" class="form-label">ARP Number</label>
             <input type="number" class="form-control" id="arpNumber" placeholder="Enter ARP Number"
               value="<?= isset($rpu_details['arp']) ? htmlspecialchars($rpu_details['arp']) : ''; ?>" disabled>
           </div>
 
-          <!-- Property Number Input (Number only) -->
+          <!-- Property Number Input -->
           <div class="col-md-6 mb-3">
             <label for="propertyNumber" class="form-label">Property Number</label>
             <input type="number" class="form-control" id="propertyNumber" placeholder="Enter Property Number"
@@ -729,10 +728,9 @@ $conn->close();
           </div>
         </div>
 
-        <!-- Print Button at the Bottom Right -->
+        <!-- Print Button -->
         <div class="text-right mt-4">
           <?php
-          // Get the property ID from the current URL (e.g., FAAS.php?id=140)
           $p_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
           ?>
           <a href="DRP.php?p_id=<?= urlencode($p_id); ?>"
@@ -744,7 +742,7 @@ $conn->close();
     </div>
   </section>
 
-  <!-- Modal for Declaration of Property -->
+  <!-- Declaration of Property Modal-->
   <div class="modal fade" id="editDeclarationProperty" tabindex="-1" aria-labelledby="editDeclarationPropertyLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -848,10 +846,8 @@ $conn->close();
     </div>
 
     <div class="card border-0 shadow p-4 rounded-3">
-      <!-- Quick Actions Row -->
       <div class="row mb-4">
         <?php
-        // Get the property ID from the current URL (e.g., FAAS.php?id=140)
         $p_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
         ?>
         <div class="col-md-6 mb-3">

@@ -1,10 +1,10 @@
 <?php
-session_start(); // Start session at the top
+session_start(); 
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once '../database.php'; // Include your database connection
+require_once '../database.php'; 
 
 $conn = Database::getInstance();
 if ($conn->connect_error) {
@@ -32,11 +32,8 @@ $plant_count = 327;
 <html lang="en">
 
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-  <!-- Bootstrap CSS -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
@@ -57,7 +54,7 @@ $plant_count = 327;
  <!-- Main Body -->
 <div class="container-fluid p-0 main-content" style="margin-top: 20px;">
   <div class="row px-4">
-    <!-- Left Column: Stats + Table -->
+    <!-- Left Column: Stats and Table -->
     <div class="col-lg-8">
       <!-- Stats Cards Container -->
       <div class="modern-card shadow-lg p-4 rounded-lg mb-4">

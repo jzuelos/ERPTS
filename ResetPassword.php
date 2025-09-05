@@ -3,7 +3,7 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// ✅ Clear session if user clicks Back to Login
+// Clear session and redirect to login
 if (isset($_GET['clear'])) {
   $_SESSION = [];
   if (ini_get("session.use_cookies")) {
@@ -26,7 +26,7 @@ if (isset($_GET['clear'])) {
 
 require_once 'database.php';
 
-// ✅ Load PHPMailer
+// Load PHPMailer
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 require 'vendor/autoload.php';
@@ -81,7 +81,7 @@ function sendVerificationCode($userEmail, $code)
   }
 }
 
-// ========== STEP 1: EMAIL SUBMISSION ==========
+// email submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['email'])) {
   $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
 
@@ -96,7 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['email'])) {
         $user = $result->fetch_assoc();
         $_SESSION['reset_email'] = $user['email'];
 
-        // ✅ Generate verification code
+        // generate random code 
         $code = random_int(100000, 999999);
         $_SESSION['verification_code'] = $code;
         $_SESSION['verification_expires'] = time() + (3 * 60); // 3 minutes
@@ -111,13 +111,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['email'])) {
     }
   }
 
-  // ✅ Redirect after Step 1 to prevent refresh resend
+  // redirect after email submission to prevent re-posting on refresh
   header("Location: ResetPassword.php");
   exit();
 }
 
 
-// ========== RESEND CODE ==========
+// Resend code
 if (isset($_POST['resend'])) {
   if (!empty($_SESSION['reset_email'])) {
     $code = random_int(100000, 999999);
@@ -129,12 +129,12 @@ if (isset($_POST['resend'])) {
     $_SESSION['resent'] = true;
   }
 
-  // ✅ Redirect after resend to prevent duplicate sends on refresh
+  // redirect after resend to prevent re-posting on refresh
   header("Location: ResetPassword.php");
   exit();
 }
 
-// ========== STEP 2: CODE VERIFICATION ==========
+// Code verification
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['code'])) {
   $enteredCode = trim($_POST['code']);
   if (!empty($_SESSION['verification_code'])) {
@@ -149,17 +149,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['code'])) {
     }
   }
 
-  // ✅ Redirect after verification attempt to prevent re-posting on refresh
+  // redirect after code submission to prevent re-posting on refresh
   header("Location: ResetPassword.php");
   exit();
 }
 
-// ========== STEP 3: PASSWORD RESET ==========
+// password reset
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['newPassword'], $_POST['confirmPassword'])) {
   $newPassword = $_POST['newPassword'];
   $confirmPassword = $_POST['confirmPassword'];
 
-  // ✅ Strong password rules
+  // strong password rules
   $errors = [];
   if (strlen($newPassword) < 8) {
     $errors[] = "Password must be at least 8 characters long.";
@@ -188,7 +188,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['newPassword'], $_POST[
     if ($stmt) {
       $stmt->bind_param("ss", $hashedPassword, $_SESSION['reset_email']);
       if ($stmt->execute()) {
-        // ✅ Success: clear session and redirect
+        // clear session and redirect
         session_unset();
         session_destroy();
         header("Location: index.php?reset=success");
@@ -249,7 +249,7 @@ $conn->close();
           </div>
         </div>
 
-        <!-- Step 1: Enter Email -->
+        <!--Enter Email -->
         <form id="emailForm" method="POST" action=""
           style="<?php echo (empty($_SESSION['step']) || $_SESSION['step'] == 1) ? '' : 'display:none;'; ?>">
           <div class="form-group">
@@ -262,7 +262,7 @@ $conn->close();
           <button type="submit" class="btn btn-dark w-100 mt-3">Send Code</button>
         </form>
 
-        <!-- Step 2: Enter Code -->
+        <!--Enter Code -->
         <form id="codeForm" method="POST" action=""
           style="<?php echo (!empty($_SESSION['step']) && $_SESSION['step'] == 2) ? '' : 'display:none;'; ?>">
           <div class="form-group">
@@ -283,7 +283,7 @@ $conn->close();
           <button type="submit" class="btn btn-dark w-100 mt-4">Enter Code</button>
         </form>
 
-        <!-- Countdown + Resend -->
+        <!-- Countdown and Reset -->
         <?php if (!empty($_SESSION['step']) && $_SESSION['step'] == 2): ?>
           <div class="text-center mt-3">
             <p id="countdown" class="text-danger font-weight-bold"></p>
@@ -297,7 +297,7 @@ $conn->close();
           <?php endif; ?>
         <?php endif; ?>
 
-        <!-- Step 3: New Password -->
+        <!-- New Password -->
         <form id="passwordForm" method="POST" action=""
           style="<?php echo (!empty($_SESSION['step']) && $_SESSION['step'] == 3) ? '' : 'display:none;'; ?>">
           <div class="form-group">
@@ -364,7 +364,7 @@ $conn->close();
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      // Toggle password visibility
+      // Eyecandy toggle password
       document.querySelectorAll(".togglePassword").forEach(icon => {
         icon.addEventListener("click", function () {
           const targetId = this.getAttribute("data-target");
@@ -379,7 +379,7 @@ $conn->close();
         });
       });
 
-      // Countdown timer
+      // Countdown Timer
       <?php if (!empty($_SESSION['verification_expires']) && !empty($_SESSION['step']) && $_SESSION['step'] == 2): ?>
         var expirationTime = <?php echo $_SESSION['verification_expires'] - time(); ?>; // seconds left
         var countdownElem = document.getElementById("countdown");

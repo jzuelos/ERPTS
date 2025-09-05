@@ -2,11 +2,8 @@
 <html lang="en">
 
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-  <!-- Bootstrap CSS -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
@@ -23,9 +20,8 @@
 <body>
   <div id="selectedOwnerDisplay"></div> <!-- Display area for selected owner IDs -->
   <?php
-  session_start(); // Start session at the top
-
-  // Prevent the browser from caching this page
+  session_start();
+  // Prevent caching
   header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
   header("Cache-Control: post-check=0, pre-check=0", false);
   header("Pragma: no-cache");
@@ -40,9 +36,8 @@
     die("Connection failed: " . $conn->connect_error);
   }
 
-  // Check if form is submitted via POST
+  // Handle form submission
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Sanitize inputs
     $house_number = filter_input(INPUT_POST, 'house_number', FILTER_SANITIZE_NUMBER_INT);
     $block_number = filter_input(INPUT_POST, 'block_number', FILTER_SANITIZE_NUMBER_INT);
     $province = filter_input(INPUT_POST, 'province', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -63,38 +58,38 @@
     $selected_owner_ids = isset($_POST['selected_owner_ids']) ? explode(',', $_POST['selected_owner_ids']) : [];
     $selected_owner_ids = array_map('intval', $selected_owner_ids);
 
-    // Ensure house number and city are provided
+    // Basic validation
     if ($house_number && $city) {
       $conn->begin_transaction();
 
       try {
-        // Insert property data into p_info table
+        // Insert into p_info table
         $stmt = $conn->prepare("INSERT INTO p_info (house_no, block_no, province, city, district, barangay, house_tag_no, land_area, desc_land, documents, ownID_Fk) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         if ($stmt) {
           $owner_id = !empty($selected_owner_ids) ? $selected_owner_ids[0] : null;
           $stmt->bind_param("iissssiissi", $house_number, $block_number, $province, $city, $district, $barangay, $house_tag, $land_area, $desc_land, $documents, $owner_id);
 
           if ($stmt->execute()) {
-            $property_id = $stmt->insert_id; // Get last inserted ID
-            $_SESSION['last_property_id'] = $property_id; // Store it in session
+            $property_id = $stmt->insert_id; // Get the last inserted property ID
+            $_SESSION['last_property_id'] = $property_id; // Store for modal link
 
-            // Insert owners into propertyowner table and collect propertyowner_ids
+            // Insert into propertyowner table for each selected owner
             $propertyowner_ids = [];
             if (!empty($selected_owner_ids)) {
               foreach ($selected_owner_ids as $owner_id) {
-                // Ensure the owner exists
+                // Verify owner exists
                 $check_owner_stmt = $conn->prepare("SELECT 1 FROM owners_tb WHERE own_id = ?");
                 $check_owner_stmt->bind_param("i", $owner_id);
                 $check_owner_stmt->execute();
                 $check_owner_stmt->store_result();
 
                 if ($check_owner_stmt->num_rows > 0) {
-                  // Insert into propertyowner table and get the propertyowner_id
+                  // Insert into propertyowner
                   $owner_stmt = $conn->prepare("INSERT INTO propertyowner (property_id, owner_id) VALUES (?, ?)");
                   if ($owner_stmt) {
                     $owner_stmt->bind_param("ii", $property_id, $owner_id);
                     if ($owner_stmt->execute()) {
-                      // Get the last inserted propertyowner_id
+                      
                       $propertyowner_id = $owner_stmt->insert_id;
                       $propertyowner_ids[] = $propertyowner_id; // Collect owner IDs
                     } else {
@@ -111,10 +106,10 @@
               }
             }
 
-            // Now insert a single FAAS record with all the owner IDs as JSON
+            // Insert into FAAS table
             $faas_stmt = $conn->prepare("INSERT INTO FAAS (pro_id, propertyowner_id) VALUES (?, ?)");
             if ($faas_stmt) {
-              // Convert the owner IDs array to JSON format
+              // Convert array of owner IDs to JSON
               $owners_json = json_encode($propertyowner_ids);
 
               $faas_stmt->bind_param("is", $property_id, $owners_json);
@@ -151,7 +146,7 @@
     }
   }
 
-  // Show modal after successful property addition
+  // Show modal if property was added
   if (isset($_SESSION['property_added']) && $_SESSION['property_added'] === true) {
     unset($_SESSION['property_added']);
     echo "<script>
@@ -161,14 +156,14 @@
     </script>";
   }
 
-  // Display session message
+
   if (isset($_SESSION['message'])) {
     echo "<p>" . $_SESSION['message'] . "</p>";
     unset($_SESSION['message']);
   }
   ?>
 
-  <!-- Bootstrap Modal for Confirmation -->
+  <!-- Confirmation Modal -->
   <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel"
     aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -182,7 +177,6 @@
         <div class="modal-body">
           Property added <br> Do you want to continue to the FAAS sheet?
         </div>
-        <!-- Modal Footer with Dynamic Link -->
         <div class="modal-footer">
           <a href="FAAS.php<?php echo isset($_SESSION['last_property_id']) ? '?id=' . $_SESSION['last_property_id'] : ''; ?>"
             class="btn btn-primary">Yes</a>
@@ -192,7 +186,7 @@
     </div>
   </div>
 
-  <!-- Include Bootstrap JS and dependencies -->
+  <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -208,7 +202,6 @@
   <section class="container my-4">
     <div class="card">
       <div class="card-body">
-        <!-- Owner Search Section -->
         <div class="mb-3">
           <form action="" method="POST" id="ownerSearchForm">
             <label for="owner_search" class="form-label"><span style="color: red;">*</span> Search for Owner</label>
@@ -233,7 +226,7 @@
           </thead>
           <tbody id="resultsBody">
             <?php
-            // Include the database connection
+            // Database connection
             require_once '../database.php';
 
             // Get the database connection

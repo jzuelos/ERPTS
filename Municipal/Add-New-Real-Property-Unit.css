@@ -1,4 +1,4 @@
-/* General Section Styles */
+
 .u-section-1 .u-sheet-1 {
   min-height: 119px;
 }
@@ -16,7 +16,7 @@
   border: 1px solid #ccc;
 }
 
-/* Responsive Adjustments */
+
 @media (max-width: 1199px) {
   .u-section-2 .u-form-1 {
     margin-right: 0;

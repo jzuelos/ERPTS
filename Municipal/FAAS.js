@@ -36,7 +36,7 @@ function saveOwnerData() {
 
   // For demonstration, log the data
   console.log(ownerData);
-  // You would send this data to the server (e.g., via AJAX)
+  // send this data to the server (e.g., via AJAX)
 }
 
 function addOwnerData() {
