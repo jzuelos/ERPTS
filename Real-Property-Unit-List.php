@@ -39,6 +39,7 @@ SELECT
   p.city,
   p.district,
   p.land_area,
+  p.is_active,
   GROUP_CONCAT(DISTINCT CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname) SEPARATOR ' / ') AS owner
 FROM p_info p
 LEFT JOIN faas f ON f.pro_id = p.p_id
@@ -158,8 +159,9 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
               <?php foreach ($propertyUnits as $unit):
                 $ownerRaw = isset($unit['owner']) ? $unit['owner'] : '';
                 $owner = trim((string) $ownerRaw) !== '' ? $ownerRaw : 'None';
+                $rowClass = ($unit['is_active'] == 0) ? 'table-secondary' : ''; // highlight inactive
                 ?>
-                <tr>
+                <tr class="<?= $rowClass ?>">
                   <td><?= htmlspecialchars($unit['p_id']) ?></td>
                   <td><?= htmlspecialchars($owner) ?></td>
                   <td>

@@ -19,6 +19,76 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
+// Fetch faas_id from GET parameter
+$property_id = $_GET['id'] ?? null;
+
+// Check property active status
+$is_active = 1;
+if ($property_id) {
+  $stmt = $conn->prepare("SELECT is_active FROM p_info WHERE p_id = ?");
+  $stmt->bind_param("i", $property_id);
+  $stmt->execute();
+  $is_active = $stmt->get_result()->fetch_assoc()['is_active'] ?? 1;
+}
+$disableButton = ($is_active == 0) ? 'disabled' : '';
+
+// === Disable property (Cancel RPU by disabling p_info) ===
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'disable_property') {
+  // Auth check: only admins
+  $user_role = $_SESSION['user_type'] ?? 'user';
+  $current_user_id = $_SESSION['user_id'] ?? null; // for audit
+  if ($user_role !== 'admin') {
+    $_SESSION['flash_error'] = "Permission denied. Only admins can disable properties.";
+    header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . urlencode($_POST['return_p_id'] ?? ''));
+    exit;
+  }
+
+  $property_p_id = intval($_POST['p_id'] ?? 0);
+  if ($property_p_id <= 0) {
+    $_SESSION['flash_error'] = "Invalid property id.";
+    header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . urlencode($_POST['return_p_id'] ?? ''));
+    exit;
+  }
+
+  // Get faas info for this property (re-using your helper if exists)
+  $stmtF = $conn->prepare("SELECT faas_id FROM faas WHERE pro_id = ?");
+  $stmtF->bind_param("i", $property_p_id);
+  $stmtF->execute();
+  $resF = $stmtF->get_result();
+  $faas_row = $resF ? $resF->fetch_assoc() : null;
+  $faas_id_to_check = $faas_row['faas_id'] ?? null;
+  $stmtF->close();
+
+  // If there's a faas_id, re-check rpu_dec for that faas_id (disallow disable if tax declaration exists)
+  if (!empty($faas_id_to_check)) {
+    $chk = $conn->prepare("SELECT dec_id FROM rpu_dec WHERE faas_id = ?");
+    $chk->bind_param("i", $faas_id_to_check);
+    $chk->execute();
+    $chk_res = $chk->get_result();
+    if ($chk_res && $chk_res->num_rows > 0) {
+      $_SESSION['flash_error'] = "Cannot disable property: tax declaration already exists for this FAAS.";
+      $chk->close();
+      header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . urlencode($property_p_id));
+      exit;
+    }
+    $chk->close();
+  }
+
+  // OK — disable the p_info row (set is_active = 0) and store audit info
+  $upd = $conn->prepare("UPDATE p_info SET is_active = 0, disabled_at = NOW(), disabled_by = ? WHERE p_id = ?");
+  $upd->bind_param("ii", $current_user_id, $property_p_id);
+  if ($upd->execute()) {
+    $_SESSION['flash_success'] = "Property #{$property_p_id} cancelled.";
+  } else {
+    $_SESSION['flash_error'] = "Failed to disable property: " . $upd->error;
+  }
+  $upd->close();
+
+  // Redirect back to the same view (fresh page)
+  header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . urlencode($property_p_id));
+  exit;
+}
+
 // Utility function to safely fetch a property by ID
 function fetchProperty($conn, $p_id)
 {
@@ -83,8 +153,7 @@ function fetchFaasInfo($conn, $property_id)
   return $stmt->get_result()->fetch_assoc();
 }
 
-// Fetch faas_id from GET parameter(important echo DO NOT DELETE)
-$property_id = $_GET['id'] ?? null;
+// Fetch faas_id from GET parameter(important echo DO NOT DELETE) null;
 $faas_info = fetchFaasInfo($conn, $property_id);
 if ($faas_info) {
   $faas_id = $faas_info['faas_id'];
@@ -341,9 +410,29 @@ $conn->close();
 <body>
   <!-- Header Navigation -->
   <?php include 'header.php'; ?>
+
+  <?php if (!empty($_SESSION['flash_success'])): ?>
+    <div class="alert alert-success">
+      <?php echo htmlspecialchars($_SESSION['flash_success']);
+      unset($_SESSION['flash_success']); ?>
+    </div>
+  <?php endif; ?>
+  <?php if (!empty($_SESSION['flash_error'])): ?>
+    <div class="alert alert-danger">
+      <?php echo htmlspecialchars($_SESSION['flash_error']);
+      unset($_SESSION['flash_error']); ?>
+    </div>
+  <?php endif; ?>
+
+  <?php if ($is_active == 0): ?>
+    <div class="alert alert-warning text-center my-3">
+      <strong>The RPU no longer appears in listings with all information tied to it discarded</strong>
+    </div>
+  <?php endif; ?>
+
   <!--Main Body-->
   <!-- Owner's Information Section -->
-  <section class="container mt-5" id="owner-info-section">
+  <section class="container mt-4" id="owner-info-section">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="d-flex align-items-center">
         <a href="Real-Property-Unit-List.php">
@@ -351,9 +440,40 @@ $conn->close();
         </a>
         <h4 class="ms-3 mb-0">Owner's Information</h4>
       </div>
-      <button type="button" class="btn btn-outline-primary btn-sm" id="editOwnerBtn"
-        onclick="showOISModal()">Edit</button>
+      <button type="button" class="btn btn-outline-primary btn-sm" id="editOwnerBtn" onclick="showOISModal()"
+        <?= $disableButton ?>>Edit</button>
     </div>
+
+    <?php
+    if (!empty($property_id)) {
+      $no_declaration = empty($rpu_declaration); // true if no rpu_dec present
+    
+      if ($is_active == 0): ?>
+        <!-- Property already disabled -->
+        <span class="btn btn-outline-secondary disabled" title="This property is already inactive.">
+          <i class="fas fa-ban"></i> RPU Cancelled
+        </span>
+
+      <?php elseif ($no_declaration): ?>
+        <!-- Can disable (only if active + no declaration) -->
+        <form method="post" onsubmit="return confirm('Disable this property? This will mark the property inactive.');"
+          class="d-inline">
+          <input type="hidden" name="action" value="disable_property">
+          <input type="hidden" name="p_id" value="<?php echo htmlspecialchars($property_id); ?>">
+          <input type="hidden" name="return_p_id" value="<?php echo htmlspecialchars($property_id); ?>">
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-ban"></i> Cancel RPU (Disable Property)
+          </button>
+        </form>
+
+      <?php else: ?>
+        <!-- Declaration exists, cannot disable -->
+        <span class="btn btn-secondary disabled" title="Cannot disable: tax declaration exists for this property">
+          <i class="fas fa-ban"></i> Cannot cancel RPU with TD encoded
+        </span>
+      <?php endif;
+    }
+    ?>
 
     <div class="card border-0 shadow p-4 rounded-3">
       <div id="owner-info" class="row">
@@ -468,7 +588,7 @@ $conn->close();
   <section class="container my-5" id="property-info-section">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h4 class="section-title">Property Information</h4>
-      <button type="button" class="btn btn-outline-primary btn-sm" onclick="showEditPropertyModal()">Edit</button>
+      <button type="button" class="btn btn-outline-primary btn-sm" onclick="showEditPropertyModal()" <?= $disableButton ?>>Edit</button>
     </div>
     <div class="card border-0 shadow p-4 rounded-3">
       <form id="property-info">
@@ -595,8 +715,8 @@ $conn->close();
     <div class="d-flex justify-content-between align-items-center mb-3">
       <!-- Title and Edit Button -->
       <h4 class="mb-0">RPU Identification Numbers</h4>
-      <button type="button" class="btn btn-outline-primary btn-sm" id="editRPUButton"
-        onclick="toggleEdit()">Edit</button>
+      <button type="button" class="btn btn-outline-primary btn-sm" id="editRPUButton" onclick="toggleEdit()"
+        <?= $disableButton ?>>Edit</button>
     </div>
 
     <div class="card border-0 shadow p-4 rounded-3">
@@ -646,7 +766,7 @@ $conn->close();
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h4 class="mb-0">Declaration of Property</h4>
       <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
-        data-bs-target="#editDeclarationProperty">Edit</button>
+        data-bs-target="#editDeclarationProperty <?= $disableButton ?>">Edit</button>
     </div>
 
     <div class="card border-0 shadow p-4 rounded-3">
@@ -860,8 +980,9 @@ $conn->close();
         $p_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
         ?>
         <div class="col-md-6 mb-3">
-          <a href="Land.php?p_id=<?= $p_id; ?>" class="btn w-100 py-2 text-white text-decoration-none"
-            style="background-color: #379777; border-color: #2e8266;">
+          <a href="<?= ($is_active == 1) ? "Land.php?p_id=$p_id" : '#' ?>"
+            class="btn w-100 py-2 text-white text-decoration-none <?= ($is_active == 0) ? 'disabled' : '' ?>"
+            style="background-color: #379777; border-color: #2e8266; pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
             <i class="fas fa-plus-circle me-2"></i>Add Land
           </a>
         </div>
@@ -903,8 +1024,10 @@ $conn->close();
                         class="btn btn-sm btn-primary" title="Edit">
                         <i class="bi bi-pencil"></i>
                       </a>
-                      <a href="print-layout.php?p_id=<?= urlencode($p_id); ?>&land_id=<?= urlencode($record['land_id']); ?>"
-                        class="btn btn-sm btn-secondary ml-3" title="View" target="_blank">
+                      <a href="<?= ($is_active == 1)
+                        ? 'print-layout.php?p_id=' . urlencode($p_id) . '&land_id=' . urlencode($record['land_id'])
+                        : '#' ?>" class="btn btn-sm btn-secondary ml-3 <?= ($is_active == 0) ? 'disabled' : '' ?>"
+                        title="View" target="_blank" style="pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
                         <i class="bi bi-printer"></i>
                       </a>
                     </div>
@@ -952,8 +1075,9 @@ $conn->close();
       <!-- Quick Actions Row -->
       <div class="row mb-4">
         <div class="col-md-6 mb-3">
-          <a href="PnTrees.php" class="btn w-100 py-2 text-white text-decoration-none"
-            style="background-color: #379777; border-color: #2e8266;">
+          <a href="<?= ($is_active == 1) ? 'PnTrees.php' : '#' ?>"
+            class="btn w-100 py-2 text-white text-decoration-none <?= ($is_active == 0) ? 'disabled' : '' ?>"
+            style="background-color: #379777; border-color: #2e8266; pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
             <i class="fas fa-plus-circle me-2"></i>Add Plants/Trees
           </a>
         </div>
