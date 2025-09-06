@@ -1,102 +1,104 @@
 <?php
 session_start();
 
-// Check if the user is logged in by verifying if 'user_id' exists in the session
+// ✅ Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
-  header("Location: index.php"); // Redirect to login page if user is not logged in
-  exit; // Stop further execution after redirection
+  header("Location: index.php");
+  exit;
 }
 
-$user_role = $_SESSION['user_type'] ?? 'user'; // Default to 'user' if role is not set
-
-// Prevent the browser from caching this page
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
-header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
-header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility
+// ✅ Prevent caching
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 ?>
-
 <!doctype html>
 <html lang="en">
-
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Electronic Real Property Tax System</title>
 
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
-    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
-    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <!-- ✅ Bootstrap 5 & FontAwesome -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-KyZXEJr+8+6g5K4r53m5s3xmw1Is0J6wBd04YOeFvXOsZTgmYF9flT/qe6LZ9s+0" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="header.css">
   <link rel="stylesheet" href="Transaction.css">
-  <title>Electronic Real Property Tax System</title>
 </head>
+<body class="d-flex flex-column min-vh-100">
 
-<body>
-  <!-- Header Navigation -->
+  <!-- Header -->
   <?php include 'header.php'; ?>
 
-  <!-- Main Body -->
-  <div class="container my-5">
-    <h2 class="text-center">Transaction</h2>
+  <!-- Main Menu -->
+  <main class="container my-5 flex-grow-1">
+    <section class="w-100" style="max-width: 1100px; margin: auto;">
+      <div class="status-container mb-5 text-center">
+        <h3 class="text-secondary" style="font-size: 2rem;">Transaction</h3>
+      </div>
 
-    <div class="table-responsive">
-      <table class="table modern-table table-hover">
-        <thead class="thead-light">
-          <tr>
-            <th>ID</th>
-            <th>Owner</th>
-            <th>Date</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td>John Doe</td>
-            <td>2024-10-15</td>
-            <td><span class="badge badge-warning">Pending</span></td>
-            <td><a href="Track.html" class="btn btn-info btn-sm">Track</a></td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>Jane Smith</td>
-            <td>2024-10-18</td>
-            <td><span class="badge badge-success">Approved</span></td>
-            <td><a href="#" class="btn btn-info btn-sm">Track</a></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
- <!-- Footer -->
- <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
-        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
-        <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span> 
+      <div class="row justify-content-center">
+        <!-- Permanent Cancellation -->
+        <div class="col-md-3 mb-4">
+          <a href="PermanentCancel.php" class="text-decoration-none">
+            <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+              <div class="card-body d-flex align-items-center justify-content-center text-center">
+                <i class="fas fa-ban me-3" style="font-size: 2rem; color: red;"></i>
+                <h5 class="fw-bold mb-0" style="font-size: 1.25rem;">Permanent Cancellation</h5>
+              </div>
+            </div>
+          </a>
         </div>
-    </footer>
 
-  <!-- Optional JavaScript -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-    crossorigin="anonymous"></script>
-      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Track Transaction -->
+        <div class="col-md-3 mb-4">
+          <a href="Track.php" class="text-decoration-none">
+            <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+              <div class="card-body d-flex align-items-center justify-content-center text-center">
+                <i class="fas fa-route me-3" style="font-size: 2rem;"></i>
+                <h5 class="fw-bold mb-0" style="font-size: 1.25rem;">Track Transaction</h5>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <!-- Approved Transactions -->
+        <div class="col-md-3 mb-4">
+          <a href="Approved.php" class="text-decoration-none">
+            <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+              <div class="card-body d-flex align-items-center justify-content-center text-center">
+                <i class="fas fa-check-circle me-3 text-success" style="font-size: 2rem;"></i>
+                <h5 class="fw-bold mb-0" style="font-size: 1.25rem;">Approved</h5>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <!-- Pending Transactions -->
+        <div class="col-md-3 mb-4">
+          <a href="Pending.php" class="text-decoration-none">
+            <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+              <div class="card-body d-flex align-items-center justify-content-center text-center">
+                <i class="fas fa-clock me-3 text-warning" style="font-size: 2rem;"></i>
+                <h5 class="fw-bold mb-0" style="font-size: 1.25rem;">Pending</h5>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-light text-center py-3 mt-auto">
+    <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span>
+  </footer>
+
+  <!-- ✅ Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

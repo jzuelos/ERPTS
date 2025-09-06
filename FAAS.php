@@ -357,15 +357,28 @@ $conn->close();
 
     <div class="card border-0 shadow p-4 rounded-3">
       <div id="owner-info" class="row">
-        <!-- Loop through each owner and display their info -->
-        <?php foreach ($owners_details as $owner): ?>
+        <?php if (count($owners_details) > 1): ?>
+          <!-- Multiple owners: treat as Company -->
           <div class="col-md-12 mb-4">
             <form>
               <div class="mb-3 w-50">
-                <label for="ownerName" class="form-label">Company or Owner</label>
+                <label for="companyName" class="form-label">Company</label>
+                <input type="text" class="form-control" id="companyName"
+                  value="<?php echo htmlspecialchars(implode(' / ', array_column($owners_details, 'owner_name'))); ?>"
+                  placeholder="Enter Company" disabled>
+              </div>
+            </form>
+          </div>
+
+        <?php elseif (count($owners_details) === 1): ?>
+          <!-- Single owner: show Owner + split name fields -->
+          <?php $owner = $owners_details[0]; ?>
+          <div class="col-md-12 mb-4">
+            <form>
+              <div class="mb-3 w-50">
+                <label for="ownerName" class="form-label">Owner</label>
                 <input type="text" class="form-control" id="ownerName"
-                  value="<?php echo htmlspecialchars($owner['owner_name']); ?>" placeholder="Enter Company or Owner"
-                  disabled>
+                  value="<?php echo htmlspecialchars($owner['owner_name']); ?>" placeholder="Enter Owner" disabled>
               </div>
             </form>
           </div>
@@ -389,7 +402,17 @@ $conn->close();
               </div>
             </form>
           </div>
-        <?php endforeach; ?>
+        <?php else: ?>
+          <!-- No owners -->
+          <div class="col-md-12 mb-4">
+            <form>
+              <div class="mb-3 w-50">
+                <label for="noOwner" class="form-label">Owner</label>
+                <input type="text" class="form-control" id="noOwner" value="No owner assigned" disabled>
+              </div>
+            </form>
+          </div>
+        <?php endif; ?>
       </div>
     </div>
   </section>
