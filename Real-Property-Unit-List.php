@@ -82,7 +82,8 @@ $barangayResult = $conn->query($barangayQuery);
 
 if ($barangayResult && $barangayResult->num_rows > 0) {
   while ($barangayRow = $barangayResult->fetch_assoc()) {
-    $barangayOptions .= '<option value="' . $barangayRow['brgy_id'] . '">' . $barangayRow['brgy_name'] . '</option>';
+    $barangayOptions .= '<option value="' . strtolower($barangayRow['brgy_name']) . '">'
+      . $barangayRow['brgy_name'] . '</option>';
   }
 } else {
   $barangayOptions = '<option value="">No Barangays Available</option>';
@@ -128,17 +129,21 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
             <input type="text" class="form-control" id="searchInput" placeholder="Search" onkeyup="filterTable()">
           </div>
 
-          <!-- barangay dropdown -->
           <div class="col-8 col-sm-6 col-md-3 col-lg-2 mb-2 mb-md-0">
-            <select class="form-select" id="barangayDropdown" name="barangay">
-              <option selected value="">All Barangay</option>
-              <?php echo $barangayOptions; ?>
-            </select>
+            <div class="d-flex">
+              <!-- Dropdown -->
+              <select class="form-select me-2" id="barangayDropdown" name="barangay">
+                <option selected value="">All Barangay</option>
+                <?php echo $barangayOptions; ?>
+              </select>
+
+              <!-- Button -->
+              <button type="button" class="btn btn-success" onclick="filterTable()">Search</button>
+            </div>
           </div>
 
           <!-- action buttons -->
           <div class="col-12 col-md-3 col-lg-5 text-md-end">
-            <button type="button" class="btn btn-success me-2" onclick="filterTable()">Search</button>
             <a href="Add-New-Real-Property-Unit.php" class="btn btn-success">Add new RPU</a>
           </div>
         </div>
