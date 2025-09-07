@@ -24,6 +24,7 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="header.css">
   <link rel="stylesheet" href="Track.css">
@@ -37,7 +38,14 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
 
   <!--Main Content-->
   <div class="container">
-    <h1><i class="fas fa-exchange-alt"></i> Transaction Dashboard</h1>
+  <h1><i class="fas fa-exchange-alt"></i> Transaction Dashboard</h1>
+
+  <!-- Back Button placed below the heading -->
+  <div class="mb-3">
+    <a href="Transaction.php" class="btn btn-secondary btn-sm">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+  </div>
 
     <div class="dashboard">
       <div class="card">
