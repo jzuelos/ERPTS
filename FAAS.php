@@ -435,9 +435,9 @@ $conn->close();
   <section class="container mt-4" id="owner-info-section">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="d-flex align-items-center">
-        <a href="Real-Property-Unit-List.php">
-          <img src="images/backward.png" width="35" height="35" alt="Back">
-        </a>
+      <a href="Home.php" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left"></i> Back
+      </a>
         <h4 class="ms-3 mb-0">Owner's Information</h4>
       </div>
       <button type="button" class="btn btn-outline-primary btn-sm" id="editOwnerBtn" onclick="showOISModal()"
