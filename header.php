@@ -5,10 +5,11 @@ $user_role = $_SESSION['user_type'] ?? 'user'; // Default to 'user' if role is n
 <!-- Header Navigation -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-custom fixed-top">
 <div class="container-fluid px-3 d-flex align-items-center justify-content-between">
-  <a class="navbar-brand py-2 d-flex align-items-center" href="Home.php">
-    <img src="images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="me-2" alt="">
-    <span class="fs-5 fw-semibold text-white">Electronic Real Property Tax System</span>
-  </a>
+<a class="navbar-brand py-2 d-flex align-items-center" href="Home.php">
+  <img src="/ERPTS/images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="me-2" alt="">
+  <span class="fs-5 fw-semibold text-white">Electronic Real Property Tax System</span>
+</a>
+
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
