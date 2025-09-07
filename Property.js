@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
   let selectedForm = "";
 
- 
   document.querySelectorAll(".location-card").forEach((card) => {
     card.addEventListener("click", function (event) {
       event.preventDefault();
@@ -27,11 +26,10 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-
 document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("cancelBtn").addEventListener("click", function () {
-$("#confirmationModal").modal("hide"); // Force-close modal
-});
+    $("#confirmationModal").modal("hide"); // Force-close modal
+  });
 
   // Handle Reset Button Click (Resets Form Only)
   document.querySelectorAll(".reset-btn").forEach((button) => {
@@ -58,11 +56,11 @@ $("#confirmationModal").modal("hide"); // Force-close modal
   });
 
   document.querySelectorAll(".close").forEach((button) => {
-button.addEventListener("click", function () {
-  const modal = this.closest(".modal");
-  $(modal).modal("hide"); // Close the modal manually
-});
-});
+    button.addEventListener("click", function () {
+      const modal = this.closest(".modal");
+      $(modal).modal("hide"); // Close the modal manually
+    });
+  });
 });
 
 function changeLocationType(type) {
@@ -77,11 +75,13 @@ function changeLocationType(type) {
   } else if (type === "Barangay") {
     document.getElementById("barangayTable").classList.remove("d-none");
   }
-}  
+}
 
-$(document).ready(function() {
+// ==================== AJAX FORM SUBMISSIONS ====================
+
+$(document).ready(function () {
   // Submit Classification Form
-  $("#classificationModal .submit-btn").click(function(event) {
+  $("#classificationModal .submit-btn").click(function (event) {
     event.preventDefault();
 
     var formData = {
@@ -95,17 +95,18 @@ $(document).ready(function() {
       url: "propertyFunctions.php",
       type: "POST",
       data: formData,
-      success: function(response) {
+      success: function (response) {
         console.log("Server Response:", response); // Debugging
         if (response.trim() === "Classification details added successfully!") {
           alert("Classification added successfully!");
           $("#classificationForm")[0].reset();
           $("#classificationModal").modal("hide");
+          location.reload(); // refresh table
         } else {
           alert("Error: " + response);
         }
       },
-      error: function(xhr, status, error) {
+      error: function (xhr, status, error) {
         console.error("AJAX Error:", error);
         alert("AJAX request failed. Check console for details.");
       }
@@ -113,54 +114,55 @@ $(document).ready(function() {
   });
 
   // Reset Classification Form
-  $("#classificationModal .reset-btn").click(function() {
+  $("#classificationModal .reset-btn").click(function () {
     $("#classificationForm")[0].reset();
   });
 });
 
-//submit actual use form
-$(document).ready(function() {
-  $("#actUsesModal .submit-btn").click(function(event) {
-      event.preventDefault(); // Prevent default form submission
+// Submit Actual Use Form
+$(document).ready(function () {
+  $("#actUsesModal .submit-btn").click(function (event) {
+    event.preventDefault(); // Prevent default form submission
 
-      var formData = {
-          report_code: $("#reportCode").val(),
-          lu_code: $("#reportCodeValue").val(),
-          lu_description: $("#reportDescription").val(),
-          lu_al: $("#reportAssessmentLevel").val(),
-          lu_status: $("input[name='reportStatus']:checked").val()
-      };
+    var formData = {
+      report_code: $("#reportCode").val(),
+      lu_code: $("#reportCodeValue").val(),
+      lu_description: $("#reportDescription").val(),
+      lu_al: $("#reportAssessmentLevel").val(),
+      lu_status: $("input[name='reportStatus']:checked").val()
+    };
 
-      $.ajax({
-          url: "propertyFunctions.php",
-          type: "POST",
-          data: formData,
-          success: function(response) {
-              console.log("Server Response:", response); // Debugging
-              if (response.trim() === "Land Use added successfully!") {
-                  alert("Land Use added successfully!");
-                  $("#reportForm")[0].reset(); // Reset form
-                  $("#actUsesModal").modal("hide"); // Close modal after success
-              } else {
-                  alert("Error: " + response);
-              }
-          },
-          error: function(xhr, status, error) {
-              console.error("AJAX Error:", error);
-              alert("AJAX request failed. Check console for details.");
-          }
-      });
+    $.ajax({
+      url: "propertyFunctions.php",
+      type: "POST",
+      data: formData,
+      success: function (response) {
+        console.log("Server Response:", response); // Debugging
+        if (response.trim() === "Land Use added successfully!") {
+          alert("Land Use added successfully!");
+          $("#reportForm")[0].reset(); // Reset form
+          $("#actUsesModal").modal("hide"); // Close modal after success
+          location.reload(); // refresh table
+        } else {
+          alert("Error: " + response);
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error("AJAX Error:", error);
+        alert("AJAX request failed. Check console for details.");
+      }
+    });
   });
 
   // Reset form button for Land Use
-  $("#actUsesModal .reset-btn").click(function() {
-      $("#reportForm")[0].reset();
+  $("#actUsesModal .reset-btn").click(function () {
+    $("#reportForm")[0].reset();
   });
 });
 
-$(document).ready(function() {
-  // Submit Sub-Classes Form
-  $("#subClassesModal .submit-btn").click(function(event) {
+// Submit Sub-Classes Form
+$(document).ready(function () {
+  $("#subClassesModal .submit-btn").click(function (event) {
     event.preventDefault();
 
     var formData = {
@@ -174,17 +176,18 @@ $(document).ready(function() {
       url: "propertyFunctions.php",
       type: "POST",
       data: formData,
-      success: function(response) {
+      success: function (response) {
         console.log("Server Response:", response);
         if (response.trim() === "Sub-Class added successfully!") {
           alert("Sub-Class added successfully!");
           $("#subClassesForm")[0].reset();
           $("#subClassesModal").modal("hide");
+          location.reload(); // refresh table
         } else {
           alert("Error: " + response);
         }
       },
-      error: function(xhr, status, error) {
+      error: function (xhr, status, error) {
         console.error("AJAX Error:", error);
         alert("AJAX request failed. Check console for details.");
       }
@@ -192,7 +195,36 @@ $(document).ready(function() {
   });
 
   // Reset Sub-Classes Form
-  $("#subClassesModal .reset-btn").click(function() {
+  $("#subClassesModal .reset-btn").click(function () {
     $("#subClassesForm")[0].reset();
+  });
+});
+
+// ==================== DELETE FUNCTIONALITY ====================
+$(document).ready(function () {
+  $(".delete-btn").click(function () {
+    var id = $(this).data("id");
+    var table = $(this).data("table");
+
+    if (confirm("Are you sure you want to delete this record?")) {
+      $.ajax({
+        url: "propertyFunctions.php",
+        type: "POST",
+        data: { action: "delete", id: id, table: table },
+        dataType: "json",
+        success: function (response) {
+          if (response.success) {
+            alert("Record deleted successfully!");
+            location.reload(); // refresh the table
+          } else {
+            alert("Error: " + response.message);
+          }
+        },
+        error: function (xhr, status, error) {
+          console.error("AJAX Error:", error);
+          alert("AJAX request failed. Check console for details.");
+        }
+      });
+    }
   });
 });

@@ -162,7 +162,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                   data-bs-target='#editClassificationModal' title='Edit'>
                     <i class='fas fa-edit'></i>
                 </button>
-                <button class='btn btn-sm btn-outline-danger' title='Delete'>
+                <button class='btn btn-sm btn-outline-danger delete-btn' 
+                  data-id='{$row['c_id']}' 
+                  data-table='classification' 
+                  title='Delete'>
                   <i class='fas fa-trash-alt'></i>
                 </button>
               </td>
@@ -213,7 +216,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 data-bs-target='#editActualUsesModal' title='Edit'>
                   <i class='fas fa-edit'></i>
                 </button>
-                <button class='btn btn-sm btn-outline-danger' title='Delete'>
+                <button class='btn btn-sm btn-outline-danger delete-btn' 
+                  data-id='{$row['lu_id']}' 
+                  data-table='land_use' 
+                  title='Delete'>
                   <i class='fas fa-trash-alt'></i>
                 </button>
               </td>
@@ -260,7 +266,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 data-bs-target='#editSubClassesModal' title='Edit'>
                   <i class='fas fa-edit'></i>
                 </button>
-                <button class='btn btn-sm btn-outline-danger' title='Delete'>
+                <button class='btn btn-sm btn-outline-danger delete-btn' 
+                  data-id='{$row['sc_id']}' 
+                  data-table='subclass' 
+                  title='Delete'>
                   <i class='fas fa-trash-alt'></i>
                 </button>
               </td>
@@ -678,173 +687,173 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    let selectedForm = "";
+    document.addEventListener("DOMContentLoaded", function() {
+      let selectedForm = "";
 
-    // Handle location card click → open confirmation modal
-    document.querySelectorAll(".location-card").forEach((card) => {
-      card.addEventListener("click", function (event) {
-        event.preventDefault();
-        const categoryName = this.getAttribute("data-name");
-        selectedForm = this.getAttribute("data-form");
-        document.getElementById("categoryName").textContent = categoryName;
-        $("#confirmationModal").modal("show");
+      // Handle location card click → open confirmation modal
+      document.querySelectorAll(".location-card").forEach((card) => {
+        card.addEventListener("click", function(event) {
+          event.preventDefault();
+          const categoryName = this.getAttribute("data-name");
+          selectedForm = this.getAttribute("data-form");
+          document.getElementById("categoryName").textContent = categoryName;
+          $("#confirmationModal").modal("show");
+        });
       });
-    });
 
-    // Confirm selection → show the correct modal
-    document.getElementById("confirmBtn").addEventListener("click", function () {
-      $("#confirmationModal").modal("hide");
-      setTimeout(() => {
-        $("#" + selectedForm).modal("show");
-      }, 500);
-    });
-
-    // Cancel button inside confirmation modal
-    document.getElementById("cancelBtn").addEventListener("click", function () {
-      $("#confirmationModal").modal("hide");
-    });
-
-    // Reset button inside any modal → reset the form
-    document.querySelectorAll(".reset-btn").forEach((button) => {
-      button.addEventListener("click", function () {
-        const modal = this.closest(".modal");
-        const form = modal.querySelector("form");
-        if (form) form.reset();
+      // Confirm selection → show the correct modal
+      document.getElementById("confirmBtn").addEventListener("click", function() {
+        $("#confirmationModal").modal("hide");
+        setTimeout(() => {
+          $("#" + selectedForm).modal("show");
+        }, 500);
       });
-    });
 
-    // Submit button inside any modal
-    document.querySelectorAll(".submit-btn").forEach((button) => {
-      button.addEventListener("click", function () {
-        const modal = this.closest(".modal");
-        const form = modal.querySelector("form");
-        if (form && form.checkValidity()) {
-          alert("Form submitted: " + form.id);
+      // Cancel button inside confirmation modal
+      document.getElementById("cancelBtn").addEventListener("click", function() {
+        $("#confirmationModal").modal("hide");
+      });
+
+      // Reset button inside any modal → reset the form
+      document.querySelectorAll(".reset-btn").forEach((button) => {
+        button.addEventListener("click", function() {
+          const modal = this.closest(".modal");
+          const form = modal.querySelector("form");
+          if (form) form.reset();
+        });
+      });
+
+      // Submit button inside any modal
+      document.querySelectorAll(".submit-btn").forEach((button) => {
+        button.addEventListener("click", function() {
+          const modal = this.closest(".modal");
+          const form = modal.querySelector("form");
+          if (form && form.checkValidity()) {
+            alert("Form submitted: " + form.id);
+            $(modal).modal("hide");
+          } else {
+            form.reportValidity();
+          }
+        });
+      });
+
+      // Close button inside any modal
+      document.querySelectorAll(".close").forEach((button) => {
+        button.addEventListener("click", function() {
+          const modal = this.closest(".modal");
           $(modal).modal("hide");
-        } else {
-          form.reportValidity();
-        }
+        });
       });
-    });
 
-    // Close button inside any modal
-    document.querySelectorAll(".close").forEach((button) => {
-      button.addEventListener("click", function () {
-        const modal = this.closest(".modal");
-        $(modal).modal("hide");
-      });
-    });
+      // Change category dropdown
+      window.changeCategoryType = function(type) {
+        document.getElementById("classificationTable").classList.add("d-none");
+        document.getElementById("actualUsesTable").classList.add("d-none");
+        document.getElementById("subClassesTable").classList.add("d-none");
+        document.getElementById("categoryTypeDropdown").textContent = type;
 
-    // Change category dropdown
-    window.changeCategoryType = function (type) {
-      document.getElementById("classificationTable").classList.add("d-none");
-      document.getElementById("actualUsesTable").classList.add("d-none");
-      document.getElementById("subClassesTable").classList.add("d-none");
-      document.getElementById("categoryTypeDropdown").textContent = type;
-
-      if (type === "Classification") {
-        document.getElementById("classificationTable").classList.remove("d-none");
-      } else if (type === "ActualUses") {
-        document.getElementById("actualUsesTable").classList.remove("d-none");
-      } else if (type === "SubClasses") {
-        document.getElementById("subClassesTable").classList.remove("d-none");
-      }
-    };
-
-    // =========================
-    // EDIT BUTTONS
-    // =========================
-    document.querySelectorAll('.edit-btn').forEach(button => {
-      button.addEventListener('click', function () {
-        const table = this.getAttribute('data-table');
-
-        if (table === 'classification') {
-          document.getElementById('editClassificationCode').value = this.getAttribute('data-code');
-          document.getElementById('editClassificationDescription').value = this.getAttribute('data-description');
-          document.getElementById('editClassificationAssessment').value = this.getAttribute('data-assessment');
-          document.getElementById('editClassificationStatus').value = this.getAttribute('data-status');
-        } else if (table === 'actual_uses') {
-          document.getElementById('editReportCode').value = this.getAttribute('data-reportcode');
-          document.getElementById('editActualUsesCode').value = this.getAttribute('data-code');
-          document.getElementById('editActualUsesDescription').value = this.getAttribute('data-description');
-          document.getElementById('editActualUsesAssessment').value = this.getAttribute('data-assessment');
-          document.getElementById('editActualUsesStatus').value = this.getAttribute('data-status');
-        } else if (table === 'sub_classes') {
-          document.getElementById('editSubClassesCode').value = this.getAttribute('data-code');
-          document.getElementById('editSubClassesDescription').value = this.getAttribute('data-description');
-          document.getElementById('editSubClassesAssessment').value = this.getAttribute('data-unitvalue');
-          document.getElementById('editSubClassesStatus').value = this.getAttribute('data-status');
-        }
-      });
-    });
-
-    // =========================
-    // SAVE CHANGES (AJAX)
-    // =========================
-    document.getElementById('saveClassificationChanges').addEventListener('click', function () {
-      const code = document.getElementById('editClassificationCode').value;
-      const description = document.getElementById('editClassificationDescription').value;
-      const assessment = document.getElementById('editClassificationAssessment').value;
-      const status = document.getElementById('editClassificationStatus').value;
-
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", window.location.href, true);
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      xhr.onload = function () {
-        if (xhr.status === 200 && xhr.responseText.trim() === "success") {
-          alert("Classification updated successfully!");
-          location.reload();
-        } else {
-          alert("Error saving Classification changes: " + xhr.responseText);
+        if (type === "Classification") {
+          document.getElementById("classificationTable").classList.remove("d-none");
+        } else if (type === "ActualUses") {
+          document.getElementById("actualUsesTable").classList.remove("d-none");
+        } else if (type === "SubClasses") {
+          document.getElementById("subClassesTable").classList.remove("d-none");
         }
       };
-      xhr.send(`action=update_classification&code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
+
+      // =========================
+      // EDIT BUTTONS
+      // =========================
+      document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const table = this.getAttribute('data-table');
+
+          if (table === 'classification') {
+            document.getElementById('editClassificationCode').value = this.getAttribute('data-code');
+            document.getElementById('editClassificationDescription').value = this.getAttribute('data-description');
+            document.getElementById('editClassificationAssessment').value = this.getAttribute('data-assessment');
+            document.getElementById('editClassificationStatus').value = this.getAttribute('data-status');
+          } else if (table === 'actual_uses') {
+            document.getElementById('editReportCode').value = this.getAttribute('data-reportcode');
+            document.getElementById('editActualUsesCode').value = this.getAttribute('data-code');
+            document.getElementById('editActualUsesDescription').value = this.getAttribute('data-description');
+            document.getElementById('editActualUsesAssessment').value = this.getAttribute('data-assessment');
+            document.getElementById('editActualUsesStatus').value = this.getAttribute('data-status');
+          } else if (table === 'sub_classes') {
+            document.getElementById('editSubClassesCode').value = this.getAttribute('data-code');
+            document.getElementById('editSubClassesDescription').value = this.getAttribute('data-description');
+            document.getElementById('editSubClassesAssessment').value = this.getAttribute('data-unitvalue');
+            document.getElementById('editSubClassesStatus').value = this.getAttribute('data-status');
+          }
+        });
+      });
+
+      // =========================
+      // SAVE CHANGES (AJAX)
+      // =========================
+      document.getElementById('saveClassificationChanges').addEventListener('click', function() {
+        const code = document.getElementById('editClassificationCode').value;
+        const description = document.getElementById('editClassificationDescription').value;
+        const assessment = document.getElementById('editClassificationAssessment').value;
+        const status = document.getElementById('editClassificationStatus').value;
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", window.location.href, true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onload = function() {
+          if (xhr.status === 200 && xhr.responseText.trim() === "success") {
+            alert("Classification updated successfully!");
+            location.reload();
+          } else {
+            alert("Error saving Classification changes: " + xhr.responseText);
+          }
+        };
+        xhr.send(`action=update_classification&code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
+      });
+
+      document.getElementById('saveActualUsesChanges').addEventListener('click', function() {
+        const reportCode = document.getElementById('editReportCode').value;
+        const code = document.getElementById('editActualUsesCode').value;
+        const description = document.getElementById('editActualUsesDescription').value;
+        const assessment = document.getElementById('editActualUsesAssessment').value;
+        const status = document.getElementById('editActualUsesStatus').value;
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", window.location.href, true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onload = function() {
+          if (xhr.status === 200 && xhr.responseText.trim() === "success") {
+            alert("Actual Uses updated successfully!");
+            location.reload();
+          } else {
+            alert("Error saving Actual Uses changes: " + xhr.responseText);
+          }
+        };
+        xhr.send(`action=update_actual_uses&reportCode=${reportCode}&code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
+      });
+
+      document.getElementById('saveSubClassesChanges').addEventListener('click', function() {
+        const code = document.getElementById('editSubClassesCode').value;
+        const description = document.getElementById('editSubClassesDescription').value;
+        const assessment = document.getElementById('editSubClassesAssessment').value;
+        const status = document.getElementById('editSubClassesStatus').value;
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", window.location.href, true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onload = function() {
+          if (xhr.status === 200 && xhr.responseText.trim() === "success") {
+            alert("Sub-Classes updated successfully!");
+            location.reload();
+          } else {
+            alert("Error saving Sub-Classes changes: " + xhr.responseText);
+          }
+        };
+        xhr.send(`action=update_sub_classes&code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
+      });
+
     });
-
-    document.getElementById('saveActualUsesChanges').addEventListener('click', function () {
-      const reportCode = document.getElementById('editReportCode').value;
-      const code = document.getElementById('editActualUsesCode').value;
-      const description = document.getElementById('editActualUsesDescription').value;
-      const assessment = document.getElementById('editActualUsesAssessment').value;
-      const status = document.getElementById('editActualUsesStatus').value;
-
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", window.location.href, true);
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      xhr.onload = function () {
-        if (xhr.status === 200 && xhr.responseText.trim() === "success") {
-          alert("Actual Uses updated successfully!");
-          location.reload();
-        } else {
-          alert("Error saving Actual Uses changes: " + xhr.responseText);
-        }
-      };
-      xhr.send(`action=update_actual_uses&reportCode=${reportCode}&code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
-    });
-
-    document.getElementById('saveSubClassesChanges').addEventListener('click', function () {
-      const code = document.getElementById('editSubClassesCode').value;
-      const description = document.getElementById('editSubClassesDescription').value;
-      const assessment = document.getElementById('editSubClassesAssessment').value;
-      const status = document.getElementById('editSubClassesStatus').value;
-
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", window.location.href, true);
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      xhr.onload = function () {
-        if (xhr.status === 200 && xhr.responseText.trim() === "success") {
-          alert("Sub-Classes updated successfully!");
-          location.reload();
-        } else {
-          alert("Error saving Sub-Classes changes: " + xhr.responseText);
-        }
-      };
-      xhr.send(`action=update_sub_classes&code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
-    });
-
-  });
-</script>
+  </script>
 
 </body>
 
