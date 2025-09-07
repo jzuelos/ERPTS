@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 06, 2025 at 08:50 PM
+-- Generation Time: Sep 07, 2025 at 07:45 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -103,7 +103,7 @@ CREATE TABLE `classification` (
 INSERT INTO `classification` (`c_id`, `c_code`, `c_description`, `c_uv`, `c_status`) VALUES
 (5, 'CO213', 'Residential', 35.00, 'Active'),
 (6, 'AG34', 'Agricultural', 50.00, 'Active'),
-(7, 'CO234', 'Commercial', 46.00, 'Active'),
+(7, 'CO234', 'Commercial', 46.00, 'Inactive'),
 (8, 'IN432', 'Industrial', 54.00, 'Active');
 
 -- --------------------------------------------------------
