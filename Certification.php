@@ -101,9 +101,10 @@ if ($conn->connect_error) {
             <button class="btn btn-sm btn-outline-primary me-1 edit-btn" title="Edit" data-bs-toggle="modal" data-bs-target="#editModal">
                 <i class="fas fa-edit"></i>
             </button>
-            <button class="btn btn-sm btn-outline-danger" title="Delete">
-                <i class="fas fa-trash-alt"></i>
-            </button>
+        <button class="btn btn-sm btn-outline-danger delete-btn" 
+                data-id="001" title="Delete">
+          <i class="fas fa-trash-alt"></i>
+        </button>
             </td>
         </tr>
           </tbody>
@@ -192,6 +193,25 @@ if ($conn->connect_error) {
   </div>
 </div>
 
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this record? <strong>This action cannot be undone.</strong>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </main>
 
   
@@ -255,8 +275,34 @@ function saveEditEntry() {
   // Close the modal after saving
   $('#editModal').modal('hide');
 }
-
   </script>
+
+  <script>
+    //Delete Confirmation
+document.addEventListener("DOMContentLoaded", () => {
+  let activeRow = null;
+  const modalEl = document.getElementById("deleteModal");
+  const modal = new bootstrap.Modal(modalEl);
+
+  // On Click
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".delete-btn");
+    if (!btn) return;
+    activeRow = btn.closest("tr");
+    modal.show();
+  });
+
+  // Confirm Delete
+  document.getElementById("confirmDeleteBtn").addEventListener("click", () => {
+    if (activeRow) {
+      activeRow.remove(); 
+      modal.hide();
+
+    }
+  });
+});
+</script>
+
 </body>
 
 </html>

@@ -463,6 +463,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     </div>
   </div>
 
+  <!--Delete Confirmation Modal-->  
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteModalLabel"><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this record? <strong>This action cannot be undone.</strong>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
   <!-- Add Property Category Modal -->
   <!-- Confirmation Modal -->
   <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel"
@@ -854,6 +873,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
     });
   </script>
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
+  let deleteId = null;
+  let deleteTable = null;
+
+  // When delete button is clicked
+  document.querySelectorAll(".delete-btn").forEach(button => {
+    button.addEventListener("click", function () {
+      deleteId = this.getAttribute("data-id");
+      deleteTable = this.getAttribute("data-table");
+      // Show modal
+      let modal = new bootstrap.Modal(document.getElementById("deleteModal"));
+      modal.show();
+    });
+  });
+
+  // When confirm delete is clicked
+  document.getElementById("confirmDeleteBtn").addEventListener("click", function () {
+    if (deleteId && deleteTable) {
+      // Example AJAX call (adjust according to your backend)
+      fetch("delete.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `id=${deleteId}&table=${deleteTable}`
+      })
+      .then(response => response.text())
+      .then(data => {
+        // Optionally remove row from table
+        document.querySelector(`[data-id='${deleteId}'][data-table='${deleteTable}']`).closest("tr").remove();
+
+        // Hide modal
+        let modalEl = document.getElementById("deleteModal");
+        let modal = bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+      });
+    }
+  });
+});
+</script>
+
 
 </body>
 

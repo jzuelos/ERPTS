@@ -200,7 +200,7 @@ $(document).ready(function () {
   });
 });
 
-// ==================== DELETE FUNCTIONALITY ====================
+//Delete Functionality
 $(document).ready(function () {
   $(".delete-btn").click(function () {
     var id = $(this).data("id");
@@ -228,3 +228,5 @@ $(document).ready(function () {
     }
   });
 });
+
+
