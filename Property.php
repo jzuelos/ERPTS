@@ -152,15 +152,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
               <td>{$row['c_uv']}%</td>
               <td>{$statusBadge}</td>
               <td>
-                <button class='btn btn-sm btn-outline-primary me-1 edit-btn'
-                data-table='classification'
-                data-code='{$row['c_code']}'
-                data-description='{$row['c_description']}'
-                data-assessment='{$row['c_uv']}'
-                data-status='{$row['c_status']}'
-                data-bs-toggle='modal'
-                data-bs-target='#editClassificationModal' title='Edit'>
-                  <i class='fas fa-edit'></i>
+                  <button class='btn btn-sm btn-outline-primary me-1 edit-btn'
+                  data-table='classification'
+                  data-code='{$row['c_code']}'
+                  data-description='{$row['c_description']}'
+                  data-assessment='{$row['c_uv']}'
+                  data-status='{$row['c_status']}'
+                  data-bs-toggle='modal'
+                  data-bs-target='#editClassificationModal' title='Edit'>
+                    <i class='fas fa-edit'></i>
                 </button>
                 <button class='btn btn-sm btn-outline-danger' title='Delete'>
                   <i class='fas fa-trash-alt'></i>
@@ -453,10 +453,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
       </div>
     </div>
   </div>
-
-
-
-
 
   <!-- Add Property Category Modal -->
   <!-- Confirmation Modal -->

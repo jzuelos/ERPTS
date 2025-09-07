@@ -49,7 +49,7 @@ if ($conn->connect_error) {
 
   <!-- Location Title -->
   <div class="text-center mb-5">
-    <h2 class="text-secondary font-weight-bold" style="font-size: 2.5rem;">Land</h2>
+    <h2 class="text-secondary font-weight-bold" style="font-size: 2.5rem;">Certification</h2>
   </div>
 
   <!-- Property Categories Table Section -->
@@ -69,19 +69,6 @@ if ($conn->connect_error) {
       <span class="input-group-text bg-transparent border-end-0">
         <i class="fas fa-search"></i>
       </span>
-    </div>
-
-    <!-- Dropdown -->
-    <div class="dropdown">
-      <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="categoryTypeDropdown"
-        data-bs-toggle="dropdown" aria-expanded="false">
-        Classification
-      </button>
-      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="categoryTypeDropdown">
-        <li><a class="dropdown-item" href="#" onclick="changeCategoryType('Classification')">Classification</a></li>
-        <li><a class="dropdown-item" href="#" onclick="changeCategoryType('ActualUses')">Actual Uses</a></li>
-        <li><a class="dropdown-item" href="#" onclick="changeCategoryType('SubClasses')">Sub-Classes</a></li>
-      </ul>
     </div>
   </div>
 </div>
@@ -125,7 +112,7 @@ if ($conn->connect_error) {
     </div>
   </div>
 
-
+<!--Modal Section--> 
 <!-- Add Modal -->
 <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
  <div class="modal-dialog" style="max-width: 30%; width: 30%; height: 30%; max-height: 30%;"> 
