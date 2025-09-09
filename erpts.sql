@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 07, 2025 at 07:45 PM
+-- Generation Time: Sep 09, 2025 at 04:45 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -209,9 +209,9 @@ CREATE TABLE `land` (
 --
 
 INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `north`, `east`, `south`, `west`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`, `adjust_factor`, `adjust_percent`, `adjust_value`, `adjust_mv`, `assess_lvl`, `assess_value`, `faas_id`, `created_at`, `updated_at`) VALUES
-(55, 25634, '423', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 800, '', 20.00, 16000.00, '', 17.00, -13280.00, 2720.00, 100.00, 2720.00, 33, '2025-08-27 16:41:18', '2025-08-27 16:41:18'),
-(56, 1234, '3412', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 432, '1', 34.00, 14688.00, '', 100.00, 0.00, 14688.00, 34.00, 4993.92, 33, '2025-08-27 16:41:18', '2025-08-27 16:41:18'),
-(57, 3421, '4321', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'asdfasdfa', 'Residential', '', 800, '', 200.00, 160000.00, '', 100.00, 0.00, 160000.00, 65.00, 104000.00, 36, '2025-08-27 16:41:18', '2025-08-27 16:42:32');
+(55, 25634, '423', 'Lot 15', 'Barangay Road', 'Rice Field', 'River', 'Bounded by residential and agricultural lands', 'Cruz', 'Juan', 'Dela', '09171234567', 'juan.cruz@example.com', 'Rizal Street', 'Kalamunding', 'District 1', 'Daet', 'Camarines Norte', 'Residential lot with improvements', 'Residential', 'House and Lot', 800, 'Residential', 20.00, 16000.00, 'Depreciation', 17.00, -13280.00, 2720.00, 20.00, 544.00, 33, '2025-08-27 16:41:18', '2025-09-09 14:40:08'),
+(56, 1234, '3412', 'Lot 22', 'Barangay Road', 'Vacant Lot', 'Riverbank', 'Commercial property near public market', 'Reyes', 'Maria', 'Lopez', '09181234567', 'maria.reyes@example.com', 'Mabini Street', 'Gahon', 'District 2', 'Daet', 'Camarines Norte', 'Commercial lot', 'Commercial', 'Business Establishment', 432, 'Commercial', 34.00, 14688.00, 'Standard', 0.00, 0.00, 14688.00, 34.00, 4993.92, 33, '2025-08-27 16:41:18', '2025-09-09 14:40:08'),
+(57, 3421, '4321', 'Highway', 'Residential Subdivision', 'Barangay Hall', 'Rice Field', 'Prime residential land near highway', 'Santos', 'Pedro', 'Gonzales', '09201234567', 'pedro.santos@example.com', 'Quezon Avenue', 'Bagasbas', 'District 3', 'Daet', 'Camarines Norte', 'Residential land', 'Residential', 'Vacant Lot', 800, 'Residential', 200.00, 160000.00, 'Standard', 0.00, 0.00, 160000.00, 65.00, 104000.00, 36, '2025-08-27 16:41:18', '2025-09-09 14:40:08');
 
 -- --------------------------------------------------------
 
@@ -375,10 +375,10 @@ CREATE TABLE `p_info` (
 --
 
 INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`, `created_at`, `updated_at`, `is_active`, `disabled_at`, `disabled_by`) VALUES
-(144, 12, 23, 0, 'Province 1', 'Daet', 'District 1', 'Kalamunding', '', 0, 302, '   ', 'affidavit, barangay', '2025-08-31 19:01:44', '2025-08-31 19:01:44', 1, NULL, NULL),
-(147, 12, 23, 0, '54', '3', 'District 2', '67', '', 453, 3453, '   ', 'affidavit, barangay', '2025-08-31 19:01:44', '2025-08-31 19:01:44', 1, NULL, NULL),
-(156, 0, 42134, 0, '54', '4', 'District 2', '67', '', 42, 432, '   ', 'affidavit', '2025-09-05 14:01:18', '2025-09-06 18:45:29', 0, '2025-09-07 02:45:29', 9),
-(157, 0, 5345, 0, '54', '4', 'District 2', '66', '', 0, 5345, '   ', 'barangay', '2025-09-05 14:13:20', '2025-09-06 18:44:51', 1, NULL, NULL);
+(144, 0, 23, 1, 'Camarines Norte', 'Daet', 'District 1', 'Kalamunding', 'Rizal Street', 0, 302, 'Residential lot with affidavit and barangay cleara', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-08-31 19:01:44', 1, NULL, NULL),
+(147, 0, 23, 3, 'Camarines Norte', 'Daet', 'District 2', 'Gahon', 'Mabini Street', 0, 453, 'Commercial lot with affidavit and barangay clearan', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-08-31 19:01:44', 1, NULL, NULL),
+(156, 0, 42134, 4, 'Camarines Norte', 'Daet', 'District 2', 'Bagasbas', 'Quezon Avenue', 0, 432, 'Agricultural lot with affidavit', 'Affidavit', '2025-09-05 14:01:18', '2025-09-06 18:45:29', 0, '2025-09-07 02:45:29', 9),
+(157, 0, 5345, 4, 'Camarines Norte', 'Daet', 'District 2', 'Camambugan', 'San Roque Street', 0, 5345, 'Residential lot with barangay document', 'Barangay Clearance', '2025-09-05 14:13:20', '2025-09-06 18:44:51', 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -427,8 +427,8 @@ CREATE TABLE `rpu_dec` (
 --
 
 INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `pro_assess`, `pro_date`, `mun_assess`, `mun_date`, `td_cancel`, `previous_pin`, `tax_year`, `entered_by`, `entered_year`, `prev_own`, `prev_assess`, `faas_id`, `total_property_value`) VALUES
-(28, 2342, 'fasdf', '2025-08-13', '', '2025-07-29', 0, 0, '2025-08-05', 0, '2025-08-20', '34234', 0.00, 33, 38401.00),
-(29, 5345435, '', '0000-00-00', '', '0000-00-00', 0, 0, '0000-00-00', 0, '0000-00-00', '', 0.00, 36, 264000.00);
+(28, 2342, 'Provincial Assessor Juan Dela Cruz', '2025-08-13', 'Municipal Assessor Maria Reyes', '2025-07-29', 0, 112233, '2025-08-05', 101, '2025-08-20', 'Pedro Santos', 2720.00, 33, 38401.00),
+(29, 5345435, 'Provincial Assessor Juan Dela Cruz', '2025-07-15', 'Municipal Assessor Maria Reyes', '2025-07-16', 0, 445566, '2025-08-01', 102, '2025-08-20', 'Josefina Bautista', 5000.00, 36, 264000.00);
 
 -- --------------------------------------------------------
 
