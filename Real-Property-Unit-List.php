@@ -32,7 +32,7 @@ if ($conn->connect_error) {
 $sql = "
 SELECT 
   p.p_id,
-  p.house_no,
+  p.street,
   p.block_no,
   p.barangay,
   p.province,
@@ -170,7 +170,7 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
                   <td><?= htmlspecialchars($unit['p_id']) ?></td>
                   <td><?= htmlspecialchars($owner) ?></td>
                   <td>
-                    <?= htmlspecialchars("{$unit['house_no']}, {$unit['barangay']}, {$unit['city']}, {$unit['province']}") ?>
+                    <?= htmlspecialchars("{$unit['street']}, {$unit['barangay']}, {$unit['city']}, {$unit['province']}") ?>
                   </td>
                   <td><?= htmlspecialchars($unit['land_area']) ?></td>
                   <td><a href="FAAS.php?id=<?= htmlspecialchars($unit['p_id']) ?>" class="btn btn-primary">EDIT</a></td>
