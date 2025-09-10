@@ -25,10 +25,6 @@ if ($conn->connect_error) {
 }
 
 // Fetch property units along with their owners, sorted by latest ID first
-// Logic used:
-// p_info.p_id -> faas.pro_id
-// faas.propertyowner_id is a JSON array of pO_id values (e.g. [62,63])
-// propertyowner.pO_id matches those values and contains owner_id -> owners_tb.own_id
 $sql = "
 SELECT 
   p.p_id,
@@ -226,7 +222,7 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
                   echo "<tr>
                     <td>" . htmlspecialchars($unit['p_id']) . "</td>
                     <td>" . htmlspecialchars($owner) . "</td>
-                    <td>" . htmlspecialchars($unit['house_no'] . ', ' . $unit['barangay'] . ', ' . $unit['city'] . ', ' . $unit['province']) . "</td>
+                    <td>" . htmlspecialchars($unit['street'] . ', ' . $unit['barangay'] . ', ' . $unit['city'] . ', ' . $unit['province']) . "</td>
                     <td>" . htmlspecialchars($unit['land_area']) . "</td>
                   </tr>";
                 }
