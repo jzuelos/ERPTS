@@ -79,64 +79,71 @@ $result = $conn->query($sql);
       <h2 class="fw-bold fst-italic text-black">
         Welcome, <?php echo htmlspecialchars($first_name); ?>!
       </h2>
-      <!-- Left Column: Stats + Table -->
-      <div class="col-lg-8">
-        <!-- Stats Cards Container -->
-        <div class="modern-card shadow-lg p-4 rounded-lg mb-4">
-          <div class="row g-4">
-            <!-- Property Listing -->
-            <div class="col-md-4">
-              <div class="stats-card h-100">
-                <h4 class="font-weight-bold">Property Listings</h4>
-                <div class="d-flex align-items-center mt-3">
-                  <i class="fas fa-building fa-3x text-warning me-3"></i>
-                  <div>
-                    <h2 class="mb-0"><?php echo $total_properties; ?></h2>
-                    <small class="text-muted">Total Properties</small>
-                  </div>
-                </div>
-              </div>
+      <div class="row mt-4">
+  <!-- Left Column -->
+  <div class="col-lg-8">
+    <!-- Stats + Line Graph Card -->
+    <div class="modern-card shadow-lg p-4 rounded-lg mb-4">
+      <div class="row g-3">
+        <!-- Stats Cards stacked vertically on the right -->
+        <div class="col-md-4 d-flex flex-column gap-3">
+          <!-- Property Listing -->
+          <a href="Real-Property-Unit-List.php" class="text-decoration-none text-dark">
+            <div class="stats-card text-center p-3 shadow-sm">
+              <h6 class="fw-bold">Property Listings</h6>
+              <i class="fas fa-building fa-2x text-warning my-2"></i>
+              <h3 class="mb-0"><?php echo $total_properties; ?></h3>
+              <small class="text-muted">Total Properties</small>
             </div>
+          </a>
 
-            <!-- Owner Statistics -->
-            <div class="col-md-4">
-              <div class="stats-card h-100">
-                <h4 class="font-weight-bold">Owner Statistics</h4>
-                <div class="d-flex align-items-center mt-3">
-                  <i class="fas fa-users fa-3x text-warning me-3"></i>
-                  <div>
-                    <h2 class="mb-0"><?php echo $total_owners; ?></h2>
-                    <small class="text-muted">Total Owners</small>
-                  </div>
-                </div>
-              </div>
+          <!-- Owner Statistics -->
+          <a href="Tax-Declaration-List.php" class="text-decoration-none text-dark">
+            <div class="stats-card text-center p-3 shadow-sm">
+              <h6 class="fw-bold">Owner Statistics</h6>
+              <i class="fas fa-users fa-2x text-warning my-2"></i>
+              <h3 class="mb-0"><?php echo $total_owners; ?></h3>
+              <small class="text-muted">Total Owners</small>
             </div>
+          </a>
 
-            <!-- Parcel -->
-            <div class="col-md-4">
-              <div class="stats-card h-100">
-                <h4 class="font-weight-bold">PARCEL</h4>
-                <div class="row mt-3">
-                  <div class="col-4 text-center">
-                    <i class="fas fa-map fa-2x text-warning mb-2"></i>
-                    <div class="parcel-count"><?php echo $land_count; ?></div>
-                    <h6>LAND</h6>
-                  </div>
-                  <div class="col-4 text-center">
-                    <i class="fas fa-building fa-2x text-warning mb-2"></i>
-                    <div class="parcel-count"><?php echo $building_count; ?></div>
-                    <h6>BUILDING</h6>
-                  </div>
-                  <div class="col-4 text-center">
-                    <i class="fas fa-tree fa-2x text-warning mb-2"></i>
-                    <div class="parcel-count"><?php echo $plant_count; ?></div>
-                    <h6>PLANT/TREES</h6>
-                  </div>
+          <!-- Parcel -->
+          <a href="Track.php" class="text-decoration-none text-dark">
+            <div class="stats-card text-center p-3 shadow-sm">
+              <h6 class="fw-bold">Parcel</h6>
+              <div class="d-flex justify-content-around mt-2">
+                <div>
+                  <i class="fas fa-map fa-lg text-warning mb-1"></i>
+                  <div class="parcel-count"><?php echo $land_count; ?></div>
+                  <small>Land</small>
+                </div>
+                <div>
+                  <i class="fas fa-building fa-lg text-warning mb-1"></i>
+                  <div class="parcel-count"><?php echo $building_count; ?></div>
+                  <small>Building</small>
+                </div>
+                <div>
+                  <i class="fas fa-tree fa-lg text-warning mb-1"></i>
+                  <div class="parcel-count"><?php echo $plant_count; ?></div>
+                  <small>Plant/Trees</small>
                 </div>
               </div>
             </div>
-          </div>
+          </a>
         </div>
+
+<!-- Line Graph on the left -->
+<div class="col-md-8 d-flex justify-content-center align-items-center">
+  <div class="w-100" style="max-width: 600px;">
+    <h6 class="mb-2 text-center"><i class="fas fa-chart-line me-2"></i> Property Statistics</h6>
+    <div style="height:300px;">
+      <canvas id="dashboardChart"></canvas>
+    </div>
+  </div>
+</div>
+</div> 
+</div>
+
 
         <!-- Tax Declaration Table -->
         <div class="modern-card shadow-lg p-4 rounded-lg">
@@ -296,6 +303,8 @@ $result = $conn->query($sql);
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="DashboardGraph.js"></script>
 </body>
 
 </html>
