@@ -19,27 +19,27 @@
         
         <div class="timeline">
             <div class="timeline-step completed">
-                <div class="step-title">Paper Request</div>
+                <div class="step-title">Transaction Request</div>
                 <div class="step-date">08-21-2024</div>
             </div>
             
             <div class="timeline-step completed">
-                <div class="step-title">Confirmed</div>
+                <div class="step-title">Pending</div>
                 <div class="step-date">08-21-2024</div>
             </div>
             
             <div class="timeline-step completed">
-                <div class="step-title">Verifying</div>
+                <div class="step-title">Processing Paper</div>
                 <div class="step-date">08-21-2024</div>
             </div>
             
             <div class="timeline-step completed">
-                <div class="step-title">Verified</div>
+                <div class="step-title">Completed</div>
                 <div class="step-date">09-7-2024</div>
             </div>
             
             <div class="timeline-step active">
-                <div class="step-title">Received and Complete</div>
+                <div class="step-title">Received</div>
                 <div class="step-date">09-10-2024</div>
             </div>
         </div>
