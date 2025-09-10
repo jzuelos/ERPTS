@@ -28,6 +28,7 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="header.css">
   <link rel="stylesheet" href="Track.css">
+
   <title>Electronic Real Property Tax System</title>
 </head>
 
@@ -91,21 +92,26 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
           while ($row = $result->fetch_assoc()) {
             $statusClass = strtolower(str_replace(' ', '-', $row['status'])); // e.g., "In Progress" → "in-progress"
 
-            echo "<tr>
-              <td>{$row['transaction_id']}</td>
-              <td>{$row['name']}</td>
-              <td>{$row['contact_number']}</td>
-              <td>{$row['description']}</td>
-              <td><span class='status-badge status-{$statusClass}'>{$row['status']}</span></td>
-              <td>
-                <button class='btn btn-sm btn-primary' onclick='openModal(\"{$row['transaction_id']}\")'>
-                  <i class='fas fa-edit'></i> Edit
-                </button>
-                <button class='btn btn-sm btn-danger' onclick='deleteTransaction(\"{$row['transaction_id']}\")'>
-                  <i class='fas fa-trash'></i> Delete
-                </button>
-              </td>
-            </tr>";
+echo "<tr>
+        <td>{$row['transaction_id']}</td>
+        <td>{$row['name']}</td>
+        <td>{$row['contact_number']}</td>
+        <td>{$row['description']}</td>
+        <td><span class='status-badge status-{$statusClass}'>{$row['status']}</span></td>
+        <td>
+          <button class='btn btn-sm btn-success' onclick=\"confirmTransaction('{$row['transaction_id']}')\">
+            <i class='fas fa-check'></i>
+          </button>
+          <button class='btn btn-sm btn-primary' onclick=\"openModal('{$row['transaction_id']}')\">
+            <i class='fas fa-edit'></i> Edit
+          </button>
+          <button class='btn btn-sm btn-danger' onclick=\"deleteTransaction('{$row['transaction_id']}')\">
+            <i class='fas fa-trash'></i> Delete
+          </button>
+        </td>
+      </tr>";
+
+
           }
         } else {
           echo "<tr><td colspan='6' class='text-center'>No transactions found</td></tr>";
@@ -122,48 +128,94 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
     </div>
   </div>
 
-  <!-- Modal -->
-  <div class="modal fade" id="transactionModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title" id="modalTitle">
-            <i class="fas fa-exchange-alt"></i> Add Transaction
-          </h3>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
+  <!-- Edit Modal -->
+<div class="modal fade" id="transactionModal" tabindex="-1">
+  <div class="modal-dialog modal-lg"> 
+    <div class="modal-content">
+      
+      <!-- Header -->
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">
+          <i class="fas fa-exchange-alt"></i> Add Transaction
+        </h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
 
-        <div class="modal-body">
-          <input type="text" id="transactionID" name="t_code" class="form-control mb-2" placeholder="Transaction Code">
+      <!-- Body -->
+      <div class="modal-body">
+        <input type="text" id="transactionID" name="t_code" class="form-control mb-2" placeholder="Transaction Code">
 
-          <input type="text" id="nameInput" name="t_name" class="form-control mb-2" placeholder="Name">
+        <input type="text" id="nameInput" name="t_name" class="form-control mb-2" placeholder="Name">
 
-          <!-- ✅ New Contact Number field -->
-          <input type="text" id="contactInput" name="t_contact" class="form-control mb-2" placeholder="Contact Number">
+        <input type="text" id="contactInput" name="t_contact" class="form-control mb-2" placeholder="Contact Number">
 
-          <input type="text" id="transactionInput" name="t_description" class="form-control mb-2" placeholder="Transaction Description">
+        <input type="text" id="transactionInput" name="t_description" class="form-control mb-2" placeholder="Transaction Description">
 
-          <select id="statusInput" name="t_status" class="form-select mb-2" required>
-            <option value="" disabled selected hidden>Select Status</option>
-            <option value="Pending">Pending</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
-          </select>
-        </div>
+        <select id="transactionType" name="transactionType" class="form-select mb-2" required onchange="showRequirements()">
+          <option value="" disabled selected hidden>Select Transaction</option>
+          <option value="Simple Transfer of Ownership">Simple Transfer of Ownership</option>
+          <option value="New Declaration of Real Property">New Declaration of Real Property</option>
+          <option value="Revision/Correction">Revision/Correction of Real Properties</option>
+          <option value="Consolidation">Consolidation of Real Properties</option>
+        </select>
 
-        <div class="modal-footer">
-          <div class="d-flex w-100 gap-2">
-            <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">
-              <i class="fas fa-times"></i> Cancel
-            </button>
-            <button type="button" class="btn btn-success w-50" onclick="saveTransaction()">
-              <i class="fas fa-save"></i> Save
-            </button>
-          </div>
+        <!-- Checklist container -->
+        <div id="requirementsText" class="alert alert-info mt-2" style="display:none; white-space:pre-line;"></div>
+
+        <select id="statusInput" name="t_status" class="form-select mb-2" required>
+          <option value="" disabled selected hidden>Select Status</option>
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        </select>
+
+        <!-- Upload File Input -->
+        <div class="mb-2">
+          <label for="fileUpload" class="form-label">Upload File</label>
+          <input type="file" id="fileUpload" name="t_file" class="form-control">
         </div>
       </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <div class="d-flex w-100 gap-2">
+          <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+          <button type="button" class="btn btn-success w-50" onclick="saveTransaction()">
+            <i class="fas fa-save"></i> Save
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
+</div>
+
+
+
+  <!-- Confirm Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title text-success" id="confirmModalLabel">Confirm Transaction</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body">
+        Are you sure you want to confirm this transaction?
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-success" id="confirmBtn">Yes, Confirm</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
 
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">

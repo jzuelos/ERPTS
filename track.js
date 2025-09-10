@@ -210,7 +210,160 @@ function logActivity(message) {
   log.prepend(item);
 }
 
-// Initialize with some sample data if needed
-window.onload = function () {
-  loadTransactions();
-};
+
+function checkTransaction(transactionId) {
+  const checkbox = event.target;
+
+  if (checkbox.checked) {
+    console.log("Transaction " + transactionId + " marked as checked ");
+    // Example: mark as Completed
+    // sendUpdate(transactionId, "Completed");
+  } else {
+    console.log("Transaction " + transactionId + " unchecked ");
+    // Example: mark as In Progress
+    // sendUpdate(transactionId, "In Progress");
+  }
+}
+
+/* Example function to send updates to the server 
+function sendUpdate(transactionId, status) {
+  fetch("updateTransaction.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: "transaction_id=" + transactionId + "&status=" + status
+  })
+  .then(response => response.text())
+  .then(data => {
+    console.log("Server response:", data);
+  })
+  .catch(error => console.error("Error:", error));
+}*/
+
+//Confirmation Modals
+  function confirmTransaction(transactionId) {
+    currentTransactionId = transactionId;
+    let confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    confirmModal.show();
+  }
+ let currentTransactionId = null;
+  document.getElementById("confirmBtn").addEventListener("click", function() {
+    if (currentTransactionId) {
+      console.log("Confirmed transaction:", currentTransactionId);
+      // TODO: send AJAX request to PHP to update status in DB
+      // Example:
+      // fetch('confirm_transaction.php', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      //   body: 'transaction_id=' + currentTransactionId
+      // }).then(() => location.reload());
+    }
+    bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
+  });
+
+  function saveTransaction() {
+  const formData = new FormData();
+  formData.append("t_code", document.getElementById("transactionID").value);
+  formData.append("t_name", document.getElementById("nameInput").value);
+  formData.append("t_contact", document.getElementById("contactInput").value);
+  formData.append("t_description", document.getElementById("transactionInput").value);
+  formData.append("transactionType", document.getElementById("transactionType").value);
+  formData.append("t_status", document.getElementById("statusInput").value);
+
+  const file = document.getElementById("fileUpload").files[0];
+  if (file) {
+    formData.append("t_file", file);
+  }
+
+  fetch("save_transaction.php", {
+    method: "POST",
+    body: formData
+  })
+  .then(response => response.text())
+  .then(data => {
+    console.log(data);
+    location.reload(); // refresh after saving
+  })
+  .catch(err => console.error(err));
+}
+
+function showRequirements() {
+  const transactionType = document.getElementById("transactionType").value;
+  const requirementsDiv = document.getElementById("requirementsText");
+
+  let text = "";
+
+  switch (transactionType) {
+    case "Simple Transfer of Ownership":
+      text = `CHECKLIST : SIMPLE TRANSFER OF OWNERSHIP (LAND/BUILDING/MACHINERIES)
+1. DEED OF CONVEYANCES (duly notarized/registered from Registry of Deeds)
+   a. Sale
+   b. Donations
+   c. Extrajudicial Settlement etc..
+2. CERTIFICATION OF TAX PAYMENT - Municipal Treasurers Office (MTO) 
+3. CERTIFICATION FROM BUREAU OF INTERNAL REVENUE (BIR eCAR)
+4. CERTIFICATE OF TRANSFER TAX – Provincial Treasurers Office (PTO)
+5. TITLE – Authenticated/Certified true copy/Electronic true copy
+   a. Free Patent (DENR/Bureau of Lands)
+   b. Original certificate of title (OCT)
+   c. Transfer Certificate of Title (TCT)
+   d. CLOA – DAR
+   e. EP – DAR
+6. DAR CLEARANCE (if Agricultural Land)
+7. AFFIDAVIT OF PUBLICATION (if Extrajudicial settlement)`;
+      break;
+
+    case "New Declaration of Real Property":
+      text = `CHECKLIST :  NEW DECLARATION OF REAL PROPERTY
+1. LAND
+   a. LETTER REQUEST BY OWNER
+   b. AFFIDAVIT OF OWNERSHIP/POSSESSION
+   c. CERTIFICATION FROM BARANGAY CAPTAIN
+   d. CERTIFICATION FROM DENR/PENRO (alienable & disposable)
+   e. LIST OF CLAIMANTS (DENR/PENRO)
+   f. APPROVED SURVEY PLAN and/or CADASTRAL MAP
+   g. INSPECTION REPORT
+2. BUILDING
+   a. LETTER REQUEST BY OWNER
+   b. BUILDING PERMIT
+   c. BUILDING FLOOR PLAN
+   d. SWORN STATEMENT FOR TRUE FAIR MARKET VALUE
+   e. PICTURES
+   f. NOTICE OF ASSESSMENT
+3. MACHINERIES
+   a. LETTER REQUEST
+   b. SWORN STATEMENT BY THE OWNER
+   c. ACTUAL COST OF MACHINERY
+   d. PICTURES
+   e. NOTICE OF ASSESSMENT`;
+      break;
+
+    case "Revision/Correction":
+      text = `CHECKLIST : REVISION/CORRECTION AREA, BOUNDARIES etc….OF REAL PROPERTIES
+1. LETTER REQUEST BY OWNER
+2. CERTIFICATION FROM DENR/PENRO
+3. TITLE (if any) - Authenticated/Certified true copy/Electronic true copy
+4. CERTIFICATION OF TAX PAYMENT - Municipal Treasurers Office (MTO)
+5. CADASTRAL MAP (DENR/PENRO) if any`;
+      break;
+
+    case "Consolidation":
+      text = `CHECKLIST :  CONSOLIDATION OF REAL PROPERTIES (TAX DECLARATION)
+1. LETTER REQUEST BY OWNER
+2. TITLE (if any) - Authenticated/Certified true copy/Electronic true copy
+3. CERTIFICATION OF TAX PAYMENT - Municipal Treasurers Office (MTO)
+4. APPROVED SUBDIVISION PLAN`;
+      break;
+
+    default:
+      text = "";
+  }
+
+  if (text) {
+    requirementsDiv.style.display = "block";
+    requirementsDiv.textContent = text;
+  } else {
+    requirementsDiv.style.display = "none";
+  }
+}
