@@ -1,45 +1,40 @@
-
 .form-container {
     border: none;
     border-radius: 12px;
     background-color: #ffffff;
     padding: 40px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
+    transition: box-shadow 0.3s;
+}
   
-  .form-container:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-  }
-  
-
-  h3, h5 {
+.form-container:hover {
+    /* Same shadow size, only opacity change */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+h3, h5 {
     color: #333;
     font-weight: 700;
     margin-bottom: 20px;
-  }
+}
   
-  .text-center {
+.text-center {
     text-align: center;
-  }
+}
   
-
-  .input-field {
+.input-field {
     border-radius: 8px;
     border: 1px solid #ced4da;
     padding: 12px;
     transition: border-color 0.3s, box-shadow 0.3s;
-  }
+}
   
-  .input-field:focus {
+.input-field:focus {
     border-color: #007bff;
     box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
     outline: none;
-  }
+}
   
-
-  .submit-btn {
+.submit-btn {
     background-color: #007bff;
     border: none;
     border-radius: 8px;
@@ -48,26 +43,25 @@
     padding: 12px 16px;
     width: 100%;
     transition: background-color 0.3s, transform 0.3s;
-  }
+}
   
-  .submit-btn:hover {
+.submit-btn:hover {
     background-color: #0056b3;
     transform: translateY(-2px);
     cursor: pointer;
-  }
+}
 
-  .form-group label {
+.form-group label {
     font-weight: 600;
     margin-bottom: 5px;
     color: #555;
-  }
+}
 
-  body {
+body {
     background-color: #f4f6f8;
-  }
+}
   
-  .container {
+.container {
     max-width: 900px;
     margin-top: 40px;
-  }
-  
+}
