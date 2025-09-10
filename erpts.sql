@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 10, 2025 at 04:15 PM
+-- Generation Time: Sep 10, 2025 at 06:46 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -417,7 +417,6 @@ INSERT INTO `district` (`district_id`, `district_code`, `description`, `status`,
 
 CREATE TABLE `faas` (
   `faas_id` int(50) NOT NULL,
-  `propertyowner_id` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`propertyowner_id`)),
   `pro_id` int(50) DEFAULT NULL,
   `rpu_idno` int(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -426,11 +425,11 @@ CREATE TABLE `faas` (
 -- Dumping data for table `faas`
 --
 
-INSERT INTO `faas` (`faas_id`, `propertyowner_id`, `pro_id`, `rpu_idno`) VALUES
-(33, '[62,63]', 144, 46),
-(36, '[66]', 147, 62),
-(42, '[]', 156, NULL),
-(43, '[72]', 157, NULL);
+INSERT INTO `faas` (`faas_id`, `pro_id`, `rpu_idno`) VALUES
+(33, 144, 46),
+(36, 147, 62),
+(42, 156, 63),
+(43, 157, NULL);
 
 -- --------------------------------------------------------
 
@@ -622,7 +621,6 @@ INSERT INTO `province` (`province_id`, `province_name`) VALUES
 
 CREATE TABLE `p_info` (
   `p_id` int(50) NOT NULL,
-  `ownID_Fk` int(50) NOT NULL,
   `house_no` int(10) NOT NULL,
   `block_no` int(10) NOT NULL,
   `province` varchar(30) NOT NULL,
@@ -645,11 +643,11 @@ CREATE TABLE `p_info` (
 -- Dumping data for table `p_info`
 --
 
-INSERT INTO `p_info` (`p_id`, `ownID_Fk`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`, `created_at`, `updated_at`, `is_active`, `disabled_at`, `disabled_by`) VALUES
-(144, 0, 23, 1, 'Camarines Norte', 'Daet', 'District 1', 'Kalamunding', 'Rizal Street', 0, 302, 'Residential lot with affidavit and barangay cleara', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-08-31 19:01:44', 1, NULL, NULL),
-(147, 0, 23, 3, 'Camarines Norte', 'Daet', 'District 2', 'Gahon', 'Mabini Street', 0, 453, 'Commercial lot with affidavit and barangay clearan', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-08-31 19:01:44', 1, NULL, NULL),
-(156, 0, 42134, 4, 'Camarines Norte', 'Daet', 'District 2', 'Bagasbas', 'Quezon Avenue', 0, 432, 'Agricultural lot with affidavit', 'Affidavit', '2025-09-05 14:01:18', '2025-09-06 18:45:29', 0, '2025-09-07 02:45:29', 9),
-(157, 0, 5345, 4, 'Camarines Norte', 'Daet', 'District 2', 'Camambugan', 'San Roque Street', 0, 5345, 'Residential lot with barangay document', 'Barangay Clearance', '2025-09-05 14:13:20', '2025-09-06 18:44:51', 1, NULL, NULL);
+INSERT INTO `p_info` (`p_id`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`, `created_at`, `updated_at`, `is_active`, `disabled_at`, `disabled_by`) VALUES
+(144, 23, 1, 'Camarines Norte', 'Daet', 'District 1', 'Kalamunding', 'Rizal Street', 0, 302, 'Residential lot with affidavit and barangay cleara', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-08-31 19:01:44', 1, NULL, NULL),
+(147, 23, 3, 'Camarines Norte', 'Daet', 'District 2', 'Gahon', 'Mabini Street', 0, 453, 'Commercial lot with affidavit and barangay clearan', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-08-31 19:01:44', 1, NULL, NULL),
+(156, 42134, 4, 'Camarines Norte', 'Daet', 'District 2', 'Bagasbas', 'Quezon Avenue', 1, 432, 'Agricultural lot with affidavit', 'Affidavit', '2025-09-05 14:01:18', '2025-09-10 14:43:52', 1, NULL, NULL),
+(157, 5345, 4, 'Camarines Norte', 'Daet', 'District 2', 'Camambugan', 'San Roque', 0, 5345, 'Residential lot with barangay document', 'Barangay Clearance', '2025-09-05 14:13:20', '2025-09-10 16:00:54', 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -722,7 +720,8 @@ CREATE TABLE `rpu_idnum` (
 
 INSERT INTO `rpu_idnum` (`rpu_id`, `arp`, `pin`, `taxability`, `effectivity`, `faas_id`) VALUES
 (46, 2147483647, 34564234, 'special', '2024', 33),
-(62, 42342, 23423, 'exempt', '42342', 36);
+(62, 42342, 23423, 'exempt', '42342', 36),
+(63, 423234, 423423, 'taxable', '2004', 42);
 
 -- --------------------------------------------------------
 
@@ -848,7 +847,6 @@ ALTER TABLE `district`
 --
 ALTER TABLE `faas`
   ADD PRIMARY KEY (`faas_id`),
-  ADD KEY `propertyowner_id` (`propertyowner_id`(768)),
   ADD KEY `pro_id` (`pro_id`);
 
 --
@@ -895,8 +893,7 @@ ALTER TABLE `province`
 -- Indexes for table `p_info`
 --
 ALTER TABLE `p_info`
-  ADD PRIMARY KEY (`p_id`),
-  ADD KEY `ownID_FK` (`ownID_Fk`);
+  ADD PRIMARY KEY (`p_id`);
 
 --
 -- Indexes for table `region`
@@ -969,7 +966,7 @@ ALTER TABLE `district`
 -- AUTO_INCREMENT for table `faas`
 --
 ALTER TABLE `faas`
-  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT for table `land`
@@ -999,7 +996,7 @@ ALTER TABLE `owners_tb`
 -- AUTO_INCREMENT for table `propertyowner`
 --
 ALTER TABLE `propertyowner`
-  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
 
 --
 -- AUTO_INCREMENT for table `province`
@@ -1011,7 +1008,7 @@ ALTER TABLE `province`
 -- AUTO_INCREMENT for table `p_info`
 --
 ALTER TABLE `p_info`
-  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=158;
+  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
 
 --
 -- AUTO_INCREMENT for table `region`
@@ -1029,7 +1026,7 @@ ALTER TABLE `rpu_dec`
 -- AUTO_INCREMENT for table `rpu_idnum`
 --
 ALTER TABLE `rpu_idnum`
-  MODIFY `rpu_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `rpu_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `subclass`
