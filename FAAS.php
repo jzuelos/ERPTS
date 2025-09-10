@@ -93,11 +93,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'disab
 function fetchProperty($conn, $p_id)
 {
   $sql = "
-    SELECT p.p_id, p.house_no, p.block_no, p.barangay, p.province, p.city, p.district, p.land_area,
-           CONCAT(o.own_fname, ', ', o.own_mname, ' ', o.own_surname) AS owner_name,
-           o.own_fname AS first_name, o.own_mname AS middle_name, o.own_surname AS last_name
+    SELECT 
+      p.p_id, 
+      p.house_no, 
+      p.block_no, 
+      p.province, 
+      p.city, 
+      p.district, 
+      p.barangay, 
+      p.street,
+      p.house_tag_no,
+      p.land_area, 
+      p.desc_land, 
+      p.documents, 
+      p.created_at, 
+      p.updated_at, 
+      p.is_active,
+      p.disabled_at,
+      p.disabled_by
     FROM p_info p
-    LEFT JOIN owners_tb o ON p.ownId_Fk = o.own_id
     WHERE p.p_id = ?
   ";
   $stmt = $conn->prepare($sql);
@@ -105,6 +119,7 @@ function fetchProperty($conn, $p_id)
   $stmt->execute();
   return $stmt->get_result()->fetch_assoc();
 }
+
 
 // Fetch owners list
 function fetchOwners($conn)
@@ -144,10 +159,9 @@ function fetchOwnersByIds($conn, $owner_ids)
   return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 }
 
-// Fetch faas info (faas_id, propertyowner_id)
 function fetchFaasInfo($conn, $property_id)
 {
-  $stmt = $conn->prepare("SELECT faas_id, propertyowner_id FROM faas WHERE pro_id = ?");
+  $stmt = $conn->prepare("SELECT faas_id FROM faas WHERE pro_id = ?");
   $stmt->bind_param("i", $property_id);
   $stmt->execute();
   return $stmt->get_result()->fetch_assoc();
@@ -378,6 +392,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 }
 
+//Add Owner Save/Insert in same file
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST)) {
+  $data = json_decode(file_get_contents("php://input"), true);
+  if ($data && isset($data['action'])) {
+    if ($data['action'] === 'update_owner') {
+      $stmt = $conn->prepare("UPDATE owners_tb SET own_fname=?, own_mname=?, own_surname=? WHERE own_id=?");
+      $stmt->bind_param("sssi", $data['first_name'], $data['middle_name'], $data['last_name'], $data['owner_id']);
+      $ok = $stmt->execute();
+      echo json_encode(["success" => $ok, "error" => $stmt->error]);
+      exit;
+    }
+
+    if ($data['action'] === 'add_owner') {
+      $stmt = $conn->prepare("INSERT INTO owners_tb (own_fname, own_mname, own_surname) VALUES (?, ?, ?)");
+      $stmt->bind_param("sss", $data['first_name'], $data['middle_name'], $data['last_name']);
+      $ok = $stmt->execute();
+      $new_id = $stmt->insert_id;
+      if ($ok) {
+        $link = $conn->prepare("INSERT INTO propertyowner (property_id, owner_id) VALUES (?, ?)");
+        $link->bind_param("ii", $data['property_id'], $new_id);
+        $link->execute();
+      }
+      echo json_encode(["success" => $ok, "error" => $stmt->error]);
+      exit;
+    }
+  }
+}
+
 // General owners list
 $owners = fetchOwners($conn);
 
@@ -435,9 +477,9 @@ $conn->close();
   <section class="container mt-4" id="owner-info-section">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="d-flex align-items-center">
-      <a href="Real-Property-Unit-List.php" class="btn btn-outline-secondary btn-sm">
-        <i class="fas fa-arrow-left"></i> Back
-      </a>
+        <a href="Real-Property-Unit-List.php" class="btn btn-outline-secondary btn-sm">
+          <i class="fas fa-arrow-left"></i> Back
+        </a>
         <h4 class="ms-3 mb-0">Owner's Information</h4>
       </div>
       <button type="button" class="btn btn-outline-primary btn-sm" id="editOwnerBtn" onclick="showOISModal()"
@@ -447,7 +489,7 @@ $conn->close();
     <?php
     if (!empty($property_id)) {
       $no_declaration = empty($rpu_declaration); // true if no rpu_dec present
-    
+
       if ($is_active == 0): ?>
         <!-- Property already disabled -->
         <span class="btn btn-outline-secondary disabled" title="This property is already inactive.">
@@ -471,7 +513,7 @@ $conn->close();
         <span class="btn btn-secondary disabled" title="Cannot disable: tax declaration exists for this property">
           <i class="fas fa-ban"></i> Cannot cancel RPU with TD encoded
         </span>
-      <?php endif;
+    <?php endif;
     }
     ?>
 
@@ -547,32 +589,25 @@ $conn->close();
         </div>
         <div class="modal-body">
           <!-- Owner Info (Editable) -->
-          <form id="editOwnerForm">
-            <!-- Loop through each owner and display their info for editing -->
-            <?php foreach ($owners_details as $owner): ?>
-              <div class="mb-3">
-                <label for="ownerNameModal" class="form-label">Company or Owner</label>
-                <input type="text" class="form-control" id="ownerNameModal"
-                  value="<?php echo htmlspecialchars($owner['owner_name']); ?>" placeholder="Enter Company or Owner">
-              </div>
-              <h6 class="mb-3">Name</h6>
-              <div class="mb-3">
-                <label for="firstNameModal" class="form-label">First Name</label>
-                <input type="text" class="form-control" id="firstNameModal"
-                  value="<?php echo htmlspecialchars($owner['first_name']); ?>" placeholder="Enter First Name">
-              </div>
-              <div class="mb-3">
-                <label for="middleNameModal" class="form-label">Middle Name</label>
-                <input type="text" class="form-control" id="middleNameModal"
-                  value="<?php echo htmlspecialchars($owner['middle_name']); ?>" placeholder="Enter Middle Name">
-              </div>
-              <div class="mb-3">
-                <label for="lastNameModal" class="form-label">Last Name</label>
-                <input type="text" class="form-control" id="lastNameModal"
-                  value="<?php echo htmlspecialchars($owner['last_name']); ?>" placeholder="Enter Last Name">
-              </div>
-              <hr class="my-4">
-            <?php endforeach; ?>
+          <form id="editOwnerForm" data-owner-id="<?= $owner['own_id'] ?>">
+            <div class="mb-3">
+              <label class="form-label">Company or Owner</label>
+              <input type="text" class="form-control" value="<?= htmlspecialchars($owner['owner_name']) ?>" disabled>
+            </div>
+            <h6 class="mb-3">Name</h6>
+            <div class="mb-3">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-control firstNameModal" value="<?= htmlspecialchars($owner['first_name']) ?>">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Middle Name</label>
+              <input type="text" class="form-control middleNameModal" value="<?= htmlspecialchars($owner['middle_name']) ?>">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-control lastNameModal" value="<?= htmlspecialchars($owner['last_name']) ?>">
+            </div>
+            <hr class="my-4">
           </form>
         </div>
         <div class="modal-footer">
@@ -644,14 +679,6 @@ $conn->close();
                 placeholder="Enter Land Area" disabled>
             </div>
           </div>
-          <div class="col-md-6 mb-4">
-            <div class="mb-3">
-              <label for="zoneNumber" class="form-label">Zone Number</label>
-              <input type="text" class="form-control" id="zoneNumber"
-                value="<?php echo isset($property['zone_no']) ? htmlspecialchars($property['zone_no']) : ''; ?>"
-                placeholder="Enter Zone Number" disabled>
-            </div>
-          </div>
         </div>
       </form>
     </div>
@@ -693,10 +720,6 @@ $conn->close();
               <div class="col-12 mb-3">
                 <label for="landAreaModal" class="form-label">Land Area</label>
                 <input type="text" class="form-control" id="landAreaModal" placeholder="Enter Land Area">
-              </div>
-              <div class="col-12 mb-3">
-                <label for="zoneNumberModal" class="form-label">Zone Number</label>
-                <input type="text" class="form-control" id="zoneNumberModal" placeholder="Enter Zone Number">
               </div>
             </div>
           </form>
@@ -963,14 +986,14 @@ $conn->close();
     </div>
   </div>
 
-    <!-- LAND Section -->
-    <section class="container my-5" id="land-section">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="section-title">
-          </a>
-          LAND
-        </h4>
-      </div>
+  <!-- LAND Section -->
+  <section class="container my-5" id="land-section">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h4 class="section-title">
+        </a>
+        LAND
+      </h4>
+    </div>
 
     <div class="card border-0 shadow p-4 rounded-3">
       <!-- Quick Actions Row -->
@@ -1025,8 +1048,8 @@ $conn->close();
                         <i class="bi bi-pencil"></i>
                       </a>
                       <a href="<?= ($is_active == 1)
-                        ? 'print-layout.php?p_id=' . urlencode($p_id) . '&land_id=' . urlencode($record['land_id'])
-                        : '#' ?>" class="btn btn-sm btn-secondary ml-3 <?= ($is_active == 0) ? 'disabled' : '' ?>"
+                                  ? 'print-layout.php?p_id=' . urlencode($p_id) . '&land_id=' . urlencode($record['land_id'])
+                                  : '#' ?>" class="btn btn-sm btn-secondary ml-3 <?= ($is_active == 0) ? 'disabled' : '' ?>"
                         title="View" target="_blank" style="pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
                         <i class="bi bi-printer"></i>
                       </a>
@@ -1163,25 +1186,25 @@ $conn->close();
       </table>
     </div>
 
-<!-- Floating Dropdown Menu (Bottom Right of Page) -->
-<div class="dropdown" style="position:fixed; bottom:20px; right:20px; z-index:1050;">
-    <button id="mapMenuBtn" 
-            class="btn btn-danger btn-lg rounded-circle d-flex align-items-center justify-content-center" 
-            type="button"
-            aria-expanded="false"
-            style="width:60px; height:60px;">
+    <!-- Floating Dropdown Menu (Bottom Right of Page) -->
+    <div class="dropdown" style="position:fixed; bottom:20px; right:20px; z-index:1050;">
+      <button id="mapMenuBtn"
+        class="btn btn-danger btn-lg rounded-circle d-flex align-items-center justify-content-center"
+        type="button"
+        aria-expanded="false"
+        style="width:60px; height:60px;">
         <i class="fas fa-bars fa-1x"></i>
-    </button>
-  <ul class="dropdown-menu shadow">
-    <li><a class="dropdown-item scroll-link" href="#owner-info-section"><i class="fas fa-user"></i> Owner's Info</a></li>
-    <li><a class="dropdown-item scroll-link" href="#property-info-section"><i class="fas fa-home"></i> Property Info</a></li>
-    <li><a class="dropdown-item scroll-link" href="#rpu-identification-section"><i class="fas fa-id-card"></i> RPU Identification</a></li>
-    <li><a class="dropdown-item scroll-link" href="#declaration-section"><i class="fas fa-file-alt"></i> Declaration</a></li>
-    <li><a class="dropdown-item scroll-link" href="#land-section"><i class="fas fa-map"></i> Land</a></li>
-    <li><a class="dropdown-item scroll-link" href="#plants-trees-section"><i class="fas fa-tree"></i> Plants & Trees</a></li>
-    <li><a class="dropdown-item scroll-link" href="#valuation-section"><i class="fas fa-balance-scale"></i> Valuation</a></li>
-  </ul>
-</div>
+      </button>
+      <ul class="dropdown-menu shadow">
+        <li><a class="dropdown-item scroll-link" href="#owner-info-section"><i class="fas fa-user"></i> Owner's Info</a></li>
+        <li><a class="dropdown-item scroll-link" href="#property-info-section"><i class="fas fa-home"></i> Property Info</a></li>
+        <li><a class="dropdown-item scroll-link" href="#rpu-identification-section"><i class="fas fa-id-card"></i> RPU Identification</a></li>
+        <li><a class="dropdown-item scroll-link" href="#declaration-section"><i class="fas fa-file-alt"></i> Declaration</a></li>
+        <li><a class="dropdown-item scroll-link" href="#land-section"><i class="fas fa-map"></i> Land</a></li>
+        <li><a class="dropdown-item scroll-link" href="#plants-trees-section"><i class="fas fa-tree"></i> Plants & Trees</a></li>
+        <li><a class="dropdown-item scroll-link" href="#valuation-section"><i class="fas fa-balance-scale"></i> Valuation</a></li>
+      </ul>
+    </div>
 
   </section>
 
@@ -1196,7 +1219,7 @@ $conn->close();
   <script>
     // Function to capitalize the first letter of each word
     function capitalizeFirstLetter(element) {
-      element.value = element.value.replace(/\b\w/g, function (char) {
+      element.value = element.value.replace(/\b\w/g, function(char) {
         return char.toUpperCase();
       });
     }
@@ -1207,7 +1230,7 @@ $conn->close();
     }
 
     // Attach the function to the 'input' event of each relevant field after DOM is fully loaded
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
       // Apply capitalization to specific input fields in the owner info section and modal
       const fieldsToCapitalize = [
         'ownerName', 'firstName', 'middleName', 'lastName',
@@ -1218,7 +1241,7 @@ $conn->close();
       fieldsToCapitalize.forEach(fieldId => {
         const inputField = document.getElementById(fieldId);
         if (inputField) {
-          inputField.addEventListener("input", function () {
+          inputField.addEventListener("input", function() {
             capitalizeFirstLetter(inputField);
           });
         }
@@ -1227,7 +1250,7 @@ $conn->close();
       // Event listener for ARD Number to restrict input to numbers only
       const ardNumberField = document.getElementById("ardNumberModal");
       if (ardNumberField) {
-        ardNumberField.addEventListener("input", function () {
+        ardNumberField.addEventListener("input", function() {
           restrictToNumbers(ardNumberField);
         });
       }
@@ -1337,12 +1360,12 @@ $conn->close();
 
       // Send data to FAASrpuID.php
       fetch('FAASrpuID.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(arpData)
-      })
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(arpData)
+        })
         .then(response => response.json())
         .then(data => {
           if (data.success) {
@@ -1358,32 +1381,32 @@ $conn->close();
     }
   </script>
   <script>
-document.addEventListener("DOMContentLoaded", function () {
-  const menuBtn = document.getElementById("mapMenuBtn");
+    document.addEventListener("DOMContentLoaded", function() {
+      const menuBtn = document.getElementById("mapMenuBtn");
 
-  // Initialize dropdown with top-left placement
-  const dropdown = new bootstrap.Dropdown(menuBtn, {
-    popperConfig(defaultBsPopperConfig) {
-      return {
-        ...defaultBsPopperConfig,
-        placement: "top-start"
-      };
-    }
-  });
+      // Initialize dropdown with top-left placement
+      const dropdown = new bootstrap.Dropdown(menuBtn, {
+        popperConfig(defaultBsPopperConfig) {
+          return {
+            ...defaultBsPopperConfig,
+            placement: "top-start"
+          };
+        }
+      });
 
-  // Toggle on click only
-  menuBtn.addEventListener("click", function (e) {
-    e.preventDefault();
-    dropdown.toggle();
-  });
-});
-</script>
+      // Toggle on click only
+      menuBtn.addEventListener("click", function(e) {
+        e.preventDefault();
+        dropdown.toggle();
+      });
+    });
+  </script>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
       const toggle = document.getElementById("showToggle");
       const tableContainer = document.getElementById("landTableContainer");
 
-      toggle.addEventListener("change", function () {
+      toggle.addEventListener("change", function() {
         if (toggle.checked) {
           tableContainer.style.display = "block";
         } else {
@@ -1393,6 +1416,73 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   </script>
 
+  <script>
+    function saveOwnerData() {
+      const propertyId = new URLSearchParams(window.location.search).get('id');
+      const forms = document.querySelectorAll("#editOwnerModal form");
+
+      forms.forEach(form => {
+        const ownerId = form.dataset.ownerId;
+        const first = form.querySelector(".firstNameModal").value;
+        const middle = form.querySelector(".middleNameModal").value;
+        const last = form.querySelector(".lastNameModal").value;
+
+        fetch(window.location.href, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              action: "update_owner",
+              property_id: propertyId,
+              owner_id: ownerId,
+              first_name: first,
+              middle_name: middle,
+              last_name: last
+            })
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              location.reload();
+            } else {
+              alert("Error: " + data.error);
+            }
+          });
+      });
+    }
+
+    function addOwnerData() {
+      const propertyId = new URLSearchParams(window.location.search).get('id');
+      const first = prompt("Enter first name:");
+      const middle = prompt("Enter middle name:");
+      const last = prompt("Enter last name:");
+
+      if (!first || !last) return;
+
+      fetch(window.location.href, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            action: "add_owner",
+            property_id: propertyId,
+            first_name: first,
+            middle_name: middle,
+            last_name: last
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            location.reload();
+          } else {
+            alert("Error: " + data.error);
+          }
+        });
+    }
+  </script>
 
   <!-- Bootstrap 5 JS Bundle (Popper included) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

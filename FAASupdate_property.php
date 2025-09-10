@@ -10,19 +10,10 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Log raw POST data for debugging
-error_log("Raw POST Data: " . file_get_contents("php://input"));
-
 // Ensure the request is POST
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     die("Invalid request method.");
 }
-
-// Log all received POST data
-error_log("Received POST Data: " . print_r($_POST, true));
-
-// Respond with received data for debugging purposes
-echo "Received Data: " . json_encode($_POST);
 
 // Validate required fields
 if (empty($_POST['property_id'])) {
@@ -30,29 +21,19 @@ if (empty($_POST['property_id'])) {
 }
 
 // Sanitize POST data
-$propertyId = $_POST['property_id'];
-$street = $_POST['street'] ?? '';
-$barangay = $_POST['barangay'] ?? '';
+$propertyId   = intval($_POST['property_id']);
+$street       = $_POST['street'] ?? '';
+$barangay     = $_POST['barangay'] ?? '';
 $municipality = $_POST['municipality'] ?? '';
-$province = $_POST['province'] ?? '';
-$houseNumber = $_POST['houseNumber'] ?? '';
-$landArea = $_POST['landArea'] ?? '';
-$zoneNumber = $_POST['zoneNumber'] ?? ''; // Not used in query
-$ardNumber = $_POST['ardNumber'] ?? '';   // Not used in query
-$taxability = $_POST['taxability'] ?? ''; // Not used in query
-$effectivity = $_POST['effectivity'] ?? ''; // Not used in query
-
-// Log sanitized variables for debugging
-error_log("Sanitized Variables: property_id=$propertyId, street=$street, barangay=$barangay, municipality=$municipality, province=$province, houseNumber=$houseNumber, landArea=$landArea");
-
-// Initialize $stmt to avoid undefined errors
-$stmt = null;
+$province     = $_POST['province'] ?? '';
+$houseNumber  = $_POST['houseNumber'] ?? '';
+$landArea     = $_POST['landArea'] ?? '';
 
 // Prepare and execute the SQL update query
 try {
     $stmt = $conn->prepare("
         UPDATE p_info 
-        SET street = ?, barangay = ?, city = ?, province = ?, house_no = ?, land_area = ? 
+        SET street = ?, barangay = ?, city = ?, province = ?, house_no = ?, land_area = ?
         WHERE p_id = ?
     ");
 
@@ -77,8 +58,7 @@ try {
     echo "Error: " . $e->getMessage();
     error_log("Error: " . $e->getMessage());
 } finally {
-    // Clean up resources only if $stmt was successfully created
-    if ($stmt !== null) {
+    if (isset($stmt) && $stmt !== null) {
         $stmt->close();
     }
     $conn->close();

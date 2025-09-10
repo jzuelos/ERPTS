@@ -264,28 +264,27 @@ $land_query->bind_param("i", $faas_id);
 $land_query->execute();
 $land_result = $land_query->get_result();
 
-if ($land_result->num_rows > 0) {
-  $land_data = $land_result->fetch_assoc();
-} else {
-  die("Error: No land record found for this FAAS.");
+if ($land_result && $land_result->num_rows > 0) {
+    $land_data = $land_result->fetch_assoc();
 }
 
 $land_id = $land_data['land_id'] ?? 0; //fetch land_id
 
-$land_query->close();
+$land_query->close(); 
 
-// Fetch certification data using the land_id
+// Fetch certification data using the land_id (only if land exists)
 $cert_data = [];
-if (isset($land_data['land_id'])) {
-  $cert_query = $conn->prepare("SELECT * FROM certification WHERE land_id = ?");
-  $cert_query->bind_param("i", $land_data['land_id']);
-  $cert_query->execute();
-  $cert_result = $cert_query->get_result();
 
-  if ($cert_result->num_rows > 0) {
-    $cert_data = $cert_result->fetch_assoc();
-  }
-  $cert_query->close();
+if (!empty($land_id)) { // only try if land exists
+    $cert_query = $conn->prepare("SELECT * FROM certification WHERE land_id = ?");
+    $cert_query->bind_param("i", $land_id);
+    $cert_query->execute();
+    $cert_result = $cert_query->get_result();
+
+    if ($cert_result && $cert_result->num_rows > 0) {
+        $cert_data = $cert_result->fetch_assoc();
+    }
+    $cert_query->close();
 }
 
 $conn->close();

@@ -43,13 +43,7 @@ SELECT
   GROUP_CONCAT(DISTINCT CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname) SEPARATOR ' / ') AS owner
 FROM p_info p
 LEFT JOIN faas f ON f.pro_id = p.p_id
-LEFT JOIN propertyowner po 
-  ON f.propertyowner_id IS NOT NULL
-     AND f.propertyowner_id <> '[]'
-     AND FIND_IN_SET(
-           CAST(po.pO_id AS CHAR),
-           REPLACE(REPLACE(REPLACE(REPLACE(f.propertyowner_id, '[', ''), ']', ''), '\"', ''), ' ', '')
-         ) > 0
+LEFT JOIN propertyowner po ON po.property_id = p.p_id
 LEFT JOIN owners_tb o ON o.own_id = po.owner_id
 GROUP BY p.p_id
 ORDER BY p.p_id DESC
@@ -165,7 +159,7 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
                 $ownerRaw = isset($unit['owner']) ? $unit['owner'] : '';
                 $owner = trim((string) $ownerRaw) !== '' ? $ownerRaw : 'None';
                 $rowClass = ($unit['is_active'] == 0) ? 'table-secondary' : ''; // highlight inactive
-                ?>
+              ?>
                 <tr class="<?= $rowClass ?>">
                   <td><?= htmlspecialchars($unit['p_id']) ?></td>
                   <td><?= htmlspecialchars($owner) ?></td>
@@ -304,7 +298,6 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
     }
 
     document.addEventListener("DOMContentLoaded", initializeTable);
-
   </script>
   <script>
     // Function to reset the modal when the close button is clicked
@@ -320,7 +313,7 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
       tableBody.innerHTML = '';
       var propertyUnits = <?php echo json_encode($propertyUnits); ?>;
 
-      propertyUnits.forEach(function (unit) {
+      propertyUnits.forEach(function(unit) {
         var row = `<tr>
                 <td>${unit.p_id}</td>
                 <td>${unit.owner}</td>
@@ -337,11 +330,11 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
       var searchQuery = document.getElementById("modalSearchInput").value.toLowerCase();
       var tableRows = document.getElementById("modalTableBody").getElementsByTagName("tr");
 
-      Array.from(tableRows).forEach(function (row) {
+      Array.from(tableRows).forEach(function(row) {
         var cells = row.getElementsByTagName("td");
         var matchFound = false;
 
-        Array.from(cells).forEach(function (cell) {
+        Array.from(cells).forEach(function(cell) {
           if (cell.innerText.toLowerCase().includes(searchQuery)) {
             matchFound = true;
           }
@@ -349,7 +342,6 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
         row.style.display = matchFound ? "" : "none";
       });
     }
-
   </script>
   <script src="http://localhost/ERPTS/Real-Property-Unit-List.js"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

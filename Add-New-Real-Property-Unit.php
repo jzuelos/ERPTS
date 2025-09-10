@@ -24,7 +24,7 @@
   <div id="selectedOwnerDisplay"></div> <!-- Display area for selected owner IDs -->
   <?php
   session_start(); // Start session at the top
-  
+
   // Prevent the browser from caching this page
   header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
   header("Cache-Control: post-check=0, pre-check=0", false);
@@ -88,7 +88,7 @@
           if ($stmt->execute()) {
             $property_id = $stmt->insert_id; // Get last inserted ID
             $_SESSION['last_property_id'] = $property_id; // Store it in session
-  
+
             // Insert owners into propertyowner table and collect propertyowner_ids
             $propertyowner_ids = [];
             if (!empty($selected_owner_ids)) {
@@ -121,13 +121,12 @@
               }
             }
 
-            // Now insert a single FAAS record with all the owner IDs as JSON
-            $faas_stmt = $conn->prepare("INSERT INTO FAAS (pro_id, propertyowner_id) VALUES (?, ?)");
+            // Insert a single FAAS record for the property
+            $faas_stmt = $conn->prepare("INSERT INTO FAAS (pro_id) VALUES (?)");
             if ($faas_stmt) {
-              $owners_json = json_encode($propertyowner_ids);
-              $faas_stmt->bind_param("is", $property_id, $owners_json);
+              $faas_stmt->bind_param("i", $property_id);
               if ($faas_stmt->execute()) {
-                echo "<p>Inserted into FAAS for property_id $property_id with owners: " . implode(", ", $propertyowner_ids) . ".</p>";
+                echo "<p>Inserted into FAAS for property_id $property_id.</p>";
               } else {
                 throw new Exception("Error executing FAAS insertion: " . $faas_stmt->error);
               }

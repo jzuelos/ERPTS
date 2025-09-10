@@ -71,7 +71,6 @@ function showEditPropertyModal() {
   document.getElementById('provinceModal').value = document.getElementById('province').value;
   document.getElementById('houseNumberModal').value = document.getElementById('houseNumber').value;
   document.getElementById('landAreaModal').value = document.getElementById('landArea').value;
-  document.getElementById('zoneNumberModal').value = document.getElementById('zoneNumber').value;
 
   // Show the modal
   var myModal = new bootstrap.Modal(document.getElementById('editPropertyModal'), {
@@ -90,7 +89,6 @@ function savePropertyData() {
   var province = document.getElementById('provinceModal').value;
   var houseNumber = document.getElementById('houseNumberModal').value;
   var landArea = document.getElementById('landAreaModal').value;
-  var zoneNumber = document.getElementById('zoneNumberModal').value;
 
   // Log to check if values are being captured
   console.log("Saving property with ID:", propertyId);
@@ -110,15 +108,14 @@ function savePropertyData() {
     }
   };
 
-  // Send data to PHP script
+  // Send data to PHP script (no zone number anymore)
   xhr.send("property_id=" + encodeURIComponent(propertyId) +
            "&street=" + encodeURIComponent(street) +
            "&barangay=" + encodeURIComponent(barangay) +
            "&municipality=" + encodeURIComponent(municipality) +
            "&province=" + encodeURIComponent(province) +
            "&houseNumber=" + encodeURIComponent(houseNumber) +
-           "&landArea=" + encodeURIComponent(landArea) +
-           "&zoneNumber=" + encodeURIComponent(zoneNumber));
+           "&landArea=" + encodeURIComponent(landArea));
 }
 
 //Function to show Plant and Trees modal
