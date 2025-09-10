@@ -109,77 +109,117 @@
 
   <!-- Main Body -->
 <section class="container mt-5">
-  <div class="card p-4 shadow-sm form-container">
-    <h3 class="mb-4 text-center">Add Property Owner</h3>
+  <div class="card p-4 form-container">
+
+    <!-- Back + Title inline -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <a href="Add-New-Real-Property-Unit.php " class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left"></i> Back
+      </a>
+      <h3 class="mb-0 text-center flex-grow-1">Add Property Owner</h3>
+    </div>
+
     <form action="" method="POST">
+      <div class="row">
+        <!-- Owner’s Information (Row 1) -->
+        <div class="col-md-6">
+          <h5>Owner's Information <small class="text-muted">(Required)</small></h5>
+          <div class="form-group mb-3">
+            <label for="firstName"><span class="text-danger">*</span> First Name</label>
+            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter First Name" required>
+          </div>
+          <div class="form-group mb-3">
+            <label for="middleName">Middle Name</label>
+            <input type="text" class="form-control" id="middleName" name="middleName" placeholder="Enter Middle Name">
+          </div>
+          <div class="form-group mb-3">
+            <label for="surname"><span class="text-danger">*</span> Surname</label>
+            <input type="text" class="form-control" id="surname" name="surname" placeholder="Enter Surname" required>
+          </div>
+        <div class="form-group mb-3">
+          <label for="birthday"><span class="text-danger">*</span> Birthday</label>
+          <input type="date" class="form-control" id="birthday" name="birthday" required>
+        </div>
+          <div class="form-group mb-3">
+            <label for="tinNumber"><span class="text-danger">*</span> TIN No.</label>
+            <input type="text" class="form-control" id="tinNumber" name="tinNumber" placeholder="Enter TIN Number" required>
+          </div>
+        </div>
 
-     <!-- Owner's Information -->
-<div class="form-group">
-  <label for="firstName"><span style="color: red;">*</span> First Name</label>
-  <input type="text" class="form-control input-field" id="firstName" name="firstName" placeholder="Enter First Name" required>
-</div>
-<div class="form-group">
-  <label for="middleName">Middle Name</label>
-  <input type="text" class="form-control input-field" id="middleName" name="middleName" placeholder="Enter Middle Name">
-</div>
-<div class="form-group">
-  <label for="surname"><span style="color: red;">*</span> Surname</label>
-  <input type="text" class="form-control input-field" id="surname" name="surname" placeholder="Enter Surname" required>
-</div>
-<div class="form-group">
-  <label for="tinNumber"><span style="color: red;">*</span> TIN No.</label>
-  <input type="text" class="form-control input-field" id="tinNumber" name="tinNumber" placeholder="Enter TIN Number" required>
+        <div class="col-md-6">
+          <h5>Owner Information <small class="text-muted">(Optional)</small></h5>
+          <div class="form-group mb-3">
+            <label for="telephone">Telephone</label>
+            <input type="text" class="form-control" id="telephone" name="telephone" placeholder="Enter Telephone Number">
+          </div>
+          <div class="form-group mb-3">
+            <label for="fax">Fax</label>
+            <input type="text" class="form-control" id="fax" name="fax" placeholder="Enter Fax Number">
+          </div>
+          <div class="form-group mb-3">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Enter Email Address">
+          </div>
+          <div class="form-group mb-3">
+            <label for="website">Website</label>
+            <input type="url" class="form-control" id="website" name="website" placeholder="Enter Website URL">
+          </div>
+        </div>
+      </div>
+
+<!-- Address (Row 2) -->
+<div class="row mt-4">
+  <div class="col-12">
+    <h5>Address</h5>
+  </div>
+
+  <!-- Municipality -->
+  <div class="col-md-3 mb-3">
+    <label for="city"><span class="text-danger">*</span> Municipality / City</label>
+    <select class="form-select" id="city" name="city" required>
+      <option value="" selected disabled>Select Municipality</option>
+      <option value="municipality1">Municipality 1</option>
+      <option value="municipality2">Municipality 2</option>
+      <option value="municipality3">Municipality 3</option>
+    </select>
+  </div>
+
+  <!-- District -->
+  <div class="col-md-3 mb-3">
+    <label for="district"><span class="text-danger">*</span> District</label>
+    <select class="form-select" id="district" name="district" required>
+      <option value="" selected disabled>Select District</option>
+      <option value="district1">District 1</option>
+      <option value="district2">District 2</option>
+      <option value="district3">District 3</option>
+    </select>
+  </div>
+
+  <!-- Barangay -->
+  <div class="col-md-3 mb-3">
+    <label for="barangay"><span class="text-danger">*</span> Barangay</label>
+    <select class="form-select" id="barangay" name="barangay" required>
+      <option value="" selected disabled>Select Barangay</option>
+      <option value="barangay1">Barangay 1</option>
+      <option value="barangay2">Barangay 2</option>
+      <option value="barangay3">Barangay 3</option>
+    </select>
+  </div>
+
+  <!-- Street / House Number -->
+  <div class="col-md-3 mb-3">
+    <label for="streetHouse"><span class="text-danger">*</span> Street / House No.</label>
+    <input type="text" class="form-control" id="streetHouse" name="streetHouse" placeholder="Enter Street / House No." required>
+  </div>
 </div>
 
-<!-- Address -->
-<h5 class="mt-4">Address</h5>
-<div class="form-group">
-  <label for="houseNumber"><span style="color: red;">*</span> House Number</label>
-  <input type="text" class="form-control input-field" id="houseNumber" name="houseNumber" placeholder="Enter House Number" required>
-</div>
-<div class="form-group">
-  <label for="street"><span style="color: red;">*</span> Street</label>
-  <input type="text" class="form-control input-field" id="street" name="street" placeholder="Enter Street" required>
-</div>
-<div class="form-group">
-  <label for="barangay"><span style="color: red;">*</span> Barangay</label>
-  <input type="text" class="form-control input-field" id="barangay" name="barangay" placeholder="Enter Barangay" required>
-</div>
-<div class="form-group">
-  <label for="district"><span style="color: red;">*</span> District</label>
-  <input type="text" class="form-control input-field" id="district" name="district" placeholder="Enter District" required>
-</div>
-<div class="form-group">
-  <label for="city"><span style="color: red;">*</span> City</label>
-  <input type="text" class="form-control input-field" id="city" name="city" placeholder="Enter City" required>
-</div>
-<div class="form-group">
-  <label for="province"><span style="color: red;">*</span> Province</label>
-  <input type="text" class="form-control input-field" id="province" name="province" placeholder="Enter Province" required>
-</div>
 
-<!-- Owner Contact Information -->
-<h5 class="mt-4">Owner Information<small> (Optional)</small></h5>
-<div class="form-group">
-  <label for="telephone">Telephone</label>
-  <input type="text" class="form-control input-field" id="telephone" name="telephone" placeholder="Enter Telephone Number">
-</div>
-<div class="form-group">
-  <label for="fax">Fax</label>
-  <input type="text" class="form-control input-field" id="fax" name="fax" placeholder="Enter Fax Number">
-</div>
-<div class="form-group">
-  <label for="email">Email</label>
-  <input type="email" class="form-control input-field" id="email" name="email" placeholder="Enter Email Address">
-</div>
-<div class="form-group">
-  <label for="website">Website</label>
-  <input type="url" class="form-control input-field" id="website" name="website" placeholder="Enter Website URL">
-</div>
-
-<button type="submit" class="btn btn-primary submit-btn">Submit</button>
-</form>
-</div>
+      <!-- Submit Button -->
+      <div class="text-end mt-3">
+        <button type="submit" class="btn btn-primary submit-btn">Submit</button>
+      </div>
+    </form>
+  </div>
 </section>
 
   <!-- Footer --> 
