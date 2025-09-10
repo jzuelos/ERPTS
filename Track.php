@@ -72,10 +72,11 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
         <tr>
           <th>Transaction ID</th>
           <th>Name</th>
-          <th>Contact Number</th> <!-- New Column -->
+          <th>Contact Number</th> 
           <th>Description</th>
           <th>Status</th>
           <th>Actions</th>
+          <th>Confirm</th>
         </tr>
       </thead>
       <tbody id="transactionTable">
@@ -98,15 +99,21 @@ echo "<tr>
         <td>{$row['contact_number']}</td>
         <td>{$row['description']}</td>
         <td><span class='status-badge status-{$statusClass}'>{$row['status']}</span></td>
-        <td>
-          <button class='btn btn-sm btn-success' onclick=\"confirmTransaction('{$row['transaction_id']}')\">
-            <i class='fas fa-check'></i>
-          </button>
+
+                <td>
           <button class='btn btn-sm btn-primary' onclick=\"openModal('{$row['transaction_id']}')\">
             <i class='fas fa-edit'></i> Edit
           </button>
           <button class='btn btn-sm btn-danger' onclick=\"deleteTransaction('{$row['transaction_id']}')\">
             <i class='fas fa-trash'></i> Delete
+          </button>
+        </td>
+        <td>
+
+
+      
+          <button class='btn btn-sm btn-success' onclick=\"confirmTransaction('{$row['transaction_id']}')\">
+            <i class='fas fa-check'></i>
           </button>
         </td>
       </tr>";

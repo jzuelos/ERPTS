@@ -21,6 +21,7 @@
   </style>
 
   <?php
+
   include 'database.php';
   $conn = Database::getInstance();
 
@@ -77,23 +78,34 @@
   <!-- Header -->
   <?php include 'header.php'; ?>
 
-  <div class="form-center-wrapper">
-    <div class="center-form-wrapper">
-      <div class="card p-4">
+<div class="container my-5">
+  <div class="card shadow-lg border-0 rounded-3 mx-auto" style="max-width: 1200px;">
+    <div class="card-body p-5">
 
+<<<<<<< HEAD
         <!-- Back button -->
         <div class="mb-3">
           <a href="Home.php" class="btn btn-outline-secondary btn-sm">
             <i class="fas fa-arrow-left"></i> Back
           </a>
         </div>
+=======
+      <!-- Back + Title -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="Home.php" class="btn btn-outline-secondary btn-sm">
+          <i class="fas fa-arrow-left"></i> Back
+        </a>
+        <h4 class="fw-bold text-primary text-center flex-grow-1 mb-0">
+          PROPERTY BY CLASSIFICATION AGRICULTURAL (AG)
+        </h4>
+        <div style="width: 70px;"></div>
+      </div>
+>>>>>>> e7c0d296a9cabf14098be95f34a69fd53c0bf294
 
-        <form>
-          <!-- Header Section -->
-          <div class="form-header d-flex align-items-center mb-4">
-            <h4 class="fw-bold mb-3">PROPERTY BY CLASSIFICATION AGRICULTURAL (AG)</h4>
-          </div>
+      <form class="border rounded p-4 bg-light d-flex flex-column justify-content-center" style="height: 500px;">
+        <div class="row g-5">
 
+<<<<<<< HEAD
           <!-- Filter by Classification -->
           <div class="form-group form-check">
             <input type="checkbox" class="form-check-input" id="classificationCheck">
@@ -127,6 +139,19 @@
             <div class="form-group col-md-6">
               <label for="provinceSelect">Province</label>
               <select class="form-control" id="provinceSelect" disabled>
+=======
+          <!-- LEFT COLUMN (Location) -->
+          <div class="col-md-6">
+
+            <div class="form-check mb-3">
+              <input type="checkbox" class="form-check-input" id="locationCheck">
+              <label class="form-check-label fw-bold" for="locationCheck">Filter by: Location</label>
+            </div>
+
+            <div class="mb-3">
+              <label for="provinceSelect" class="form-label fw-bold">Province</label>
+              <select class="form-select" id="provinceSelect" disabled>
+>>>>>>> e7c0d296a9cabf14098be95f34a69fd53c0bf294
                 <option value="" disabled selected>Select Province</option>
                 <?php
                 if ($regions_result->num_rows === 0) {
@@ -141,11 +166,42 @@
               </select>
             </div>
 
+<<<<<<< HEAD
             <!-- Municipality -->
             <div class="form-group col-md-6">
               <label for="citySelect" class="form-label">Municipality</label>
               <select class="form-control" id="citySelect" disabled>
                 <option value="" disabled selected>Select Municipality</option>
+=======
+            <div class="mb-3">
+              <label for="citySelect" class="form-label fw-bold">Municipality</label>
+              <select class="form-select" id="citySelect">
+                <option value="" disabled selected>Select Municipality</option>
+                <?php
+                if ($municipalities_result->num_rows > 0) {
+                  while ($row = $municipalities_result->fetch_assoc()) {
+                    echo "<option value='" . htmlspecialchars($row['m_id'], ENT_QUOTES) . "'>"
+                      . htmlspecialchars($row['m_description'], ENT_QUOTES) . "</option>";
+                  }
+                } else {
+                  echo "<option disabled>No municipalities found</option>";
+                }
+                ?>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="districtSelect" class="form-label fw-bold">District</label>
+              <select class="form-select" id="districtSelect" disabled>
+                <option value="" disabled selected>Select District</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="barangaySelect" class="form-label fw-bold">Barangay</label>
+              <select class="form-select" id="barangaySelect" disabled>
+                <option value="" disabled selected>Select Barangay</option>
+>>>>>>> e7c0d296a9cabf14098be95f34a69fd53c0bf294
                 <?php
                 if ($municipalities_result->num_rows > 0) {
                   while ($row = $municipalities_result->fetch_assoc()) {
@@ -175,41 +231,77 @@
               </select>
             </div>
           </div>
-          <hr>
 
-          <!-- Filter by Date -->
-          <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input" id="dateCheck">
-            <label class="form-check-label fw-bold" for="dateCheck">Filter by: Date Created</label>
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="fromDate">From:</label>
-              <input type="date" class="form-control" id="fromDate" disabled min="<?php echo $minDate; ?>"
-                max="<?php echo $maxDate; ?>">
+          <!-- RIGHT COLUMN (Classification + Date) -->
+          <div class="col-md-6">
+
+            <!-- Classification -->
+            <div class="form-check mb-3">
+              <input type="checkbox" class="form-check-input" id="classificationCheck">
+              <label class="form-check-label fw-bold" for="classificationCheck">Filter by: Classification</label>
             </div>
-            <div class="form-group col-md-6">
-              <label for="toDate">To:</label>
-              <input type="date" class="form-control" id="toDate" disabled min="<?php echo $minDate; ?>"
-                max="<?php echo $maxDate; ?>">
+
+            <div class="mb-3">
+              <label for="classificationSelect" class="form-label fw-bold">Classification</label>
+              <select class="form-select w-75" id="classificationSelect" disabled>
+                <option value="" disabled selected>Select Classification</option>
+                <?php
+                if ($classification_result && $classification_result->num_rows > 0) {
+                  while ($row = $classification_result->fetch_assoc()) {
+                    echo "<option value='" . htmlspecialchars($row['c_description'], ENT_QUOTES) . "'>"
+                      . htmlspecialchars($row['c_description'], ENT_QUOTES) . "</option>";
+                  }
+                } else {
+                  echo "<option disabled>No classifications found</option>";
+                }
+                ?>
+              </select>
+            </div>
+
+            <hr>
+
+            <!-- Date Filter -->
+            <div class="form-check mb-3">
+              <input type="checkbox" class="form-check-input" id="dateCheck">
+              <label class="form-check-label fw-bold" for="dateCheck">Filter by: Date Created</label>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="fromDate" class="form-label fw-bold">From:</label>
+                <input type="date" class="form-control" id="fromDate" disabled 
+                       min="<?php echo $minDate; ?>" max="<?php echo $maxDate; ?>">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="toDate" class="form-label fw-bold">To:</label>
+                <input type="date" class="form-control" id="toDate" disabled 
+                       min="<?php echo $minDate; ?>" max="<?php echo $maxDate; ?>">
+              </div>
+            </div>
+
+            <hr>
+
+            <!-- Print All -->
+            <div class="form-check mb-3">
+              <input type="checkbox" class="form-check-input" id="printAllCheck">
+              <label class="form-check-label fw-bold" for="printAllCheck">Print ALL (No Filtering)</label>
+            </div>
+
+            <!-- Submit -->
+            <div class="text-end">
+              <a href="#" id="printBtn" class="btn btn-primary px-4" target="_blank">PRINT</a>
             </div>
           </div>
-          <hr>
 
-          <!-- Print All -->
-          <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input" id="printAllCheck">
-            <label class="form-check-label fw-bold" for="printAllCheck">Print ALL (No Filtering)</label>
-          </div>
-
-          <!-- Submit -->
-          <div class="text-right">
-            <a href="#" id="printBtn" class="btn btn-primary" target="_blank">PRINT</a>
-          </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   </div>
+</div>
+
+
+
+
 
   <!-- Footer -->
   <footer>
@@ -330,6 +422,69 @@
       updateStates();
     });
   </script>
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Classification filter toggle
+  const classificationCheck = document.getElementById("classificationCheck");
+  const classificationSelect = document.getElementById("classificationSelect");
+
+  classificationCheck.addEventListener("change", function () {
+    if (this.checked) {
+      classificationSelect.disabled = false;
+    } else {
+      classificationSelect.disabled = true;
+      classificationSelect.selectedIndex = 0; // reset to "Select Classification"
+    }
+  });
+
+  // Location filter toggle
+  const locationCheck = document.getElementById("locationCheck");
+  const provinceSelect = document.getElementById("provinceSelect");
+  const citySelect = document.getElementById("citySelect");
+  const districtSelect = document.getElementById("districtSelect");
+  const barangaySelect = document.getElementById("barangaySelect");
+
+  locationCheck.addEventListener("change", function () {
+    if (this.checked) {
+      provinceSelect.disabled = false;
+      citySelect.disabled = false;
+      districtSelect.disabled = false;
+      barangaySelect.disabled = false;
+    } else {
+      provinceSelect.disabled = true;
+      citySelect.disabled = true;
+      districtSelect.disabled = true;
+      barangaySelect.disabled = true;
+
+      // reset values
+      provinceSelect.selectedIndex = 0;
+      citySelect.selectedIndex = 0;
+      districtSelect.selectedIndex = 0;
+      barangaySelect.selectedIndex = 0;
+    }
+  });
+
+  // Date filter toggle
+  const dateCheck = document.getElementById("dateCheck");
+  const fromDate = document.getElementById("fromDate");
+  const toDate = document.getElementById("toDate");
+
+  dateCheck.addEventListener("change", function () {
+    if (this.checked) {
+      fromDate.disabled = false;
+      toDate.disabled = false;
+    } else {
+      fromDate.disabled = true;
+      toDate.disabled = true;
+
+      // reset values
+      fromDate.value = "";
+      toDate.value = "";
+    }
+  });
+});
+</script>
+
 </body>
 
 </html>

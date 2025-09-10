@@ -35,6 +35,10 @@
   require_once "database.php";
   $conn = Database::getInstance();
 
+  date_default_timezone_set('Asia/Manila');
+  
+
+
   // Capture filters
   $classification = $_GET['classification'] ?? '';
   $province = $_GET['province'] ?? '';
@@ -100,7 +104,12 @@ WHERE 1=1
 
   $result = $conn->query($sql);
   ?>
-  
+
+   <h1 style="text-align:center; font-size:22px; margin-bottom:20px;">
+    Province of Camarines Norte <br>
+    <span style="font-size:18px;">(Provincial Assessor's Office)</span>
+  </h1>
+
   <div class="header">
     <span><b>Classification:</b> <?= htmlspecialchars($classification) ?></span>
     <span><b>Province:</b> <?= htmlspecialchars($province) ?></span>
@@ -148,6 +157,12 @@ WHERE 1=1
       <?php endif; ?>
     </tbody>
   </table>
+
+  <div style="position:fixed; bottom:20px; right:20px; font-size:14px; text-align:right;">
+    <b>ASSESSED BY:</b> <?= htmlspecialchars($_SESSION['username'] ?? 'Guest') ?><br> 
+    <b>Date & Time:</b> <?= date("F d, Y h:i A") ?>
+  </div>
+
 
 </body>
 
