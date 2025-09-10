@@ -235,7 +235,7 @@
       <th class="text-center align-middle">ID</th>
       <th class="text-center align-middle">Owner Name<br><small>(Surname, Firstname)</small></th>
       <th class="text-center align-middle">Address<br><small>(Street, Barangay, City, Province)</small></th>
-      <th class="text-center align-middle">Date</th>
+      <th class="text-center align-middle">Date of Birth</th>
       <th class="text-center align-middle">Select</th>
     </tr>
   </thead>
@@ -247,7 +247,7 @@
     // Get the database connection
     $conn = Database::getInstance();
 
-    // Fetch initial data (no date column for now)
+    // Fetch initial data
     $stmt = $conn->prepare("SELECT own_id, own_fname, own_surname, street, barangay, city, province FROM owners_tb ORDER BY own_surname ASC, own_fname ASC LIMIT 5");
     $stmt->execute();
     $result = $stmt->get_result();
@@ -258,7 +258,7 @@
         $fullName = htmlspecialchars($row['own_fname'] . ', ' . $row['own_surname'], ENT_QUOTES);
         $address = htmlspecialchars($row['street'] . ', ' . $row['barangay'] . ', ' . $row['city'] . ', ' . $row['province'], ENT_QUOTES);
 
-        // Placeholder date (Add Backend)
+        // Placeholder Date of Birth (Add Backend)
         $date = '—';
 
         // Output each row
@@ -278,8 +278,6 @@
     ?>
   </tbody>
 </table>
-
-
 
         <!-- Add Owner -->
         <div class="d-flex justify-content-end mt-4">
