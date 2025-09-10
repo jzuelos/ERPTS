@@ -367,3 +367,26 @@ function showRequirements() {
     requirementsDiv.style.display = "none";
   }
 }
+
+  // Reset modal inputs when closed
+  document.addEventListener("DOMContentLoaded", () => {
+    const transactionModal = document.getElementById("transactionModal");
+
+    transactionModal.addEventListener("hidden.bs.modal", () => {
+      // Reset all form fields inside modal
+      transactionModal.querySelectorAll("input, select, textarea").forEach(el => {
+        if (el.type === "file") {
+          el.value = ""; // clear file input
+        } else {
+          el.value = "";
+        }
+      });
+
+      // Also reset requirements text
+      const requirementsText = document.getElementById("requirementsText");
+      if (requirementsText) {
+        requirementsText.style.display = "none";
+        requirementsText.innerText = "";
+      }
+    });
+  });
