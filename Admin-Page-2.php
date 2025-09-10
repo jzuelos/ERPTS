@@ -98,7 +98,26 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
             </div>
           </a>
         </div>
+         <div class="col-md-3 mb-4">
+          <a href="ActivityLog.php" class="text-decoration-none">
+            <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+              <div class="card-body d-flex align-items-center justify-content-center">
+                <i class="fas fa-clipboard-list mr-4" style="font-size: 2rem;"></i>
+                <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">Activity Log</h5>
+              </div>
+            </div>
+          </a>
       </div>
+       <div class="col-md-3 mb-4">
+          <a href="Statistics.php" class="text-decoration-none">
+            <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+              <div class="card-body d-flex align-items-center justify-content-center">
+                <i class="fas fa-chart-line mr-4" style="font-size: 2rem;"></i>
+                <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">Statistics</h5>
+              </div>
+            </div>
+          </a>
+          </div>
     </section>
   </main>
 

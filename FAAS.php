@@ -400,10 +400,10 @@ $conn->close();
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="FAAS.css">
   <link rel="stylesheet" href="header.css">
-  <link rel="stylesheet" href="back2top.css">
   <title>Electronic Real Property Tax System</title>
 </head>
 
@@ -435,7 +435,7 @@ $conn->close();
   <section class="container mt-4" id="owner-info-section">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="d-flex align-items-center">
-      <a href="Home.php" class="btn btn-outline-secondary btn-sm">
+      <a href="Real-Property-Unit-List.php" class="btn btn-outline-secondary btn-sm">
         <i class="fas fa-arrow-left"></i> Back
       </a>
         <h4 class="ms-3 mb-0">Owner's Information</h4>
@@ -762,7 +762,7 @@ $conn->close();
   </section>
 
   <!--Declaration of Property-->
-  <section class="container mt-5" id="property-info-section">
+  <section class="container mt-5" id="declaration-section">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h4 class="mb-0">Declaration of Property</h4>
       <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
@@ -963,14 +963,14 @@ $conn->close();
     </div>
   </div>
 
-  <!-- LAND Section -->
-  <section class="container my-5" id="land-section">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h4 class="section-title">
-        </a>
-        LAND
-      </h4>
-    </div>
+    <!-- LAND Section -->
+    <section class="container my-5" id="land-section">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="section-title">
+          </a>
+          LAND
+        </h4>
+      </div>
 
     <div class="card border-0 shadow p-4 rounded-3">
       <!-- Quick Actions Row -->
@@ -1162,6 +1162,27 @@ $conn->close();
         </tbody>
       </table>
     </div>
+
+<!-- Floating Dropdown Menu (Bottom Right of Page) -->
+<div class="dropdown" style="position:fixed; bottom:20px; right:20px; z-index:1050;">
+    <button id="mapMenuBtn" 
+            class="btn btn-danger btn-lg rounded-circle d-flex align-items-center justify-content-center" 
+            type="button"
+            aria-expanded="false"
+            style="width:60px; height:60px;">
+        <i class="fas fa-bars fa-1x"></i>
+    </button>
+  <ul class="dropdown-menu shadow">
+    <li><a class="dropdown-item scroll-link" href="#owner-info-section"><i class="fas fa-user"></i> Owner's Info</a></li>
+    <li><a class="dropdown-item scroll-link" href="#property-info-section"><i class="fas fa-home"></i> Property Info</a></li>
+    <li><a class="dropdown-item scroll-link" href="#rpu-identification-section"><i class="fas fa-id-card"></i> RPU Identification</a></li>
+    <li><a class="dropdown-item scroll-link" href="#declaration-section"><i class="fas fa-file-alt"></i> Declaration</a></li>
+    <li><a class="dropdown-item scroll-link" href="#land-section"><i class="fas fa-map"></i> Land</a></li>
+    <li><a class="dropdown-item scroll-link" href="#plants-trees-section"><i class="fas fa-tree"></i> Plants & Trees</a></li>
+    <li><a class="dropdown-item scroll-link" href="#valuation-section"><i class="fas fa-balance-scale"></i> Valuation</a></li>
+  </ul>
+</div>
+
   </section>
 
   <!-- Footer -->
@@ -1337,18 +1358,26 @@ $conn->close();
     }
   </script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const backToTopBtn = document.getElementById('backToTopBtn');
+document.addEventListener("DOMContentLoaded", function () {
+  const menuBtn = document.getElementById("mapMenuBtn");
 
-      backToTopBtn.addEventListener('click', () => {
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth'
-        });
-      });
-    });
-  </script>
+  // Initialize dropdown with top-left placement
+  const dropdown = new bootstrap.Dropdown(menuBtn, {
+    popperConfig(defaultBsPopperConfig) {
+      return {
+        ...defaultBsPopperConfig,
+        placement: "top-start"
+      };
+    }
+  });
 
+  // Toggle on click only
+  menuBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    dropdown.toggle();
+  });
+});
+</script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const toggle = document.getElementById("showToggle");
@@ -1372,11 +1401,7 @@ $conn->close();
   <script src="http://localhost/ERPTS/FAAS.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-
-  <button id="backToTopBtn" title="Back to Top">
-    <i class="fas fa-arrow-up"></i>
-  </button>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
