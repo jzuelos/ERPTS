@@ -34,7 +34,6 @@
   $stmt->execute();
   $regions_result = $stmt->get_result();
 
-
   // Fetch municipalities
   $municipalities_stmt = $conn->prepare("SELECT m_id, m_description FROM municipality");
   $municipalities_stmt->execute();
@@ -51,17 +50,26 @@
   }
 
   // Fetch barangays
-  $barangays_stmt = $conn->prepare("SELECT brgy_id, brgy_name FROM brgy");
+  $barangays_stmt = $conn->prepare("SELECT brgy_id, brgy_name, m_id FROM brgy");
   $barangays_stmt->execute();
   $barangays_result = $barangays_stmt->get_result();
 
-  // Fetch min and max created_at from your table (example: land table)
+  $barangays = [];
+  while ($row = $barangays_result->fetch_assoc()) {
+    $barangays[] = $row;
+  }
+
+  // Fetch min and max created_at
   $date_range_stmt = $conn->prepare("SELECT MIN(DATE(created_at)) as min_date, MAX(DATE(created_at)) as max_date FROM p_info");
   $date_range_stmt->execute();
   $date_range_result = $date_range_stmt->get_result()->fetch_assoc();
 
   $minDate = $date_range_result['min_date'] ?? date('Y-m-d');
   $maxDate = $date_range_result['max_date'] ?? date('Y-m-d');
+
+  // Encode for JS
+  $districts_json = json_encode($districts);
+  $barangays_json = json_encode($barangays);
   ?>
 </head>
 
@@ -73,7 +81,7 @@
     <div class="center-form-wrapper">
       <div class="card p-4">
 
-        <!-- Back button OUTSIDE the form -->
+        <!-- Back button -->
         <div class="mb-3">
           <a href="Home.php" class="btn btn-outline-secondary btn-sm">
             <i class="fas fa-arrow-left"></i> Back
@@ -85,7 +93,6 @@
           <div class="form-header d-flex align-items-center mb-4">
             <h4 class="fw-bold mb-3">PROPERTY BY CLASSIFICATION AGRICULTURAL (AG)</h4>
           </div>
-
 
           <!-- Filter by Classification -->
           <div class="form-group form-check">
@@ -116,6 +123,7 @@
             <label class="form-check-label fw-bold" for="locationCheck">Filter by: Location</label>
           </div>
           <div class="form-row">
+            <!-- Province -->
             <div class="form-group col-md-6">
               <label for="provinceSelect">Province</label>
               <select class="form-control" id="provinceSelect" disabled>
@@ -133,50 +141,37 @@
               </select>
             </div>
 
+            <!-- Municipality -->
             <div class="form-group col-md-6">
-              <!-- Municipality -->
-              <div class="mb-3">
-                <label for="citySelect" class="form-label">Municipality</label>
-                <select class="form-control" id="citySelect">
-                  <option value="" disabled selected>Select Municipality</option>
-                  <?php
-                  if ($municipalities_result->num_rows > 0) {
-                    while ($row = $municipalities_result->fetch_assoc()) {
-                      echo "<option value='" . htmlspecialchars($row['m_id'], ENT_QUOTES) . "'>"
-                        . htmlspecialchars($row['m_description'], ENT_QUOTES) . "</option>";
-                    }
-                  } else {
-                    echo "<option disabled>No municipalities found</option>";
-                  }
-                  ?>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-group col-md-6">
-              <!-- District -->
-              <div class="mb-3">
-                <label for="districtSelect" class="form-label">District</label>
-                <select class="form-control" id="districtSelect" disabled>
-                  <option value="" disabled selected>Select District</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-group col-md-6">
-              <label for="barangaySelect">Barangay</label>
-              <select class="form-control" id="barangaySelect" disabled>
-                <option value="" disabled selected>Select Barangay</option>
+              <label for="citySelect" class="form-label">Municipality</label>
+              <select class="form-control" id="citySelect" disabled>
+                <option value="" disabled selected>Select Municipality</option>
                 <?php
-                if ($barangays_result && $barangays_result->num_rows > 0) {
-                  while ($row = $barangays_result->fetch_assoc()) {
-                    echo "<option value='" . htmlspecialchars($row['brgy_name'], ENT_QUOTES) . "'>"
-                      . htmlspecialchars($row['brgy_name'], ENT_QUOTES) . "</option>";
+                if ($municipalities_result->num_rows > 0) {
+                  while ($row = $municipalities_result->fetch_assoc()) {
+                    echo "<option value='" . htmlspecialchars($row['m_id'], ENT_QUOTES) . "'>"
+                      . htmlspecialchars($row['m_description'], ENT_QUOTES) . "</option>";
                   }
                 } else {
-                  echo "<option disabled>No barangays</option>";
+                  echo "<option disabled>No municipalities found</option>";
                 }
                 ?>
+              </select>
+            </div>
+
+            <!-- District -->
+            <div class="form-group col-md-6">
+              <label for="districtSelect" class="form-label">District</label>
+              <select class="form-control" id="districtSelect" disabled>
+                <option value="" disabled selected>Select District</option>
+              </select>
+            </div>
+
+            <!-- Barangay -->
+            <div class="form-group col-md-6">
+              <label for="barangaySelect" class="form-label">Barangay</label>
+              <select class="form-control" id="barangaySelect" disabled>
+                <option value="" disabled selected>Select Barangay</option>
               </select>
             </div>
           </div>
@@ -228,15 +223,18 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // Embed PHP districts into JS
-    const districts = <?php echo json_encode($districts); ?>;
+    document.addEventListener("DOMContentLoaded", function() {
+      // Data from PHP
+      const districts = <?php echo $districts_json; ?>;
+      const barangays = <?php echo $barangays_json; ?>;
 
-    document.addEventListener("DOMContentLoaded", function () {
+      // Checkboxes
       const printAllCheckbox = document.getElementById("printAllCheck");
       const classificationCheckbox = document.getElementById("classificationCheck");
       const locationCheckbox = document.getElementById("locationCheck");
       const dateCheckbox = document.getElementById("dateCheck");
 
+      // Filters
       const classificationSelect = document.getElementById("classificationSelect");
       const provinceSelect = document.getElementById("provinceSelect");
       const citySelect = document.getElementById("citySelect");
@@ -245,129 +243,90 @@
       const fromDate = document.getElementById("fromDate");
       const toDate = document.getElementById("toDate");
 
+      // Buttons
       const printBtn = document.querySelector(".btn.btn-primary");
 
-      function updateStates() {
-        if (printAllCheckbox.checked) {
-          classificationCheckbox.disabled = true;
-          locationCheckbox.disabled = true;
-          dateCheckbox.disabled = true;
-          classificationSelect.disabled = true;
-          provinceSelect.disabled = true;
-          citySelect.disabled = true;
-          districtSelect.disabled = true;
-          barangaySelect.disabled = true;
-          fromDate.disabled = true;
-          toDate.disabled = true;
-        } else {
-          classificationCheckbox.disabled = false;
-          locationCheckbox.disabled = false;
-          dateCheckbox.disabled = false;
-
-          classificationSelect.disabled = !classificationCheckbox.checked;
-
-          const loc = locationCheckbox.checked;
-          provinceSelect.disabled = !loc;
-          citySelect.disabled = !loc;
-          districtSelect.disabled = !loc;
-          barangaySelect.disabled = !loc;
-
-          const date = dateCheckbox.checked;
-          fromDate.disabled = !date;
-          toDate.disabled = !date;
-        }
-
-        if (classificationCheckbox.checked || locationCheckbox.checked || dateCheckbox.checked) {
-          printAllCheckbox.disabled = true;
-        } else {
-          printAllCheckbox.disabled = false;
-        }
-      }
-
-      // Auto-load districts based on selected municipality
-      citySelect.addEventListener("change", function () {
+      // ✅ When Municipality changes → auto-fill district + load barangays
+      citySelect.addEventListener("change", function() {
         const m_id = this.value;
+
+        // Reset
         districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
+        barangaySelect.innerHTML = '<option value="" disabled selected>Select Barangay</option>';
         districtSelect.disabled = true;
+        barangaySelect.disabled = true;
 
-        if (m_id) {
-          const filtered = districts.filter(d => d.m_id == m_id);
+        // Auto-fill the FIRST district for this municipality
+        const filteredDistricts = districts.filter(d => d.m_id == m_id);
+        if (filteredDistricts.length > 0) {
+          const d = filteredDistricts[0]; // first district
+          const opt = document.createElement("option");
+          opt.value = d.district_id;
+          opt.textContent = d.description;
+          opt.selected = true;
+          districtSelect.appendChild(opt);
+          districtSelect.disabled = true; // locked (cannot change)
+        }
 
-          if (filtered.length > 0) {
-            districtSelect.innerHTML = ""; // clear placeholder
-            filtered.forEach(d => {
-              let opt = document.createElement("option");
-              opt.value = d.district_id;   // store ID, safer for DB
-              opt.textContent = d.description;
-              districtSelect.appendChild(opt);
-            });
-
-            // ✅ Auto-select the first district
-            districtSelect.selectedIndex = 0;
-
-            // ✅ Lock the field (disable so user cannot change)
-            districtSelect.disabled = true;
-          }
+        // Load barangays for this municipality
+        const filteredBarangays = barangays.filter(b => b.m_id == m_id);
+        if (filteredBarangays.length > 0) {
+          filteredBarangays.forEach(b => {
+            const opt = document.createElement("option");
+            opt.value = b.brgy_id;
+            opt.textContent = b.brgy_name;
+            barangaySelect.appendChild(opt);
+          });
+          barangaySelect.disabled = false;
         }
       });
 
-      // Validate date ranges visually
-      toDate.addEventListener("change", function () {
-        toDate.classList.remove("is-invalid");
-        if (fromDate.value && toDate.value < fromDate.value) {
-          toDate.classList.add("is-invalid");
-        }
-      });
+      // ✅ Enable/disable filters based on checkboxes
+      function updateStates() {
+        const allDisabled = printAllCheckbox.checked;
 
-      fromDate.addEventListener("change", function () {
-        fromDate.classList.remove("is-invalid");
-        if (toDate.value && fromDate.value > toDate.value) {
-          fromDate.classList.add("is-invalid");
-        }
-      });
-
-      // Collect parameters on PRINT button click
-      printBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-
-        if (fromDate.classList.contains("is-invalid") || toDate.classList.contains("is-invalid")) {
-          alert("Please fix the date range before proceeding.");
-          return;
-        }
-
-        let params = new URLSearchParams();
-
-        if (printAllCheckbox.checked) {
-          params.append("print_all", "1");
-        } else {
-          if (classificationCheckbox.checked && classificationSelect.value) {
-            params.append("classification", classificationSelect.value);
-          }
-          if (locationCheckbox.checked) {
-            if (provinceSelect.value) params.append("province", provinceSelect.value);
-            if (citySelect.value) params.append("municipality", citySelect.value);
-            if (districtSelect.value) params.append("district", districtSelect.value);
-            if (barangaySelect.value) params.append("barangay", barangaySelect.value);
-          }
-          if (dateCheckbox.checked) {
-            if (fromDate.value) params.append("from_date", fromDate.value);
-            if (toDate.value) params.append("to_date", toDate.value);
-          }
-        }
-
-        if (!printAllCheckbox.checked && !params.toString()) {
-          alert("Please select at least one filter or print all.");
-          return;
-        }
-
-        window.open("report-print.php?" + params.toString(), "_blank");
-      });
+        classificationSelect.disabled = allDisabled || !classificationCheckbox.checked;
+        provinceSelect.disabled = allDisabled || !locationCheckbox.checked;
+        citySelect.disabled = allDisabled || !locationCheckbox.checked;
+        districtSelect.disabled = allDisabled || !locationCheckbox.checked; // will still be auto-filled
+        barangaySelect.disabled = allDisabled || !locationCheckbox.checked;
+        fromDate.disabled = allDisabled || !dateCheckbox.checked;
+        toDate.disabled = allDisabled || !dateCheckbox.checked;
+      }
 
       printAllCheckbox.addEventListener("change", updateStates);
       classificationCheckbox.addEventListener("change", updateStates);
       locationCheckbox.addEventListener("change", updateStates);
       dateCheckbox.addEventListener("change", updateStates);
 
+      // ✅ Date validation
+      toDate.addEventListener("change", function() {
+        if (fromDate.value && toDate.value < fromDate.value) {
+          alert("The 'To Date' cannot be earlier than 'From Date'.");
+          this.value = "";
+        }
+      });
+
+      // ✅ Print button
+      printBtn.addEventListener("click", function(e) {
+        e.preventDefault();
+
+        if (!printAllCheckbox.checked) {
+          if (
+            (classificationCheckbox.checked && !classificationSelect.value) ||
+            (locationCheckbox.checked && (!provinceSelect.value || !citySelect.value)) ||
+            (dateCheckbox.checked && (!fromDate.value || !toDate.value))
+          ) {
+            alert("Please fill all selected filters before printing.");
+            return;
+          }
+        }
+
+        alert("Printing report...");
+        // TODO: replace with actual print function
+      });
+
+      // Init
       updateStates();
     });
   </script>
