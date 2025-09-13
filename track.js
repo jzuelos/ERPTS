@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', function () {
   if (modalElement) {
     transactionModal = new bootstrap.Modal(modalElement);
   }
+
+  loadTransactions();
 });
 
 function openModal(id = null) {
@@ -27,17 +29,27 @@ function openModal(id = null) {
     if (tx) {
       document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Transaction';
       document.getElementById('transactionID').value = tx.t_code || '';
+      document.getElementById('transactionID').disabled = true; // disable editing code
       document.getElementById('nameInput').value = tx.name || '';
-      document.getElementById('contactInput').value = tx.contact || '';   // NEW
+      document.getElementById('contactInput').value = tx.contact || '';
       document.getElementById('transactionInput').value = tx.transaction || '';
       document.getElementById('statusInput').value = tx.status || '';
       editId = id;
     }
   } else {
     document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus"></i> Add Transaction';
-    document.getElementById('transactionID').value = '';
+
+    // Fetch next transaction code from backend
+    fetch('trackFunctions.php?action=getNextTransactionCode')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('transactionID').value = data.next_code;
+        document.getElementById('transactionID').disabled = true; // prevent editing
+      })
+      .catch(err => console.error('Error fetching next transaction code:', err));
+
     document.getElementById('nameInput').value = '';
-    document.getElementById('contactInput').value = '';                   // NEW
+    document.getElementById('contactInput').value = '';
     document.getElementById('transactionInput').value = '';
     document.getElementById('statusInput').selectedIndex = 0;
     editId = null;
@@ -55,11 +67,12 @@ function closeModal() {
 function saveTransaction() {
   const t_code = document.getElementById("transactionID").value.trim();
   const t_name = document.getElementById("nameInput").value.trim();
-  const t_contact = document.getElementById("contactInput").value.trim(); // NEW
+  const t_contact = document.getElementById("contactInput").value.trim();
   const t_description = document.getElementById("transactionInput").value.trim();
+  const transactionType = document.getElementById("transactionType").value;
   const t_status = document.getElementById("statusInput").value;
 
-  if (!t_code || !t_name || !t_contact || !t_description || !t_status) {
+  if (!t_code || !t_name || !t_contact || !t_description || !t_status || !transactionType) {
     alert("Please fill out all fields.");
     return;
   }
@@ -68,19 +81,29 @@ function saveTransaction() {
   formData.append("action", editId ? "updateTransaction" : "saveTransaction");
   formData.append("t_code", t_code);
   formData.append("t_name", t_name);
-  formData.append("t_contact", t_contact); // NEW
+  formData.append("t_contact", t_contact);
   formData.append("t_description", t_description);
+  formData.append("transactionType", transactionType);
   formData.append("t_status", t_status);
 
-  // IMPORTANT: backend expects "transaction_id" (not "id")
+  const files = document.getElementById("fileUpload").files;
+  if (files.length > 0) {
+    for (let i = 0; i < files.length; i++) {
+      formData.append("t_file[]", files[i]); // send all files
+    }
+  }
+
   if (editId) {
     formData.append("transaction_id", editId);
   }
 
-  fetch("trackFunctions.php", { method: "POST", body: formData })
+  fetch("trackFunctions.php", {  // keep consistent backend
+    method: "POST",
+    body: formData
+  })
     .then(async (response) => {
       const text = await response.text();
-      console.log("RAW server response:", text); // <- check this in DevTools if anything goes wrong
+      console.log("RAW server response:", text);
       let data;
       try {
         data = JSON.parse(text);
@@ -97,15 +120,7 @@ function saveTransaction() {
         );
 
         alert(editId ? "Transaction updated!" : "Transaction saved!");
-        // Reset fields
-        document.getElementById("transactionID").value = "";
-        document.getElementById("nameInput").value = "";
-        document.getElementById("contactInput").value = ""; // NEW
-        document.getElementById("transactionInput").value = "";
-        document.getElementById("statusInput").selectedIndex = 0;
-
         if (transactionModal) transactionModal.hide();
-
         if (typeof loadTransactions === "function") loadTransactions();
       } else {
         alert("Error: " + (data.message || "Unknown error"));
@@ -165,21 +180,35 @@ function updateTable() {
     const row = document.createElement('tr');
     const statusClass = tx.status === 'Completed' ? 'status-completed' : 'status-in-progress';
 
+    // disable confirm button unless Completed
+    const confirmDisabled = tx.status !== 'Completed';
+    const confirmBtnClass = confirmDisabled ? 'btn-secondary' : 'btn-success';
+    const confirmAttr = confirmDisabled ? 'disabled' : '';
+
     row.innerHTML = `
-        <td>${tx.t_code || '#' + tx.id}</td>
-        <td>${tx.name}</td>
-        <td>${tx.contact || ''}</td> <!-- NEW -->
-        <td>${tx.transaction}</td>
-        <td><span class="status-badge ${statusClass}">${tx.status}</span></td>
-        <td>
-          <button class="btn btn-edit" onclick="openModal(${tx.id})">
-            <i class="fas fa-edit"></i> Edit
-          </button>
-          <button class="btn btn-delete" onclick="deleteTransaction(${tx.id})">
-            <i class="fas fa-trash"></i> Delete
-          </button>
-        </td>
-      `;
+  <td>${tx.t_code || '#' + tx.id}</td>
+  <td>${tx.name}</td>
+  <td>${tx.contact || ''}</td>
+  <td>${tx.transaction}</td>
+  <td><span class="status-badge ${statusClass}">${tx.status}</span></td>
+  <td>
+    <button class="btn btn-edit" onclick="openModal(${tx.id})">
+      <i class="fas fa-edit"></i> Edit
+    </button>
+    <button class="btn btn-delete" onclick="deleteTransaction(${tx.id})">
+      <i class="fas fa-trash"></i> Delete
+    </button>
+    <button class="btn btn-ar" onclick="showDocuments(${tx.id})">
+      <i class="fas fa-file-image"></i> Documents
+    </button>
+  </td>
+  <td>
+    <button class="btn ${confirmBtnClass} btn-sm" onclick="confirmTransaction(${tx.id})" ${confirmAttr}>
+      <i class="fas fa-check"></i>
+    </button>
+  </td>`;
+
+
     table.appendChild(row);
   });
 
@@ -242,51 +271,25 @@ function sendUpdate(transactionId, status) {
 }*/
 
 //Confirmation Modals
-  function confirmTransaction(transactionId) {
-    currentTransactionId = transactionId;
-    let confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
-    confirmModal.show();
-  }
- let currentTransactionId = null;
-  document.getElementById("confirmBtn").addEventListener("click", function() {
-    if (currentTransactionId) {
-      console.log("Confirmed transaction:", currentTransactionId);
-      // TODO: send AJAX request to PHP to update status in DB
-      // Example:
-      // fetch('confirm_transaction.php', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      //   body: 'transaction_id=' + currentTransactionId
-      // }).then(() => location.reload());
-    }
-    bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
-  });
-
-  function saveTransaction() {
-  const formData = new FormData();
-  formData.append("t_code", document.getElementById("transactionID").value);
-  formData.append("t_name", document.getElementById("nameInput").value);
-  formData.append("t_contact", document.getElementById("contactInput").value);
-  formData.append("t_description", document.getElementById("transactionInput").value);
-  formData.append("transactionType", document.getElementById("transactionType").value);
-  formData.append("t_status", document.getElementById("statusInput").value);
-
-  const file = document.getElementById("fileUpload").files[0];
-  if (file) {
-    formData.append("t_file", file);
-  }
-
-  fetch("save_transaction.php", {
-    method: "POST",
-    body: formData
-  })
-  .then(response => response.text())
-  .then(data => {
-    console.log(data);
-    location.reload(); // refresh after saving
-  })
-  .catch(err => console.error(err));
+function confirmTransaction(transactionId) {
+  currentTransactionId = transactionId;
+  let confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+  confirmModal.show();
 }
+let currentTransactionId = null;
+document.getElementById("confirmBtn").addEventListener("click", function () {
+  if (currentTransactionId) {
+    console.log("Confirmed transaction:", currentTransactionId);
+    // TODO: send AJAX request to PHP to update status in DB
+    // Example:
+    // fetch('confirm_transaction.php', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    //   body: 'transaction_id=' + currentTransactionId
+    // }).then(() => location.reload());
+  }
+  bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
+});
 
 function showRequirements() {
   const transactionType = document.getElementById("transactionType").value;
@@ -368,25 +371,94 @@ function showRequirements() {
   }
 }
 
-  // Reset modal inputs when closed
-  document.addEventListener("DOMContentLoaded", () => {
-    const transactionModal = document.getElementById("transactionModal");
+// Reset modal inputs when closed
+document.addEventListener("DOMContentLoaded", () => {
+  const transactionModal = document.getElementById("transactionModal");
 
-    transactionModal.addEventListener("hidden.bs.modal", () => {
-      // Reset all form fields inside modal
-      transactionModal.querySelectorAll("input, select, textarea").forEach(el => {
-        if (el.type === "file") {
-          el.value = ""; // clear file input
-        } else {
-          el.value = "";
-        }
-      });
-
-      // Also reset requirements text
-      const requirementsText = document.getElementById("requirementsText");
-      if (requirementsText) {
-        requirementsText.style.display = "none";
-        requirementsText.innerText = "";
+  transactionModal.addEventListener("hidden.bs.modal", () => {
+    // Reset all form fields inside modal
+    transactionModal.querySelectorAll("input, select, textarea").forEach(el => {
+      if (el.type === "file") {
+        el.value = ""; // clear file input
+      } else {
+        el.value = "";
       }
     });
+
+    // Also reset requirements text
+    const requirementsText = document.getElementById("requirementsText");
+    if (requirementsText) {
+      requirementsText.style.display = "none";
+      requirementsText.innerText = "";
+    }
   });
+});
+
+//Show Documents
+function showDocuments(transactionId) {
+  fetch(`trackFunctions.php?action=getDocuments&transaction_id=${transactionId}`)
+    .then(res => res.json())
+    .then(files => {
+      const container = document.getElementById("documentsList");
+      container.innerHTML = "";
+
+      if (files.length === 0) {
+        container.innerHTML = "<p>No documents uploaded.</p>";
+      } else {
+        files.forEach(file => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "doc-item mb-3 d-flex align-items-center justify-content-between";
+
+          // Extract the file name from the path
+          const fileName = file.file_path.split("/").pop();
+
+          wrapper.innerHTML = `
+    <div class="d-flex align-items-center gap-3">
+      <img src="${file.file_path}" class="img-fluid" style="max-height:100px; width:auto;">
+      <span class="doc-name text-center flex-grow-1">${fileName}</span>
+    </div>
+    <button class="btn btn-sm btn-danger" onclick="deleteDocument(${file.file_id}, ${transactionId})">
+      <i class="fas fa-trash"></i> Delete
+    </button>
+  `;
+
+          container.appendChild(wrapper);
+        });
+      }
+
+      new bootstrap.Modal(document.getElementById("documentsModal")).show();
+    })
+    .catch(err => console.error("Error loading documents:", err));
+}
+
+// Delete Document
+function deleteDocument(fileId, transactionId) {
+  if (!confirm("Delete this document?")) return;
+
+  const formData = new FormData();
+  formData.append("action", "deleteDocument");
+  formData.append("file_id", fileId);
+
+  fetch("trackFunctions.php", {
+    method: "POST",
+    body: formData
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert("Document deleted!");
+        showDocuments(transactionId); // reload list
+
+        // 🔹 Fix stuck backdrop
+        const backdrops = document.querySelectorAll(".modal-backdrop");
+        backdrops.forEach(bd => bd.remove());
+        document.body.classList.remove("modal-open");
+        document.body.style.paddingRight = "";
+      } else {
+        alert("Error: " + data.message);
+      }
+    })
+    .catch(err => console.error("Error deleting document:", err));
+}
+
+
