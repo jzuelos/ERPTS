@@ -592,20 +592,20 @@ $conn->close();
           <form id="editOwnerForm" data-owner-id="<?= $owner['own_id'] ?>">
             <div class="mb-3">
               <label class="form-label">Company or Owner</label>
-              <input type="text" class="form-control" value="<?= htmlspecialchars($owner['owner_name']) ?>" disabled>
+              <input type="text" class="form-control" value="<?= htmlspecialchars($owner['owner_name']) ?>" maxlength="20" disabled>
             </div>
             <h6 class="mb-3">Name</h6>
             <div class="mb-3">
               <label class="form-label">First Name</label>
-              <input type="text" class="form-control firstNameModal" value="<?= htmlspecialchars($owner['first_name']) ?>">
+              <input type="text" class="form-control firstNameModal" value="<?= htmlspecialchars($owner['first_name']) ?>" maxlength="20">
             </div>
             <div class="mb-3">
               <label class="form-label">Middle Name</label>
-              <input type="text" class="form-control middleNameModal" value="<?= htmlspecialchars($owner['middle_name']) ?>">
+              <input type="text" class="form-control middleNameModal" value="<?= htmlspecialchars($owner['middle_name']) ?>" maxlength="20">
             </div>
             <div class="mb-3">
               <label class="form-label">Last Name</label>
-              <input type="text" class="form-control lastNameModal" value="<?= htmlspecialchars($owner['last_name']) ?>">
+              <input type="text" class="form-control lastNameModal" value="<?= htmlspecialchars($owner['last_name']) ?>" maxlength="20">
             </div>
             <hr class="my-4">
           </form>
@@ -699,27 +699,27 @@ $conn->close();
               <input type="hidden" id="propertyIdModal">
               <div class="col-12 mb-3">
                 <label for="streetModal" class="form-label">Street</label>
-                <input type="text" class="form-control" id="streetModal" placeholder="Enter Street">
+                <input type="text" class="form-control" id="streetModal" placeholder="Enter Street" maxlength="30">
               </div>
               <div class="col-12 mb-3">
                 <label for="barangayModal" class="form-label">Barangay</label>
-                <input type="text" class="form-control" id="barangayModal" placeholder="Enter Barangay">
+                <input type="text" class="form-control" id="barangayModal" placeholder="Enter Barangay" maxlength="20">
               </div>
               <div class="col-12 mb-3">
                 <label for="municipalityModal" class="form-label">Municipality</label>
-                <input type="text" class="form-control" id="municipalityModal" placeholder="Enter Municipality">
+                <input type="text" class="form-control" id="municipalityModal" placeholder="Enter Municipality" maxlength="20">
               </div>
               <div class="col-12 mb-3">
                 <label for="provinceModal" class="form-label">Province</label>
-                <input type="text" class="form-control" id="provinceModal" placeholder="Enter Province">
+                <input type="text" class="form-control" id="provinceModal" placeholder="Enter Province" maxlength="20">
               </div>
               <div class="col-12 mb-3">
                 <label for="houseNumberModal" class="form-label">House Number</label>
-                <input type="text" class="form-control" id="houseNumberModal" placeholder="Enter House Number">
+                <input type="text" class="form-control" id="houseNumberModal" placeholder="Enter House Number" maxlength="10">
               </div>
               <div class="col-12 mb-3">
                 <label for="landAreaModal" class="form-label">Land Area</label>
-                <input type="text" class="form-control" id="landAreaModal" placeholder="Enter Land Area">
+                <input type="text" class="form-control" id="landAreaModal" placeholder="Enter Land Area" maxlength="20">
               </div>
             </div>
           </form>
@@ -749,14 +749,14 @@ $conn->close();
           <div class="col-md-6 mb-3">
             <label for="arpNumber" class="form-label">ARP Number</label>
             <input type="number" class="form-control" id="arpNumber" placeholder="Enter ARP Number"
-              value="<?= isset($rpu_details['arp']) ? htmlspecialchars($rpu_details['arp']) : ''; ?>" disabled>
+              value="<?= isset($rpu_details['arp']) ? htmlspecialchars($rpu_details['arp']) : ''; ?>"  maxlength="20"disabled>
           </div>
 
           <!-- Property Number Input (Number only) -->
           <div class="col-md-6 mb-3">
             <label for="propertyNumber" class="form-label">Property Number</label>
             <input type="number" class="form-control" id="propertyNumber" placeholder="Enter Property Number"
-              value="<?= isset($rpu_details['pin']) ? htmlspecialchars($rpu_details['pin']) : ''; ?>" disabled>
+              value="<?= isset($rpu_details['pin']) ? htmlspecialchars($rpu_details['pin']) : ''; ?>"  maxlength="20"disabled>
           </div>
 
           <!-- Taxability Dropdown -->
@@ -900,7 +900,7 @@ $conn->close();
                   Number)</label>
                 <input type="text" class="form-control" id="taxDeclarationNumberModal" name="arp_no"
                   value="<?= htmlspecialchars($rpu_declaration['arp_no'] ?? '') ?>"
-                  placeholder="Enter Tax Declaration Number">
+                  placeholder="Enter Tax Declaration Number" maxlength="15">
               </div>
 
               <div class="col-12 mb-3">
@@ -911,7 +911,7 @@ $conn->close();
                 <label for="provincialAssessorModal" class="form-label">Provincial Assessor</label>
                 <input type="text" class="form-control" id="provincialAssessorModal" name="pro_assess"
                   value="<?= htmlspecialchars($rpu_declaration['pro_assess'] ?? '') ?>"
-                  placeholder="Enter Provincial Assessor">
+                  placeholder="Enter Provincial Assessor" maxlength="20">
               </div>
               <div class="col-md-6 mb-3">
                 <label for="provincialDateModal" class="form-label">Date</label>
@@ -923,7 +923,7 @@ $conn->close();
                 <label for="municipalAssessorModal" class="form-label">City/Municipal Assessor</label>
                 <input type="text" class="form-control" id="municipalAssessorModal" name="mun_assess"
                   value="<?= htmlspecialchars($rpu_declaration['mun_assess'] ?? '') ?>"
-                  placeholder="Enter City/Municipal Assessor">
+                  placeholder="Enter City/Municipal Assessor" maxlength="20">
               </div>
               <div class="col-md-6 mb-3">
                 <label for="municipalDateModal" class="form-label">Date</label>
@@ -935,13 +935,13 @@ $conn->close();
                 <label for="cancelsTDModal" class="form-label">Cancels TD Number</label>
                 <input type="text" class="form-control" id="cancelsTDModal" name="td_cancel"
                   value="<?= htmlspecialchars($rpu_declaration['td_cancel'] ?? '') ?>"
-                  placeholder="Enter Cancels TD Number">
+                  placeholder="Enter Cancels TD Number" maxlength="20">
               </div>
               <div class="col-md-6 mb-3">
                 <label for="previousPinModal" class="form-label">Previous Pin</label>
                 <input type="text" class="form-control" id="previousPinModal" name="previous_pin"
                   value="<?= htmlspecialchars($rpu_declaration['previous_pin'] ?? '') ?>"
-                  placeholder="Enter Previous Pin">
+                  placeholder="Enter Previous Pin" maxlength="20">
               </div>
 
               <div class="col-md-6 mb-3">
@@ -965,13 +965,13 @@ $conn->close();
                 <label for="previousOwnerModal" class="form-label">Previous Owner</label>
                 <input type="text" class="form-control" id="previousOwnerModal" name="prev_own"
                   value="<?= htmlspecialchars($rpu_declaration['prev_own'] ?? '') ?>"
-                  placeholder="Enter Previous Owner">
+                  placeholder="Enter Previous Owner" maxlength="50">
               </div>
               <div class="col-md-6 mb-3">
                 <label for="previousAssessedValueModal" class="form-label">Previous Assessed Value</label>
                 <input type="text" class="form-control" id="previousAssessedValueModal" name="prev_assess"
                   value="<?= htmlspecialchars($rpu_declaration['prev_assess'] ?? '') ?>"
-                  placeholder="Enter Assessed Value">
+                  placeholder="Enter Assessed Value" maxlength="20">
               </div>
             </div>
         </div>

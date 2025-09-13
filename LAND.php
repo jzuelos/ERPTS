@@ -735,12 +735,12 @@ $conn->close();
               <div class="col-md-6 mb-4">
                 <label for="octTctNumberModal" class="form-label">OCT/TCT Number</label>
                 <input type="text" id="octTctNumberModal" name="oct_no" class="form-control"
-                  placeholder="Enter OCT/TCT Number" required>
+                  placeholder="Enter OCT/TCT Number" maxlength="50" required>
               </div>
               <div class="col-md-6 mb-4">
                 <label for="surveyNumberModal" class="form-label">Survey Number</label>
                 <input type="text" id="surveyNumberModal" name="survey_no" class="form-control"
-                  placeholder="Enter Survey Number" required>
+                  placeholder="Enter Survey Number" maxlength="20" required>
               </div>
             </div>
 
@@ -749,22 +749,22 @@ $conn->close();
               <div class="col-md-3 mb-4">
                 <label for="northModal" class="form-label">North Boundary</label>
                 <input type="text" id="northModal" name="north_boundary" class="form-control"
-                  placeholder="Enter North Boundary">
+                  placeholder="Enter North Boundary" maxlength="10">
               </div>
               <div class="col-md-3 mb-4">
                 <label for="southModal" class="form-label">South Boundary</label>
                 <input type="text" id="southModal" name="south_boundary" class="form-control"
-                  placeholder="Enter South Boundary">
+                  placeholder="Enter South Boundary" maxlength="10">
               </div>
               <div class="col-md-3 mb-4">
                 <label for="eastModal" class="form-label">East Boundary</label>
                 <input type="text" id="eastModal" name="east_boundary" class="form-control"
-                  placeholder="Enter East Boundary">
+                  placeholder="Enter East Boundary" maxlength="10">
               </div>
               <div class="col-md-3 mb-4">
                 <label for="westModal" class="form-label">West Boundary</label>
                 <input type="text" id="westModal" name="west_boundary" class="form-control"
-                  placeholder="Enter West Boundary">
+                  placeholder="Enter West Boundary" maxlength="10">
               </div>
             </div>
 
@@ -772,7 +772,7 @@ $conn->close();
             <div class="mb-4">
               <label for="boundaryDescriptionModal" class="form-label">Boundary Description</label>
               <textarea class="form-control" id="boundaryDescriptionModal" name="boun_desc" rows="2"
-                placeholder="Enter boundary description"></textarea>
+                placeholder="Enter boundary description" maxlength="20"></textarea>
             </div>
 
             <!-- Administrator Information -->
@@ -781,17 +781,17 @@ $conn->close();
               <div class="col-md-4 mb-4">
                 <label for="adminLastNameModal" class="form-label">Last Name</label>
                 <input type="text" id="adminLastNameModal" name="last_name" class="form-control"
-                  placeholder="Enter last name">
+                  placeholder="Enter last name" maxlength="15">
               </div>
               <div class="col-md-4 mb-4">
                 <label for="adminFirstNameModal" class="form-label">First Name</label>
                 <input type="text" id="adminFirstNameModal" name="first_name" class="form-control"
-                  placeholder="Enter first name">
+                  placeholder="Enter first name" maxlength="15">
               </div>
               <div class="col-md-4 mb-4">
                 <label for="adminMiddleNameModal" class="form-label">Middle Name</label>
                 <input type="text" id="adminMiddleNameModal" name="middle_name" class="form-control"
-                  placeholder="Enter middle name">
+                  placeholder="Enter middle name" maxlength="15">
               </div>
             </div>
 
@@ -800,11 +800,11 @@ $conn->close();
               <div class="col-md-6 mb-4">
                 <label for="adminContactModal" class="form-label">Contact Number</label>
                 <input type="text" id="adminContactModal" name="contact_no" class="form-control"
-                  placeholder="Enter contact number">
+                  placeholder="Enter contact number"maxlength="11">
               </div>
               <div class="col-md-6 mb-4">
                 <label for="adminEmailModal" class="form-label">Email</label>
-                <input type="email" id="adminEmailModal" name="email" class="form-control" placeholder="Enter email">
+                <input type="email" id="adminEmailModal" name="email" class="form-control" placeholder="Enter email" maxlength="40">
               </div>
             </div>
 
@@ -814,22 +814,22 @@ $conn->close();
               <div class="col-md-3 mb-4">
                 <label for="adminAddressNumberModal" class="form-label">House Number</label>
                 <input type="text" id="adminAddressNumberModal" name="house_street" class="form-control"
-                  placeholder="Enter house number">
+                  placeholder="Enter house number" maxlength="10">
               </div>
               <div class="col-md-3 mb-4">
                 <label for="adminAddressStreetModal" class="form-label">Street</label>
                 <input type="text" id="adminAddressStreetModal" name="barangay" class="form-control"
-                  placeholder="Enter street">
+                  placeholder="Enter street" maxlength="15">
               </div>
               <div class="col-md-3 mb-4">
                 <label for="adminAddressMunicipalityModal" class="form-label">Municipality</label>
                 <input type="text" id="adminAddressMunicipalityModal" name="municipality" class="form-control"
-                  placeholder="Enter municipality">
+                  placeholder="Enter municipality" maxlength="15">
               </div>
               <div class="col-md-3 mb-4">
                 <label for="adminAddressProvinceModal" class="form-label">Province</label>
                 <input type="text" id="adminAddressProvinceModal" name="province" class="form-control"
-                  placeholder="Enter province">
+                  placeholder="Enter province" maxlength="15">
               </div>
             </div>
 
@@ -839,7 +839,7 @@ $conn->close();
               <div class="col-md-6 mb-4">
                 <label for="landDescModal" class="form-label">Land Description</label>
                 <input type="text" id="landDescModal" name="land_desc" class="form-control"
-                  placeholder="Enter land description">
+                  placeholder="Enter land description" maxlength="50">
               </div>
               <!-- Classification -->
               <div class="col-md-6 col-12 mb-4">
@@ -897,7 +897,7 @@ $conn->close();
                 <label for="areaModal" class="form-label">Area</label>
                 <div class="input-group">
                   <input type="number" id="areaModal" name="area" class="form-control" placeholder="Enter area"
-                    step="any" required>
+                    step="any" maxlength="15" required>
                   <div class="input-group-append ml-4">
                     <div class="form-check">
                       <input class="form-check-input" type="radio" name="areaUnit" value="sqm" id="sqm" checked>
@@ -916,12 +916,12 @@ $conn->close();
               <div class="col-md-6 mb-4">
                 <label for="unitValue" class="form-label">Unit Value</label>
                 <input type="text" id="unitValue" class="form-control" placeholder="Enter unit value" name="unit_value"
-                  disabled value="<?php echo htmlspecialchars($land_data['unit_value']); ?>">
+                  disabled value="<?php echo htmlspecialchars($land_data['unit_value']); ?>" maxlength="20">
               </div>
               <div class="col-md-6 mb-6">
                 <label for="recom_unitValue" class="form-label">Recommended Unit Value</label>
                 <input type="text" id="recom_unitValue" class="form-control" placeholder="loading..."
-                  name="recom_unit_value" readonly value="">
+                  name="recom_unit_value" readonly value="" maxlength="20">
               </div>
             </div>
 
@@ -954,7 +954,7 @@ $conn->close();
                 <div class="mb-3">
                   <label for="marketValue" class="form-label">Market Value</label>
                   <input type="text" id="marketValue" class="form-control" placeholder="Enter market value"
-                    name="market_value" readonly value="<?php echo htmlspecialchars($land_data['market_value']); ?>">
+                    name="market_value" readonly value="<?php echo htmlspecialchars($land_data['market_value']); ?>" maxlength="30"> 
                 </div>
               </div>
             </div>
@@ -966,7 +966,7 @@ $conn->close();
                 <div class="col-md-12 mb-4">
                   <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
                   <textarea id="adjustmentFactorModal" name="adjustment_factor" class="form-control" rows="3"
-                    placeholder="Enter adjustment factor"></textarea>
+                    placeholder="Enter adjustment factor" maxlength="150"></textarea>
                 </div>
               </div>
 
@@ -979,12 +979,12 @@ $conn->close();
                 <div class="col-md-4 mb-4">
                   <label for="valueAdjustmentModal" class="form-label">Value Adjustment</label>
                   <input type="text" id="valueAdjustmentModal" name="value_adjustment" class="form-control"
-                    placeholder="Enter value adjustment" readonly>
+                    placeholder="Enter value adjustment" maxlength="20" readonly>
                 </div>
                 <div class="col-md-4 mb-4">
                   <label for="adjustedMarketValueModal" class="form-label">Adjusted Market Value</label>
                   <input type="text" id="adjustedMarketValueModal" name="adjusted_market_value" class="form-control"
-                    placeholder="Enter adjusted market value" readonly>
+                    placeholder="Enter adjusted market value" maxlength="20" readonly>
                 </div>
               </div>
             </div>
