@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 13, 2025 at 08:27 AM
+-- Generation Time: Sep 13, 2025 at 01:35 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -647,7 +647,7 @@ CREATE TABLE `p_info` (
 INSERT INTO `p_info` (`p_id`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`, `created_at`, `updated_at`, `is_active`, `disabled_at`, `disabled_by`) VALUES
 (144, 23, 1, 'Camarines Norte', 'Daet', 'District 1', 'Kalamunding', 'Rizal Street', 0, 302, 'Residential lot with affidavit and barangay cleara', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-08-31 19:01:44', 1, NULL, NULL),
 (147, 23, 3, 'Camarines Norte', 'Daet', 'District 2', 'Gahon', 'Mabini Street', 0, 453, 'Commercial lot with affidavit and barangay clearan', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-08-31 19:01:44', 1, NULL, NULL),
-(156, 42134, 4, 'Camarines Norte', 'Daet', 'District 2', 'Bagasbas', 'Quezon Avenue', 1, 432, 'Agricultural lot with affidavit', 'Affidavit', '2025-09-05 14:01:18', '2025-09-10 14:43:52', 1, NULL, NULL),
+(156, 42134, 4, 'Camarines Norte', 'Daet', 'District 2', 'Bagasbas', 'Quezon Avenue', 1, 432, 'Agricultural lot with affidavit', 'Affidavit', '2025-09-05 14:01:18', '2025-09-13 06:29:21', 0, '2025-09-13 14:29:21', 9),
 (157, 5345, 4, 'Camarines Norte', 'Daet', 'District 2', 'Camambugan', 'San Roque', 0, 5345, 'Residential lot with barangay document', 'Barangay Clearance', '2025-09-05 14:13:20', '2025-09-10 16:00:54', 1, NULL, NULL);
 
 -- --------------------------------------------------------
@@ -761,20 +761,38 @@ CREATE TABLE `transactions` (
   `description` varchar(255) NOT NULL,
   `status` enum('Pending','In Progress','Completed') DEFAULT 'Pending',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `transaction_type` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `transactions`
 --
 
-INSERT INTO `transactions` (`transaction_id`, `transaction_code`, `name`, `contact_number`, `description`, `status`, `created_at`, `updated_at`) VALUES
-(1, '002', 'test 1', NULL, 'test1', 'In Progress', '2025-08-20 14:43:32', '2025-08-20 14:43:32'),
-(2, '001', 'test 2', NULL, 'test 2', 'Pending', '2025-08-20 14:45:05', '2025-08-20 14:45:05'),
-(3, '003', 'test 3', NULL, 'test 3', 'Completed', '2025-08-20 14:46:42', '2025-08-20 14:46:42'),
-(4, '004', 'test 4', NULL, 'test 4', 'Pending', '2025-08-20 14:56:05', '2025-08-20 14:56:05'),
-(5, '005', 'name 5', NULL, 'test 5', 'Completed', '2025-08-20 15:00:40', '2025-08-20 15:00:40'),
-(6, '1234', 'fsdaf', NULL, 'sdfg', 'In Progress', '2025-08-22 14:24:10', '2025-09-03 15:57:40');
+INSERT INTO `transactions` (`transaction_id`, `transaction_code`, `name`, `contact_number`, `description`, `status`, `created_at`, `updated_at`, `transaction_type`) VALUES
+(3, '003', 'test 3', NULL, 'test 3', 'Completed', '2025-08-20 14:46:42', '2025-08-20 14:46:42', NULL),
+(14, '25592', 'James', '12345', 'huwaw', 'Pending', '2025-09-13 11:08:00', '2025-09-13 11:30:02', 'Simple Transfer of Ownership');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `transaction_files`
+--
+
+CREATE TABLE `transaction_files` (
+  `file_id` int(11) NOT NULL,
+  `transaction_id` int(11) NOT NULL,
+  `file_path` varchar(255) NOT NULL,
+  `uploaded_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `transaction_files`
+--
+
+INSERT INTO `transaction_files` (`file_id`, `transaction_id`, `file_path`, `uploaded_at`) VALUES
+(27, 14, 'uploads/transaction_14/tx_68c55090799d8_premium_photo-1666900440561-94dcb6865554.avif', '2025-09-13 11:08:00'),
+(28, 14, 'uploads/transaction_14/tx_68c550907a160_photo-1493612276216-ee3925520721.avif', '2025-09-13 11:08:00');
 
 -- --------------------------------------------------------
 
@@ -922,6 +940,13 @@ ALTER TABLE `transactions`
   ADD PRIMARY KEY (`transaction_id`);
 
 --
+-- Indexes for table `transaction_files`
+--
+ALTER TABLE `transaction_files`
+  ADD PRIMARY KEY (`file_id`),
+  ADD KEY `transaction_id` (`transaction_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -1026,7 +1051,13 @@ ALTER TABLE `subclass`
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
-  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT for table `transaction_files`
+--
+ALTER TABLE `transaction_files`
+  MODIFY `file_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -1079,6 +1110,12 @@ ALTER TABLE `rpu_dec`
 --
 ALTER TABLE `rpu_idnum`
   ADD CONSTRAINT `faas_idrpu` FOREIGN KEY (`faas_id`) REFERENCES `faas` (`faas_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `transaction_files`
+--
+ALTER TABLE `transaction_files`
+  ADD CONSTRAINT `transaction_files_ibfk_1` FOREIGN KEY (`transaction_id`) REFERENCES `transactions` (`transaction_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

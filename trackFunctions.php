@@ -147,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($action === 'deleteTransaction') {
         $transaction_id = intval($_POST['transaction_id'] ?? 0);
 
-        // fetch transaction code BEFORE deleting the row
+        // Get transaction code
         $stmt = $conn->prepare("SELECT transaction_code FROM transactions WHERE transaction_id=?");
         $stmt->bind_param("i", $transaction_id);
         $stmt->execute();
@@ -159,31 +159,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             exit;
         }
 
-        // delete transaction row
+        // Delete transaction
         $stmt = $conn->prepare("DELETE FROM transactions WHERE transaction_id=?");
         $stmt->bind_param("i", $transaction_id);
 
         if ($stmt->execute()) {
-            // delete related files from DB
+            // Delete files from DB
             $conn->query("DELETE FROM transaction_files WHERE transaction_id=" . $transaction_id);
 
-            // delete folder/files safely
+            // Delete folder & files safely
             $folderPath = __DIR__ . "/uploads/transaction_" . $transaction_code;
             if (is_dir($folderPath)) {
                 foreach (glob("$folderPath/*") as $file) {
-                    if (is_file($file) && !unlink($file)) {
-                        error_log("Failed to delete file: $file");
-                    }
+                    @unlink($file); // suppress errors
                 }
-                if (!rmdir($folderPath)) {
-                    error_log("Failed to remove folder: $folderPath");
-                }
+                @rmdir($folderPath); // suppress errors
             }
 
-            echo json_encode(["success" => true, "message" => "Transaction deleted successfully!"]);
+            echo json_encode(["success" => true, "message" => "Transaction and images deleted!"]);
         } else {
-            error_log("Delete transaction failed: " . $stmt->error);
-            echo json_encode(["success" => false, "message" => $stmt->error]);
+            echo json_encode(["success" => false, "message" => "Delete failed"]);
         }
         exit;
     }
