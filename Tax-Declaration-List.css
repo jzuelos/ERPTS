@@ -29,6 +29,10 @@
   border-top: 1px solid #dee2e6;
 }
 
+tabvle.modern-table tbody td {
+  text-align: left !important;
+}
+
 /* Subtext style under the Owner header */
 .owner-subtext {
   font-size: 0.8em;

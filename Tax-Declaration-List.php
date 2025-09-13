@@ -88,15 +88,15 @@ $result = $conn->query($sql);
     </div>
 
     <div class="table-responsive">
-      <table class="table table-hover table-striped modern-table text-center">
+      <table class="table table-hover table-striped modern-table">
         <thead class="thead-dark">
           <tr>
-            <th>TD ID</th>
-            <th>OWNER<br><span class="owner-subtext">(person) (company/group)</span></th>
-            <th>TD NUMBER</th>
-            <th>PROPERTY VALUE</th>
-            <th>YEAR</th>
-            <th>ACTIONS</th>
+            <th class="text-center">TD ID</th>
+            <th class="text-center">OWNER<br><span class="owner-subtext">(person) (company/group)</span></th>
+            <th class="text-center">TD NUMBER</th>
+            <th class="text-center">PROPERTY VALUE</th>
+            <th class="text-center">YEAR</th>
+            <th class="text-center">ACTIONS</th>
           </tr>
         </thead>
         <tbody>
@@ -116,7 +116,7 @@ $result = $conn->query($sql);
               echo "<td>" . htmlspecialchars($row['tax_year'] ?? '') . "</td>";
 
               if (!empty($p_id)) {
-                echo "<td><a href='FAAS.php?id={$p_id}' class='btn btn-primary'>EDIT</a></td>";
+                echo "<td class='text-center'><a href='FAAS.php?id={$p_id}' class='btn btn-primary'>EDIT</a></td>";
               } else {
                 echo "<td><span class='text-muted'>No Property</span></td>";
               }

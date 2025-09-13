@@ -23,7 +23,7 @@ table.modern-table thead th {
   color: white;
   font-weight: 600;
   padding: 12px;
-  text-align: center;
+  text-align: left;
   border: none;
 }
 
@@ -40,7 +40,7 @@ table.modern-table tbody tr:hover {
 
 table.modern-table tbody td {
   padding: 15px;
-  text-align: center;
+  text-align: left;
   vertical-align: middle;
   color: #333;
   border: none;

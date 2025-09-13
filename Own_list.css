@@ -16,13 +16,9 @@
   
   .table thead th {
     padding: 12px;
-    text-align: left;
     font-weight: bold;
   }
   
-  .table tbody tr {
-    transition: background-color 0.3s ease;
-  }
   
   .table tbody tr:nth-child(even) {
     background-color: #f8f9fa;
@@ -32,10 +28,9 @@
     background-color: #e9ecef;
   }
   
-  .table tbody td {
-    padding: 12px;
-    border-bottom: 1px solid #dee2e6;
-    text-align: left;
+  #propertyTable th, #propertyTable td{
+    text-align: left !important;
+    vertical-align: middle;
   }
   
 

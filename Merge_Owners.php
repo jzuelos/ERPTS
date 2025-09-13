@@ -149,8 +149,8 @@ if ($total_result && $total_result->num_rows > 0) {
 <form method="post" action="Merge_Owners.php">
   <section class="container mt-5">
     <div class="header-container d-flex justify-content-between align-items-center">
-      <a href="Own_list.php">
-        <img src="images/backward.png" width="35" height="35" alt="Back" class="back-button">
+      <a href="Admin-Page-2.php" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left"></i> Back
       </a>
       <div class="table-title">Merge Owners</div>
     </div>
@@ -181,7 +181,7 @@ if ($total_result && $total_result->num_rows > 0) {
 
     <!-- Table -->
     <div class="table-responsive">
-      <table class="table table-striped table-hover modern-table text-center">
+      <table class="table table-striped table-hover modern-table text-start">
         <thead class="thead-dark">
           <tr>
             <th scope="col">Person ID</th>

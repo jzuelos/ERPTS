@@ -81,3 +81,7 @@
   border: 1px solid #ccc;
   padding: 8px;
 }
+
+table.table thead th, table.table tbody td {
+  text-align: left !important;
+}
