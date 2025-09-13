@@ -177,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           </table>
 
           <!-- Actual Uses Table -->
-          <table class="table table-hover align-middle mb-0 d-none" id="actualUsesTable">
+          <table class="table table-hover align-middle mb-0 d-none text-start" id="actualUsesTable">
             <thead class="table-light">
               <tr>
                 <th style="width: 15%">Report Code</th>
@@ -230,7 +230,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           </table>
 
           <!-- Sub-Classes Table -->
-          <table class="table table-hover align-middle mb-0 d-none" id="subClassesTable">
+          <table class="table table-hover align-middle mb-0 d-none text-start" id="subClassesTable">
             <thead class="table-light">
               <tr>
                 <th style="width: 15%">Code</th>

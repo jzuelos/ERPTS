@@ -112,7 +112,7 @@ if ($conn->connect_error) {
       <div class="px-3">
         <div class="table-responsive rounded">
           <table class="table table-hover align-middle mb-0" id="municipalityTable">
-            <thead class="table-light">
+            <thead class="table-light text-start">
               <tr>
                 <th style="width: 20%">Region</th>
                 <th style="width: 15%">Code</th>
@@ -147,7 +147,7 @@ if ($conn->connect_error) {
 
           <!-- District Table -->
           <table class="table table-hover align-middle mb-0 d-none" id="districtTable">
-            <thead class="table-light">
+            <thead class="table-light text-start">
               <tr>
                 <th style="width: 20%">Municipality/City</th>
                 <th style="width: 15%">Code</th>
@@ -182,7 +182,7 @@ if ($conn->connect_error) {
 
           <!-- Barangay Table -->
           <table class="table table-hover align-middle mb-0 d-none" id="barangayTable">
-            <thead class="table-light">
+            <thead class="table-light text-start">
               <tr>
                 <th style="width: 20%">District/Municipality/City</th>
                 <th style="width: 15%">Barangay Code</th>

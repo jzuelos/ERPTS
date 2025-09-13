@@ -81,14 +81,14 @@ if ($result->num_rows > 0) {
 
     <!-- Table -->
     <div class="table-responsive">
-      <table class="table table-bordered text-center modern-table" id="propertyTable">
+      <table class="table table-bordered modern-table" id="propertyTable">
         <thead class="thead-dark">
           <tr>
-            <th class="text-center align-middle">ID</th>
-            <th class="text-center align-middle">Name</th>
-            <th class="text-center align-middle">Address <br><small>House No., Street, District</small></th>
-            <th class="text-center align-middle">Information</th>
-            <th class="text-center align-middle">Edit</th>
+            <th class="align-middle">ID</th>
+            <th class="align-middle">Name</th>
+            <th class="align-middle">Address <br><small>House No., Street, District</small></th>
+            <th class="align-middle">Information</th>
+            <th class="align-middle">Edit</th>
           </tr>
         </thead>
         <tbody>

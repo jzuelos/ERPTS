@@ -207,12 +207,18 @@
   <?php include 'header.php'; ?>
 
   <!-- Main Header -->
+   <div>
   <section class="text-center my-4">
     <h2 class="text-black">Property Information</h2>
   </section>
 
   <!-- Form Section -->
   <section class="container my-4">
+    <div class="mb-3">
+            <a href="Real-Property-Unit-List.php" class="btn btn-outline-secondary btn-sm">
+          <i class="fas fa-arrow-left"></i> Back
+        </a>
+</div>
     <div class="card">
       <div class="card-body">
         <!-- Owner Search Section -->
@@ -229,14 +235,14 @@
           </form>
         </div>
 
-<table class="table table-bordered mb-3">
+<table class="table table-bordered mb-3 text-start">
   <thead class="table-light">
     <tr>
-      <th class="text-center align-middle">ID</th>
-      <th class="text-center align-middle">Owner Name<br><small>(Surname, Firstname)</small></th>
-      <th class="text-center align-middle">Address<br><small>(Street, Barangay, City, Province)</small></th>
-      <th class="text-center align-middle">Date of Birth</th>
-      <th class="text-center align-middle">Select</th>
+      <th class="align-middle">ID</th>
+      <th class="align-middle">Owner Name<br><small>(Surname, Firstname)</small></th>
+      <th class="align-middle">Address<br><small>(Street, Barangay, City, Province)</small></th>
+      <th class="align-middle">Date of Birth</th>
+      <th class="align-middle">Select</th>
     </tr>
   </thead>
   <tbody id="resultsBody">
@@ -263,11 +269,11 @@
 
         // Output each row
         echo "<tr>";
-        echo "<td class='text-center align-middle'>" . $ownerId . "</td>";
-        echo "<td class='text-center align-middle'>" . $fullName . "</td>";
-        echo "<td class='text-center align-middle'>" . $address . "</td>";
-        echo "<td class='text-center align-middle'>" . $date . "</td>";
-        echo "<td class='text-center align-middle'><input type='checkbox' name='selected_ids[]' value='" . $ownerId . "'></td>";
+        echo "<td class='align-middle'>" . $ownerId . "</td>";
+        echo "<td class='align-middle'>" . $fullName . "</td>";
+        echo "<td class='align-middle'>" . $address . "</td>";
+        echo "<td class='align-middle'>" . $date . "</td>";
+        echo "<td class='align-middle'><input type='checkbox' name='selected_ids[]' value='" . $ownerId . "'></td>";
         echo "</tr>";
       }
     } else {

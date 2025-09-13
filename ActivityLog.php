@@ -39,7 +39,7 @@ header("Pragma: no-cache");
       <h4 class="mb-3"><i class="fas fa-history me-2"></i> Activity Log</h4>
 
       <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle">
+        <table class="table table-striped table-hover align-middle text-start">
           <thead class="table-dark">
             <tr>
               <th style="width: 10%">No.</th>

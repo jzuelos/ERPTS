@@ -140,7 +140,7 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
 
         <!-- Table -->
         <div class="table-responsive">
-          <table class="table table-bordered text-center modern-table" id="propertyTable"> <!-- Responsive table -->
+          <table class="table table-bordered text-start modern-table" id="propertyTable"> <!-- Responsive table -->
             <thead>
               <tr>
                 <th>OD ID</th>
