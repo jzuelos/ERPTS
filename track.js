@@ -116,11 +116,6 @@ function saveTransaction() {
     })
     .then((data) => {
       if (data.success) {
-        logActivity(editId
-          ? `Updated transaction #${editId} (${t_name})`
-          : `Added new transaction (${t_name})`
-        );
-
         alert(editId ? "Transaction updated!" : "Transaction saved!");
         if (transactionModal) transactionModal.hide();
         if (typeof loadTransactions === "function") loadTransactions();
@@ -226,23 +221,6 @@ function updateCounts() {
   document.getElementById('completedCount').innerText =
     transactions.filter(t => t.status === 'Completed').length;
 }
-
-function logActivity(message) {
-  const log = document.getElementById('activityLog');
-  const item = document.createElement('div');
-  item.className = 'activity-item';
-  item.innerHTML = `
-    <i class="fas fa-circle"></i>
-    <span>${new Date().toLocaleString()}: ${message}</span>
-  `;
-
-  // Limit to 10 most recent activities
-  if (log.children.length >= 10) {
-    log.removeChild(log.lastChild);
-  }
-  log.prepend(item);
-}
-
 
 function checkTransaction(transactionId) {
   const checkbox = event.target;
