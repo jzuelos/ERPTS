@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   loadTransactions();
+  loadActivity();
 });
 
 function openModal(id = null) {
@@ -33,7 +34,7 @@ function openModal(id = null) {
       document.getElementById('nameInput').value = tx.name || '';
       document.getElementById('contactInput').value = tx.contact || '';
       document.getElementById('transactionInput').value = tx.transaction || '';
-      document.getElementById('transactionType').value = tx.transaction_type || '';  // 🔹 FIX
+      document.getElementById('transactionType').value = tx.transaction_type || '';
       document.getElementById('statusInput').value = tx.status || '';
       editId = id;
     }
@@ -54,6 +55,7 @@ function openModal(id = null) {
     document.getElementById('contactInput').value = '';
     document.getElementById('transactionInput').value = '';
     document.getElementById('statusInput').selectedIndex = 0;
+    document.getElementById('transactionType').selectedIndex = 0;
     editId = null;
   }
 
@@ -119,6 +121,7 @@ function saveTransaction() {
         alert(editId ? "Transaction updated!" : "Transaction saved!");
         if (transactionModal) transactionModal.hide();
         if (typeof loadTransactions === "function") loadTransactions();
+        if (typeof loadActivity === "function") loadActivity(); // refresh activity
       } else {
         alert("Error: " + (data.message || "Unknown error"));
       }
@@ -147,28 +150,109 @@ function loadTransactions() {
     .catch(error => console.error("Error loading transactions:", error));
 }
 
+// --- Load recent activity from backend ---
+function loadActivity() {
+  const tbody = document.getElementById("activityTableBody");
+  if (!tbody) return;
+
+  // show loading row
+  tbody.innerHTML = `<tr><td colspan="5" class="text-center">Loading recent activity…</td></tr>`;
+
+  fetch("trackFunctions.php?action=getActivity")
+    .then(res => res.json())
+    .then(data => {
+      tbody.innerHTML = "";
+
+      if (!Array.isArray(data) || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center">No recent activity.</td></tr>`;
+        return;
+      }
+
+      data.forEach(item => {
+        // fields returned by backend: created_at, t_code, action, details, user, transaction_id
+        const createdAtRaw = item.created_at || "";
+        const tcode = item.t_code || ("#" + (item.transaction_id || ""));
+        const action = item.action || "";
+        const detailsRaw = item.details || "";
+        const user = item.user || "";
+
+        // truncate long details to 120 chars
+        const details = (detailsRaw.length > 120) ? (detailsRaw.slice(0, 117) + '...') : detailsRaw;
+
+        // Attempt a friendly date/time. If parse fails, fall back to raw string.
+        const prettyDate = formatTimestamp(createdAtRaw);
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td style="white-space:nowrap">${prettyDate}</td>
+          <td>${escapeHtml(tcode)}</td>
+          <td>${escapeHtml(action)}</td>
+          <td title="${escapeHtml(detailsRaw)}">${escapeHtml(details)}</td>
+          <td>${escapeHtml(user)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    })
+    .catch(err => {
+      console.error("Error loading activity:", err);
+      tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Failed to load activity.</td></tr>`;
+    });
+}
+
+// small helper: try to format 'YYYY-MM-DD HH:MM:SS' or ISO strings, else return input
+function formatTimestamp(s) {
+  if (!s) return "";
+  // convert "YYYY-MM-DD HH:MM:SS" -> "YYYY-MM-DDTHH:MM:SS" then try Date()
+  let iso = s.replace(' ', 'T');
+  // if string lacks seconds or timezone, don't break — try Date parse and fallback
+  const d = new Date(iso);
+  if (!isNaN(d.getTime())) {
+    return d.toLocaleString();
+  }
+  return s;
+}
+
+// basic escape to avoid injecting HTML
+function escapeHtml(str) {
+  if (typeof str !== 'string') return str;
+  return str.replace(/[&<>"'`=\/]/g, function (s) {
+    return ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+      '/': '&#x2F;',
+      '`': '&#x60;',
+      '=': '&#x3D;'
+    })[s];
+  });
+}
+
+
 function deleteTransaction(id) {
-  if (confirm('Are you sure you want to delete this transaction?')) {
+    if (!confirm('Are you sure you want to delete this transaction?')) return;
+
     let formData = new FormData();
     formData.append("action", "deleteTransaction");
     formData.append("transaction_id", id);
 
     fetch("trackFunctions.php", {
-      method: "POST",
-      body: formData
+        method: "POST",
+        body: formData
     })
-      .then(response => response.json())
-      .then(data => {
+    .then(res => res.json())
+    .then(data => {
         if (data.success) {
-          alert("Transaction deleted successfully!");
-          loadTransactions(); // refresh from DB
+            alert(data.message); // Optional: show deletion success
+            loadTransactions(); // Reload your transaction table
         } else {
-          alert("Error: " + data.message);
+            alert("Failed: " + data.message);
         }
-      })
-      .catch(error => console.error("Error deleting transaction:", error));
-  }
+    })
+    .catch(err => console.error("Error deleting transaction:", err));
 }
+
 
 function updateTable() {
   const table = document.getElementById('transactionTable');
@@ -227,30 +311,10 @@ function checkTransaction(transactionId) {
 
   if (checkbox.checked) {
     console.log("Transaction " + transactionId + " marked as checked ");
-    // Example: mark as Completed
-    // sendUpdate(transactionId, "Completed");
   } else {
     console.log("Transaction " + transactionId + " unchecked ");
-    // Example: mark as In Progress
-    // sendUpdate(transactionId, "In Progress");
   }
 }
-
-/* Example function to send updates to the server 
-function sendUpdate(transactionId, status) {
-  fetch("updateTransaction.php", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: "transaction_id=" + transactionId + "&status=" + status
-  })
-  .then(response => response.text())
-  .then(data => {
-    console.log("Server response:", data);
-  })
-  .catch(error => console.error("Error:", error));
-}*/
 
 //Confirmation Modals
 function confirmTransaction(transactionId) {
@@ -263,12 +327,6 @@ document.getElementById("confirmBtn").addEventListener("click", function () {
   if (currentTransactionId) {
     console.log("Confirmed transaction:", currentTransactionId);
     // TODO: send AJAX request to PHP to update status in DB
-    // Example:
-    // fetch('confirm_transaction.php', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    //   body: 'transaction_id=' + currentTransactionId
-    // }).then(() => location.reload());
   }
   bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
 });
@@ -355,11 +413,12 @@ function showRequirements() {
 
 // Reset modal inputs when closed
 document.addEventListener("DOMContentLoaded", () => {
-  const transactionModal = document.getElementById("transactionModal");
+  const modalEl = document.getElementById("transactionModal");
+  if (!modalEl) return;
 
-  transactionModal.addEventListener("hidden.bs.modal", () => {
+  modalEl.addEventListener("hidden.bs.modal", () => {
     // Reset all form fields inside modal
-    transactionModal.querySelectorAll("input, select, textarea").forEach(el => {
+    modalEl.querySelectorAll("input, select, textarea").forEach(el => {
       if (el.type === "file") {
         el.value = ""; // clear file input
       } else {
@@ -384,7 +443,7 @@ function showDocuments(transactionId) {
       const container = document.getElementById("documentsList");
       container.innerHTML = "";
 
-      if (files.length === 0) {
+      if (!Array.isArray(files) || files.length === 0) {
         container.innerHTML = "<p>No documents uploaded.</p>";
       } else {
         files.forEach(file => {
@@ -394,7 +453,7 @@ function showDocuments(transactionId) {
           // Extract the file name from the path
           const fileName = file.file_path.split("/").pop();
 
-          // Truncate file name (max 25 chars)
+          // Truncate file name (max 70 chars)
           let displayName = fileName.length > 70
             ? fileName.substring(0, 22) + "..."
             : fileName;
@@ -446,6 +505,7 @@ function deleteDocument(fileId, transactionId) {
       if (data.success) {
         alert("Document deleted!");
         showDocuments(transactionId); // reload list
+        if (typeof loadActivity === "function") loadActivity();
 
         // 🔹 Fix stuck backdrop
         const backdrops = document.querySelectorAll(".modal-backdrop");
@@ -458,5 +518,3 @@ function deleteDocument(fileId, transactionId) {
     })
     .catch(err => console.error("Error deleting document:", err));
 }
-
-

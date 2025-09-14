@@ -14,8 +14,8 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-// Fetch all transactions
-$sql = "SELECT transaction_id, transaction_code, name, contact_number, description, status 
+// Fetch all transactions (include transaction_type now)
+$sql = "SELECT transaction_id, transaction_code, name, contact_number, description, transaction_type, status 
         FROM transactions ORDER BY transaction_id DESC";
 $result = $conn->query($sql);
 
@@ -34,6 +34,7 @@ $transactionRows = "";
 if ($result && $result->num_rows > 0) {
   while ($row = $result->fetch_assoc()) {
     $statusClass = strtolower(str_replace(' ', '-', $row['status'])); // e.g., "In Progress" → "in-progress"
+    $transaction_type = htmlspecialchars($row['transaction_type'] ?? '', ENT_QUOTES);
 
     $transactionRows .= "
 <tr>
@@ -41,6 +42,7 @@ if ($result && $result->num_rows > 0) {
   <td>{$row['name']}</td>
   <td>{$row['contact_number']}</td>
   <td>{$row['description']}</td>
+  <td>{$transaction_type}</td>
   <td><span class='status-badge status-{$statusClass}'>{$row['status']}</span></td>
   <td>
     <button class='btn btn-sm btn-primary' onclick='openModal(" . $row['transaction_id'] . ")'>
@@ -61,10 +63,9 @@ if ($result && $result->num_rows > 0) {
     </button>
   </td>
 </tr>";
-
   }
 } else {
-  $transactionRows = "<tr><td colspan='7' class='text-center'>No transactions found</td></tr>";
+  $transactionRows = "<tr><td colspan='8' class='text-center'>No transactions found</td></tr>";
 }
 ?>
 <!doctype html>
@@ -137,41 +138,31 @@ if ($result && $result->num_rows > 0) {
       </tbody>
     </table>
 
-<!-- Recent Activity Section -->
-<div class="recent-activity">
-  <h3><i class="fas fa-history"></i> Recent Transaction Activity</h3>
+    <!-- Recent Activity Section -->
+    <div class="recent-activity">
+      <h3><i class="fas fa-history"></i> Recent Transaction Activity</h3>
 
-  <!-- Activity Table -->
-  <div id="activityLog">
-    <table class="table table-borderless">
-      <thead>
-        <tr>
-          <th scope="col">Date/Time</th>
-          <th scope="col">Transaction Code</th>
-          <th scope="col">Action</th>
-          <th scope="col">Details</th>
-          <th scope="col">Current User</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>2025-09-14 02:45 PM</td>
-          <td>TXN-00123</td>
-          <td>Updated</td>
-          <td>Status Updated</td>
-          <td>Admin</td>
-        </tr>
-        <tr>
-          <td>2025-09-14 03:00 PM</td>
-          <td>TXN-00124</td>
-          <td>Document Created</td>
-          <td>New Property Record</td>
-          <td>Clerk01</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+      <!-- Activity Table -->
+      <div id="activityLog">
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th scope="col">Date/Time</th>
+              <th scope="col">Transaction Code</th>
+              <th scope="col">Action</th>
+              <th scope="col">Details</th>
+              <th scope="col">Current User</th>
+            </tr>
+          </thead>
+          <tbody id="activityTableBody">
+            <tr id="activityLoadingRow">
+              <td colspan="5" class="text-center">Loading recent activity…</td>
+            </tr>
+          </tbody>
+
+        </table>
+      </div>
+    </div>
 
 
   </div>
