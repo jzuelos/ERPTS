@@ -137,12 +137,45 @@ if ($result && $result->num_rows > 0) {
       </tbody>
     </table>
 
-    <div class="recent-activity">
-      <h3><i class="fas fa-history"></i> Recent Transaction Activity</h3>
-      <div id="activityLog">
-        <!-- Logs appear here -->
-      </div>
-    </div>
+<!-- Recent Activity Section -->
+<div class="recent-activity">
+  <h3><i class="fas fa-history"></i> Recent Transaction Activity</h3>
+
+  <!-- Activity Table -->
+  <div id="activityLog">
+    <table class="table table-borderless">
+      <thead>
+        <tr>
+          <!-- Column headers -->
+          <th scope="col">Date/Time (PH Standard Time)</th>
+          <th scope="col">Transaction Code</th>
+          <th scope="col">Action</th>
+          <th scope="col">Details</th>
+          <th scope="col">Current User</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Example row (replace with dynamic logs later) -->
+        <tr>
+          <td>2025-09-14 02:45 PM</td>
+          <td>TXN-00123</td>
+          <td>Updated</td>
+          <td>Status Updated</td>
+          <td>Admin</td>
+        </tr>
+        <tr>
+          <td>2025-09-14 03:00 PM</td>
+          <td>TXN-00124</td>
+          <td>Document Created</td>
+          <td>New Property Record</td>
+          <td>Clerk01</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
   </div>
 
   <!-- Edit Modal -->

@@ -26,6 +26,13 @@
       padding: 4px;
       text-align: center;
     }
+
+    @media print {
+      @page {{
+        size: landscape;
+      }}
+    }
+
   </style>
 </head>
 
