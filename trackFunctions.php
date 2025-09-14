@@ -41,7 +41,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'getNextTransactionCode') {
 // ---------- GET DOCUMENTS ----------
 if (isset($_GET['action']) && $_GET['action'] === 'getDocuments') {
     $transaction_id = intval($_GET['transaction_id']);
-    $stmt = $conn->prepare("SELECT file_id, file_path FROM transaction_files WHERE transaction_id=?");
+    $stmt = $conn->prepare("SELECT file_id, file_path, uploaded_at FROM transaction_files WHERE transaction_id=?");
     $stmt->bind_param("i", $transaction_id);
     $stmt->execute();
     $result = $stmt->get_result();

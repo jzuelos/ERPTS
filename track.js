@@ -29,14 +29,16 @@ function openModal(id = null) {
     if (tx) {
       document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Transaction';
       document.getElementById('transactionID').value = tx.t_code || '';
-      document.getElementById('transactionID').disabled = true; // disable editing code
+      document.getElementById('transactionID').disabled = true;
       document.getElementById('nameInput').value = tx.name || '';
       document.getElementById('contactInput').value = tx.contact || '';
       document.getElementById('transactionInput').value = tx.transaction || '';
+      document.getElementById('transactionType').value = tx.transaction_type || '';  // 🔹 FIX
       document.getElementById('statusInput').value = tx.status || '';
       editId = id;
     }
-  } else {
+  }
+  else {
     document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus"></i> Add Transaction';
 
     // Fetch next transaction code from backend
@@ -142,6 +144,7 @@ function loadTransactions() {
         name: tx.name,
         contact: tx.contact_number,       // NEW
         transaction: tx.description,
+        transaction_type: tx.transaction_type,
         status: tx.status
       }));
       updateTable();
@@ -195,11 +198,11 @@ function updateTable() {
     <button class="btn btn-edit" onclick="openModal(${tx.id})">
       <i class="fas fa-edit"></i> Edit
     </button>
+    <button class="btn btn-dark" onclick="showDocuments(${tx.id})">
+      <i class="fas fa-file-image"></i> Documents
+    </button>
     <button class="btn btn-delete" onclick="deleteTransaction(${tx.id})">
       <i class="fas fa-trash"></i> Delete
-    </button>
-    <button class="btn btn-ar" onclick="showDocuments(${tx.id})">
-      <i class="fas fa-file-image"></i> Documents
     </button>
   </td>
   <td>
@@ -207,7 +210,6 @@ function updateTable() {
       <i class="fas fa-check"></i>
     </button>
   </td>`;
-
 
     table.appendChild(row);
   });
@@ -412,16 +414,32 @@ function showDocuments(transactionId) {
           // Extract the file name from the path
           const fileName = file.file_path.split("/").pop();
 
+          // Truncate file name (max 25 chars)
+          let displayName = fileName.length > 70
+            ? fileName.substring(0, 22) + "..."
+            : fileName;
+
           wrapper.innerHTML = `
-    <div class="d-flex align-items-center gap-3">
-      <img src="${file.file_path}" class="img-fluid" style="max-height:100px; width:auto;">
-      <span class="doc-name text-center flex-grow-1">${fileName}</span>
+  <div class="d-flex align-items-center justify-content-between w-100">
+    <!-- Left: Image -->
+    <img src="${file.file_path}" class="img-fluid" style="max-height:100px; width:auto;">
+
+    <!-- Middle: File name + date -->
+    <div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 mx-3" style="max-width: 300px; overflow: hidden;">
+      <span class="doc-name text-truncate text-center w-100" title="${fileName}">
+        ${displayName}
+      </span>
+      <small class="text-muted text-center">
+        ${file.uploaded_at}
+      </small>
     </div>
+
+    <!-- Right: Delete button -->
     <button class="btn btn-sm btn-danger" onclick="deleteDocument(${file.file_id}, ${transactionId})">
       <i class="fas fa-trash"></i> Delete
     </button>
-  `;
-
+  </div>
+`;
           container.appendChild(wrapper);
         });
       }
