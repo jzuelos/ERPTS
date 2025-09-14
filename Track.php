@@ -146,8 +146,7 @@ if ($result && $result->num_rows > 0) {
     <table class="table table-borderless">
       <thead>
         <tr>
-          <!-- Column headers -->
-          <th scope="col">Date/Time (PH Standard Time)</th>
+          <th scope="col">Date/Time</th>
           <th scope="col">Transaction Code</th>
           <th scope="col">Action</th>
           <th scope="col">Details</th>
@@ -155,7 +154,6 @@ if ($result && $result->num_rows > 0) {
         </tr>
       </thead>
       <tbody>
-        <!-- Example row (replace with dynamic logs later) -->
         <tr>
           <td>2025-09-14 02:45 PM</td>
           <td>TXN-00123</td>
