@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 14, 2025 at 12:16 PM
+-- Generation Time: Sep 14, 2025 at 08:58 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -397,18 +397,18 @@ CREATE TABLE `district` (
 --
 
 INSERT INTO `district` (`district_id`, `district_code`, `description`, `status`, `m_id`) VALUES
-(13, '1', 'District 1', 'Active', 7),
-(14, '1', 'District 1', 'Active', 8),
-(15, '1', 'District 1', 'Active', 9),
-(16, '1', 'District 1', 'Active', 10),
-(17, '1', 'District 1', 'Active', 14),
-(18, '2', 'District 2', 'Active', 3),
-(19, '2', 'District 2', 'Active', 4),
-(20, '2', 'District 2', 'Active', 5),
-(21, '2', 'District 2', 'Active', 6),
-(22, '2', 'District 2', 'Active', 11),
-(23, '2', 'San Vicente', 'Active', 12),
-(24, '2', 'District 2', 'Active', 13);
+(1, '4600', 'District 2', 'Active', 1),
+(2, '4601', 'District 2', 'Active', 2),
+(3, '4602', 'District 2', 'Active', 3),
+(4, '4603', 'District 2', 'Active', 4),
+(5, '4604', 'District 1', 'Active', 5),
+(6, '4605', 'District 1', 'Active', 6),
+(7, '4606', 'District 1', 'Active', 7),
+(8, '4607', 'District 1', 'Active', 8),
+(9, '4608', 'District 1', 'Active', 9),
+(10, '4609', 'District 2', 'Active', 10),
+(11, '4610', 'District 2', 'Active', 11),
+(12, '4611', 'District 1', 'Active', 12);
 
 -- --------------------------------------------------------
 
@@ -770,8 +770,8 @@ CREATE TABLE `transactions` (
 --
 
 INSERT INTO `transactions` (`transaction_id`, `transaction_code`, `name`, `contact_number`, `description`, `status`, `created_at`, `updated_at`, `transaction_type`) VALUES
-(3, '003', 'test 3', '09344532342', 'test 3', 'Completed', '2025-08-20 14:46:42', '2025-09-14 09:58:58', 'Simple Transfer of Ownership'),
-(14, '25592', 'James', '12345', 'huwaw', 'Pending', '2025-09-13 11:08:00', '2025-09-14 10:09:21', 'New Declaration of Real Property');
+(21, '45206', 'James', '09232412', 'New Discovery', 'In Progress', '2025-09-14 18:45:08', '2025-09-14 18:45:21', 'New Declaration of Real Property'),
+(23, '11385', 'Renz', '093445323', 'Request to Change Ownership', 'In Progress', '2025-09-14 18:53:30', '2025-09-14 18:53:30', 'Simple Transfer of Ownership');
 
 -- --------------------------------------------------------
 
@@ -791,9 +791,42 @@ CREATE TABLE `transaction_files` (
 --
 
 INSERT INTO `transaction_files` (`file_id`, `transaction_id`, `file_path`, `uploaded_at`) VALUES
-(29, 14, 'uploads/transaction_14/tx_68c6882d3f71d_photo-1493612276216-ee3925520721.avif', '2025-09-14 09:17:33'),
-(30, 14, 'uploads/transaction_14/tx_68c6898106394_premium_photo-1666900440561-94dcb6865554.avif', '2025-09-14 09:23:13'),
-(31, 14, 'uploads/transaction_14/tx_68c6899d92ea7_photo-1500462918059-b1a0cb512f1d.avif', '2025-09-14 09:23:41');
+(43, 21, 'uploads/transaction_21/tx_68c70d34a5cda_premium_photo-1666900440561-94dcb6865554.avif', '2025-09-14 18:45:08'),
+(48, 23, 'uploads/transaction_23/tx_68c70f2ad733a_premium_photo-1666900440561-94dcb6865554.avif', '2025-09-14 18:53:30');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `transaction_logs`
+--
+
+CREATE TABLE `transaction_logs` (
+  `log_id` int(11) NOT NULL,
+  `transaction_id` int(11) NOT NULL,
+  `action` varchar(50) NOT NULL,
+  `details` text DEFAULT NULL,
+  `user_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `transaction_logs`
+--
+
+INSERT INTO `transaction_logs` (`log_id`, `transaction_id`, `action`, `details`, `user_id`, `created_at`) VALUES
+(34, 21, 'Document Uploaded', 'uploads/transaction_21/tx_68c70d34a5cda_premium_photo-1666900440561-94dcb6865554.avif', 9, '2025-09-14 18:45:08'),
+(35, 21, 'Created', 'Transaction created', 9, '2025-09-14 18:45:08'),
+(36, 21, 'Document Uploaded', 'uploads/transaction_21/tx_68c70d41598a0_photo-1500462918059-b1a0cb512f1d.avif', 9, '2025-09-14 18:45:21'),
+(37, 21, 'Updated', 'Transaction updated', 9, '2025-09-14 18:45:21'),
+(38, 21, 'Document Deleted', 'Deleted document: uploads/transaction_21/tx_68c70d41598a0_photo-1500462918059-b1a0cb512f1d.avif', 9, '2025-09-14 18:45:33'),
+(39, 22, 'Created', 'Transaction created', 9, '2025-09-14 18:48:24'),
+(40, 22, 'Document Uploaded', 'uploads/transaction_22/tx_68c70e5f3cc72_premium_photo-1666900440561-94dcb6865554.avif', 9, '2025-09-14 18:50:07'),
+(41, 22, 'Document Uploaded', 'uploads/transaction_22/tx_68c70e5f3d936_photo-1493612276216-ee3925520721.avif', 9, '2025-09-14 18:50:07'),
+(42, 22, 'Document Uploaded', 'uploads/transaction_22/tx_68c70e5f3e6b6_photo-1500462918059-b1a0cb512f1d.avif', 9, '2025-09-14 18:50:07'),
+(43, 22, 'Updated', 'Transaction updated', 9, '2025-09-14 18:50:07'),
+(44, 22, 'Deleted', 'Transaction deleted', 9, '2025-09-14 18:51:35'),
+(45, 23, 'Document Uploaded', 'uploads/transaction_23/tx_68c70f2ad733a_premium_photo-1666900440561-94dcb6865554.avif', 9, '2025-09-14 18:53:30'),
+(46, 23, 'Created', 'Transaction created', 9, '2025-09-14 18:53:30');
 
 -- --------------------------------------------------------
 
@@ -854,6 +887,12 @@ ALTER TABLE `certification`
 --
 ALTER TABLE `classification`
   ADD PRIMARY KEY (`c_id`);
+
+--
+-- Indexes for table `district`
+--
+ALTER TABLE `district`
+  ADD PRIMARY KEY (`district_id`);
 
 --
 -- Indexes for table `faas`
@@ -948,6 +987,14 @@ ALTER TABLE `transaction_files`
   ADD KEY `transaction_id` (`transaction_id`);
 
 --
+-- Indexes for table `transaction_logs`
+--
+ALTER TABLE `transaction_logs`
+  ADD PRIMARY KEY (`log_id`),
+  ADD KEY `transaction_id` (`transaction_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -975,6 +1022,12 @@ ALTER TABLE `certification`
 --
 ALTER TABLE `classification`
   MODIFY `c_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `district`
+--
+ALTER TABLE `district`
+  MODIFY `district_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `faas`
@@ -1052,13 +1105,19 @@ ALTER TABLE `subclass`
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
-  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `transaction_files`
 --
 ALTER TABLE `transaction_files`
-  MODIFY `file_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `file_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+
+--
+-- AUTO_INCREMENT for table `transaction_logs`
+--
+ALTER TABLE `transaction_logs`
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT for table `users`
