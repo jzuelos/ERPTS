@@ -189,27 +189,29 @@ function updateTable() {
     const confirmAttr = confirmDisabled ? 'disabled' : '';
 
     row.innerHTML = `
-  <td>${tx.t_code || '#' + tx.id}</td>
-  <td>${tx.name}</td>
-  <td>${tx.contact || ''}</td>
-  <td>${tx.transaction}</td>
-  <td><span class="status-badge ${statusClass}">${tx.status}</span></td>
-  <td>
-    <button class="btn btn-edit" onclick="openModal(${tx.id})">
-      <i class="fas fa-edit"></i> Edit
-    </button>
-    <button class="btn btn-dark" onclick="showDocuments(${tx.id})">
-      <i class="fas fa-file-image"></i> Documents
-    </button>
-    <button class="btn btn-delete" onclick="deleteTransaction(${tx.id})">
-      <i class="fas fa-trash"></i> Delete
-    </button>
-  </td>
-  <td>
-    <button class="btn ${confirmBtnClass} btn-sm" onclick="confirmTransaction(${tx.id})" ${confirmAttr}>
-      <i class="fas fa-check"></i>
-    </button>
-  </td>`;
+      <td>${tx.t_code || '#' + tx.id}</td>
+      <td>${tx.name}</td>
+      <td>${tx.contact || ''}</td>
+      <td>${tx.transaction}</td>
+      <td>${tx.transaction_type || ''}</td> <!-- 🔹 show transaction type -->
+      <td><span class="status-badge ${statusClass}">${tx.status}</span></td>
+      <td>
+        <button class="btn btn-edit btn-sm" onclick="openModal(${tx.id})">
+          <i class="fas fa-edit"></i> Edit
+        </button>
+        <button class="btn btn-dark btn-sm" onclick="showDocuments(${tx.id})">
+          <i class="fas fa-file-image"></i> Documents
+        </button>
+        <button class="btn btn-delete btn-sm" onclick="deleteTransaction(${tx.id})">
+          <i class="fas fa-trash"></i> Delete
+        </button>
+      </td>
+      <td>
+        <button class="btn ${confirmBtnClass} btn-sm" onclick="confirmTransaction(${tx.id})" ${confirmAttr}>
+          <i class="fas fa-check"></i>
+        </button>
+      </td>
+    `;
 
     table.appendChild(row);
   });

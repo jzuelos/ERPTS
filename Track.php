@@ -126,6 +126,7 @@ if ($result && $result->num_rows > 0) {
           <th>Name</th>
           <th>Contact Number</th>
           <th>Description</th>
+          <th>Transaction Type</th>
           <th>Status</th>
           <th>Actions</th>
           <th>Confirm</th>
