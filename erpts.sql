@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 13, 2025 at 01:35 PM
+-- Generation Time: Sep 14, 2025 at 12:16 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -770,8 +770,8 @@ CREATE TABLE `transactions` (
 --
 
 INSERT INTO `transactions` (`transaction_id`, `transaction_code`, `name`, `contact_number`, `description`, `status`, `created_at`, `updated_at`, `transaction_type`) VALUES
-(3, '003', 'test 3', NULL, 'test 3', 'Completed', '2025-08-20 14:46:42', '2025-08-20 14:46:42', NULL),
-(14, '25592', 'James', '12345', 'huwaw', 'Pending', '2025-09-13 11:08:00', '2025-09-13 11:30:02', 'Simple Transfer of Ownership');
+(3, '003', 'test 3', '09344532342', 'test 3', 'Completed', '2025-08-20 14:46:42', '2025-09-14 09:58:58', 'Simple Transfer of Ownership'),
+(14, '25592', 'James', '12345', 'huwaw', 'Pending', '2025-09-13 11:08:00', '2025-09-14 10:09:21', 'New Declaration of Real Property');
 
 -- --------------------------------------------------------
 
@@ -791,8 +791,9 @@ CREATE TABLE `transaction_files` (
 --
 
 INSERT INTO `transaction_files` (`file_id`, `transaction_id`, `file_path`, `uploaded_at`) VALUES
-(27, 14, 'uploads/transaction_14/tx_68c55090799d8_premium_photo-1666900440561-94dcb6865554.avif', '2025-09-13 11:08:00'),
-(28, 14, 'uploads/transaction_14/tx_68c550907a160_photo-1493612276216-ee3925520721.avif', '2025-09-13 11:08:00');
+(29, 14, 'uploads/transaction_14/tx_68c6882d3f71d_photo-1493612276216-ee3925520721.avif', '2025-09-14 09:17:33'),
+(30, 14, 'uploads/transaction_14/tx_68c6898106394_premium_photo-1666900440561-94dcb6865554.avif', '2025-09-14 09:23:13'),
+(31, 14, 'uploads/transaction_14/tx_68c6899d92ea7_photo-1500462918059-b1a0cb512f1d.avif', '2025-09-14 09:23:41');
 
 -- --------------------------------------------------------
 
@@ -1057,7 +1058,7 @@ ALTER TABLE `transactions`
 -- AUTO_INCREMENT for table `transaction_files`
 --
 ALTER TABLE `transaction_files`
-  MODIFY `file_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `file_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `users`
