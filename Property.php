@@ -342,7 +342,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           </div>
           <div class="mb-2">
             <label for="editClassificationDescription" class="form-label">Description</label>
-            <input type="text" class="form-control" id="editClassificationDescription">
+            <input type="text" class="form-control" id="editClassificationDescription" maxlength="100">
           </div>
           <div class="mb-2">
             <label for="editClassificationAssessment" class="form-label">Assessment Level (%)</label>
@@ -390,7 +390,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           </div>
           <div class="mb-2">
             <label for="editActualUsesDescription" class="form-label">Description</label>
-            <input type="text" class="form-control" id="editActualUsesDescription">
+            <input type="text" class="form-control" id="editActualUsesDescription" maxlength="100">
           </div>
           <div class="mb-2">
             <label for="editActualUsesAssessment" class="form-label">Assessment Level (%)</label>
@@ -435,7 +435,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           </div>
           <div class="mb-2">
             <label for="editSubClassesDescription" class="form-label">Description</label>
-            <input type="text" class="form-control" id="editSubClassesDescription">
+            <input type="text" class="form-control" id="editSubClassesDescription" maxlength="100">
           </div>
           <div class="mb-2">
             <label for="editSubClassesAssessment" class="form-label">Unit Value</label>
@@ -523,7 +523,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             <div class="form-group">
               <label for="classificationCode">Code</label>
               <input type="text" class="form-control" id="classificationCode" name="c_code"
-                placeholder="Enter Classification Code" required>
+                placeholder="Enter Classification Code" maxlength="6" required>
             </div>
 
             <div class="form-group">
@@ -597,11 +597,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             </div>
             <div class="form-group">
               <label for="reportCodeValue">Code</label>
-              <input type="text" class="form-control" id="reportCodeValue" placeholder="Enter Code" required>
+              <input type="text" class="form-control" id="reportCodeValue" placeholder="Enter Code" maxlength="6" required>
             </div>
             <div class="form-group">
               <label for="reportDescription">Description</label>
-              <input type="text" class="form-control" id="reportDescription" placeholder="Enter Description" required>
+              <input type="text" class="form-control" id="reportDescription" placeholder="Enter Description" maxlength="100"required>
             </div>
             <div class="form-group">
               <label for="reportAssessmentLevel">Assessment Level (%)</label>
@@ -646,12 +646,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           <form id="subClassesForm">
             <div class="form-group">
               <label for="subClassesCode">Code</label>
-              <input type="text" class="form-control" id="subClassesCode" placeholder="Enter Code" required>
+              <input type="text" class="form-control" id="subClassesCode" placeholder="Enter Code" maxlenght="6"required>
             </div>
             <div class="form-group">
               <label for="subClassesDescription">Description</label>
               <input type="text" class="form-control" id="subClassesDescription" placeholder="Enter Description"
-                required>
+                 maxlenght="100 "required>
             </div>
             <div class="form-group">
               <label for="unitValue">Unit Value</label>

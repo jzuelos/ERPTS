@@ -159,51 +159,51 @@ if ($result->num_rows > 0) {
             <div class="form-row">
               <div class="form-group col-md-4">
                 <label for="firstName">First Name</label>
-                <input type="text" class="form-control" id="firstName" placeholder="Enter first name">
+                <input type="text" class="form-control" id="firstName" placeholder="Enter first name" maxlength="20">
               </div>
               <div class="form-group col-md-4">
                 <label for="middleName">Middle Name</label>
-                <input type="text" class="form-control" id="middleName" placeholder="Enter middle name">
+                <input type="text" class="form-control" id="middleName" placeholder="Enter middle name" maxlength="20">
               </div>
               <div class="form-group col-md-4">
                 <label for="surname">Surname</label>
-                <input type="text" class="form-control" id="surname" placeholder="Enter surname">
+                <input type="text" class="form-control" id="surname" placeholder="Enter surname" maxlength="20">
               </div>
             </div>
             <div class="form-group">
               <label for="tinNo">TIN No.</label>
-              <input type="text" class="form-control" id="tinNo" placeholder="Enter TIN number">
+              <input type="text" class="form-control" id="tinNo" placeholder="Enter TIN number" maxlength="15">
             </div>
 
             <!-- Address Fields -->
             <div class="form-row">
               <div class="form-group col-md-6">
                 <label for="houseNumber">House Number</label>
-                <input type="text" class="form-control" id="houseNumber" placeholder="Enter house number">
+                <input type="text" class="form-control" id="houseNumber" placeholder="Enter house number" maxlength="10">
               </div>
               <div class="form-group col-md-6">
                 <label for="street">Street</label>
-                <input type="text" class="form-control" id="street" placeholder="Enter street">
+                <input type="text" class="form-control" id="street" placeholder="Enter street" maxlength="50">
               </div>
             </div>
             <div class="form-row">
               <div class="form-group col-md-6">
                 <label for="barangay">Barangay</label>
-                <input type="text" class="form-control" id="barangay" placeholder="Enter barangay">
+                <input type="text" class="form-control" id="barangay" placeholder="Enter barangay" maxlength="50">
               </div>
               <div class="form-group col-md-6">
                 <label for="district">District</label>
-                <input type="text" class="form-control" id="district" placeholder="Enter district">
+                <input type="text" class="form-control" id="district" placeholder="Enter district" maxlength="50">
               </div>
             </div>
             <div class="form-row">
               <div class="form-group col-md-6">
                 <label for="city">City</label>
-                <input type="text" class="form-control" id="city" placeholder="Enter city">
+                <input type="text" class="form-control" id="city" placeholder="Enter city" maxlength="50">
               </div>
               <div class="form-group col-md-6">
                 <label for="province">Province</label>
-                <input type="text" class="form-control" id="province" placeholder="Enter province">
+                <input type="text" class="form-control" id="province" placeholder="Enter province" maxlength="50">
               </div>
             </div>
 
@@ -212,20 +212,20 @@ if ($result->num_rows > 0) {
             <div class="form-row">
               <div class="form-group col-md-4">
                 <label for="telephone">Telephone</label>
-                <input type="text" class="form-control" id="telephone" placeholder="Enter telephone number">
+                <input type="text" class="form-control" id="telephone" placeholder="Enter telephone number" maxlength="11">
               </div>
               <div class="form-group col-md-4">
                 <label for="fax">Fax</label>
-                <input type="text" class="form-control" id="fax" placeholder="Enter fax number">
+                <input type="text" class="form-control" id="fax" placeholder="Enter fax number" maxlength="15">
               </div>
               <div class="form-group col-md-4">
                 <label for="email">Email</label>
-                <input type="email" class="form-control" id="email" placeholder="Enter email address">
+                <input type="email" class="form-control" id="email" placeholder="Enter email address" maxlength="50">
               </div>
             </div>
             <div class="form-group">
               <label for="website">Website</label>
-              <input type="text" class="form-control" id="website" placeholder="Enter website">
+              <input type="text" class="form-control" id="website" placeholder="Enter website" maxlength="100">
             </div>
           </form>
         </div>
