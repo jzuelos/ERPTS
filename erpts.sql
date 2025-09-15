@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 14, 2025 at 08:58 PM
+-- Generation Time: Sep 15, 2025 at 07:58 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -552,6 +552,7 @@ CREATE TABLE `owners_tb` (
   `own_fname` varchar(20) NOT NULL,
   `own_mname` varchar(20) NOT NULL,
   `own_surname` varchar(20) NOT NULL,
+  `date_birth` date DEFAULT NULL,
   `tin_no` int(20) NOT NULL,
   `house_no` varchar(20) NOT NULL,
   `street` varchar(30) NOT NULL,
@@ -566,12 +567,12 @@ CREATE TABLE `owners_tb` (
 -- Dumping data for table `owners_tb`
 --
 
-INSERT INTO `owners_tb` (`own_id`, `own_fname`, `own_mname`, `own_surname`, `tin_no`, `house_no`, `street`, `barangay`, `district`, `city`, `province`, `own_info`) VALUES
-(8, 'Renz', 'Balce', 'Dioneda', 0, '5', 'Purok', 'Bulala', 'District 1', 'Santa Elena', 'Camarines Norte', 'Telephone: 09922007821, Fax: , Email: rdioneda4@gmail.com, Website: '),
-(9, 'Jonard', 'Balce', 'Canaria', 0, '1', 'Purok 3', 'Alawihao', 'District 2', 'Santa elena', 'Camarines norte', 'Telephone: 09473846382, Fax: , Email: jonard@gmail.com, Website: '),
-(10, 'Rommel James', 'Balce', 'Gacho', 0, '3', 'Purok 2', 'Bagacay', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09738265234, Fax: , Email: rommel@gmail.com, Website: '),
-(11, 'John Lloyd', 'Balce', 'Zuelos', 0, '1', 'Purok 2', 'Kalamunding', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09643826422, Fax: , Email: jzuelos@gmail.com, Website: '),
-(12, 'Mark', 'Balce', 'Bertillo', 0, '3', 'Purok 1', 'Pasig', 'District 2', 'Daet', 'Camarines norte', 'Telephone: 09634618435, Fax: , Email: markbertillo@gmail.com, Website:');
+INSERT INTO `owners_tb` (`own_id`, `own_fname`, `own_mname`, `own_surname`, `date_birth`, `tin_no`, `house_no`, `street`, `barangay`, `district`, `city`, `province`, `own_info`) VALUES
+(8, 'Renz', 'Balce', 'Dioneda', '2015-09-16', 0, '5', 'Purok', 'Bulala', 'District 1', 'Santa Elena', 'Camarines Norte', 'Telephone: 09922007821, Fax: , Email: rdioneda4@gmail.com, Website: '),
+(9, 'Jonard', 'Balce', 'Canaria', '2017-09-08', 0, '1', 'Purok 3', 'Alawihao', 'District 2', 'Santa elena', 'Camarines norte', 'Telephone: 09473846382, Fax: , Email: jonard@gmail.com, Website: '),
+(10, 'Rommel James', 'Balce', 'Gacho', '2016-09-15', 0, '3', 'Purok 2', 'Bagacay', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09738265234, Fax: , Email: rommel@gmail.com, Website: '),
+(11, 'John Lloyd', 'Balce', 'Zuelos', '2018-09-17', 0, '1', 'Purok 2', 'Kalamunding', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09643826422, Fax: , Email: jzuelos@gmail.com, Website: '),
+(12, 'Mark', 'Balce', 'Bertillo', '2019-09-17', 0, '3', 'Purok 1', 'Pasig', 'District 2', 'Daet', 'Camarines norte', 'Telephone: 09634618435, Fax: , Email: markbertillo@gmail.com, Website:');
 
 -- --------------------------------------------------------
 
@@ -765,14 +766,6 @@ CREATE TABLE `transactions` (
   `transaction_type` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `transactions`
---
-
-INSERT INTO `transactions` (`transaction_id`, `transaction_code`, `name`, `contact_number`, `description`, `status`, `created_at`, `updated_at`, `transaction_type`) VALUES
-(21, '45206', 'James', '09232412', 'New Discovery', 'In Progress', '2025-09-14 18:45:08', '2025-09-14 18:45:21', 'New Declaration of Real Property'),
-(23, '11385', 'Renz', '093445323', 'Request to Change Ownership', 'In Progress', '2025-09-14 18:53:30', '2025-09-14 18:53:30', 'Simple Transfer of Ownership');
-
 -- --------------------------------------------------------
 
 --
@@ -785,14 +778,6 @@ CREATE TABLE `transaction_files` (
   `file_path` varchar(255) NOT NULL,
   `uploaded_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `transaction_files`
---
-
-INSERT INTO `transaction_files` (`file_id`, `transaction_id`, `file_path`, `uploaded_at`) VALUES
-(43, 21, 'uploads/transaction_21/tx_68c70d34a5cda_premium_photo-1666900440561-94dcb6865554.avif', '2025-09-14 18:45:08'),
-(48, 23, 'uploads/transaction_23/tx_68c70f2ad733a_premium_photo-1666900440561-94dcb6865554.avif', '2025-09-14 18:53:30');
 
 -- --------------------------------------------------------
 
@@ -826,7 +811,11 @@ INSERT INTO `transaction_logs` (`log_id`, `transaction_id`, `action`, `details`,
 (43, 22, 'Updated', 'Transaction updated', 9, '2025-09-14 18:50:07'),
 (44, 22, 'Deleted', 'Transaction deleted', 9, '2025-09-14 18:51:35'),
 (45, 23, 'Document Uploaded', 'uploads/transaction_23/tx_68c70f2ad733a_premium_photo-1666900440561-94dcb6865554.avif', 9, '2025-09-14 18:53:30'),
-(46, 23, 'Created', 'Transaction created', 9, '2025-09-14 18:53:30');
+(46, 23, 'Created', 'Transaction created', 9, '2025-09-14 18:53:30'),
+(47, 23, 'Updated', 'Transaction updated', 9, '2025-09-15 15:58:48'),
+(48, 23, 'Updated', 'Transaction updated', 9, '2025-09-15 16:54:45'),
+(49, 23, 'Deleted', 'Transaction deleted', 9, '2025-09-15 16:55:16'),
+(50, 21, 'Deleted', 'Transaction deleted', 9, '2025-09-15 16:56:01');
 
 -- --------------------------------------------------------
 
@@ -1117,7 +1106,7 @@ ALTER TABLE `transaction_files`
 -- AUTO_INCREMENT for table `transaction_logs`
 --
 ALTER TABLE `transaction_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT for table `users`
