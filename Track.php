@@ -138,33 +138,66 @@ if ($result && $result->num_rows > 0) {
       </tbody>
     </table>
 
-    <!-- Recent Activity Section -->
-    <div class="recent-activity">
-      <h3><i class="fas fa-history"></i> Recent Transaction Activity</h3>
+<!-- Recent Activity Section -->
+<div class="recent-activity">
+  <h3><i class="fas fa-history"></i> Recent Transaction Activity</h3>
 
-      <!-- Activity Table -->
-      <div id="activityLog">
-        <table class="table table-borderless">
-          <thead>
-            <tr>
-              <th scope="col">Date/Time</th>
-              <th scope="col">Transaction Code</th>
-              <th scope="col">Action</th>
-              <th scope="col">Details</th>
-              <th scope="col">Current User</th>
-            </tr>
-          </thead>
-          <tbody id="activityTableBody">
-            <tr id="activityLoadingRow">
-              <td colspan="5" class="text-center">Loading recent activity…</td>
-            </tr>
-          </tbody>
-
-        </table>
-      </div>
+  <!-- Filters -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <!-- Date Picker -->
+    <div>
+      <label for="dateFilter" class="form-label me-2">Filter by Date:</label>
+      <input type="date" id="dateFilter" class="form-control d-inline-block" style="width: auto;">
     </div>
 
+    <!-- Search -->
+    <div>
+      <input type="text" id="searchInput" class="form-control" placeholder="Search transaction...">
+    </div>
+  </div>
 
+  <!-- Activity Table -->
+  <div id="activityLog">
+    <table class="table table-borderless">
+      <thead>
+        <tr>
+          <th scope="col">Date/Time</th>
+          <th scope="col">Transaction Code</th>
+          <th scope="col">Action</th>
+          <th scope="col">Details</th>
+          <th scope="col">Current User</th>
+        </tr>
+      </thead>
+      <tbody id="activityTableBody">
+        <tr id="activityLoadingRow">
+          <td colspan="5" class="text-center">Loading recent activity…</td>
+        </tr>
+        <!-- Example rows (remove when loading dynamically) -->
+        <tr>
+          <td>2025-09-12 14:32</td>
+          <td>TX12345</td>
+          <td>Added</td>
+          <td>New record</td>
+          <td>Admin</td>
+        </tr>
+        <tr>
+          <td>2025-09-11 10:20</td>
+          <td>TX67890</td>
+          <td>Updated</td>
+          <td>Edited details</td>
+          <td>User1</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <nav>
+    <ul class="pagination justify-content-center" id="pagination">
+      <!-- JS will populate pages -->
+    </ul>
+  </nav>
+</div>
   </div>
 
   <!-- Edit Modal -->

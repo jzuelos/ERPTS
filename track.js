@@ -518,3 +518,70 @@ function deleteDocument(fileId, transactionId) {
     })
     .catch(err => console.error("Error deleting document:", err));
 }
+
+//Recent Activity 
+ document.addEventListener("DOMContentLoaded", function () {
+    const rowsPerPage = 5;
+    const tableBody = document.getElementById("activityTableBody");
+    const pagination = document.getElementById("pagination");
+    const searchInput = document.getElementById("searchInput");
+    const dateFilter = document.getElementById("dateFilter");
+
+    let rows = Array.from(tableBody.querySelectorAll("tr:not(#activityLoadingRow)"));
+
+    function filterRows() {
+      const searchText = searchInput.value.toLowerCase();
+      const filterDate = dateFilter.value;
+
+      rows.forEach(row => {
+        const rowText = row.innerText.toLowerCase();
+        const rowDate = row.cells[0]?.innerText.split(" ")[0]; // Extract date 
+
+        const matchesSearch = rowText.includes(searchText);
+        const matchesDate = !filterDate || rowDate === filterDate;
+
+        row.style.display = (matchesSearch && matchesDate) ? "" : "none";
+      });
+
+      paginate();
+    }
+
+    function paginate() {
+      const visibleRows = rows.filter(r => r.style.display !== "none");
+      const totalPages = Math.ceil(visibleRows.length / rowsPerPage);
+
+      pagination.innerHTML = "";
+      for (let i = 1; i <= totalPages; i++) {
+        const li = document.createElement("li");
+        li.classList.add("page-item");
+        li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+
+        li.addEventListener("click", function (e) {
+          e.preventDefault();
+          showPage(i, visibleRows);
+        });
+
+        pagination.appendChild(li);
+      }
+
+      if (totalPages > 0) showPage(1, visibleRows);
+    }
+
+    function showPage(page, visibleRows) {
+      visibleRows.forEach((row, index) => {
+        row.style.display = (index >= (page - 1) * rowsPerPage && index < page * rowsPerPage) ? "" : "none";
+      });
+
+      // Highlight active page
+      pagination.querySelectorAll(".page-item").forEach((li, i) => {
+        li.classList.toggle("active", i + 1 === page);
+      });
+    }
+
+    // Event listeners
+    searchInput.addEventListener("input", filterRows);
+    dateFilter.addEventListener("change", filterRows);
+
+    // Initial pagination
+    paginate();
+      });
