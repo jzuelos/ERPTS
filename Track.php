@@ -172,29 +172,15 @@ if ($result && $result->num_rows > 0) {
         <tr id="activityLoadingRow">
           <td colspan="5" class="text-center">Loading recent activity…</td>
         </tr>
-        <!-- Example rows (remove when loading dynamically) -->
-        <tr>
-          <td>2025-09-12 14:32</td>
-          <td>TX12345</td>
-          <td>Added</td>
-          <td>New record</td>
-          <td>Admin</td>
-        </tr>
-        <tr>
-          <td>2025-09-11 10:20</td>
-          <td>TX67890</td>
-          <td>Updated</td>
-          <td>Edited details</td>
-          <td>User1</td>
-        </tr>
       </tbody>
+
+      
     </table>
   </div>
 
   <!-- Pagination -->
   <nav>
     <ul class="pagination justify-content-center" id="pagination">
-      <!-- JS will populate pages -->
     </ul>
   </nav>
 </div>
