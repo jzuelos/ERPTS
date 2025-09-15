@@ -24,7 +24,7 @@
   <div id="selectedOwnerDisplay"></div> <!-- Display area for selected owner IDs -->
   <?php
   session_start(); // Start session at the top
-
+  
   // Prevent the browser from caching this page
   header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
   header("Cache-Control: post-check=0, pre-check=0", false);
@@ -88,7 +88,7 @@
           if ($stmt->execute()) {
             $property_id = $stmt->insert_id; // Get last inserted ID
             $_SESSION['last_property_id'] = $property_id; // Store it in session
-
+  
             // Insert owners into propertyowner table and collect propertyowner_ids
             $propertyowner_ids = [];
             if (!empty($selected_owner_ids)) {
@@ -207,118 +207,126 @@
   <?php include 'header.php'; ?>
 
   <!-- Main Header -->
-   <div>
-  <section class="text-center my-4">
-    <h2 class="text-black">Property Information</h2>
-  </section>
+  <div>
+    <section class="text-center my-4">
+      <h2 class="text-black">Property Information</h2>
+    </section>
 
-  <!-- Form Section -->
-  <section class="container my-4">
-    <div class="mb-3">
-            <a href="Real-Property-Unit-List.php" class="btn btn-outline-secondary btn-sm">
+    <!-- Form Section -->
+    <section class="container my-4">
+      <div class="mb-3">
+        <a href="Real-Property-Unit-List.php" class="btn btn-outline-secondary btn-sm">
           <i class="fas fa-arrow-left"></i> Back
         </a>
-</div>
-    <div class="card">
-      <div class="card-body">
-        <!-- Owner Search Section -->
-        <div class="mb-3">
-          <form action="" method="POST" id="ownerSearchForm">
-            <label for="owner_search" class="form-label"><span style="color: red;">*</span> Search for Owner</label>
-            <div class="input-group">
-              <input type="text" id="owner_search" name="search" class="form-control" placeholder="Search Owner"
-                required>
-              <button type="submit" class="btn btn-primary">Search</button>
-              <button type="button" class="btn btn-secondary clear-button"
-                onclick="clearOwnerSearchForm()">Clear</button>
-            </div>
-          </form>
-        </div>
-
-<table class="table table-bordered mb-3 text-start">
-  <thead class="table-light">
-    <tr>
-      <th class="align-middle">ID</th>
-      <th class="align-middle">Owner Name<br><small>(Surname, Firstname)</small></th>
-      <th class="align-middle">Address<br><small>(Street, Barangay, City, Province)</small></th>
-      <th class="align-middle">Date of Birth</th>
-      <th class="align-middle">Select</th>
-    </tr>
-  </thead>
-  <tbody id="resultsBody">
-    <?php
-    // Include the database connection
-    require_once 'database.php';
-
-    // Get the database connection
-    $conn = Database::getInstance();
-
-    // Fetch initial data
-    $stmt = $conn->prepare("SELECT own_id, own_fname, own_surname, street, barangay, city, province FROM owners_tb ORDER BY own_surname ASC, own_fname ASC LIMIT 5");
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result && $result->num_rows > 0) {
-      while ($row = $result->fetch_assoc()) {
-        $ownerId = htmlspecialchars($row['own_id'], ENT_QUOTES);
-        $fullName = htmlspecialchars($row['own_fname'] . ', ' . $row['own_surname'], ENT_QUOTES);
-        $address = htmlspecialchars($row['street'] . ', ' . $row['barangay'] . ', ' . $row['city'] . ', ' . $row['province'], ENT_QUOTES);
-
-        // Placeholder Date of Birth (Add Backend)
-        $date = '—';
-
-        // Output each row
-        echo "<tr>";
-        echo "<td class='align-middle'>" . $ownerId . "</td>";
-        echo "<td class='align-middle'>" . $fullName . "</td>";
-        echo "<td class='align-middle'>" . $address . "</td>";
-        echo "<td class='align-middle'>" . $date . "</td>";
-        echo "<td class='align-middle'><input type='checkbox' name='selected_ids[]' value='" . $ownerId . "'></td>";
-        echo "</tr>";
-      }
-    } else {
-      echo "<tr><td colspan='5' class='text-center'>No data found</td></tr>";
-    }
-
-    $stmt->close();
-    ?>
-  </tbody>
-</table>
-
-        <!-- Add Owner -->
-        <div class="d-flex justify-content-end mt-4">
-          <a href="Add_POwner.php" class="btn btn-primary ml-2">Add Owner</a>
-        </div>
-
-        <form action="" id="propertyForm" method="POST" onsubmit="return validateForm();">
-          <input type="hidden" name="selected_owner_ids" id="selected_owner_ids" />
-
-          <!-- Location of Property -->
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label for="house_number" class="form-label"><span style="color: red;">*</span> Location of
-                Property</label>
-              <input type="number" id="house_number" name="house_number" class="form-control" placeholder="House Number"
-                required>
-            </div>
-            <div class="col-md-6">
-              <label for="block_number" class="form-label">Block Number</label>
-              <input type="number" id="block_number" name="block_number" class="form-control"
-                placeholder="Block Number">
-            </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <!-- Owner Search Section -->
+          <div class="mb-3">
+            <form action="" method="POST" id="ownerSearchForm">
+              <label for="owner_search" class="form-label"><span style="color: red;">*</span> Search for Owner</label>
+              <div class="input-group">
+                <input type="text" id="owner_search" name="search" class="form-control" placeholder="Search Owner"
+                  required>
+                <button type="submit" class="btn btn-primary">Search</button>
+                <button type="button" class="btn btn-secondary clear-button"
+                  onclick="clearOwnerSearchForm()">Clear</button>
+              </div>
+            </form>
           </div>
 
-          <?php
-          // Get the database connection
-          $conn = Database::getInstance();
+          <table class="table table-bordered mb-3 text-start">
+            <thead class="table-light">
+              <tr>
+                <th class="align-middle">ID</th>
+                <th class="align-middle">Owner Name<br><small>(Surname, Firstname)</small></th>
+                <th class="align-middle">Address<br><small>(Street, Barangay, City, Province)</small></th>
+                <th class="align-middle">Date of Birth</th>
+                <th class="align-middle">Select</th>
+              </tr>
+            </thead>
+            <tbody id="resultsBody">
+              <?php
+              // Include the database connection
+              require_once 'database.php';
 
-          // Fetch active provinces
-          $stmt = $conn->prepare("SELECT province_id, province_name FROM province");
-          $stmt->execute();
-          $regions_result = $stmt->get_result();
+              // Get the database connection
+              $conn = Database::getInstance();
 
-          // Fetch active municipalities with their district names
-          $municipalities_stmt = $conn->prepare("
+              // Fetch initial data (added date_birth)
+              $stmt = $conn->prepare("
+    SELECT own_id, own_fname, own_surname, street, barangay, city, province, date_birth 
+    FROM owners_tb 
+    ORDER BY own_surname ASC, own_fname ASC 
+    LIMIT 5
+");
+              $stmt->execute();
+              $result = $stmt->get_result();
+
+              if ($result && $result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                  $ownerId = htmlspecialchars($row['own_id'], ENT_QUOTES);
+                  $fullName = htmlspecialchars($row['own_fname'] . ', ' . $row['own_surname'], ENT_QUOTES);
+                  $address = htmlspecialchars($row['street'] . ', ' . $row['barangay'] . ', ' . $row['city'] . ', ' . $row['province'], ENT_QUOTES);
+
+                  // Keep the date_birth in DB format (YYYY-MM-DD)
+                  $date = !empty($row['date_birth'])
+                    ? htmlspecialchars($row['date_birth'], ENT_QUOTES)
+                    : '—';
+
+                  // Output each row
+                  echo "<tr>";
+                  echo "<td class='align-middle'>{$ownerId}</td>";
+                  echo "<td class='align-middle'>{$fullName}</td>";
+                  echo "<td class='align-middle'>{$address}</td>";
+                  echo "<td class='align-middle'>{$date}</td>";
+                  echo "<td class='align-middle'><input type='checkbox' name='selected_ids[]' value='{$ownerId}'></td>";
+                  echo "</tr>";
+                }
+              } else {
+                echo "<tr><td colspan='5' class='text-center'>No data found</td></tr>";
+              }
+
+              $stmt->close();
+              ?>
+
+            </tbody>
+          </table>
+
+          <!-- Add Owner -->
+          <div class="d-flex justify-content-end mt-4">
+            <a href="Add_POwner.php" class="btn btn-primary ml-2">Add Owner</a>
+          </div>
+
+          <form action="" id="propertyForm" method="POST" onsubmit="return validateForm();">
+            <input type="hidden" name="selected_owner_ids" id="selected_owner_ids" />
+
+            <!-- Location of Property -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="house_number" class="form-label"><span style="color: red;">*</span> Location of
+                  Property</label>
+                <input type="number" id="house_number" name="house_number" class="form-control"
+                  placeholder="House Number" required>
+              </div>
+              <div class="col-md-6">
+                <label for="block_number" class="form-label">Block Number</label>
+                <input type="number" id="block_number" name="block_number" class="form-control"
+                  placeholder="Block Number">
+              </div>
+            </div>
+
+            <?php
+            // Get the database connection
+            $conn = Database::getInstance();
+
+            // Fetch active provinces
+            $stmt = $conn->prepare("SELECT province_id, province_name FROM province");
+            $stmt->execute();
+            $regions_result = $stmt->get_result();
+
+            // Fetch active municipalities with their district names
+            $municipalities_stmt = $conn->prepare("
             SELECT 
               municipality.m_id, 
               municipality.m_description, 
@@ -327,141 +335,141 @@
             LEFT JOIN district ON municipality.m_id = district.m_id 
             WHERE municipality.m_status = 'Active'
         ");
-          $municipalities_stmt->execute();
-          $municipalities_result = $municipalities_stmt->get_result();
+            $municipalities_stmt->execute();
+            $municipalities_result = $municipalities_stmt->get_result();
 
-          // Fetch active barangays
-          $barangays_stmt = $conn->prepare("SELECT brgy_id, brgy_name FROM brgy WHERE status = 'Active'");
-          $barangays_stmt->execute();
-          $barangays_result = $barangays_stmt->get_result();
-          ?>
-          <!-- Province Dropdown -->
-          <div class="row mb-3">
-            <div class="col-md-3">
-              <label for="province" class="form-label">Province</label>
-              <select class="form-control" id="province" name="province" required>
-                <option value="" disabled selected>Select Province</option>
-                <?php
-                while ($row = $regions_result->fetch_assoc()) {
-                  echo "<option value='" . htmlspecialchars($row['province_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['province_name'], ENT_QUOTES) . "</option>";
-                }
-                ?>
-              </select>
-            </div>
-
-            <!-- Municipality Dropdown -->
-            <div class="col-md-3">
-              <label for="municipality" class="form-label">Municipality</label>
-              <select class="form-control" id="municipality" name="municipality" required>
-                <option value="" disabled selected>Select Municipality</option>
-                <?php
-                while ($row = $municipalities_result->fetch_assoc()) {
-                  $m_id = htmlspecialchars($row['m_id'], ENT_QUOTES);
-                  $municipality = htmlspecialchars($row['m_description'], ENT_QUOTES);
-                  $district = htmlspecialchars($row['district_name'], ENT_QUOTES);
-                  echo "<option value='$m_id' data-district='$district'>$municipality</option>";
-                }
-                ?>
-              </select>
-            </div>
-
-            <!-- District (auto-filled) -->
-            <div class="col-md-3">
-              <label for="district" class="form-label">District</label>
-              <input type="text" class="form-control" id="district" name="district" readonly
-                placeholder="Auto-filled from Municipality">
-            </div>
-
-            <!-- Barangay Dropdown -->
-            <div class="col-md-3">
-              <label for="barangay" class="form-label">Barangay</label>
-              <select class="form-control" id="barangay" name="barangay" required>
-                <option value="" disabled selected>Select Barangay</option>
-                <?php
-                if ($barangays_result && $barangays_result->num_rows > 0) {
-                  while ($row = $barangays_result->fetch_assoc()) {
-                    echo "<option value='" . htmlspecialchars($row['brgy_id']) . "'>" . htmlspecialchars($row['brgy_name']) . "</option>";
+            // Fetch active barangays
+            $barangays_stmt = $conn->prepare("SELECT brgy_id, brgy_name FROM brgy WHERE status = 'Active'");
+            $barangays_stmt->execute();
+            $barangays_result = $barangays_stmt->get_result();
+            ?>
+            <!-- Province Dropdown -->
+            <div class="row mb-3">
+              <div class="col-md-3">
+                <label for="province" class="form-label">Province</label>
+                <select class="form-control" id="province" name="province" required>
+                  <option value="" disabled selected>Select Province</option>
+                  <?php
+                  while ($row = $regions_result->fetch_assoc()) {
+                    echo "<option value='" . htmlspecialchars($row['province_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['province_name'], ENT_QUOTES) . "</option>";
                   }
-                } else {
-                  echo "<option disabled>No active barangays</option>";
-                }
-                ?>
-              </select>
-            </div>
-          </div>
+                  ?>
+                </select>
+              </div>
 
-          <!-- House Tag Number and Land Area -->
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label for="house_tag_number" class="form-label">House Tag Number</label>
-              <input type="number" id="house_tag_number" name="house_tag_number" class="form-control"
-                placeholder="House Tag Number">
-            </div>
-            <div class="col-md-6">
-              <label for="land_area" class="form-label"><span style="color: red;">*</span> Land Area (sq. m)</label>
-              <input type="number" id="land_area" name="land_area" class="form-control" placeholder="Land Area"
-                required>
-            </div>
-          </div>
+              <!-- Municipality Dropdown -->
+              <div class="col-md-3">
+                <label for="municipality" class="form-label">Municipality</label>
+                <select class="form-control" id="municipality" name="municipality" required>
+                  <option value="" disabled selected>Select Municipality</option>
+                  <?php
+                  while ($row = $municipalities_result->fetch_assoc()) {
+                    $m_id = htmlspecialchars($row['m_id'], ENT_QUOTES);
+                    $municipality = htmlspecialchars($row['m_description'], ENT_QUOTES);
+                    $district = htmlspecialchars($row['district_name'], ENT_QUOTES);
+                    echo "<option value='$m_id' data-district='$district'>$municipality</option>";
+                  }
+                  ?>
+                </select>
+              </div>
 
-          <!-- Description of Land -->
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label for="lot_no" class="form-label">Lot Number</label>
-              <input type="number" id="lot_no" name="lot_no" class="form-control" placeholder="Lot Number">
-            </div>
-            <div class="col-md-6">
-              <label for="zone_no" class="form-label">Zone Number</label>
-              <input type="number" id="zone_no" name="zone_no" class="form-control" placeholder="Zone Number">
-            </div>
-          </div>
+              <!-- District (auto-filled) -->
+              <div class="col-md-3">
+                <label for="district" class="form-label">District</label>
+                <input type="text" class="form-control" id="district" name="district" readonly
+                  placeholder="Auto-filled from Municipality">
+              </div>
 
-          <!-- Documents -->
-          <fieldset class="border p-3 mb-3">
-            <legend class="w-auto">Documents</legend>
-            <div class="form-check">
-              <input type="checkbox" id="cb_affidavit" name="documents[]" value="affidavit" class="form-check-input">
-              <label for="cb_affidavit" class="form-check-label">Affidavit of Ownership</label>
+              <!-- Barangay Dropdown -->
+              <div class="col-md-3">
+                <label for="barangay" class="form-label">Barangay</label>
+                <select class="form-control" id="barangay" name="barangay" required>
+                  <option value="" disabled selected>Select Barangay</option>
+                  <?php
+                  if ($barangays_result && $barangays_result->num_rows > 0) {
+                    while ($row = $barangays_result->fetch_assoc()) {
+                      echo "<option value='" . htmlspecialchars($row['brgy_id']) . "'>" . htmlspecialchars($row['brgy_name']) . "</option>";
+                    }
+                  } else {
+                    echo "<option disabled>No active barangays</option>";
+                  }
+                  ?>
+                </select>
+              </div>
             </div>
-            <div class="form-check">
-              <input type="checkbox" id="cb_barangay" name="documents[]" value="barangay" class="form-check-input">
-              <label for="cb_barangay" class="form-check-label">Barangay Certificate</label>
-            </div>
-            <div class="form-check">
-              <input type="checkbox" id="cb_tag" name="documents[]" value="land_tagging" class="form-check-input">
-              <label for="cb_tag" class="form-check-label">Land Tagging</label>
-            </div>
-          </fieldset>
 
-          <!-- Button Group -->
-          <div class="d-flex justify-content-end mt-4">
-            <button type="submit" class="btn btn-primary">Submit</button>
-            <button type="button" class="btn btn-secondary ml-2" onclick="clearMainForm()">Clear Form</button>
-            <a href="Real-Property-Unit-List.php" class="btn btn-danger ml-2">Cancel</a>
-          </div>
-        </form>
+            <!-- House Tag Number and Land Area -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="house_tag_number" class="form-label">House Tag Number</label>
+                <input type="number" id="house_tag_number" name="house_tag_number" class="form-control"
+                  placeholder="House Tag Number">
+              </div>
+              <div class="col-md-6">
+                <label for="land_area" class="form-label"><span style="color: red;">*</span> Land Area (sq. m)</label>
+                <input type="number" id="land_area" name="land_area" class="form-control" placeholder="Land Area"
+                  required>
+              </div>
+            </div>
+
+            <!-- Description of Land -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="lot_no" class="form-label">Lot Number</label>
+                <input type="number" id="lot_no" name="lot_no" class="form-control" placeholder="Lot Number">
+              </div>
+              <div class="col-md-6">
+                <label for="zone_no" class="form-label">Zone Number</label>
+                <input type="number" id="zone_no" name="zone_no" class="form-control" placeholder="Zone Number">
+              </div>
+            </div>
+
+            <!-- Documents -->
+            <fieldset class="border p-3 mb-3">
+              <legend class="w-auto">Documents</legend>
+              <div class="form-check">
+                <input type="checkbox" id="cb_affidavit" name="documents[]" value="affidavit" class="form-check-input">
+                <label for="cb_affidavit" class="form-check-label">Affidavit of Ownership</label>
+              </div>
+              <div class="form-check">
+                <input type="checkbox" id="cb_barangay" name="documents[]" value="barangay" class="form-check-input">
+                <label for="cb_barangay" class="form-check-label">Barangay Certificate</label>
+              </div>
+              <div class="form-check">
+                <input type="checkbox" id="cb_tag" name="documents[]" value="land_tagging" class="form-check-input">
+                <label for="cb_tag" class="form-check-label">Land Tagging</label>
+              </div>
+            </fieldset>
+
+            <!-- Button Group -->
+            <div class="d-flex justify-content-end mt-4">
+              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="button" class="btn btn-secondary ml-2" onclick="clearMainForm()">Clear Form</button>
+              <a href="Real-Property-Unit-List.php" class="btn btn-danger ml-2">Cancel</a>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Footer -->
-  <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
-    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
-      <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span>
-    </div>
-  </footer>
+    <!-- Footer -->
+    <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
+      <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+        <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span>
+      </div>
+    </footer>
 
-  <script src="http://localhost/ERPTS/Add-New-Real-Property-Unit.js"></script>
+    <script src="http://localhost/ERPTS/Add-New-Real-Property-Unit.js"></script>
 
-  <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-    crossorigin="anonymous"></script>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
+      integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
+      integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+      crossorigin="anonymous"></script>
 </body>
 
 </html>
