@@ -68,6 +68,7 @@ if ($result && $result->num_rows > 0) {
   $transactionRows = "<tr><td colspan='8' class='text-center'>No transactions found</td></tr>";
 }
 ?>
+
 <!doctype html>
 <html lang="en">
 
@@ -137,53 +138,57 @@ if ($result && $result->num_rows > 0) {
         <?= $transactionRows ?>
       </tbody>
     </table>
-
-<!-- Recent Activity Section -->
-<div class="recent-activity">
-  <h3><i class="fas fa-history"></i> Recent Transaction Activity</h3>
-
-  <!-- Filters -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <!-- Date Picker -->
-    <div>
-      <label for="dateFilter" class="form-label me-2">Filter by Date:</label>
-      <input type="date" id="dateFilter" class="form-control d-inline-block" style="width: auto;">
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center mt-3 mb-5">
+      <ul class="pagination" id="transactionPagination"></ul>
     </div>
 
-    <!-- Search -->
-    <div>
-      <input type="text" id="searchInput" class="form-control" placeholder="Search transaction...">
+    <!-- Recent Activity Section -->
+    <div class="recent-activity">
+      <h3><i class="fas fa-history"></i> Recent Transaction Activity</h3>
+
+      <!-- Filters -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Date Picker -->
+        <div>
+          <label for="dateFilter" class="form-label me-2">Filter by Date:</label>
+          <select id="dateFilter" class="form-select">
+            <option value="">All Dates</option>
+          </select>
+        </div>
+
+        <!-- Search -->
+        <div>
+          <input type="text" id="searchInput" class="form-control" placeholder="Search transaction code...">
+        </div>
+      </div>
+
+      <!-- Activity Table -->
+      <div id="activityLog">
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th scope="col">Date/Time</th>
+              <th scope="col">Transaction Code</th>
+              <th scope="col">Action</th>
+              <th scope="col">Details</th>
+              <th scope="col">Current User</th>
+            </tr>
+          </thead>
+          <tbody id="activityTableBody">
+            <tr id="activityLoadingRow">
+              <td colspan="5" class="text-center">Loading recent activity…</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <nav>
+        <ul class="pagination justify-content-center" id="pagination">
+        </ul>
+      </nav>
     </div>
-  </div>
-
-  <!-- Activity Table -->
-  <div id="activityLog">
-    <table class="table table-borderless">
-      <thead>
-        <tr>
-          <th scope="col">Date/Time</th>
-          <th scope="col">Transaction Code</th>
-          <th scope="col">Action</th>
-          <th scope="col">Details</th>
-          <th scope="col">Current User</th>
-        </tr>
-      </thead>
-      <tbody id="activityTableBody">
-        <tr id="activityLoadingRow">
-          <td colspan="5" class="text-center">Loading recent activity…</td>
-        </tr>
-      </tbody>
-
-      
-    </table>
-  </div>
-
-  <!-- Pagination -->
-  <nav>
-    <ul class="pagination justify-content-center" id="pagination">
-    </ul>
-  </nav>
-</div>
   </div>
 
   <!-- Edit Modal -->
@@ -301,6 +306,44 @@ if ($result && $result->num_rows > 0) {
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   <script src="track.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
 
+  <!-- Script for Transaction Table Pagination -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const rowsPerPage = 10;
+      const tableBody = document.getElementById("transactionTable");
+      const pagination = document.getElementById("transactionPagination");
+
+      function paginate() {
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
+        const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+        function showPage(page) {
+          rows.forEach((row, i) => {
+            row.style.display = (i >= (page - 1) * rowsPerPage && i < page * rowsPerPage) ? "" : "none";
+          });
+          pagination.querySelectorAll("li").forEach((li, i) => {
+            li.classList.toggle("active", i + 1 === page);
+          });
+        }
+
+        pagination.innerHTML = "";
+        for (let i = 1; i <= totalPages; i++) {
+          const li = document.createElement("li");
+          li.className = "page-item";
+          li.innerHTML = `<a href="#" class="page-link">${i}</a>`;
+          li.addEventListener("click", e => {
+            e.preventDefault();
+            showPage(i);
+          });
+          pagination.appendChild(li);
+        }
+
+        if (totalPages > 0) showPage(1);
+      }
+      paginate();
+    });
+  </script>
+
+</body>
 </html>

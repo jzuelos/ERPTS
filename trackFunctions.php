@@ -265,7 +265,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-
 // ---------- GET RECENT ACTIVITY ----------
 if (isset($_GET['action']) && $_GET['action'] === 'getActivity') {
     $sql = "SELECT 
@@ -279,8 +278,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'getActivity') {
             FROM transaction_logs l
             LEFT JOIN transactions t ON l.transaction_id = t.transaction_id
             LEFT JOIN users u ON l.user_id = u.user_id
-            ORDER BY l.created_at DESC
-            LIMIT 20";
+            ORDER BY l.created_at DESC";
 
     $result = $conn->query($sql);
     $rows = [];

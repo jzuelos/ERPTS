@@ -169,34 +169,62 @@ function loadActivity() {
       }
 
       data.forEach(item => {
-        // fields returned by backend: created_at, t_code, action, details, user, transaction_id
         const createdAtRaw = item.created_at || "";
         const tcode = item.t_code || ("#" + (item.transaction_id || ""));
-        const action = item.action || "";
+        const actionRaw = item.action || "";
         const detailsRaw = item.details || "";
         const user = item.user || "";
 
-        // truncate long details to 120 chars
-        const details = (detailsRaw.length > 120) ? (detailsRaw.slice(0, 117) + '...') : detailsRaw;
+        const details = detailsRaw.length > 120 ? detailsRaw.slice(0, 117) + "..." : detailsRaw;
 
-        // Attempt a friendly date/time. If parse fails, fall back to raw string.
         const prettyDate = formatTimestamp(createdAtRaw);
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td style="white-space:nowrap">${prettyDate}</td>
-          <td>${escapeHtml(tcode)}</td>
-          <td>${escapeHtml(action)}</td>
-          <td title="${escapeHtml(detailsRaw)}">${escapeHtml(details)}</td>
-          <td>${escapeHtml(user)}</td>
-        `;
+    <td style="white-space:nowrap">${prettyDate}</td>
+    <td>${escapeHtml(tcode)}</td>
+    <td style="max-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" 
+        title="${escapeHtml(actionRaw)}">
+        ${escapeHtml(actionRaw)}
+    </td>
+    <td style="max-width:400px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" 
+        title="${escapeHtml(detailsRaw)}">
+        ${escapeHtml(details)}
+    </td>
+    <td>${escapeHtml(user)}</td>
+  `;
         tbody.appendChild(tr);
       });
+      populateDateFilter(data);
+      initActivityTable();
     })
     .catch(err => {
       console.error("Error loading activity:", err);
       tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Failed to load activity.</td></tr>`;
     });
+
+  // Populate date filter dropdown
+  function populateDateFilter(data) {
+    const dateFilter = document.getElementById("dateFilter");
+    const dates = new Set();
+
+    data.forEach(item => {
+      if (item.created_at) {
+        dates.add(item.created_at.split(" ")[0]); // YYYY-MM-DD
+      }
+    });
+
+    // clear and add "All"
+    dateFilter.innerHTML = `<option value="">All Dates</option>`;
+
+    [...dates].sort().forEach(date => {
+      const opt = document.createElement("option");
+      opt.value = date;
+      opt.textContent = date;
+      dateFilter.appendChild(opt);
+    });
+  }
+
 }
 
 // small helper: try to format 'YYYY-MM-DD HH:MM:SS' or ISO strings, else return input
@@ -231,24 +259,24 @@ function escapeHtml(str) {
 
 
 function deleteTransaction(id) {
-    if (!confirm('Are you sure you want to delete this transaction?')) return;
+  if (!confirm('Are you sure you want to delete this transaction?')) return;
 
-    let formData = new FormData();
-    formData.append("action", "deleteTransaction");
-    formData.append("transaction_id", id);
+  let formData = new FormData();
+  formData.append("action", "deleteTransaction");
+  formData.append("transaction_id", id);
 
-    fetch("trackFunctions.php", {
-        method: "POST",
-        body: formData
-    })
+  fetch("trackFunctions.php", {
+    method: "POST",
+    body: formData
+  })
     .then(res => res.json())
     .then(data => {
-        if (data.success) {
-            alert(data.message); // Optional: show deletion success
-            loadTransactions(); // Reload your transaction table
-        } else {
-            alert("Failed: " + data.message);
-        }
+      if (data.success) {
+        alert(data.message); // Optional: show deletion success
+        loadTransactions(); // Reload your transaction table
+      } else {
+        alert("Failed: " + data.message);
+      }
     })
     .catch(err => console.error("Error deleting transaction:", err));
 }
@@ -519,69 +547,101 @@ function deleteDocument(fileId, transactionId) {
     .catch(err => console.error("Error deleting document:", err));
 }
 
-//Recent Activity 
- document.addEventListener("DOMContentLoaded", function () {
-    const rowsPerPage = 5;
-    const tableBody = document.getElementById("activityTableBody");
-    const pagination = document.getElementById("pagination");
-    const searchInput = document.getElementById("searchInput");
-    const dateFilter = document.getElementById("dateFilter");
+function initActivityTable() {
+  const rowsPerPage = 5;
+  const tableBody = document.getElementById("activityTableBody");
+  const pagination = document.getElementById("pagination");
+  const searchInput = document.getElementById("searchInput");
+  const dateFilter = document.getElementById("dateFilter");
 
-    let rows = Array.from(tableBody.querySelectorAll("tr:not(#activityLoadingRow)"));
+  let rows = Array.from(tableBody.querySelectorAll("tr"));
+  let currentPage = 1;
 
-    function filterRows() {
-      const searchText = searchInput.value.toLowerCase();
-      const filterDate = dateFilter.value;
+  function filterRows() {
+    const searchText = searchInput.value.toLowerCase();
+    const filterDate = dateFilter.value;
 
-      rows.forEach(row => {
-        const rowText = row.innerText.toLowerCase();
-        const rowDate = row.cells[0]?.innerText.split(" ")[0]; // Extract date 
+    rows.forEach(row => {
+      const rowText = row.innerText.toLowerCase();
+      const rowDate = row.cells[0]?.getAttribute("data-date")?.split(" ")[0];
+      const matchesSearch = rowText.includes(searchText);
+      const matchesDate = !filterDate || rowDate === filterDate;
 
-        const matchesSearch = rowText.includes(searchText);
-        const matchesDate = !filterDate || rowDate === filterDate;
+      row.style.display = (matchesSearch && matchesDate) ? "" : "none";
+    });
 
-        row.style.display = (matchesSearch && matchesDate) ? "" : "none";
-      });
-
-      paginate();
-    }
-
-    function paginate() {
-      const visibleRows = rows.filter(r => r.style.display !== "none");
-      const totalPages = Math.ceil(visibleRows.length / rowsPerPage);
-
-      pagination.innerHTML = "";
-      for (let i = 1; i <= totalPages; i++) {
-        const li = document.createElement("li");
-        li.classList.add("page-item");
-        li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-
-        li.addEventListener("click", function (e) {
-          e.preventDefault();
-          showPage(i, visibleRows);
-        });
-
-        pagination.appendChild(li);
-      }
-
-      if (totalPages > 0) showPage(1, visibleRows);
-    }
-
-    function showPage(page, visibleRows) {
-      visibleRows.forEach((row, index) => {
-        row.style.display = (index >= (page - 1) * rowsPerPage && index < page * rowsPerPage) ? "" : "none";
-      });
-
-      // Highlight active page
-      pagination.querySelectorAll(".page-item").forEach((li, i) => {
-        li.classList.toggle("active", i + 1 === page);
-      });
-    }
-
-    // Event listeners
-    searchInput.addEventListener("input", filterRows);
-    dateFilter.addEventListener("change", filterRows);
-
-    // Initial pagination
+    currentPage = 1; // reset page when filter changes
     paginate();
+  }
+
+  function paginate() {
+    const visibleRows = rows.filter(r => r.style.display !== "none");
+    const totalPages = Math.ceil(visibleRows.length / rowsPerPage);
+
+    pagination.innerHTML = "";
+
+    // Previous button
+    const prevLi = document.createElement("li");
+    prevLi.classList.add("page-item");
+    prevLi.innerHTML = `<a class="page-link" href="#">Previous</a>`;
+    prevLi.classList.toggle("disabled", currentPage === 1);
+    prevLi.addEventListener("click", e => {
+      e.preventDefault();
+      if (currentPage > 1) {
+        currentPage--;
+        showPage(currentPage, visibleRows);
+      }
+    });
+    pagination.appendChild(prevLi);
+
+    // Page numbers
+    for (let i = 1; i <= totalPages; i++) {
+      const li = document.createElement("li");
+      li.classList.add("page-item");
+      if (i === currentPage) li.classList.add("active");
+      li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+      li.addEventListener("click", e => {
+        e.preventDefault();
+        currentPage = i;
+        showPage(currentPage, visibleRows);
       });
+      pagination.appendChild(li);
+    }
+
+    // Next button
+    const nextLi = document.createElement("li");
+    nextLi.classList.add("page-item");
+    nextLi.innerHTML = `<a class="page-link" href="#">Next</a>`;
+    nextLi.classList.toggle("disabled", currentPage === totalPages);
+    nextLi.addEventListener("click", e => {
+      e.preventDefault();
+      if (currentPage < totalPages) {
+        currentPage++;
+        showPage(currentPage, visibleRows);
+      }
+    });
+    pagination.appendChild(nextLi);
+
+    if (totalPages > 0) showPage(currentPage, visibleRows);
+  }
+
+  function showPage(page, visibleRows) {
+    visibleRows.forEach((row, index) => {
+      row.style.display = (index >= (page - 1) * rowsPerPage && index < page * rowsPerPage) ? "" : "none";
+    });
+
+    // update active page
+    pagination.querySelectorAll(".page-item").forEach((li, i) => {
+      if (i > 0 && i <= pagination.childElementCount - 2) {
+        li.classList.toggle("active", parseInt(li.innerText) === page);
+      }
+    });
+  }
+
+  // Event listeners
+  searchInput.oninput = filterRows;
+  dateFilter.onchange = filterRows;
+
+  paginate();
+}
+
