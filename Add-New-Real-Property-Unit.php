@@ -339,7 +339,8 @@
             $municipalities_result = $municipalities_stmt->get_result();
 
             // Fetch active barangays
-            $barangays_stmt = $conn->prepare("SELECT brgy_id, brgy_name FROM brgy WHERE status = 'Active'");
+            // Fetch active barangays with their municipality id
+            $barangays_stmt = $conn->prepare("SELECT brgy_id, brgy_name, m_id FROM brgy WHERE status = 'Active'");
             $barangays_stmt->execute();
             $barangays_result = $barangays_stmt->get_result();
             ?>
@@ -388,7 +389,10 @@
                   <?php
                   if ($barangays_result && $barangays_result->num_rows > 0) {
                     while ($row = $barangays_result->fetch_assoc()) {
-                      echo "<option value='" . htmlspecialchars($row['brgy_id']) . "'>" . htmlspecialchars($row['brgy_name']) . "</option>";
+                      $brgy_id = htmlspecialchars($row['brgy_id'], ENT_QUOTES);
+                      $brgy_name = htmlspecialchars($row['brgy_name'], ENT_QUOTES);
+                      $m_for_brgy = htmlspecialchars($row['m_id'], ENT_QUOTES); // municipality id for this barangay
+                      echo "<option value='{$brgy_id}' data-municipality='{$m_for_brgy}'>{$brgy_name}</option>";
                     }
                   } else {
                     echo "<option disabled>No active barangays</option>";
