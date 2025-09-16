@@ -113,8 +113,9 @@ WHERE 1=1
   ?>
 
   <h1 style="text-align:center; font-size:22px; margin-bottom:20px;">
-    Province of Camarines Norte <br>
-    <span style="font-size:18px;">(Provincial Assessor's Office)</span>
+    PROVINCE OF CAMARINES NORTE <br>
+    <span style="font-size:18px;">(PROVINCIAL ASSESSOR'S OFFICE)</span><br>
+    <span style="font-size:15px;">(Property By: Classification Agricultural)</span>
   </h1>
 
   <div class="header">
