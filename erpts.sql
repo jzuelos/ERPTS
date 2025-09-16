@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 15, 2025 at 07:58 PM
+-- Generation Time: Sep 16, 2025 at 12:56 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -613,7 +613,7 @@ CREATE TABLE `province` (
 --
 
 INSERT INTO `province` (`province_id`, `province_name`) VALUES
-(54, 'Camarines Norte');
+(1, 'Camarines Norte');
 
 -- --------------------------------------------------------
 
@@ -815,7 +815,9 @@ INSERT INTO `transaction_logs` (`log_id`, `transaction_id`, `action`, `details`,
 (47, 23, 'Updated', 'Transaction updated', 9, '2025-09-15 15:58:48'),
 (48, 23, 'Updated', 'Transaction updated', 9, '2025-09-15 16:54:45'),
 (49, 23, 'Deleted', 'Transaction deleted', 9, '2025-09-15 16:55:16'),
-(50, 21, 'Deleted', 'Transaction deleted', 9, '2025-09-15 16:56:01');
+(50, 21, 'Deleted', 'Transaction deleted', 9, '2025-09-15 16:56:01'),
+(51, 24, 'Created', 'Transaction created', 10, '2025-09-14 17:12:23'),
+(52, 25, 'Created', 'Transaction created', 10, '2025-09-16 10:49:03');
 
 -- --------------------------------------------------------
 
@@ -1094,7 +1096,7 @@ ALTER TABLE `subclass`
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
-  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `transaction_files`
@@ -1106,7 +1108,7 @@ ALTER TABLE `transaction_files`
 -- AUTO_INCREMENT for table `transaction_logs`
 --
 ALTER TABLE `transaction_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `users`

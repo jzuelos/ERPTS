@@ -19,7 +19,7 @@
         
         <div class="timeline">
             <div class="timeline-step completed">
-                <div class="step-title">Transaction Request</div>
+                <div class="step-title">Transaction Requested</div>
                 <div class="step-date">08-21-2024</div>
             </div>
             
