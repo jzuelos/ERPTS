@@ -74,9 +74,7 @@ function clearOwnerSearchForm() {
     document.getElementById('owner_search').value = ''; // Clear the owner search input
 }
 
-// Function to clear the main property addition form
 function clearMainForm() {
-    // Clear input fields for the main form
     document.getElementById('house_number').value = '';
     document.getElementById('block_number').value = '';
     document.getElementById('house_tag_number').value = '';
@@ -84,13 +82,18 @@ function clearMainForm() {
     document.getElementById('lot_no').value = '';
     document.getElementById('zone_no').value = '';
 
-    // Reset select elements for the main form
+    // Reset selects
     document.getElementById('province').selectedIndex = 0;
-    document.getElementById('city').selectedIndex = 0;
-    document.getElementById('district').selectedIndex = 0;
-    document.getElementById('barangay').selectedIndex = 0;
+    document.getElementById('municipality').selectedIndex = 0; // municipality, not city
+    document.getElementById('district').value = '';
+    const barangay = document.getElementById('barangay');
+    if (barangay) {
+      barangay.innerHTML = '<option value="" disabled selected>Select Barangay</option>';
+      barangay.setAttribute('disabled', 'disabled');
+      barangay.required = false;
+    }
 
-    // Uncheck all checkboxes for the documents in the main form
+    // Uncheck documents checkboxes
     document.querySelectorAll('input[name="documents[]"]').forEach(checkbox => checkbox.checked = false);
 }
 
@@ -110,15 +113,88 @@ function validateDocumentsForm() {
 // Function to handle the change event for the municipality select element
 // and update the district input field accordingly
 document.addEventListener('DOMContentLoaded', function () {
-    const municipalitySelect = document.getElementById('municipality');
-    const districtInput = document.getElementById('district');
-  
-    if (municipalitySelect && districtInput) {
-      municipalitySelect.addEventListener('change', function () {
-        const selectedOption = this.options[this.selectedIndex];
-        const districtName = selectedOption.getAttribute('data-district') || '';
-        districtInput.value = districtName;
-      });
+  const municipalitySelect = document.getElementById('municipality');
+  const districtInput = document.getElementById('district');
+  const barangaySelect = document.getElementById('barangay');
+
+  if (!municipalitySelect || !barangaySelect) {
+    console.warn('municipality or barangay select not found');
+    return;
+  }
+
+  // Cache original barangay options that include data-municipality
+  const originalBarangayOptions = Array.from(barangaySelect.options)
+    .filter(opt => opt.dataset && opt.dataset.municipality)
+    .map(opt => ({ value: opt.value, text: opt.textContent.trim(), m: opt.dataset.municipality }));
+
+  console.log('Cached barangays count:', originalBarangayOptions.length);
+
+  function placeholderOption(text = 'Select Barangay') {
+    const p = document.createElement('option');
+    p.value = '';
+    p.disabled = true;
+    p.selected = true;
+    p.textContent = text;
+    return p;
+  }
+
+  function filterBarangays() {
+    const selectedM = municipalitySelect.value;
+    console.log('Municipality changed ->', selectedM);
+
+    // Clear and add placeholder
+    barangaySelect.innerHTML = '';
+    barangaySelect.appendChild(placeholderOption());
+
+    if (!selectedM) {
+      barangaySelect.setAttribute('disabled', 'disabled');
+      barangaySelect.required = false;
+      return;
     }
-  });
+
+    const matches = originalBarangayOptions.filter(o => o.m === selectedM);
+    console.log('Matched barangays:', matches);
+
+    if (matches.length) {
+      barangaySelect.removeAttribute('disabled');
+      barangaySelect.required = true;
+      matches.forEach(o => {
+        const el = document.createElement('option');
+        el.value = o.value;
+        el.textContent = o.text;
+        barangaySelect.appendChild(el);
+      });
+      // keep placeholder selected so user chooses one
+      barangaySelect.querySelector('option[value=""]').selected = true;
+    } else {
+      const none = document.createElement('option');
+      none.disabled = true;
+      none.textContent = 'No barangays available';
+      barangaySelect.appendChild(none);
+      barangaySelect.setAttribute('disabled', 'disabled');
+      barangaySelect.required = false;
+    }
+  }
+
+  // municipality -> district autofill
+  if (districtInput) {
+    municipalitySelect.addEventListener('change', function () {
+      const selectedOption = this.options[this.selectedIndex];
+      const districtName = selectedOption ? (selectedOption.getAttribute('data-district') || '') : '';
+      districtInput.value = districtName;
+      filterBarangays();
+    });
+  } else {
+    municipalitySelect.addEventListener('change', filterBarangays);
+  }
+
+  // set initial state on load (for edit pages)
+  if (municipalitySelect.value) {
+    filterBarangays();
+  } else {
+    barangaySelect.setAttribute('disabled', 'disabled');
+    barangaySelect.required = false;
+  }
+});
+
   
