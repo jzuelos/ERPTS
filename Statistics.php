@@ -38,27 +38,41 @@ header("Pragma: no-cache");
       </a>
     </div>
 
-    <h4 class="mb-3 text-center"><i class="fas fa-chart-line me-2"></i> Property Statistics</h4>
+    <h4 class="mb-3 text-center"><i class="fas fa-chart-line me-2"></i> Dashboard Statistics</h4>
 
+    <!-- Dropdown -->
     <div class="d-flex justify-content-center mb-3">
-  <input type="date" id="startDate" class="form-control form-control-sm me-2" style="max-width:200px;">
-  <input type="date" id="endDate" class="form-control form-control-sm me-2" style="max-width:200px;">
-  <button class="btn btn-primary btn-sm" onclick="filterChart()">Filter</button>
-</div>
-    
-  <div class="mb-4" style="max-width: 900px; margin: auto;">
-    <div style="height:500px;">
-      <canvas id="propertyChart"></canvas>
+      <select id="chartSelector" class="form-select form-select-sm" style="max-width:300px;">
+        <option value="property">Property Statistics</option>
+        <option value="user">User Activity</option>
+        <option value="audit">Audit Trail</option>
+      </select>
+    </div>
+
+    <!-- Date filter (always visible now) -->
+    <div id="dateFilter" class="d-flex justify-content-center mb-3">
+      <input type="date" id="startDate" class="form-control form-control-sm me-2" style="max-width:200px;">
+      <input type="date" id="endDate" class="form-control form-control-sm me-2" style="max-width:200px;">
+      <button class="btn btn-primary btn-sm" onclick="filterChart()">Filter</button>
+    </div>
+
+    <!-- Chart containers -->
+    <div class="mb-4" style="max-width: 900px; margin: auto;">
+      <div style="height:500px;">
+        <canvas id="propertyChart"></canvas>
+        <canvas id="userChart" style="display:none;"></canvas>
+        <canvas id="auditChart" style="display:none;"></canvas>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-end mt-2">
+      <button id="exportBtn" class="btn btn-success btn-sm">
+        Export as Image
+      </button>
     </div>
   </div>
-
-   <div class="d-flex justify-content-end mt-2">
-    <button id="exportBtn" class="btn btn-success btn-sm">
-      Export as Image
-    </button>
-  </div>
-  </div>
 </main>
+
 
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
