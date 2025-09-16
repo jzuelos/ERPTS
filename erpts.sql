@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 16, 2025 at 12:56 PM
+-- Generation Time: Sep 16, 2025 at 01:28 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -854,7 +854,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `last_name`, `first_name`, `middle_name`, `gender`, `birthdate`, `marital_status`, `tin`, `house_number`, `street`, `barangay`, `district`, `municipality`, `province`, `contact_number`, `email`, `status`, `user_type`) VALUES
 (9, 'admin', '$2y$10$uJGu7hoKfqtqSLE2EyV2GetTumt1zHaZOnvIpBeGC5dcwWBr25fc.', 'Admin', 'Admin', 'Admin', 'Male', '2001-11-11', 'Single', '000-123-456-789', '5', 'Purok', '66', '18', '14', 'Camarines Norte', '09123456789', 'johnlloydzuelos@gmail.com', 1, 'admin'),
-(10, 'user', '$2y$10$UkziCYNQ.FmUuB3V./d2xelvMkyVO8lvCCd9Yf/CvGMAZJ/jk9LB.', 'User', 'User', 'User', 'Male', '2002-02-02', 'Single', '000-321-654-987', '1', 'Purok 2', '71', '18', '4', 'Camarines Norte', '09876543210', 'user@gmail.com', 1, 'user');
+(11, 'dioneda', '$2y$10$dOOZplrD0.Lkexf7eX34z.a6yX1zJcfzkjC6NhtScOTiumbw/rw6m', 'Dioneda', 'Renz', 'Balce', 'Male', '2003-11-14', 'Married', 'NA', '5', 'Purok', '95', NULL, '5', 'Camarines Norte', '09922007821', 'rdioneda4@gmail.com', 0, 'user');
 
 --
 -- Indexes for dumped tables
@@ -1114,7 +1114,7 @@ ALTER TABLE `transaction_logs`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Constraints for dumped tables
