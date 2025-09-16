@@ -29,6 +29,7 @@ header("Pragma: no-cache");
 <body class="d-flex flex-column min-vh-100">
   <?php include 'header.php'; ?>
 
+  
 <main class="container my-5 flex-grow-1 d-flex justify-content-center">
   <div class="col-lg-10 col-md-11 col-sm-12">
     <div class="mb-3">
@@ -39,9 +40,23 @@ header("Pragma: no-cache");
 
     <h4 class="mb-3 text-center"><i class="fas fa-chart-line me-2"></i> Property Statistics</h4>
 
+    <div class="d-flex justify-content-center mb-3">
+  <input type="date" id="startDate" class="form-control form-control-sm me-2" style="max-width:200px;">
+  <input type="date" id="endDate" class="form-control form-control-sm me-2" style="max-width:200px;">
+  <button class="btn btn-primary btn-sm" onclick="filterChart()">Filter</button>
+</div>
+    
+  <div class="mb-4" style="max-width: 900px; margin: auto;">
     <div style="height:500px;">
       <canvas id="propertyChart"></canvas>
     </div>
+  </div>
+
+   <div class="d-flex justify-content-end mt-2">
+    <button id="exportBtn" class="btn btn-success btn-sm">
+      Export as Image
+    </button>
+  </div>
   </div>
 </main>
 

@@ -1,3 +1,4 @@
+ //Line Chart JS
  const ctx = document.getElementById('propertyChart').getContext('2d');
     new Chart(ctx, {
       type: 'line',
@@ -66,3 +67,56 @@
         }
       }
     });
+
+    //Create Chart JS 
+const propertyChart = new Chart(ctx, {
+  type: 'line',
+  data: chartData,
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'top' } },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: { display: true, text: 'Count', font: { weight: 'bold', size: 14 } }
+      },
+      x: {
+        title: { display: true, text: 'Date', font: { weight: 'bold', size: 14 } }
+      }
+    }
+  }
+});
+
+// Filter function
+function filterChart() {
+  const start = document.getElementById('startDate').value;
+  const end = document.getElementById('endDate').value;
+
+  if (!start || !end) {
+    alert('Please select both start and end dates.');
+    return;
+  }
+  const filteredLabels = [];
+  const filteredDatasets = chartData.datasets.map(ds => ({ ...ds, data: [] }));
+
+  chartData.labels.forEach((label, index) => {
+    if (label >= start && label <= end) {
+      filteredLabels.push(label);
+      filteredDatasets.forEach((ds, i) => {
+        ds.data.push(chartData.datasets[i].data[index]);
+      });
+    }
+  });
+
+  propertyChart.data.labels = filteredLabels;
+  propertyChart.data.datasets = filteredDatasets;
+  propertyChart.update();
+}
+
+// Export as Image
+document.getElementById('exportBtn').addEventListener('click', function() {
+  const link = document.createElement('a');
+  link.href = propertyChart.toBase64Image(); // Chart.js built-in
+  link.download = 'property-chart.png';     // File name
+  link.click();
+});
