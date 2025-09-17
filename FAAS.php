@@ -490,7 +490,7 @@ $conn->close();
     <?php
     if (!empty($property_id)) {
       $no_declaration = empty($rpu_declaration); // true if no rpu_dec present
-
+    
       if ($is_active == 0): ?>
         <!-- Property already disabled -->
         <span class="btn btn-outline-secondary disabled" title="This property is already inactive.">
@@ -514,7 +514,7 @@ $conn->close();
         <span class="btn btn-secondary disabled" title="Cannot disable: tax declaration exists for this property">
           <i class="fas fa-ban"></i> Cannot cancel RPU with TD encoded
         </span>
-    <?php endif;
+      <?php endif;
     }
     ?>
 
@@ -593,20 +593,24 @@ $conn->close();
           <form id="editOwnerForm" data-owner-id="<?= $owner['own_id'] ?>">
             <div class="mb-3">
               <label class="form-label">Company or Owner</label>
-              <input type="text" class="form-control" value="<?= htmlspecialchars($owner['owner_name']) ?>" maxlength="20" disabled>
+              <input type="text" class="form-control" value="<?= htmlspecialchars($owner['owner_name']) ?>"
+                maxlength="20" disabled>
             </div>
             <h6 class="mb-3">Name</h6>
             <div class="mb-3">
               <label class="form-label">First Name</label>
-              <input type="text" class="form-control firstNameModal" value="<?= htmlspecialchars($owner['first_name']) ?>" maxlength="20">
+              <input type="text" class="form-control firstNameModal"
+                value="<?= htmlspecialchars($owner['first_name']) ?>" maxlength="20">
             </div>
             <div class="mb-3">
               <label class="form-label">Middle Name</label>
-              <input type="text" class="form-control middleNameModal" value="<?= htmlspecialchars($owner['middle_name']) ?>" maxlength="20">
+              <input type="text" class="form-control middleNameModal"
+                value="<?= htmlspecialchars($owner['middle_name']) ?>" maxlength="20">
             </div>
             <div class="mb-3">
               <label class="form-label">Last Name</label>
-              <input type="text" class="form-control lastNameModal" value="<?= htmlspecialchars($owner['last_name']) ?>" maxlength="20">
+              <input type="text" class="form-control lastNameModal" value="<?= htmlspecialchars($owner['last_name']) ?>"
+                maxlength="20">
             </div>
             <hr class="my-4">
           </form>
@@ -708,7 +712,8 @@ $conn->close();
               </div>
               <div class="col-12 mb-3">
                 <label for="municipalityModal" class="form-label">Municipality</label>
-                <input type="text" class="form-control" id="municipalityModal" placeholder="Enter Municipality" maxlength="20">
+                <input type="text" class="form-control" id="municipalityModal" placeholder="Enter Municipality"
+                  maxlength="20">
               </div>
               <div class="col-12 mb-3">
                 <label for="provinceModal" class="form-label">Province</label>
@@ -716,7 +721,8 @@ $conn->close();
               </div>
               <div class="col-12 mb-3">
                 <label for="houseNumberModal" class="form-label">House Number</label>
-                <input type="text" class="form-control" id="houseNumberModal" placeholder="Enter House Number" maxlength="10">
+                <input type="text" class="form-control" id="houseNumberModal" placeholder="Enter House Number"
+                  maxlength="10">
               </div>
               <div class="col-12 mb-3">
                 <label for="landAreaModal" class="form-label">Land Area</label>
@@ -750,14 +756,16 @@ $conn->close();
           <div class="col-md-6 mb-3">
             <label for="arpNumber" class="form-label">ARP Number</label>
             <input type="number" class="form-control" id="arpNumber" placeholder="Enter ARP Number"
-              value="<?= isset($rpu_details['arp']) ? htmlspecialchars($rpu_details['arp']) : ''; ?>"  maxlength="20"disabled>
+              value="<?= isset($rpu_details['arp']) ? htmlspecialchars($rpu_details['arp']) : ''; ?>" maxlength="20"
+              disabled>
           </div>
 
           <!-- Property Number Input (Number only) -->
           <div class="col-md-6 mb-3">
             <label for="propertyNumber" class="form-label">Property Number</label>
             <input type="number" class="form-control" id="propertyNumber" placeholder="Enter Property Number"
-              value="<?= isset($rpu_details['pin']) ? htmlspecialchars($rpu_details['pin']) : ''; ?>"  maxlength="20"disabled>
+              value="<?= isset($rpu_details['pin']) ? htmlspecialchars($rpu_details['pin']) : ''; ?>" maxlength="20"
+              disabled>
           </div>
 
           <!-- Taxability Dropdown -->
@@ -965,8 +973,8 @@ $conn->close();
               <div class="col-md-6 mb-3">
                 <label for="previousOwnerModal" class="form-label">Previous Owner</label>
                 <input type="text" class="form-control" id="previousOwnerModal" name="prev_own"
-                  value="<?= htmlspecialchars($rpu_declaration['prev_own'] ?? '') ?>"
-                  placeholder="Enter Previous Owner" maxlength="50">
+                  value="<?= htmlspecialchars($rpu_declaration['prev_own'] ?? '') ?>" placeholder="Enter Previous Owner"
+                  maxlength="50">
               </div>
               <div class="col-md-6 mb-3">
                 <label for="previousAssessedValueModal" class="form-label">Previous Assessed Value</label>
@@ -987,170 +995,176 @@ $conn->close();
     </div>
   </div>
 
- <!-- Carousel Wrapper -->
-<div class="container my-5" id="property-carousel-section">
-  <div id="propertyCarousel" class="carousel slide" data-bs-ride="false">
-    <div class="carousel-inner">
+  <!-- Carousel Wrapper -->
+  <div class="container my-5" id="property-carousel-section">
+    <div id="propertyCarousel" class="carousel slide" data-bs-ride="false">
+      <div class="carousel-inner">
 
-    <!-- LAND Section -->
-    <div class="carousel-item active">
-      <!-- LAND Section -->
-      <section class="container my-5" id="land-section">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h4 class="section-title">
-            </a>
-            LAND
-          </h4>
+        <!-- LAND Section -->
+        <div class="carousel-item active">
+          <!-- LAND Section -->
+          <section class="container my-5" id="land-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h4 class="section-title">
+                </a>
+                LAND
+              </h4>
+            </div>
+
+            <div class="card border-0 shadow p-4 rounded-3">
+              <!-- Quick Actions Row -->
+              <div class="row mb-4">
+                <?php
+                // Get the property ID from the current URL (e.g., FAAS.php?id=140)
+                $p_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
+                ?>
+                <div class="col-md-6 mb-3">
+                  <a href="<?= ($is_active == 1) ? "Land.php?p_id=$p_id" : '#' ?>"
+                    class="btn w-100 py-2 text-white text-decoration-none <?= ($is_active == 0) ? 'disabled' : '' ?>"
+                    style="background-color: #379777; border-color: #2e8266; pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
+                    <i class="fas fa-plus-circle me-2"></i>Add Land
+                  </a>
+                </div>
+              </div>
+
+              <!-- Toggle Section -->
+              <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded">
+                <span class="fw-bold me-3">Show/Hide</span>
+                <div class="form-check form-switch m-0">
+                  <input class="form-check-input" type="checkbox" id="showToggle" checked style="margin-left: 0;">
+                </div>
+              </div>
+
+              <!-- Value Table -->
+              <div class="table-responsive" id="landTableContainer">
+                <table class="table table-borderless text-center">
+                  <thead class="border-bottom border-2">
+                    <tr class="border-bottom border-2">
+                      <th class="bold" style="width: 10%;">OCT/TCT Number</th>
+                      <th class="bold">Area (sq m)</th>
+                      <th class="bold">Market Value</th>
+                      <th class="bold">Assessed Value</th>
+                      <th class="bold" style="width: 10%;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php if (!empty($landRecords)): ?>
+                      <?php foreach ($landRecords as $record): ?>
+                        <tr class="border-bottom border-3">
+                          <td><?= htmlspecialchars($record['oct_no']) ?></td>
+                          <td><?= htmlspecialchars($record['area']) ?></td>
+                          <td><?= number_format($record['market_value'], 2) ?></td>
+                          <td>
+                            <?= isset($record['assess_value']) ? number_format($record['assess_value'], 2) : '0.00' ?>
+                          </td>
+                          <td>
+                            <div class="btn-group" role="group">
+                              <a href="LAND_Edit.php?p_id=<?= urlencode($p_id); ?>&land_id=<?= urlencode($record['land_id']); ?>"
+                                class="btn btn-sm btn-primary" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                              </a>
+                              <a href="<?= ($is_active == 1)
+                                ? 'print-layout.php?p_id=' . urlencode($p_id) . '&land_id=' . urlencode($record['land_id'])
+                                : '#' ?>"
+                                class="btn btn-sm btn-secondary ml-3 <?= ($is_active == 0) ? 'disabled' : '' ?>"
+                                title="View" target="_blank"
+                                style="pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
+                                <i class="bi bi-printer"></i>
+                              </a>
+                            </div>
+                          </td>
+                        </tr>
+                      <?php endforeach; ?>
+                    <?php else: ?>
+                      <tr>
+                        <td colspan="6" class="text-center">No records found</td>
+                      </tr>
+                    <?php endif; ?>
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+          </section>
         </div>
 
-        <div class="card border-0 shadow p-4 rounded-3">
-          <!-- Quick Actions Row -->
-          <div class="row mb-4">
-            <?php
-            // Get the property ID from the current URL (e.g., FAAS.php?id=140)
-            $p_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
-            ?>
-            <div class="col-md-6 mb-3">
-              <a href="<?= ($is_active == 1) ? "Land.php?p_id=$p_id" : '#' ?>"
-                class="btn w-100 py-2 text-white text-decoration-none <?= ($is_active == 0) ? 'disabled' : '' ?>"
-                style="background-color: #379777; border-color: #2e8266; pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
-                <i class="fas fa-plus-circle me-2"></i>Add Land
-              </a>
+        <!-- PLANTS AND TREES Section -->
+        <div class="carousel-item">
+          <section class="container my-5" id="plants-trees-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h4 class="section-title">
+                PLANTS AND TREES
+              </h4>
             </div>
-          </div>
 
-          <!-- Toggle Section -->
-          <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded">
-            <span class="fw-bold me-3">Show/Hide</span>
-            <div class="form-check form-switch m-0">
-              <input class="form-check-input" type="checkbox" id="showToggle" checked style="margin-left: 0;">
-            </div>
-          </div>
+            <div class="card border-0 shadow p-4 rounded-3">
+              <!-- Quick Actions Row -->
+              <div class="row mb-4">
+                <?php
+                // Get the property ID from the current URL (e.g., FAAS.php?id=140)
+                $p_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
+                ?>
+                <div class="col-md-6 mb-3">
+                  <a href="<?= ($is_active == 1) ? 'Property/AddPnTrees.php?p_id=' . $p_id : '#' ?>"
+                    class="btn w-100 py-2 text-white text-decoration-none <?= ($is_active == 0) ? 'disabled' : '' ?>"
+                    style="background-color: #379777; border-color: #2e8266; pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
+                    <i class="fas fa-plus-circle me-2"></i>Add Plants/Trees
+                  </a>
+                </div>
+              </div>
 
-          <!-- Value Table -->
-          <div class="table-responsive" id="landTableContainer">
-            <table class="table table-borderless text-center"> 
-              <thead class="border-bottom border-2">
-                <tr class="border-bottom border-2">
-                  <th class="bold" style="width: 10%;">OCT/TCT Number</th>
-                  <th class="bold">Area (sq m)</th>
-                  <th class="bold">Market Value</th>
-                  <th class="bold">Assessed Value</th>
-                  <th class="bold" style="width: 10%;">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php if (!empty($landRecords)): ?>
-                  <?php foreach ($landRecords as $record): ?>
-                    <tr class="border-bottom border-3">
-                      <td><?= htmlspecialchars($record['oct_no']) ?></td>
-                      <td><?= htmlspecialchars($record['area']) ?></td>
-                      <td><?= number_format($record['market_value'], 2) ?></td>
-                      <td>
-                        <?= isset($record['assess_value']) ? number_format($record['assess_value'], 2) : '0.00' ?>
-                      </td>
-                      <td>
+              <!-- Toggle Section -->
+              <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded">
+                <span class="fw-bold me-3">Show/Hide</span>
+                <div class="form-check form-switch m-0">
+                  <input class="form-check-input" type="checkbox" id="showPlantsToggle" checked style="margin-left: 0;">
+                </div>
+              </div>
+
+              <!-- Value Table -->
+              <div class="table-responsive">
+                <table class="table table-borderless">
+                  <thead>
+                    <tr>
+                      <th class="text-muted">Market Value</th>
+                      <th class="text-muted">Assessed Value</th>
+                      <th class="text-muted">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>$100,000.00</td>
+                      <td>$50,000.00</td>
+                      <td class="text-center">
                         <div class="btn-group" role="group">
-                          <a href="LAND_Edit.php?p_id=<?= urlencode($p_id); ?>&land_id=<?= urlencode($record['land_id']); ?>"
-                            class="btn btn-sm btn-primary" title="Edit">
+                          <a href="EditPnT.php" class="btn btn-sm btn-primary" title="Edit">
                             <i class="bi bi-pencil"></i>
                           </a>
-                          <a href="<?= ($is_active == 1)
-                                      ? 'print-layout.php?p_id=' . urlencode($p_id) . '&land_id=' . urlencode($record['land_id'])
-                                      : '#' ?>" class="btn btn-sm btn-secondary ml-3 <?= ($is_active == 0) ? 'disabled' : '' ?>"
-                            title="View" target="_blank" style="pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
-                            <i class="bi bi-printer"></i>
+                          <a href="#" class="btn btn-sm btn-danger ml-3" title="Delete">
+                            <i class="bi bi-trash"></i>
                           </a>
                         </div>
-                      </td>
                     </tr>
-                  <?php endforeach; ?>
-                <?php else: ?>
-                  <tr>
-                    <td colspan="6" class="text-center">No records found</td>
-                  </tr>
-                <?php endif; ?>
-              </tbody>
-            </table>
-          </div>
-
-        </div>
-      </section>
-    </div>
-
-    <!-- PLANTS AND TREES Section -->
-    <div class="carousel-item">
-      <section class="container my-5" id="plants-trees-section">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h4 class="section-title">
-            PLANTS AND TREES
-          </h4>
-        </div>
-
-        <div class="card border-0 shadow p-4 rounded-3">
-          <!-- Quick Actions Row -->
-          <div class="row mb-4">
-            <div class="col-md-6 mb-3">
-              <a href="<?= ($is_active == 1) ? 'Property/AddPnTrees.php' : '#' ?>"
-                class="btn w-100 py-2 text-white text-decoration-none <?= ($is_active == 0) ? 'disabled' : '' ?>"
-                style="background-color: #379777; border-color: #2e8266; pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
-                <i class="fas fa-plus-circle me-2"></i>Add Plants/Trees
-              </a>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-
-          <!-- Toggle Section -->
-          <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded">
-            <span class="fw-bold me-3">Show/Hide</span>
-            <div class="form-check form-switch m-0">
-              <input class="form-check-input" type="checkbox" id="showPlantsToggle" checked style="margin-left: 0;">
-            </div>
-          </div>
-
-          <!-- Value Table -->
-          <div class="table-responsive">
-            <table class="table table-borderless">
-              <thead>
-                <tr>
-                  <th class="text-muted">Market Value</th>
-                  <th class="text-muted">Assessed Value</th>
-                  <th class="text-muted">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>$100,000.00</td>
-                  <td>$50,000.00</td>
-                  <td class="text-center">
-                    <div class="btn-group" role="group">
-                      <a href="EditPnT.php" class="btn btn-sm btn-primary" title="Edit">
-                        <i class="bi bi-pencil"></i>
-                      </a>
-                      <a href="#" class="btn btn-sm btn-danger ml-3" title="Delete">
-                        <i class="bi bi-trash"></i>
-                      </a>
-                    </div>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          </section>
         </div>
-      </section>
+        <!-- Put Code In Additional Carousel Items Here-->
+      </div>
+
+      <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
+        <i class="fas fa-chevron-left"></i>
+        <span class="visually-hidden">Previous</span>
+      </button>
+
+      <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
+        <i class="fas fa-chevron-right"></i>
+        <span class="visually-hidden">Next</span>
+      </button>
     </div>
-    <!-- Put Code In Additional Carousel Items Here--> 
   </div>
-
-<button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
-  <i class="fas fa-chevron-left"></i>
-  <span class="visually-hidden">Previous</span>
-</button>
-
-<button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
-  <i class="fas fa-chevron-right"></i>
-  <span class="visually-hidden">Next</span>
-</button>
-  </div>
-</div>
 
 
   <!-- Memoranda Section -->
@@ -1169,7 +1183,7 @@ $conn->close();
       </div>
     </div>
   </section>
-  
+
   <!-- Valuation Section -->
   <section class="container my-5" id="valuation-section">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -1222,26 +1236,30 @@ $conn->close();
     </div>
   </section>
 
-  
 
-    <!-- Floating Dropdown Menu (Bottom Right of Page) -->
-    <div class="dropdown" style="position:fixed; bottom:20px; right:20px; z-index:1050;">
-      <button id="mapMenuBtn"
-        class="btn btn-danger btn-lg rounded-circle d-flex align-items-center justify-content-center"
-        type="button"
-        aria-expanded="false"
-        style="width:60px; height:60px;">
-        <i class="fas fa-bars fa-1x"></i>
-      </button>
-      <ul class="dropdown-menu shadow">
-        <li><a class="dropdown-item scroll-link" href="#owner-info-section"><i class="fas fa-user"></i> Owner's Info</a></li>
-        <li><a class="dropdown-item scroll-link" href="#property-info-section"><i class="fas fa-home"></i> Property Info</a></li>
-        <li><a class="dropdown-item scroll-link" href="#rpu-identification-section"><i class="fas fa-id-card"></i> RPU Identification</a></li>
-        <li><a class="dropdown-item scroll-link" href="#declaration-section"><i class="fas fa-file-alt"></i> Declaration</a></li>
-        <li><a class="dropdown-item scroll-link" href="#property-carousel-section"><i class="bi-building-fill"></i> Land</a></li>
-        <li><a class="dropdown-item scroll-link" href="#valuation-section"><i class="fas fa-balance-scale"></i> Valuation</a></li>
-      </ul>
-    </div>
+
+  <!-- Floating Dropdown Menu (Bottom Right of Page) -->
+  <div class="dropdown" style="position:fixed; bottom:20px; right:20px; z-index:1050;">
+    <button id="mapMenuBtn"
+      class="btn btn-danger btn-lg rounded-circle d-flex align-items-center justify-content-center" type="button"
+      aria-expanded="false" style="width:60px; height:60px;">
+      <i class="fas fa-bars fa-1x"></i>
+    </button>
+    <ul class="dropdown-menu shadow">
+      <li><a class="dropdown-item scroll-link" href="#owner-info-section"><i class="fas fa-user"></i> Owner's Info</a>
+      </li>
+      <li><a class="dropdown-item scroll-link" href="#property-info-section"><i class="fas fa-home"></i> Property
+          Info</a></li>
+      <li><a class="dropdown-item scroll-link" href="#rpu-identification-section"><i class="fas fa-id-card"></i> RPU
+          Identification</a></li>
+      <li><a class="dropdown-item scroll-link" href="#declaration-section"><i class="fas fa-file-alt"></i>
+          Declaration</a></li>
+      <li><a class="dropdown-item scroll-link" href="#property-carousel-section"><i class="bi-building-fill"></i>
+          Land</a></li>
+      <li><a class="dropdown-item scroll-link" href="#valuation-section"><i class="fas fa-balance-scale"></i>
+          Valuation</a></li>
+    </ul>
+  </div>
   </section>
 
   <!-- Footer -->
@@ -1255,7 +1273,7 @@ $conn->close();
   <script>
     // Function to capitalize the first letter of each word
     function capitalizeFirstLetter(element) {
-      element.value = element.value.replace(/\b\w/g, function(char) {
+      element.value = element.value.replace(/\b\w/g, function (char) {
         return char.toUpperCase();
       });
     }
@@ -1266,7 +1284,7 @@ $conn->close();
     }
 
     // Attach the function to the 'input' event of each relevant field after DOM is fully loaded
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       // Apply capitalization to specific input fields in the owner info section and modal
       const fieldsToCapitalize = [
         'ownerName', 'firstName', 'middleName', 'lastName',
@@ -1277,7 +1295,7 @@ $conn->close();
       fieldsToCapitalize.forEach(fieldId => {
         const inputField = document.getElementById(fieldId);
         if (inputField) {
-          inputField.addEventListener("input", function() {
+          inputField.addEventListener("input", function () {
             capitalizeFirstLetter(inputField);
           });
         }
@@ -1286,7 +1304,7 @@ $conn->close();
       // Event listener for ARD Number to restrict input to numbers only
       const ardNumberField = document.getElementById("ardNumberModal");
       if (ardNumberField) {
-        ardNumberField.addEventListener("input", function() {
+        ardNumberField.addEventListener("input", function () {
           restrictToNumbers(ardNumberField);
         });
       }
@@ -1396,12 +1414,12 @@ $conn->close();
 
       // Send data to FAASrpuID.php
       fetch('FAASrpuID.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(arpData)
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(arpData)
+      })
         .then(response => response.json())
         .then(data => {
           if (data.success) {
@@ -1417,7 +1435,7 @@ $conn->close();
     }
   </script>
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       const menuBtn = document.getElementById("mapMenuBtn");
 
       // Initialize dropdown with top-left placement
@@ -1431,18 +1449,18 @@ $conn->close();
       });
 
       // Toggle on click only
-      menuBtn.addEventListener("click", function(e) {
+      menuBtn.addEventListener("click", function (e) {
         e.preventDefault();
         dropdown.toggle();
       });
     });
   </script>
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       const toggle = document.getElementById("showToggle");
       const tableContainer = document.getElementById("landTableContainer");
 
-      toggle.addEventListener("change", function() {
+      toggle.addEventListener("change", function () {
         if (toggle.checked) {
           tableContainer.style.display = "block";
         } else {
@@ -1464,19 +1482,19 @@ $conn->close();
         const last = form.querySelector(".lastNameModal").value;
 
         fetch(window.location.href, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              action: "update_owner",
-              property_id: propertyId,
-              owner_id: ownerId,
-              first_name: first,
-              middle_name: middle,
-              last_name: last
-            })
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            action: "update_owner",
+            property_id: propertyId,
+            owner_id: ownerId,
+            first_name: first,
+            middle_name: middle,
+            last_name: last
           })
+        })
           .then(res => res.json())
           .then(data => {
             if (data.success) {
@@ -1497,18 +1515,18 @@ $conn->close();
       if (!first || !last) return;
 
       fetch(window.location.href, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            action: "add_owner",
-            property_id: propertyId,
-            first_name: first,
-            middle_name: middle,
-            last_name: last
-          })
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          action: "add_owner",
+          property_id: propertyId,
+          first_name: first,
+          middle_name: middle,
+          last_name: last
         })
+      })
         .then(res => res.json())
         .then(data => {
           if (data.success) {
