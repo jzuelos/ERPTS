@@ -1,0 +1,43 @@
+/* Hide arrows in number inputs (Chrome, Edge, Safari) */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide arrows in Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.wide-form{
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.wide-form .card{
+  width: 100%;
+}
+  compact-form{
+  max-width: 1100px;
+  margin: auto;
+}
+.compact-form .row > [class*="col-"] {
+  margin-bottom: 0.75rem; /* reduce vertical spacing */
+}
+
+.compact-form .form-control,
+.compact-form .form-select {
+  padding: 0.35rem 0.5rem; /* smaller input height */
+  font-size: 0.9rem;       /* slightly smaller text */
+}
+
+.compact-form label {
+  font-size: 0.85rem;      /* smaller labels */
+  margin-bottom: 0.25rem;  /* tighter spacing under labels */
+}
+
+.section-header{
+  margin-left: 20px;
+}

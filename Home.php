@@ -122,7 +122,7 @@ $result = $conn->query($sql);
                 <!-- Parcel -->
                 <a href="Track.php" class="text-decoration-none text-dark">
                   <div class="stats-card text-center p-3 shadow-sm">
-                    <h6 class="fw-bold">Parcel</h6>
+                    <h6 class="fw-bold">Property Types</h6>
                     <div class="d-flex justify-content-around mt-2">
                       <div>
                         <i class="fas fa-map fa-lg text-warning mb-1"></i>

@@ -1091,7 +1091,7 @@ $conn->close();
           <!-- Quick Actions Row -->
           <div class="row mb-4">
             <div class="col-md-6 mb-3">
-              <a href="<?= ($is_active == 1) ? 'Property/PnTrees.php' : '#' ?>"
+              <a href="<?= ($is_active == 1) ? 'Property/AddPnTrees.php' : '#' ?>"
                 class="btn w-100 py-2 text-white text-decoration-none <?= ($is_active == 0) ? 'disabled' : '' ?>"
                 style="background-color: #379777; border-color: #2e8266; pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
                 <i class="fas fa-plus-circle me-2"></i>Add Plants/Trees
@@ -1114,12 +1114,22 @@ $conn->close();
                 <tr>
                   <th class="text-muted">Market Value</th>
                   <th class="text-muted">Assessed Value</th>
+                  <th class="text-muted">Action</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>None</td>
-                  <td>None</td>
+                  <td>$100,000.00</td>
+                  <td>$50,000.00</td>
+                  <td class="text-center">
+                    <div class="btn-group" role="group">
+                      <a href="EditPnT.php" class="btn btn-sm btn-primary" title="Edit">
+                        <i class="bi bi-pencil"></i>
+                      </a>
+                      <a href="#" class="btn btn-sm btn-danger ml-3" title="Delete">
+                        <i class="bi bi-trash"></i>
+                      </a>
+                    </div>
                 </tr>
               </tbody>
             </table>
