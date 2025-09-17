@@ -42,7 +42,7 @@ include '../header.php';
      <div class="d-flex justify-content-between align-items-center mb-4">
         <!-- Left: back button + title -->
         <div class="d-flex align-items-center">
-          <a href="FAAS.php" class="text-decoration-none me-2">
+          <a href="../FAAS.php" class="text-decoration-none me-2">
             <i class="fas fa-arrow-left"></i>
           </a>
           <h4 class="section-title mb-0">Plants / Trees</h4>
@@ -101,28 +101,38 @@ include '../header.php';
                     oninput="this.value=this.value.replace(/[^A-Za-z0-9 ]/g,'')" required>
                 </div>
                 <div class="col-md-6 mb-4">
-                  <label class="form-label">Barangay</label>
-                  <input type="text" class="form-control" maxlength="50" style="text-transform: uppercase;"
-                    pattern="[A-Za-z0-9 ]+" title="Only letters, numbers, and spaces are allowed"
-                    oninput="this.value=this.value.replace(/[^A-Za-z0-9 ]/g,'')" required>
+                   <label class="form-label">Barangay</label>
+                  <select class="form-select">
+                    <option value="" disabled selected>Select Barangay</option>
+                    <option>Barangay 1</option>
+                    <option>Barangay 2</option>
+                    <option>Barangay 3</option>
+                  </select>
                 </div>
                 <div class="col-md-6 mb-4">
-                  <label class="form-label">District</label>
-                  <input type="text" class="form-control" maxlength="50" style="text-transform: uppercase;"
-                    pattern="[A-Za-z ]+" title="Only letters and spaces are allowed"
-                    oninput="this.value=this.value.replace(/[^A-Za-z ]/g,'')" required>
+                   <label class="form-label">District</label>
+                  <select class="form-select">
+                    <option value="" disabled selected>Select District</option>
+                    <option>District 1</option>
+                    <option>District 2</option>
+                    <option>District 3</option>
+                  </select>
                 </div>
                 <div class="col-md-6 mb-4">
-                  <label class="form-label">Municipality/City</label>
-                  <input type="text" class="form-control" maxlength="50" style="text-transform: uppercase;"
-                    pattern="[A-Za-z ]+" title="Only letters and spaces are allowed"
-                    oninput="this.value=this.value.replace(/[^A-Za-z ]/g,'')" required>
+                   <label class="form-label">Municipality/City</label>
+                  <select class="form-select">
+                    <option value="" disabled selected>Select Municipality/City</option>
+                    <option>Municipality 1</option>
+                    <option>Municipality 2</option>
+                    <option>Municipality 3</option>
+                  </select>
                 </div>
                 <div class="col-md-6 mb-4">
-                  <label class="form-label">Province</label>
-                  <input type="text" class="form-control" maxlength="50" style="text-transform: uppercase;"
-                    pattern="[A-Za-z ]+" title="Only letters and spaces are allowed"
-                    oninput="this.value=this.value.replace(/[^A-Za-z ]/g,'')" required>
+                   <label class="form-label">Province</label>
+                  <select class="form-select">
+                    <option value="" disabled selected>Select Province</option>
+                    <option>Camarines Norte</option>
+                  </select>
                 </div>
                 <div class="col-md-12 mb-4">
                   <label class="form-label">Contact Number</label>
