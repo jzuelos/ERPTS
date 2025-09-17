@@ -149,10 +149,22 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-
   z-index: 10;
+  opacity: 1; /* prevent Bootstrap opacity effect */
 }
 
+/* Remove hover/focus effect */
+#propertyCarousel .carousel-control-prev:hover,
+#propertyCarousel .carousel-control-prev:focus,
+#propertyCarousel .carousel-control-next:hover,
+#propertyCarousel .carousel-control-next:focus {
+  background: rgba(255, 255, 255, 0.97); /* same as normal */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* same as normal */
+  outline: none;
+  opacity: 1;
+}
+
+/* Icon styles */
 #propertyCarousel .carousel-control-prev i,
 #propertyCarousel .carousel-control-next i {
   font-size: 20px;
@@ -160,10 +172,11 @@
   line-height: 1;
 }
 
-#propertyCarousel .carousel-item{
+#propertyCarousel .carousel-item {
   transition: transform 0.1s ease-in-out;
 }
 
+/* Mobile adjustments */
 @media (max-width: 480px) {
   #propertyCarousel .carousel-control-prev,
   #propertyCarousel .carousel-control-next {

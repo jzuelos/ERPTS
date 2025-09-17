@@ -36,7 +36,7 @@ $user_role = $_SESSION['user_type'] ?? 'user';
 <section class="container my-5" id="plants-trees-section">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="section-title">
-            <a href="FAAS.php" class="text-decoration-none me-2" title="Back">
+            <a href="../FAAS.php" class="text-decoration-none me-2" title="Back">
                 <i class="fas fa-arrow-left"></i>
             </a>
             PLANTS AND TREES

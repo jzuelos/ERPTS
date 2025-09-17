@@ -1228,7 +1228,7 @@ $conn->close();
         <li><a class="dropdown-item scroll-link" href="#property-info-section"><i class="fas fa-home"></i> Property Info</a></li>
         <li><a class="dropdown-item scroll-link" href="#rpu-identification-section"><i class="fas fa-id-card"></i> RPU Identification</a></li>
         <li><a class="dropdown-item scroll-link" href="#declaration-section"><i class="fas fa-file-alt"></i> Declaration</a></li>
-        <li><a class="dropdown-item scroll-link" href="#property-carousel-section"><i class="fas fa-file-alt"></i> LAND</a></li>
+        <li><a class="dropdown-item scroll-link" href="#property-carousel-section"><i class="bi-building-fill"></i> Land</a></li>
         <li><a class="dropdown-item scroll-link" href="#valuation-section"><i class="fas fa-balance-scale"></i> Valuation</a></li>
       </ul>
     </div>
