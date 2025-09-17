@@ -1,14 +1,14 @@
-<?php 
+<?php
 $user_role = $_SESSION['user_type'] ?? 'user'; // Default to 'user' if role is not set
 ?>
 
 <!-- Header Navigation -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-custom fixed-top">
-<div class="container-fluid px-3 d-flex align-items-center justify-content-between">
-<a class="navbar-brand py-2 d-flex align-items-center" href="/ERPTS/Home.php">
-  <img src="/ERPTS/images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="me-2" alt="">
-  <span class="fs-5 fw-semibold text-white">Electronic Real Property Tax System</span>
-</a>
+  <div class="container-fluid px-3 d-flex align-items-center justify-content-between">
+    <a class="navbar-brand py-2 d-flex align-items-center" href="/ERPTS/Home.php">
+      <img src="/ERPTS/images/coconut_.__1_-removebg-preview1.png" width="50" height="50" class="me-2" alt="">
+      <span class="fs-5 fw-semibold text-white">Electronic Real Property Tax System</span>
+    </a>
 
 
 
@@ -18,8 +18,7 @@ $user_role = $_SESSION['user_type'] ?? 'user'; // Default to 'user' if role is n
     </button>
 
     <?php if ($user_role === 'admin'): ?>
-      <button onclick="location.href='Admin-Page-2.php'"
-        class="btn btn-warning ms-2 me-auto admin-dashboard-btn">
+      <button onclick="location.href='Admin-Page-2.php'" class="btn btn-warning ms-2 me-auto admin-dashboard-btn">
         Admin Dashboard
       </button>
     <?php endif; ?>
@@ -29,28 +28,28 @@ $user_role = $_SESSION['user_type'] ?? 'user'; // Default to 'user' if role is n
         <li class="nav-item">
           <a class="nav-link px-3" href="/ERPTS/Home.php">Home</a>
         </li>
-        
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle px-3" href="RPU-Management.php" id="navbarDropdown" role="button">
-          RPU Management
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-         <a class="dropdown-item" href="/ERPTS/Real-Property-Unit-List.php">RPU List</a>
-<a class="dropdown-item" href="/ERPTS/Real-Property-Unit-List.php">FAAS</a>
-<a class="dropdown-item" href="/ERPTS/Tax-Declaration-List.php">Tax Declaration</a>
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="/ERPTS/Track.php">Track Paper</a>
-        </div>
-      </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle px-3" href="RPU-Management.php" id="navbarDropdown" role="button">
+            RPU Management
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="/ERPTS/Real-Property-Unit-List.php">RPU List</a>
+            <a class="dropdown-item" href="/ERPTS/Real-Property-Unit-List.php">FAAS</a>
+            <a class="dropdown-item" href="/ERPTS/Tax-Declaration-List.php">Tax Declaration</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="/ERPTS/Track.php">Track Paper</a>
+          </div>
+        </li>
 
         <li class="nav-item">
-          <a class="nav-link px-3" href="/ERPTS/Property/Transaction.php">Transaction</a>
+          <a class="nav-link px-3" href="/ERPTS/Transaction.php">Transaction</a>
         </li>
-        
+
         <li class="nav-item">
-          <a class="nav-link px-3" href="/ERPTS/Property/Reports.php">Reports</a>
+          <a class="nav-link px-3" href="/ERPTS/Reports.php">Reports</a>
         </li>
-        
+
         <li class="nav-item ms-3">
           <a href="/ERPTS/logout.php" class="btn btn-danger">Log Out</a>
         </li>
@@ -59,12 +58,10 @@ $user_role = $_SESSION['user_type'] ?? 'user'; // Default to 'user' if role is n
   </div>
 </nav>
 
-  <script>
+<script>
   document.addEventListener("DOMContentLoaded", function () {
     const navbar = document.querySelector(".navbar");
     const navbarHeight = navbar.offsetHeight;
     document.body.style.paddingTop = navbarHeight + "px";
   });
 </script>
-
-
