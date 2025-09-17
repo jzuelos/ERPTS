@@ -2,9 +2,9 @@ document.addEventListener('DOMContentLoaded', function () {
     fetch('LAND.php?fetch=1')
         .then(res => res.json())
         .then(data => {
-            populateSelect('classificationModal', data.classifications);
-            populateSelect('subClassModal', data.subclasses);
-            populateSelect('actualUseModal', data.land_uses);
+            populateSelect('classification', data.classifications);
+            populateSelect('subClass', data.subclasses);
+            populateSelect('actualUse', data.land_uses);
         })
         .catch(error => console.error('Error fetching land data:', error));
 
