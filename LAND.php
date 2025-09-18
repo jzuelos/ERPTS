@@ -81,19 +81,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $oct_no = (int) ($_POST['oct_no'] ?? 0);
   $unit_value = (float) ($_POST['unit_value'] ?? 0);
   $market_value = (float) ($_POST['market_value'] ?? 0);
-  $adjust_percent = (float) ($_POST['percent_adjustment'] ?? 100);
-  $adjust_value = (float) ($_POST['value_adjustment'] ?? 0);
-  $adjust_mv = (float) ($_POST['adjusted_market_value'] ?? 0);
-  $assess_lvl = (float) ($_POST['assessment_level'] ?? 0);
-  $assess_value = (float) ($_POST['assessed_value'] ?? 0);
+  $adjust_percent = (float) ($_POST['adjust_percent'] ?? 100);
+  $adjust_value = (float) ($_POST['adjust_value'] ?? 0);
+  $adjust_mv = (float) ($_POST['adjust_mv'] ?? 0);
+  $assess_lvl = (float) ($_POST['assess_lvl'] ?? 0);
+  $assess_value = (float) ($_POST['assess_value'] ?? 0);
 
-  // Collect text values from the form (matching the names we added below)
+  // Collect text values from the form (updated to match SQL columns)
   $fields = [
     'survey_no',
-    'north_boundary',
-    'south_boundary',
-    'east_boundary',
-    'west_boundary',
+    'north',      // Changed from 'north_boundary'
+    'south',      // Changed from 'south_boundary'
+    'east',       // Changed from 'east_boundary'
+    'west',       // Changed from 'west_boundary'
     'boun_desc',
     'last_name',
     'first_name',
@@ -110,7 +110,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     'sub_class',
     'area',
     'actual_use',
-    'adjustment_factor'
+    'adjust_factor'  // Changed from 'adjustment_factor'
   ];
 
   foreach ($fields as $field) {
@@ -142,10 +142,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $faas_id,
     $oct_no,
     $survey_no,
-    $north_boundary,
-    $east_boundary,
-    $south_boundary,
-    $west_boundary,
+    $north,      // Updated variable name
+    $east,       // Updated variable name
+    $south,      // Updated variable name
+    $west,       // Updated variable name
     $boun_desc,
     $last_name,
     $first_name,
@@ -164,7 +164,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $actual_use,
     $unit_value,
     $market_value,
-    $adjustment_factor,
+    $adjust_factor,  // Updated variable name
     $adjust_percent,
     $adjust_value,
     $adjust_mv,
@@ -344,6 +344,8 @@ $conn->close();
     </div>
 
     <div class="card border-0 shadow p-4 rounded-3">
+      <!-- START FORM -->
+      <form method="POST" action="">
       <!-- Land Details Section -->
       <h5 class="section-title">Land Details</h5>
 
@@ -365,19 +367,19 @@ $conn->close();
       <div class="row">
         <div class="col-md-3 mb-4">
           <label for="north" class="form-label">North</label>
-          <input type="text" id="north" name="north_boundary" class="form-control" placeholder="Enter North Boundary">
+          <input type="text" id="north" name="north" class="form-control" placeholder="Enter North Boundary">
         </div>
         <div class="col-md-3 mb-4">
           <label for="south" class="form-label">South</label>
-          <input type="text" id="south" name="south_boundary" class="form-control" placeholder="Enter South Boundary">
+          <input type="text" id="south" name="south" class="form-control" placeholder="Enter South Boundary">
         </div>
         <div class="col-md-3 mb-4">
           <label for="east" class="form-label">East</label>
-          <input type="text" id="east" name="east_boundary" class="form-control" placeholder="Enter East Boundary">
+          <input type="text" id="east" name="east" class="form-control" placeholder="Enter East Boundary">
         </div>
         <div class="col-md-3 mb-4">
           <label for="west" class="form-label">West</label>
-          <input type="text" id="west" name="west_boundary" class="form-control" placeholder="Enter West Boundary">
+          <input type="text" id="west" name="west" class="form-control" placeholder="Enter West Boundary">
         </div>
       </div>
 
@@ -421,13 +423,9 @@ $conn->close();
       <h6 class="section-subtitle mt-4">Address</h6>
       <div class="row">
         <div class="col-md-3 mb-4">
-          <label for="adminAddressNumber" class="form-label">House Number</label>
+          <label for="adminAddressNumber" class="form-label">House Number/Street</label>
           <input type="text" id="adminAddressNumber" name="house_street" class="form-control"
-            placeholder="Enter house number">
-        </div>
-        <div class="col-md-3 mb-4">
-          <label for="adminAddressStreet" class="form-label">Street</label>
-          <input type="text" id="adminAddressStreet" name="street" class="form-control" placeholder="Enter street">
+            placeholder="Enter house number/street">
         </div>
         <div class="col-md-3 mb-4">
           <label for="adminAddressBarangay" class="form-label">Barangay</label>
@@ -513,32 +511,27 @@ $conn->close();
       <h5 class="section-title mt-5">Value Adjustment Factor</h5>
       <div class="row">
         <div class="col-md-12 mb-4">
-          <label for="adjustmentFactorModal" class="form-label">Adjustment Factor</label>
-          <textarea id="adjustmentFactorModal" name="adjustment_factor" class="form-control" rows="3"
-            placeholder="Enter adjustment factor"></textarea>
+          <label for="adjustmentFactorModal" class="form-label">Adjustment Factor Description</label>
+          <textarea id="adjustmentFactorModal" name="adjust_factor" class="form-control" rows="3"
+            placeholder="Enter adjustment factor description"></textarea>
         </div>
       </div>
 
       <div class="row">
         <div class="col-md-4 mb-4">
-          <label for="adjustmentFactor" class="form-label">Adjustment Factor</label>
-          <input type="text" id="adjustmentFactor" name="adjustment_factor" class="form-control"
-            placeholder="Enter adjustment factor">
-        </div>
-        <div class="col-md-4 mb-4">
           <label for="percentAdjustment" class="form-label">% Adjustment</label>
-          <input type="text" id="percentAdjustment" name="percent_adjustment" class="form-control"
+          <input type="text" id="percentAdjustment" name="adjust_percent" class="form-control"
             placeholder="Enter % adjustment">
         </div>
         <div class="col-md-4 mb-4">
           <label for="valueAdjustment" class="form-label">Value Adjustment</label>
-          <input type="text" id="valueAdjustment" name="value_adjustment" class="form-control"
-            placeholder="Enter value adjustment">
+          <input type="text" id="valueAdjustment" name="adjust_value" class="form-control"
+            placeholder="Enter value adjustment" value="<?= htmlspecialchars($land_data['adjust_value'] ?? '') ?>">
         </div>
         <div class="col-md-4 mb-4">
           <label for="adjustedMarketValue" class="form-label">Adjusted Market Value</label>
-          <input type="text" id="adjustedMarketValue" name="adjusted_market_value" class="form-control"
-            placeholder="Enter adjusted market value">
+          <input type="text" id="adjustedMarketValue" name="adjust_mv" class="form-control"
+            placeholder="Enter adjusted market value" value="<?= htmlspecialchars($land_data['adjust_mv'] ?? '') ?>">
         </div>
       </div>
 
@@ -547,7 +540,7 @@ $conn->close();
       <div class="row">
         <div class="col-md-6 mb-4">
           <label for="assessmentLevel" class="form-label">Assessment Level</label>
-          <input type="text" id="assessmentLevel" name="assessment_level" class="form-control"
+          <input type="text" id="assessmentLevel" name="assess_lvl" class="form-control"
             placeholder="Enter assessment level">
         </div>
         <div class="col-md-6 mb-4">
@@ -557,8 +550,8 @@ $conn->close();
         </div>
         <div class="col-md-6 mb-4">
           <label for="assessedValue" class="form-label">Assessed Value</label>
-          <input type="text" id="assessedValue" name="assessed_value" class="form-control"
-            placeholder="Enter assessed value">
+          <input type="text" id="assessedValue" name="assess_value" class="form-control"
+            placeholder="Enter assessed value" value="<?= htmlspecialchars($land_data['assess_value'] ?? '') ?>">
         </div>
       </div>
 
@@ -696,12 +689,7 @@ $conn->close();
       <!-- END FORM -->
 
     </div>
-    </div>
   </section>
-  </div>
-  </div>
-  </div>
-  </div>
 
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
