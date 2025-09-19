@@ -6,8 +6,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['fetch'])) {
   $conn = Database::getInstance();
 
   $classifications = $conn->query("SELECT c_id, c_code, c_description FROM classification WHERE c_status = 'Active'");
-  $subclasses = $conn->query("SELECT sc_id, sc_code, sc_description FROM subclass WHERE sc_status = 'Active'");
-  $land_uses = $conn->query("SELECT lu_id, lu_description FROM land_use WHERE lu_status = 'Active'");
+  $subclasses = $conn->query("SELECT sc_id, sc_code, sc_description, sc_uv FROM subclass WHERE sc_status = 'Active'");
+  $land_uses = $conn->query("SELECT lu_id, lu_description, lu_al FROM land_use WHERE lu_status = 'Active'");
 
   $data = [
     'classifications' => [],
@@ -25,14 +25,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['fetch'])) {
   while ($row = $subclasses->fetch_assoc()) {
     $data['subclasses'][] = [
       'id' => $row['sc_id'],
-      'text' => "{$row['sc_description']} ({$row['sc_code']})"
+      'text' => "{$row['sc_description']} ({$row['sc_code']})",
+      'uv' => $row['sc_uv'] // Add unit value
     ];
   }
 
   while ($row = $land_uses->fetch_assoc()) {
     $data['land_uses'][] = [
       'id' => $row['lu_id'],
-      'text' => $row['lu_description']
+      'text' => $row['lu_description'],
+      'al' => $row['lu_al'] // Add assessment level
     ];
   }
 
@@ -346,345 +348,348 @@ $conn->close();
     <div class="card border-0 shadow p-4 rounded-3">
       <!-- START FORM -->
       <form method="POST" action="">
-      <!-- Land Details Section -->
-      <h5 class="section-title">Land Details</h5>
+        <!-- Land Details Section -->
+        <h5 class="section-title">Land Details</h5>
 
-      <!-- Identification Numbers -->
-      <h6 class="section-subtitle mt-4">Identification Numbers</h6>
-      <div class="row">
-        <div class="col-md-6 mb-4">
-          <label for="octTctNumber" class="form-label">OCT/TCT Number</label>
-          <input type="text" id="octTctNumber" name="oct_no" class="form-control" placeholder="Enter OCT/TCT Number">
-        </div>
-        <div class="col-md-6 mb-4">
-          <label for="surveyNumber" class="form-label">Survey Number</label>
-          <input type="text" id="surveyNumber" name="survey_no" class="form-control" placeholder="Enter Survey Number">
-        </div>
-      </div>
-
-      <!-- Boundaries -->
-      <h6 class="section-subtitle mt-4">Boundaries</h6>
-      <div class="row">
-        <div class="col-md-3 mb-4">
-          <label for="north" class="form-label">North</label>
-          <input type="text" id="north" name="north" class="form-control" placeholder="Enter North Boundary">
-        </div>
-        <div class="col-md-3 mb-4">
-          <label for="south" class="form-label">South</label>
-          <input type="text" id="south" name="south" class="form-control" placeholder="Enter South Boundary">
-        </div>
-        <div class="col-md-3 mb-4">
-          <label for="east" class="form-label">East</label>
-          <input type="text" id="east" name="east" class="form-control" placeholder="Enter East Boundary">
-        </div>
-        <div class="col-md-3 mb-4">
-          <label for="west" class="form-label">West</label>
-          <input type="text" id="west" name="west" class="form-control" placeholder="Enter West Boundary">
-        </div>
-      </div>
-
-      <!-- Boundary Description -->
-      <h6 class="section-subtitle mt-4">Boundary Description</h6>
-      <textarea class="form-control mb-4" id="boundaryDescriptionModal" name="boun_desc" rows="2"
-        placeholder="Enter boundary description"></textarea>
-
-      <!-- Administrator Information Section -->
-      <h5 class="section-title mt-5">Administrator Information</h5>
-      <div class="row">
-        <div class="col-md-4 mb-4">
-          <label for="adminLastName" class="form-label">Last Name</label>
-          <input type="text" id="adminLastName" name="last_name" class="form-control" placeholder="Enter last name">
-        </div>
-        <div class="col-md-4 mb-4">
-          <label for="adminFirstName" class="form-label">First Name</label>
-          <input type="text" id="adminFirstName" name="first_name" class="form-control" placeholder="Enter first name">
-        </div>
-        <div class="col-md-4 mb-4">
-          <label for="adminMiddleName" class="form-label">Middle Name</label>
-          <input type="text" id="adminMiddleName" name="middle_name" class="form-control"
-            placeholder="Enter middle name">
-        </div>
-      </div>
-
-      <!-- Contact Information -->
-      <div class="row">
-        <div class="col-md-6 mb-4">
-          <label for="adminContact" class="form-label">Contact Number</label>
-          <input type="text" id="adminContact" name="contact_no" class="form-control"
-            placeholder="Enter contact number">
-        </div>
-        <div class="col-md-6 mb-4">
-          <label for="adminEmail" class="form-label">Email</label>
-          <input type="email" id="adminEmail" name="email" class="form-control" placeholder="Enter email">
-        </div>
-      </div>
-
-      <!-- Address Information -->
-      <h6 class="section-subtitle mt-4">Address</h6>
-      <div class="row">
-        <div class="col-md-3 mb-4">
-          <label for="adminAddressNumber" class="form-label">House Number/Street</label>
-          <input type="text" id="adminAddressNumber" name="house_street" class="form-control"
-            placeholder="Enter house number/street">
-        </div>
-        <div class="col-md-3 mb-4">
-          <label for="adminAddressBarangay" class="form-label">Barangay</label>
-          <input type="text" id="adminAddressBarangay" name="barangay" class="form-control"
-            placeholder="Enter barangay">
-        </div>
-        <div class="col-md-3 mb-4">
-          <label for="adminAddressDistrict" class="form-label">District</label>
-          <input type="text" id="adminAddressDistrict" name="district" class="form-control"
-            placeholder="Enter district">
-        </div>
-        <div class="col-md-6 mb-4">
-          <label for="adminAddressMunicipality" class="form-label">Municipality/City</label>
-          <input type="text" id="adminAddressMunicipality" name="municipality" class="form-control"
-            placeholder="Enter municipality or city">
-        </div>
-        <div class="col-md-6 mb-4">
-          <label for="adminAddressProvince" class="form-label">Province</label>
-          <input type="text" id="adminAddressProvince" name="province" class="form-control"
-            placeholder="Enter province">
-        </div>
-      </div>
-
-      <!-- Land Appraisal Section -->
-      <h5 class="section-title mt-5">Land Appraisal</h5>
-      <div class="row">
-        <div class="col-md-6 mb-4">
-          <label for="description" class="form-label">Description</label>
-          <input type="text" id="description" name="land_desc" class="form-control" placeholder="Enter description">
-        </div>
-        <div class="col-md-6 mb-4">
-          <label for="classification" class="form-label">Classification</label>
-          <select id="classification" name="classification" class="form-select">
-            <option value="">Select classification</option>
-          </select>
-        </div>
-        <div class="col-md-6 mb-4">
-          <label for="subClass" class="form-label">Sub-Class</label>
-          <select id="subClass" name="sub_class" class="form-select">
-            <option value="">Select sub-class</option>
-          </select>
-        </div>
-        <div class="col-md-6 mb-4">
-          <label for="actualUse" class="form-label">Actual Use</label>
-          <select id="actualUse" name="actual_use" class="form-select">
-            <option value="">Select actual use</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-4 mb-4">
-          <label for="area" class="form-label">Area</label>
-          <div class="input-group">
-            <input type="text" id="area" name="area" class="form-control" placeholder="Enter area in sq m">
-            <div class="input-group-text">
-              <label><input type="radio" name="areaUnit" value="sqm" checked> Sq m</label>
-              <label class="ms-2"><input type="radio" name="areaUnit" value="hectare"> Ha</label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-4 mb-4">
-          <label for="unitValue" class="form-label">Unit Value</label>
-          <input type="text" id="unitValue" name="unit_value" class="form-control" placeholder="Enter unit value">
-        </div>
-        <div class="col-md-4 mb-4">
-          <label for="recommendedUnitValue" class="form-label">Recommended Unit Value</label>
-          <input type="text" id="recommendedUnitValue" class="form-control" disabled>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-4 mb-4">
-          <label for="marketValue" class="form-label">Market Value</label>
-          <input type="text" id="marketValue" name="market_value" class="form-control" placeholder="Enter market value">
-        </div>
-      </div>
-
-      <!-- Value Adjustment Factor Section -->
-      <h5 class="section-title mt-5">Value Adjustment Factor</h5>
-      <div class="row">
-        <div class="col-md-12 mb-4">
-          <label for="adjustmentFactorModal" class="form-label">Adjustment Factor Description</label>
-          <textarea id="adjustmentFactorModal" name="adjust_factor" class="form-control" rows="3"
-            placeholder="Enter adjustment factor description"></textarea>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-4 mb-4">
-          <label for="percentAdjustment" class="form-label">% Adjustment</label>
-          <input type="text" id="percentAdjustment" name="adjust_percent" class="form-control"
-            placeholder="Enter % adjustment">
-        </div>
-        <div class="col-md-4 mb-4">
-          <label for="valueAdjustment" class="form-label">Value Adjustment</label>
-          <input type="text" id="valueAdjustment" name="adjust_value" class="form-control"
-            placeholder="Enter value adjustment" value="<?= htmlspecialchars($land_data['adjust_value'] ?? '') ?>">
-        </div>
-        <div class="col-md-4 mb-4">
-          <label for="adjustedMarketValue" class="form-label">Adjusted Market Value</label>
-          <input type="text" id="adjustedMarketValue" name="adjust_mv" class="form-control"
-            placeholder="Enter adjusted market value" value="<?= htmlspecialchars($land_data['adjust_mv'] ?? '') ?>">
-        </div>
-      </div>
-
-      <!-- Property Assessment Section -->
-      <h5 class="section-title mt-5">Property Assessment</h5>
-      <div class="row">
-        <div class="col-md-6 mb-4">
-          <label for="assessmentLevel" class="form-label">Assessment Level</label>
-          <input type="text" id="assessmentLevel" name="assess_lvl" class="form-control"
-            placeholder="Enter assessment level">
-        </div>
-        <div class="col-md-6 mb-4">
-          <label for="recommendedAssessmentLevel" class="form-label">% Recommended Assessment Level</label>
-          <input type="text" id="recommendedAssessmentLevel" class="form-control"
-            placeholder="Enter recommended assessment level">
-        </div>
-        <div class="col-md-6 mb-4">
-          <label for="assessedValue" class="form-label">Assessed Value</label>
-          <input type="text" id="assessedValue" name="assess_value" class="form-control"
-            placeholder="Enter assessed value" value="<?= htmlspecialchars($land_data['assess_value'] ?? '') ?>">
-        </div>
-      </div>
-
-      <!-- Certification Section -->
-      <h5 class="section-title mt-5">Certification</h5>
-      <div class="container">
+        <!-- Identification Numbers -->
+        <h6 class="section-subtitle mt-4">Identification Numbers</h6>
         <div class="row">
-          <div class="col-12">
-
-            <!-- Verified By -->
-            <div class="row mb-3 align-items-center">
-              <label class="col-md-2 col-form-label">Verified By</label>
-              <div class="col-md-4">
-                <select id="verifiedBy" name="verified_by" class="form-select">
-                  <option value="">Select verifier</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Plotted By -->
-            <div class="row mb-3 align-items-center">
-              <label class="col-md-2 col-form-label">Plotted By</label>
-              <div class="col-md-4">
-                <select id="plottedBy" name="plotted_by" class="form-select">
-                  <option value="">Select plotter</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Noted By -->
-            <div class="row mb-3 align-items-center">
-              <label class="col-md-2 col-form-label">Noted By</label>
-              <div class="col-md-4">
-                <select id="notedBy" name="noted_by" class="form-select">
-                  <option value="">Select noter</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Appraised By -->
-            <div class="row mb-3 align-items-center">
-              <label class="col-md-2 col-form-label">Appraised By</label>
-              <div class="col-md-4">
-                <select id="appraisedBy" name="appraised_by" class="form-select">
-                  <option value="">Select appraiser</option>
-                </select>
-              </div>
-              <label class="col-md-1 col-form-label text-end">Date</label>
-              <div class="col-md-3">
-                <input type="date" name="appraisal_date" class="form-control"
-                  value="<?= htmlspecialchars($cert_data['appraised_date'] ?? '') ?>">
-              </div>
-            </div>
-
-            <!-- Recommending Approval -->
-            <div class="row mb-3 align-items-center">
-              <label class="col-md-2 col-form-label">Recommending Approval</label>
-              <div class="col-md-4">
-                <input type="text" name="recommending_approval" class="form-control" placeholder="Enter Recommender"
-                  value="<?= htmlspecialchars($cert_data['recom_approval'] ?? '') ?>">
-              </div>
-              <label class="col-md-1 col-form-label text-end">Date</label>
-              <div class="col-md-3">
-                <input type="date" name="recommendation_date" class="form-control"
-                  value="<?= htmlspecialchars($cert_data['recom_date'] ?? '') ?>">
-              </div>
-            </div>
-
-            <!-- Approved By -->
-            <div class="row mb-3 align-items-center">
-              <label class="col-md-2 col-form-label">Approved By</label>
-              <div class="col-md-4">
-                <input type="text" name="approved_by" class="form-control" placeholder="Enter Approver"
-                  value="<?= htmlspecialchars($cert_data['approved'] ?? '') ?>">
-              </div>
-              <label class="col-md-1 col-form-label text-end">Date</label>
-              <div class="col-md-3">
-                <input type="date" name="approval_date" class="form-control"
-                  value="<?= htmlspecialchars($cert_data['approved_date'] ?? '') ?>">
-              </div>
-            </div>
-
+          <div class="col-md-6 mb-4">
+            <label for="octTctNumber" class="form-label">OCT/TCT Number</label>
+            <input type="text" id="octTctNumber" name="oct_no" class="form-control" placeholder="Enter OCT/TCT Number">
+          </div>
+          <div class="col-md-6 mb-4">
+            <label for="surveyNumber" class="form-label">Survey Number</label>
+            <input type="text" id="surveyNumber" name="survey_no" class="form-control"
+              placeholder="Enter Survey Number">
           </div>
         </div>
-      </div>
 
+        <!-- Boundaries -->
+        <h6 class="section-subtitle mt-4">Boundaries</h6>
+        <div class="row">
+          <div class="col-md-3 mb-4">
+            <label for="north" class="form-label">North</label>
+            <input type="text" id="north" name="north" class="form-control" placeholder="Enter North Boundary">
+          </div>
+          <div class="col-md-3 mb-4">
+            <label for="south" class="form-label">South</label>
+            <input type="text" id="south" name="south" class="form-control" placeholder="Enter South Boundary">
+          </div>
+          <div class="col-md-3 mb-4">
+            <label for="east" class="form-label">East</label>
+            <input type="text" id="east" name="east" class="form-control" placeholder="Enter East Boundary">
+          </div>
+          <div class="col-md-3 mb-4">
+            <label for="west" class="form-label">West</label>
+            <input type="text" id="west" name="west" class="form-control" placeholder="Enter West Boundary">
+          </div>
+        </div>
 
-      <!-- Miscellaneous Section -->
-      <h5 class="section-title mt-5">Miscellaneous</h5>
-      <div class="row">
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label class="form-label d-block">Idle</label>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="yes"
-                <?= (isset($cert_data['idle']) && $cert_data['idle'] == 1) ? 'checked' : '' ?>>
-              <label class="form-check-label" for="idleYes">Yes</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="no"
-                <?= (isset($cert_data['idle']) && $cert_data['idle'] == 0) ? 'checked' : '' ?>>
-              <label class="form-check-label" for="idleNo">No</label>
+        <!-- Boundary Description -->
+        <h6 class="section-subtitle mt-4">Boundary Description</h6>
+        <textarea class="form-control mb-4" id="boundaryDescriptionModal" name="boun_desc" rows="2"
+          placeholder="Enter boundary description"></textarea>
+
+        <!-- Administrator Information Section -->
+        <h5 class="section-title mt-5">Administrator Information</h5>
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <label for="adminLastName" class="form-label">Last Name</label>
+            <input type="text" id="adminLastName" name="last_name" class="form-control" placeholder="Enter last name">
+          </div>
+          <div class="col-md-4 mb-4">
+            <label for="adminFirstName" class="form-label">First Name</label>
+            <input type="text" id="adminFirstName" name="first_name" class="form-control"
+              placeholder="Enter first name">
+          </div>
+          <div class="col-md-4 mb-4">
+            <label for="adminMiddleName" class="form-label">Middle Name</label>
+            <input type="text" id="adminMiddleName" name="middle_name" class="form-control"
+              placeholder="Enter middle name">
+          </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <label for="adminContact" class="form-label">Contact Number</label>
+            <input type="text" id="adminContact" name="contact_no" class="form-control"
+              placeholder="Enter contact number">
+          </div>
+          <div class="col-md-6 mb-4">
+            <label for="adminEmail" class="form-label">Email</label>
+            <input type="email" id="adminEmail" name="email" class="form-control" placeholder="Enter email">
+          </div>
+        </div>
+
+        <!-- Address Information -->
+        <h6 class="section-subtitle mt-4">Address</h6>
+        <div class="row">
+          <div class="col-md-3 mb-4">
+            <label for="adminAddressNumber" class="form-label">House Number/Street</label>
+            <input type="text" id="adminAddressNumber" name="house_street" class="form-control"
+              placeholder="Enter house number/street">
+          </div>
+          <div class="col-md-3 mb-4">
+            <label for="adminAddressBarangay" class="form-label">Barangay</label>
+            <input type="text" id="adminAddressBarangay" name="barangay" class="form-control"
+              placeholder="Enter barangay">
+          </div>
+          <div class="col-md-3 mb-4">
+            <label for="adminAddressDistrict" class="form-label">District</label>
+            <input type="text" id="adminAddressDistrict" name="district" class="form-control"
+              placeholder="Enter district">
+          </div>
+          <div class="col-md-6 mb-4">
+            <label for="adminAddressMunicipality" class="form-label">Municipality/City</label>
+            <input type="text" id="adminAddressMunicipality" name="municipality" class="form-control"
+              placeholder="Enter municipality or city">
+          </div>
+          <div class="col-md-6 mb-4">
+            <label for="adminAddressProvince" class="form-label">Province</label>
+            <input type="text" id="adminAddressProvince" name="province" class="form-control"
+              placeholder="Enter province">
+          </div>
+        </div>
+
+        <!-- Land Appraisal Section -->
+        <h5 class="section-title mt-5">Land Appraisal</h5>
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <label for="description" class="form-label">Description</label>
+            <input type="text" id="description" name="land_desc" class="form-control" placeholder="Enter description">
+          </div>
+          <div class="col-md-6 mb-4">
+            <label for="classification" class="form-label">Classification</label>
+            <select id="classification" name="classification" class="form-select">
+              <option value="">Select classification</option>
+            </select>
+          </div>
+          <div class="col-md-6 mb-4">
+            <label for="subClass" class="form-label">Sub-Class</label>
+            <select id="subClass" name="sub_class" class="form-select">
+              <option value="">Select sub-class</option>
+            </select>
+          </div>
+          <div class="col-md-6 mb-4">
+            <label for="actualUse" class="form-label">Actual Use</label>
+            <select id="actualUse" name="actual_use" class="form-select">
+              <option value="">Select actual use</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <label for="area" class="form-label">Area</label>
+            <div class="input-group">
+              <input type="text" id="area" name="area" class="form-control" placeholder="Enter area in sq m">
+              <div class="input-group-text">
+                <label><input type="radio" name="areaUnit" value="sqm" checked> Sq m</label>
+                <label class="ms-2"><input type="radio" name="areaUnit" value="hectare"> Ha</label>
+              </div>
             </div>
           </div>
         </div>
-        <div class="col-md-6 mb-4">
-          <div class="mb-3">
-            <label class="form-label d-block">Contested</label>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="yes"
-                <?= (isset($cert_data['contested']) && $cert_data['contested'] == 1) ? 'checked' : '' ?>>
-              <label class="form-check-label" for="contestedYes">Yes</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="no"
-                <?= (isset($cert_data['contested']) && $cert_data['contested'] == 0) ? 'checked' : '' ?>>
-              <label class="form-check-label" for="contestedNo">No</label>
+
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <label for="unitValue" class="form-label">Unit Value</label>
+            <input type="text" id="unitValue" name="unit_value" class="form-control" placeholder="Enter unit value">
+          </div>
+          <div class="col-md-4 mb-4">
+            <label for="recommendedUnitValue" class="form-label">Recommended Unit Value</label>
+            <input type="text" id="recommendedUnitValue" class="form-control" disabled>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <label for="marketValue" class="form-label">Market Value</label>
+            <input type="text" id="marketValue" name="market_value" class="form-control"
+              placeholder="Enter market value">
+          </div>
+        </div>
+
+        <!-- Value Adjustment Factor Section -->
+        <h5 class="section-title mt-5">Value Adjustment Factor</h5>
+        <div class="row">
+          <div class="col-md-12 mb-4">
+            <label for="adjustmentFactorModal" class="form-label">Adjustment Factor Description</label>
+            <textarea id="adjustmentFactorModal" name="adjust_factor" class="form-control" rows="3"
+              placeholder="Enter adjustment factor description"></textarea>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <label for="percentAdjustment" class="form-label">% Adjustment</label>
+            <input type="text" id="percentAdjustment" name="adjust_percent" class="form-control"
+              placeholder="Enter % adjustment">
+          </div>
+          <div class="col-md-4 mb-4">
+            <label for="valueAdjustment" class="form-label">Value Adjustment</label>
+            <input type="text" id="valueAdjustment" name="adjust_value" class="form-control"
+              placeholder="Enter value adjustment" value="<?= htmlspecialchars($land_data['adjust_value'] ?? '') ?>">
+          </div>
+          <div class="col-md-4 mb-4">
+            <label for="adjustedMarketValue" class="form-label">Adjusted Market Value</label>
+            <input type="text" id="adjustedMarketValue" name="adjust_mv" class="form-control"
+              placeholder="Enter adjusted market value" value="<?= htmlspecialchars($land_data['adjust_mv'] ?? '') ?>">
+          </div>
+        </div>
+
+        <!-- Property Assessment Section -->
+        <h5 class="section-title mt-5">Property Assessment</h5>
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <label for="assessmentLevel" class="form-label">Assessment Level</label>
+            <input type="text" id="assessmentLevel" name="assess_lvl" class="form-control"
+              placeholder="Enter assessment level">
+          </div>
+          <div class="col-md-6 mb-4">
+            <label for="recommendedAssessmentLevel" class="form-label">% Recommended Assessment Level</label>
+            <input type="text" id="recommendedAssessmentLevel" class="form-control"
+              placeholder="Enter recommended assessment level" disabled>
+          </div>
+          <div class="col-md-6 mb-4">
+            <label for="assessedValue" class="form-label">Assessed Value</label>
+            <input type="text" id="assessedValue" name="assess_value" class="form-control"
+              placeholder="Enter assessed value" value="<?= htmlspecialchars($land_data['assess_value'] ?? '') ?>">
+          </div>
+        </div>
+
+        <!-- Certification Section -->
+        <h5 class="section-title mt-5">Certification</h5>
+        <div class="container">
+          <div class="row">
+            <div class="col-12">
+
+              <!-- Verified By -->
+              <div class="row mb-3 align-items-center">
+                <label class="col-md-2 col-form-label">Verified By</label>
+                <div class="col-md-4">
+                  <select id="verifiedBy" name="verified_by" class="form-select">
+                    <option value="">Select verifier</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Plotted By -->
+              <div class="row mb-3 align-items-center">
+                <label class="col-md-2 col-form-label">Plotted By</label>
+                <div class="col-md-4">
+                  <select id="plottedBy" name="plotted_by" class="form-select">
+                    <option value="">Select plotter</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Noted By -->
+              <div class="row mb-3 align-items-center">
+                <label class="col-md-2 col-form-label">Noted By</label>
+                <div class="col-md-4">
+                  <select id="notedBy" name="noted_by" class="form-select">
+                    <option value="">Select noter</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Appraised By -->
+              <div class="row mb-3 align-items-center">
+                <label class="col-md-2 col-form-label">Appraised By</label>
+                <div class="col-md-4">
+                  <select id="appraisedBy" name="appraised_by" class="form-select">
+                    <option value="">Select appraiser</option>
+                  </select>
+                </div>
+                <label class="col-md-1 col-form-label text-end">Date</label>
+                <div class="col-md-3">
+                  <input type="date" name="appraisal_date" class="form-control"
+                    value="<?= htmlspecialchars($cert_data['appraised_date'] ?? '') ?>">
+                </div>
+              </div>
+
+              <!-- Recommending Approval -->
+              <div class="row mb-3 align-items-center">
+                <label class="col-md-2 col-form-label">Recommending Approval</label>
+                <div class="col-md-4">
+                  <input type="text" name="recommending_approval" class="form-control" placeholder="Enter Recommender"
+                    value="<?= htmlspecialchars($cert_data['recom_approval'] ?? '') ?>">
+                </div>
+                <label class="col-md-1 col-form-label text-end">Date</label>
+                <div class="col-md-3">
+                  <input type="date" name="recommendation_date" class="form-control"
+                    value="<?= htmlspecialchars($cert_data['recom_date'] ?? '') ?>">
+                </div>
+              </div>
+
+              <!-- Approved By -->
+              <div class="row mb-3 align-items-center">
+                <label class="col-md-2 col-form-label">Approved By</label>
+                <div class="col-md-4">
+                  <input type="text" name="approved_by" class="form-control" placeholder="Enter Approver"
+                    value="<?= htmlspecialchars($cert_data['approved'] ?? '') ?>">
+                </div>
+                <label class="col-md-1 col-form-label text-end">Date</label>
+                <div class="col-md-3">
+                  <input type="date" name="approval_date" class="form-control"
+                    value="<?= htmlspecialchars($cert_data['approved_date'] ?? '') ?>">
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Print Button at Bottom Right + Save button -->
-      <div class="d-flex justify-content-between mt-4">
-        <div>
-          <button type="submit" name="save_land_btn" class="btn btn-success">Save</button>
+
+        <!-- Miscellaneous Section -->
+        <h5 class="section-title mt-5">Miscellaneous</h5>
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="mb-3">
+              <label class="form-label d-block">Idle</label>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="yes"
+                  <?= (isset($cert_data['idle']) && $cert_data['idle'] == 1) ? 'checked' : '' ?>>
+                <label class="form-check-label" for="idleYes">Yes</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="no"
+                  <?= (isset($cert_data['idle']) && $cert_data['idle'] == 0) ? 'checked' : '' ?>>
+                <label class="form-check-label" for="idleNo">No</label>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-4">
+            <div class="mb-3">
+              <label class="form-label d-block">Contested</label>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="yes"
+                  <?= (isset($cert_data['contested']) && $cert_data['contested'] == 1) ? 'checked' : '' ?>>
+                <label class="form-check-label" for="contestedYes">Yes</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="contestedStatus" id="contestedNo" value="no"
+                  <?= (isset($cert_data['contested']) && $cert_data['contested'] == 0) ? 'checked' : '' ?>>
+                <label class="form-check-label" for="contestedNo">No</label>
+              </div>
+            </div>
+          </div>
         </div>
-        <div>
-          <button type="button" class="btn btn-outline-secondary py-2 px-4" style="font-size: 1.1rem;">
-            <i class="fas fa-print me-2"></i>Print
-          </button>
+
+        <!-- Print Button at Bottom Right + Save button -->
+        <div class="d-flex justify-content-between mt-4">
+          <div>
+            <button type="submit" name="save_land_btn" class="btn btn-success">Save</button>
+          </div>
+          <div>
+            <button type="button" class="btn btn-outline-secondary py-2 px-4" style="font-size: 1.1rem;">
+              <i class="fas fa-print me-2"></i>Print
+            </button>
+          </div>
         </div>
-      </div>
       </form>
       <!-- END FORM -->
 

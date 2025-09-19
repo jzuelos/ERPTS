@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', function () {
             populateSelect('classification', data.classifications, window.landData?.classification);
             populateSelect('subClass', data.subclasses, window.landData?.subClass);
             populateSelect('actualUse', data.land_uses, window.landData?.actualUse);
+            
+            // Store the data globally for later use
+            window.dropdownData = data;
         })
         .catch(error => console.error('Error fetching land data:', error));
 
@@ -18,11 +21,39 @@ document.addEventListener('DOMContentLoaded', function () {
             const option = document.createElement('option');
             option.value = item.id;
             option.textContent = item.text;
+            
+            // Store additional data as data attributes
+            if (item.uv) option.setAttribute('data-uv', item.uv);
+            if (item.al) option.setAttribute('data-al', item.al);
 
             if (selectedValue && selectedValue == item.id) {
                 option.selected = true;
             }
             select.appendChild(option);
+        });
+    }
+
+    // === Populate recommended unit value when sub-class changes ===
+    const subClassSelect = document.getElementById('subClass');
+    const recommendedUnitValueInput = document.getElementById('recommendedUnitValue');
+    
+    if (subClassSelect && recommendedUnitValueInput) {
+        subClassSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const unitValue = selectedOption.getAttribute('data-uv') || '';
+            recommendedUnitValueInput.value = unitValue;
+        });
+    }
+
+    // === Populate recommended assessment level when actual use changes ===
+    const actualUseSelect = document.getElementById('actualUse');
+    const recommendedAssessmentLevelInput = document.getElementById('recommendedAssessmentLevel');
+    
+    if (actualUseSelect && recommendedAssessmentLevelInput) {
+        actualUseSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const assessmentLevel = selectedOption.getAttribute('data-al') || '';
+            recommendedAssessmentLevelInput.value = assessmentLevel;
         });
     }
 
