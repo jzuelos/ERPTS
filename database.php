@@ -5,9 +5,9 @@ class Database {
 
     private function __construct() {
         $servername = "localhost";
-        $username = "u521641956_erpts_username"; // Your database username
-        $password = "Erpts_password123"; // Your database password
-        $dbname = "u521641956_erpts"; // Your database name
+        $username = "root"; // Your database username
+        $password = ""; // Your database password
+        $dbname = "erpts"; // Your database name
         
         // Create connection
         $this->connection = new mysqli($servername, $username, $password, $dbname);
