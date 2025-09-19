@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 16, 2025 at 01:28 PM
+-- Generation Time: Sep 19, 2025 at 08:27 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -350,7 +350,7 @@ CREATE TABLE `certification` (
 --
 
 INSERT INTO `certification` (`cert_id`, `verified`, `noted`, `recom_approval`, `recom_date`, `plotted`, `appraised`, `appraised_date`, `approved`, `approved_date`, `idle`, `contested`, `land_id`) VALUES
-(17, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-28', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-28', 'Lingon, Nestor Jacolbia', '2025-04-28', 0, 0, 55),
+(17, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-09-17', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-09-17', 'Lingon, Nestor Jacolbia', '2025-09-17', 0, 0, 55),
 (18, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-28', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-28', 'Lingon, Nestor Jacolbia', '2025-04-28', 0, 0, 56),
 (19, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-08-27', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-08-27', 'Lingon, Nestor Jacolbia', '2025-08-27', 0, 0, 57);
 
@@ -480,7 +480,7 @@ CREATE TABLE `land` (
 --
 
 INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `north`, `east`, `south`, `west`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`, `adjust_factor`, `adjust_percent`, `adjust_value`, `adjust_mv`, `assess_lvl`, `assess_value`, `faas_id`, `created_at`, `updated_at`) VALUES
-(55, 25634, '423', 'Lot 15', 'Barangay Road', 'Rice Field', 'River', 'Bounded by residential and agricultural lands', 'Cruz', 'Juan', 'Dela', '09171234567', 'juan.cruz@example.com', 'Rizal Street', 'Kalamunding', 'District 1', 'Daet', 'Camarines Norte', 'Residential lot with improvements', 'Residential', 'House and Lot', 800, 'Residential', 20.00, 16000.00, 'Depreciation', 17.00, -13280.00, 2720.00, 20.00, 544.00, 33, '2025-08-27 16:41:18', '2025-09-09 14:40:08'),
+(55, 12345, '42322', 'Lot 15', 'Barangay Road', 'Rice Field', 'River', 'Bounded by residential and agricultural lands', 'Cruz', 'Juan', 'Dela', '09171234567', 'juan.cruz@example.com', 'Rizal Street', 'Kalamunding', 'District 1', 'Daet', 'Camarines Norte', 'Residential lot with improvements', 'Agricultural', '', 23, 'SC', 20.00, 460.00, 'Depreciation', 17.00, -381.80, 78.20, 20.00, 15.64, 33, '2025-08-27 16:41:18', '2025-09-17 15:46:37'),
 (56, 1234, '3412', 'Lot 22', 'Barangay Road', 'Vacant Lot', 'Riverbank', 'Commercial property near public market', 'Reyes', 'Maria', 'Lopez', '09181234567', 'maria.reyes@example.com', 'Mabini Street', 'Gahon', 'District 2', 'Daet', 'Camarines Norte', 'Commercial lot', 'Commercial', 'Business Establishment', 432, 'Commercial', 34.00, 14688.00, 'Standard', 0.00, 0.00, 14688.00, 34.00, 4993.92, 33, '2025-08-27 16:41:18', '2025-09-09 14:40:08'),
 (57, 3421, '4321', 'Highway', 'Residential Subdivision', 'Barangay Hall', 'Rice Field', 'Prime residential land near highway', 'Santos', 'Pedro', 'Gonzales', '09201234567', 'pedro.santos@example.com', 'Quezon Avenue', 'Bagasbas', 'District 3', 'Daet', 'Camarines Norte', 'Residential land', 'Residential', 'Vacant Lot', 800, 'Residential', 200.00, 160000.00, 'Standard', 0.00, 0.00, 160000.00, 65.00, 104000.00, 36, '2025-08-27 16:41:18', '2025-09-09 14:40:08');
 
@@ -744,9 +744,9 @@ CREATE TABLE `subclass` (
 --
 
 INSERT INTO `subclass` (`sc_id`, `sc_code`, `sc_description`, `sc_uv`, `sc_status`) VALUES
-(1, 'RA', '32', 0.00, 'Active'),
-(2, 'IA', '43', 0.00, 'Active'),
-(3, '', '', 0.00, 'Active');
+(1, 'RA', '32', 56.00, 'Active'),
+(2, 'IA', '43', 45.00, 'Active'),
+(3, '', '34', 78.00, 'Active');
 
 -- --------------------------------------------------------
 
@@ -1006,7 +1006,7 @@ ALTER TABLE `brgy`
 -- AUTO_INCREMENT for table `certification`
 --
 ALTER TABLE `certification`
-  MODIFY `cert_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `cert_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `classification`
@@ -1030,7 +1030,7 @@ ALTER TABLE `faas`
 -- AUTO_INCREMENT for table `land`
 --
 ALTER TABLE `land`
-  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- AUTO_INCREMENT for table `land_use`
