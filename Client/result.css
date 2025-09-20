@@ -68,15 +68,26 @@ body {
     border: 3px solid #FFFFFF;
     box-shadow: 0 0 0 2px #FFED92;
 }
+
+/* ✅ Completed = green */
 .timeline-step.completed:before {
     background-color: #379777;
     box-shadow: 0 0 0 2px #379777;
 }
+
+/* 🔵 Active = green with pulse */
 .timeline-step.active:before {
     background-color: #379777;
     box-shadow: 0 0 0 2px #379777;
     animation: pulse 1.5s infinite;
 }
+
+/* ⚪ Upcoming = grey */
+.timeline-step.upcoming:before {
+    background-color: #ccc;
+    box-shadow: 0 0 0 2px #ccc;
+}
+
 .step-title {
     font-weight: 600;
     margin-bottom: 5px;
@@ -175,7 +186,7 @@ body {
 @media (max-width: 600px) {
     .container {
         padding: 20px;
-    }
+    }                               
     .details-grid {
         grid-template-columns: 1fr;
     }
