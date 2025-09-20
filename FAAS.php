@@ -995,12 +995,7 @@ $conn->close();
     </div>
   </div>
 
-  <!-- Carousel Wrapper -->
-  <div class="container my-5" id="property-carousel-section">
-    <div id="propertyCarousel" class="carousel slide" data-bs-ride="false">
-      <div class="carousel-inner">
-
-        <!-- LAND Section -->
+  <!-- LAND Section -->
         <div class="carousel-item active">
           <!-- LAND Section -->
           <section class="container my-5" id="land-section">
@@ -1071,6 +1066,11 @@ $conn->close();
                                 style="pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
                                 <i class="bi bi-printer"></i>
                               </a>
+                              <a href="ViewAll.php?p_id=<?= urlencode($p_id); ?>"
+                              class="btn btn-sm btn-info ml-3"
+                              title="View All">
+                              <i class="bi bi-eye"></i>
+                            </a>
                             </div>
                           </td>
                         </tr>
@@ -1087,85 +1087,6 @@ $conn->close();
             </div>
           </section>
         </div>
-
-        <!-- PLANTS AND TREES Section -->
-        <div class="carousel-item">
-          <section class="container my-5" id="plants-trees-section">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-              <h4 class="section-title">
-                PLANTS AND TREES
-              </h4>
-            </div>
-
-            <div class="card border-0 shadow p-4 rounded-3">
-              <!-- Quick Actions Row -->
-              <div class="row mb-4">
-                <?php
-                // Get the property ID from the current URL (e.g., FAAS.php?id=140)
-                $p_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
-                ?>
-                <div class="col-md-6 mb-3">
-                  <a href="<?= ($is_active == 1) ? 'Property/AddPnTrees.php?p_id=' . $p_id : '#' ?>"
-                    class="btn w-100 py-2 text-white text-decoration-none <?= ($is_active == 0) ? 'disabled' : '' ?>"
-                    style="background-color: #379777; border-color: #2e8266; pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
-                    <i class="fas fa-plus-circle me-2"></i>Add Plants/Trees
-                  </a>
-                </div>
-              </div>
-
-              <!-- Toggle Section -->
-              <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded">
-                <span class="fw-bold me-3">Show/Hide</span>
-                <div class="form-check form-switch m-0">
-                  <input class="form-check-input" type="checkbox" id="showPlantsToggle" checked style="margin-left: 0;">
-                </div>
-              </div>
-
-              <!-- Value Table -->
-              <div class="table-responsive">
-                <table class="table table-borderless">
-                  <thead>
-                    <tr>
-                      <th class="text-muted">Market Value</th>
-                      <th class="text-muted">Assessed Value</th>
-                      <th class="text-muted">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>$100,000.00</td>
-                      <td>$50,000.00</td>
-                      <td class="text-center">
-                        <div class="btn-group" role="group">
-                          <a href="EditPnT.php" class="btn btn-sm btn-primary" title="Edit">
-                            <i class="bi bi-pencil"></i>
-                          </a>
-                          <a href="#" class="btn btn-sm btn-danger ml-3" title="Delete">
-                            <i class="bi bi-trash"></i>
-                          </a>
-                        </div>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </section>
-        </div>
-        <!-- Put Code In Additional Carousel Items Here-->
-      </div>
-
-      <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
-        <i class="fas fa-chevron-left"></i>
-        <span class="visually-hidden">Previous</span>
-      </button>
-
-      <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
-        <i class="fas fa-chevron-right"></i>
-        <span class="visually-hidden">Next</span>
-      </button>
-    </div>
-  </div>
-
 
   <!-- Memoranda Section -->
   <section class="container my-5">
