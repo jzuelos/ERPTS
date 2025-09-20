@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 20, 2025 at 02:59 PM
+-- Generation Time: Sep 20, 2025 at 03:49 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -507,7 +507,17 @@ INSERT INTO `land_use` (`lu_id`, `report_code`, `lu_code`, `lu_description`, `lu
 (2, 'SC', '43', 'SC', 100.00, 'Active'),
 (3, 'SC', 'CS244', '', 54.00, 'Active'),
 (4, 'SC', '65', 'Hello World', 0.00, 'Active'),
-(5, 'SC', 'C2', 'DFS', 342.00, 'Active');
+(5, 'SC', 'C2', 'DFS', 342.00, 'Active'),
+(6, 'RES', 'R1', 'Residential Zone – Single Family', 80.00, 'Active'),
+(7, 'RES', 'R2', 'Residential Zone – Multi Family', 90.00, 'Active'),
+(8, 'RES', 'R3', 'Residential Zone – Condominium', 100.00, 'Active'),
+(9, 'COM', 'C1', 'Commercial Zone – Retail', 120.00, 'Active'),
+(10, 'COM', 'C2', 'Commercial Zone – Office', 130.00, 'Active'),
+(11, 'IND', 'I1', 'Industrial Zone – Light Industry', 150.00, 'Active'),
+(12, 'IND', 'I2', 'Industrial Zone – Heavy Industry', 180.00, 'Active'),
+(13, 'AGR', 'A1', 'Agricultural Zone – Rice Land', 50.00, 'Active'),
+(14, 'AGR', 'A2', 'Agricultural Zone – Coconut Plantation', 45.00, 'Active'),
+(15, 'MIX', 'MX1', 'Mixed-Use Development Area', 110.00, 'Active');
 
 -- --------------------------------------------------------
 
@@ -572,7 +582,17 @@ INSERT INTO `owners_tb` (`own_id`, `own_fname`, `own_mname`, `own_surname`, `dat
 (9, 'Jonard', 'Balce', 'Canaria', '2017-09-08', 0, '1', 'Purok 3', 'Alawihao', 'District 2', 'Santa elena', 'Camarines norte', 'Telephone: 09473846382, Fax: , Email: jonard@gmail.com, Website: '),
 (10, 'Rommel James', 'Balce', 'Gacho', '2016-09-15', 0, '3', 'Purok 2', 'Bagacay', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09738265234, Fax: , Email: rommel@gmail.com, Website: '),
 (11, 'John Lloyd', 'Balce', 'Zuelos', '2018-09-17', 0, '1', 'Purok 2', 'Kalamunding', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09643826422, Fax: , Email: jzuelos@gmail.com, Website: '),
-(12, 'Mark', 'Balce', 'Bertillo', '2019-09-17', 0, '3', 'Purok 1', 'Pasig', 'District 2', 'Daet', 'Camarines norte', 'Telephone: 09634618435, Fax: , Email: markbertillo@gmail.com, Website:');
+(12, 'Mark', 'Balce', 'Bertillo', '2019-09-17', 0, '3', 'Purok 1', 'Pasig', 'District 2', 'Daet', 'Camarines norte', 'Telephone: 09634618435, Fax: , Email: markbertillo@gmail.com, Website:'),
+(13, 'Jose', 'Manuel', 'Del Rosario', '1980-05-12', 123456789, '25', 'Rizal Street', 'Bagasbas', 'District 1', 'Daet', 'Camarines Norte', 'Telephone: 09171234567, Email: jose.rosario@example.com'),
+(14, 'Maria', 'Luisa', 'Santos', '1975-03-08', 987654321, '12', 'Quezon Avenue', 'Lag-on', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09181234567, Email: maria.santos@example.com'),
+(15, 'Antonio', 'Reyes', 'Cruz', '1968-11-20', 123987654, '40', 'Mabini Street', 'Gubat', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09201234567, Email: antonio.cruz@example.com'),
+(16, 'Carmen', 'Lopez', 'Reyes', '1990-01-15', 456123789, '5', 'Burgos Street', 'Pamorangon', 'District 3', 'Daet', 'Camarines Norte', 'Telephone: 09301234567, Email: carmen.reyes@example.com'),
+(17, 'Pedro', 'Gonzales', 'Santos', '1985-07-22', 321654987, '18', 'Bonifacio Street', 'Mambalite', 'District 1', 'Daet', 'Camarines Norte', 'Telephone: 09401234567, Email: pedro.santos@example.com'),
+(18, 'Juan', 'Domingo', 'Reyes', '1972-09-10', 741852963, '8', 'San Roque', 'Awitan', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09501234567, Email: juan.reyes@example.com'),
+(19, 'Isabel', 'Fernandez', 'Cruz', '1992-04-18', 852369741, '33', 'Del Pilar Street', 'Dogongan', 'District 3', 'Daet', 'Camarines Norte', 'Telephone: 09601234567, Email: isabel.cruz@example.com'),
+(20, 'Francisco', 'Dela', 'Ramos', '1988-02-25', 963852741, '50', 'San Vicente', 'Gahonon', 'District 1', 'Daet', 'Camarines Norte', 'Telephone: 09701234567, Email: francisco.ramos@example.com'),
+(21, 'Rosario', 'Mendoza', 'Lopez', '1979-06-14', 147258369, '7', 'Magsaysay Avenue', 'Calasgasan', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09801234567, Email: rosario.lopez@example.com'),
+(22, 'Guillermo', 'Torres', 'Delos Santos', '1965-12-30', 369258147, '60', 'Libertad Street', 'Magang', 'District 3', 'Daet', 'Camarines Norte', 'Telephone: 09901234567, Email: guillermo.torres@example.com');
 
 -- --------------------------------------------------------
 
@@ -646,10 +666,10 @@ CREATE TABLE `p_info` (
 --
 
 INSERT INTO `p_info` (`p_id`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`, `created_at`, `updated_at`, `is_active`, `disabled_at`, `disabled_by`) VALUES
-(144, 23, 1, 'Camarines Norte', 'Daet', 'District 1', 'Kalamunding', 'Rizal Street', 0, 302, 'Residential lot with affidavit and barangay cleara', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-08-31 19:01:44', 1, NULL, NULL),
-(147, 23, 3, 'Camarines Norte', 'Daet', 'District 2', 'Gahon', 'Mabini Street', 0, 453, 'Commercial lot with affidavit and barangay clearan', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-08-31 19:01:44', 1, NULL, NULL),
-(156, 42134, 4, 'Camarines Norte', 'Daet', 'District 2', 'Bagasbas', 'Quezon Avenue', 1, 432, 'Agricultural lot with affidavit', 'Affidavit', '2025-09-05 14:01:18', '2025-09-13 06:29:21', 0, '2025-09-13 14:29:21', 9),
-(157, 5345, 4, 'Camarines Norte', 'Daet', 'District 2', 'Camambugan', 'San Roque', 0, 5345, 'Residential lot with barangay document', 'Barangay Clearance', '2025-09-05 14:13:20', '2025-09-10 16:00:54', 1, NULL, NULL);
+(144, 23, 1, 'Camarines Norte', 'Daet', 'District 1', 'Kalamunding', 'Rizal Street', 0, 302, 'Residential lot with Affidavit and Barangay Cleara', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-09-20 13:22:18', 1, NULL, NULL),
+(147, 23, 3, 'Camarines Norte', 'Daet', 'District 2', 'Gahon', 'Mabini Street', 0, 453, 'Commercial lot with Affidavit and Barangay Clearan', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-09-20 13:22:18', 1, NULL, NULL),
+(156, 42134, 4, 'Camarines Norte', 'Daet', 'District 2', 'Bagasbas', 'Quezon Avenue', 1, 432, 'Agricultural lot with supporting affidavit', 'Affidavit', '2025-09-05 14:01:18', '2025-09-20 13:22:18', 0, '2025-09-13 14:29:21', 9),
+(157, 5345, 4, 'Camarines Norte', 'Daet', 'District 2', 'Camambugan', 'San Roque', 0, 5345, 'Residential lot with Barangay Clearance', 'Barangay Clearance', '2025-09-05 14:13:20', '2025-09-20 13:22:18', 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -721,9 +741,9 @@ CREATE TABLE `rpu_idnum` (
 --
 
 INSERT INTO `rpu_idnum` (`rpu_id`, `arp`, `pin`, `taxability`, `effectivity`, `faas_id`) VALUES
-(46, 2147483647, 34564234, 'special', '2024', 33),
-(62, 42342, 23423, 'exempt', '42342', 36),
-(63, 423234, 423423, 'taxable', '2004', 42);
+(46, 2147483647, 34564234, 'Special Property', '2024', 33),
+(62, 42342, 23423, 'Exempt Property', '2025', 36),
+(63, 423234, 423423, 'Taxable Property', '2004', 42);
 
 -- --------------------------------------------------------
 
@@ -746,7 +766,17 @@ CREATE TABLE `subclass` (
 INSERT INTO `subclass` (`sc_id`, `sc_code`, `sc_description`, `sc_uv`, `sc_status`) VALUES
 (1, 'RA', '32', 56.00, 'Active'),
 (2, 'IA', '43', 45.00, 'Active'),
-(3, '', '34', 78.00, 'Active');
+(3, '', '34', 78.00, 'Active'),
+(4, 'RA1', 'Residential – Single Detached', 100.00, 'Active'),
+(5, 'RA2', 'Residential – Townhouse', 120.00, 'Active'),
+(6, 'RA3', 'Residential – Condominium', 150.00, 'Active'),
+(7, 'CA1', 'Commercial – Retail Store', 200.00, 'Active'),
+(8, 'CA2', 'Commercial – Office Building', 250.00, 'Active'),
+(9, 'IA1', 'Industrial – Light Manufacturing', 300.00, 'Active'),
+(10, 'IA2', 'Industrial – Heavy Manufacturing', 350.00, 'Active'),
+(11, 'AG1', 'Agricultural – Rice Farm', 50.00, 'Active'),
+(12, 'AG2', 'Agricultural – Coconut Plantation', 60.00, 'Active'),
+(13, 'MX1', 'Mixed-Use – Residential and Commercial', 180.00, 'Active');
 
 -- --------------------------------------------------------
 
@@ -1036,7 +1066,7 @@ ALTER TABLE `land`
 -- AUTO_INCREMENT for table `land_use`
 --
 ALTER TABLE `land_use`
-  MODIFY `lu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `lu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `municipality`
@@ -1048,7 +1078,7 @@ ALTER TABLE `municipality`
 -- AUTO_INCREMENT for table `owners_tb`
 --
 ALTER TABLE `owners_tb`
-  MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `propertyowner`
@@ -1090,7 +1120,7 @@ ALTER TABLE `rpu_idnum`
 -- AUTO_INCREMENT for table `subclass`
 --
 ALTER TABLE `subclass`
-  MODIFY `sc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `sc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `transactions`
