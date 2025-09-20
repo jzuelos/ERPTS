@@ -41,9 +41,12 @@ if ($check_result->num_rows > 0) {
 
     if (!empty($existing_rpu_id)) {
         // Step 2: Update rpu_idnum
-        $update_sql = "UPDATE rpu_idnum SET arp = ?, pin = ?, taxability = ?, effectivity = ?, faas_id = ? WHERE rpu_id = ?";
+        // Update
+        $update_sql = "UPDATE rpu_idnum 
+               SET arp = ?, pin = ?, taxability = ?, effectivity = ?, faas_id = ? 
+               WHERE rpu_id = ?";
         $update_stmt = $conn->prepare($update_sql);
-        $update_stmt->bind_param("iissii", $arpNumber, $propertyNumber, $taxability, $effectivity, $faasId, $existing_rpu_id);
+        $update_stmt->bind_param("isssii", $arpNumber, $propertyNumber, $taxability, $effectivity, $faasId, $existing_rpu_id);
 
         if ($update_stmt->execute()) {
             exit(json_encode(['success' => true, 'message' => 'rpu_idnum updated.']));
@@ -54,9 +57,11 @@ if ($check_result->num_rows > 0) {
 }
 
 // Step 3: Insert new rpu_idnum record
-$insert_sql = "INSERT INTO rpu_idnum (arp, pin, taxability, effectivity, faas_id) VALUES (?, ?, ?, ?, ?)";
+// Insert
+$insert_sql = "INSERT INTO rpu_idnum (arp, pin, taxability, effectivity, faas_id) 
+               VALUES (?, ?, ?, ?, ?)";
 $insert_stmt = $conn->prepare($insert_sql);
-$insert_stmt->bind_param("iissi", $arpNumber, $propertyNumber, $taxability, $effectivity, $faasId);
+$insert_stmt->bind_param("isssi", $arpNumber, $propertyNumber, $taxability, $effectivity, $faasId);
 
 if (!$insert_stmt->execute()) {
     exit(json_encode(['success' => false, 'error' => 'Insert into rpu_idnum failed.']));

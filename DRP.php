@@ -56,38 +56,45 @@ function getFaasInfo($conn, $p_id)
     return $faas_info;
 }
 
-function getOwnerFullNameByPInfo($conn, $p_id) {
-    $full_name = null;
+// Fetch owner full name(s) by p_id using propertyowner + owners_tb
+function getOwnerFullNameByPInfo($conn, $p_id)
+{
+    $owners = [];
     $sql = "
-        SELECT CONCAT(own_fname, ' ', own_mname, ' ', own_surname) AS full_name
-        FROM p_info
-        INNER JOIN owners_tb ON p_info.ownID_Fk = owners_tb.own_id
-        WHERE p_info.p_id = ?
-        LIMIT 1
+        SELECT CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname) AS full_name
+        FROM propertyowner po
+        INNER JOIN owners_tb o ON po.owner_id = o.own_id
+        WHERE po.property_id = ?
     ";
 
     if ($stmt = $conn->prepare($sql)) {
         $stmt->bind_param("i", $p_id);
         $stmt->execute();
-        $stmt->bind_result($full_name);
-        $stmt->fetch();
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $owners[] = trim($row['full_name']);
+        }
         $stmt->close();
 
-        if (!$full_name) {
-            die("Owner full name not found for p_id: $p_id.");
+        if (empty($owners)) {
+            return "N/A";
         }
     } else {
         die("Prepare failed: " . $conn->error);
     }
-    return $full_name;
+
+    // Return as a single string (comma separated)
+    return implode(", ", $owners);
 }
+
 
 // Fetch all land properties from 'land' table using faas_id
 function getLandProperties($conn, $faas_id)
 {
     $sql = "SELECT * FROM land WHERE faas_id = ?";
     $stmt = $conn->prepare($sql);
-    if (!$stmt) die("Prepare failed: " . $conn->error);
+    if (!$stmt)
+        die("Prepare failed: " . $conn->error);
 
     $stmt->bind_param("i", $faas_id);
     $stmt->execute();
@@ -130,6 +137,22 @@ $rpu_data = getRpuDataByFaasId($conn, $faas_id);
 $land_properties = getLandProperties($conn, $faas_id);
 
 // Now $p_info, $faas_info, $rpu_data, and $land_properties are ready to use
+
+// helper: format PIN as 000-00-000-00-000
+function formatPin($value)
+{
+    $digits = preg_replace('/\D/', '', $value); // keep digits only
+    if (strlen($digits) !== 13) {
+        return $value; // return as-is if not 13 digits
+    }
+    return implode('-', [
+        substr($digits, 0, 3),
+        substr($digits, 3, 2),
+        substr($digits, 5, 3),
+        substr($digits, 8, 2),
+        substr($digits, 10, 3),
+    ]);
+}
 ?>
 
 <!DOCTYPE html>
@@ -145,7 +168,13 @@ $land_properties = getLandProperties($conn, $faas_id);
 <body>
     <div class="section">
         <p class="bold">RPA Form NO. 1A</p>
-        <p><span class="bold">Assessment of Real Property No.:</span> <u>____<?= htmlspecialchars($rpu_data['arp'] ?? 'N/A') ?>____</u> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="bold">Property Index No.:</span> <u>____<?= htmlspecialchars($rpu_data['pin'] ?? 'N/A') ?>____</u></p>
+        <p>
+            <span class="bold">Assessment of Real Property No.:</span>
+            <u>____<?= htmlspecialchars($rpu_data['arp'] ?? 'N/A') ?>____</u>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <span class="bold">Property Index No.:</span>
+            <u>____<?= isset($rpu_data['pin']) ? formatPin($rpu_data['pin']) : 'N/A' ?>____</u>
+        </p>
     </div>
 
     <div class="section center">
@@ -154,8 +183,10 @@ $land_properties = getLandProperties($conn, $faas_id);
     </div>
 
     <div class="section">
-        <p><span class="bold">Owner:</span><u>_______<?= htmlspecialchars($full_name ?? 'N/A') ?>_______</u> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="bold">Address:</span> _____________________________</p>
-        <p><span class="bold">Administration:</span> _______________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="bold">Address:</span> _____________________________</p>
+        <p><span class="bold">Owner:</span><u>_______<?= htmlspecialchars($full_name ?? 'N/A') ?>_______</u>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="bold">Address:</span> _____________________________</p>
+        <p><span class="bold">Administration:</span> _______________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+                class="bold">Address:</span> _____________________________</p>
     </div>
 
     <div class="section">
@@ -177,14 +208,18 @@ $land_properties = getLandProperties($conn, $faas_id);
     </div>
 
     <div class="section">
-        <p><span class="bold">OCT/TCT No.:</span> <u>________</u> &nbsp;&nbsp; <span class="bold">Survey No.:</span> <u>_________</u> &nbsp;&nbsp; <span class="bold">Lot No.:</span> <u>_________</u> &nbsp;&nbsp; <span class="bold">Blk No.:</span> <u>_________</u></p>
+        <p><span class="bold">OCT/TCT No.:</span> <u>________</u> &nbsp;&nbsp; <span class="bold">Survey No.:</span>
+            <u>_________</u> &nbsp;&nbsp; <span class="bold">Lot No.:</span> <u>_________</u> &nbsp;&nbsp; <span
+                class="bold">Blk No.:</span> <u>_________</u>
+        </p>
     </div>
 
     <div class="section">
         <p class="bold">Boundaries:</p>
         <p>North: __________________________________ &nbsp;&nbsp; South: ___________________________________</p>
         <p>East: ___________________________________ &nbsp;&nbsp; West: ___________________________________</p>
-        <p style="font-size: 12px; text-align: center;">(State streets, streams or PIN by which bounded, or names of the owner of adjacent lands)</p>
+        <p style="font-size: 12px; text-align: center;">(State streets, streams or PIN by which bounded, or names of the
+            owner of adjacent lands)</p>
     </div>
     <div class="section">
         <table style="width: 100%;">
@@ -285,19 +320,24 @@ $land_properties = getLandProperties($conn, $faas_id);
         <!-- Previous Assessed Value and Cancellation part -->
         <div class="section">
             <p style="display: flex; justify-content: space-between; margin: 0;">
-                <span class="bold">Previous Assessed Value:</span><span style="border-bottom: 1px solid black; width: 30%; display: inline-block;"></span>
-                <span class="bold" style="text-align: left;">By:</span><span style="border-bottom: 1px solid black; width: 30%; display: inline-block;"></span>
+                <span class="bold">Previous Assessed Value:</span><span
+                    style="border-bottom: 1px solid black; width: 30%; display: inline-block;"></span>
+                <span class="bold" style="text-align: left;">By:</span><span
+                    style="border-bottom: 1px solid black; width: 30%; display: inline-block;"></span>
             </p>
             <p style="display: flex; justify-content: space-between; margin: 0;">
-                <span>This declaration cancels No.:</span><span style="border-bottom: 1px solid black; width: 30%; display: inline-block;"></span>
-                <span>Date:</span><span style="border-bottom: 1px solid black; width: 30%; display: inline-block;"></span>
+                <span>This declaration cancels No.:</span><span
+                    style="border-bottom: 1px solid black; width: 30%; display: inline-block;"></span>
+                <span>Date:</span><span
+                    style="border-bottom: 1px solid black; width: 30%; display: inline-block;"></span>
             </p>
             <p><b>Memoranda:</b>REVISED TO CORRECT THE TAXABILITY FROM TAXABLE TO EXEMPT PURSUANT TO SECTION 234 OF
                 RA 7160. LETTER REQUEST, SEC CERTIFICATE OF INCORPORATION, ARTICLES OF INCORPORATION
                 AND BY-LAWS, ALL PHOTOCOPY SUBMITTED. </p>
         </div>
 
-        <div style="border: 1px solid black; padding: 10px; width: 95%; margin-left: auto; margin-right: auto; margin-bottom: 0;">
+        <div
+            style="border: 1px solid black; padding: 10px; width: 95%; margin-left: auto; margin-right: auto; margin-bottom: 0;">
             <!-- Acknowledgement -->
             <div style="display: flex; justify-content: space-between;">
                 <div>
@@ -306,7 +346,8 @@ $land_properties = getLandProperties($conn, $faas_id);
                         <div style="margin-right: 20px;">
                             <span style="display: inline-block; border-bottom: 1px solid black; width: 200px;"></span>
                             <br>
-                            <span style="font-size: 12px; font-weight: bold; margin-left: 25%;">Owner/Administrator</span>
+                            <span
+                                style="font-size: 12px; font-weight: bold; margin-left: 25%;">Owner/Administrator</span>
                         </div>
                         <div>
                             <span style="display: inline-block; border-bottom: 1px solid black; width: 100px;"></span>
@@ -316,14 +357,19 @@ $land_properties = getLandProperties($conn, $faas_id);
                     </div>
                 </div>
                 <div style="text-align: right;">
-                    <p style="margin: 0;"><span style="font-weight: bold;">Certification Fee:₱</span> <span style="border-bottom: 1px solid black; display: inline-block; width: 100px;"></span></p>
-                    <p style="margin: 0;"><span style="font-weight: bold;">O.R. No.:</span> <span style="border-bottom: 1px solid black; display: inline-block; width: 150px;"></span></p>
-                    <p style="margin: 0;"><span style="font-weight: bold;">Date Paid:</span> <span style="border-bottom: 1px solid black; display: inline-block; width: 150px;"></span></p>
+                    <p style="margin: 0;"><span style="font-weight: bold;">Certification Fee:₱</span> <span
+                            style="border-bottom: 1px solid black; display: inline-block; width: 100px;"></span></p>
+                    <p style="margin: 0;"><span style="font-weight: bold;">O.R. No.:</span> <span
+                            style="border-bottom: 1px solid black; display: inline-block; width: 150px;"></span></p>
+                    <p style="margin: 0;"><span style="font-weight: bold;">Date Paid:</span> <span
+                            style="border-bottom: 1px solid black; display: inline-block; width: 150px;"></span></p>
                 </div>
             </div>
         </div>
         <div class="footer" style="padding: 10px; font-size: 15px; margin-top: -5px;">
-            <p><span class="bold">IMPORTANT:</span> This declaration is issued only in connection with real property taxation and the validation herein is based on a schedule of market values prepared for the purpose. It should not be considered as title to the property.</p>
+            <p><span class="bold">IMPORTANT:</span> This declaration is issued only in connection with real property
+                taxation and the validation herein is based on a schedule of market values prepared for the purpose. It
+                should not be considered as title to the property.</p>
         </div>
 </body>
 <script>
@@ -332,4 +378,5 @@ $land_properties = getLandProperties($conn, $faas_id);
         window.print();
     }, 500); // Adjust delay if needed
 </script>
+
 </html>

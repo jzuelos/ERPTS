@@ -760,13 +760,60 @@ $conn->close();
               disabled>
           </div>
 
-          <!-- Property Number Input (Number only) -->
+          <!-- Property Number Input -->
           <div class="col-md-6 mb-3">
             <label for="propertyNumber" class="form-label">Property Number</label>
-            <input type="number" class="form-control" id="propertyNumber" placeholder="Enter Property Number"
-              value="<?= isset($rpu_details['pin']) ? htmlspecialchars($rpu_details['pin']) : ''; ?>" maxlength="20"
+            <input type="text" class="form-control" id="propertyNumber" placeholder="Enter Property Number"
+              value="<?= isset($rpu_details['pin']) ? htmlspecialchars($rpu_details['pin']) : ''; ?>" maxlength="17"
               disabled>
           </div>
+
+          <script>
+            (function () {
+              const input = document.getElementById('propertyNumber');
+              const MAX = 13; // digits only
+
+              function formatPin(d) {
+                d = d.slice(0, MAX);
+                return [d.slice(0, 3), d.slice(3, 5), d.slice(5, 8), d.slice(8, 10), d.slice(10, 13)]
+                  .filter(Boolean).join('-');
+              }
+
+              function digitsOnly(s) {
+                return (s || '').replace(/\D/g, '').slice(0, MAX);
+              }
+
+              // Initialize (format existing value)
+              input.value = formatPin(digitsOnly(input.value));
+
+              input.addEventListener('input', () => {
+                const digits = digitsOnly(input.value);
+                input.value = formatPin(digits);
+                input.selectionStart = input.selectionEnd = input.value.length; // keep cursor at end
+              });
+
+              input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pasted = (e.clipboardData || window.clipboardData).getData('text') || '';
+                const digits = digitsOnly(pasted);
+                input.value = formatPin(digits);
+              });
+
+              // helper for enabling/disabling
+              window.togglePropertyNumberInput = function (enable) {
+                input.disabled = !enable;
+                if (enable) {
+                  input.focus();
+                  input.selectionStart = input.selectionEnd = input.value.length;
+                }
+              };
+
+              // helper for saving: always returns digits-only
+              window.getPropertyNumberDigits = function () {
+                return digitsOnly(input.value);
+              };
+            })();
+          </script>
 
           <!-- Taxability Dropdown -->
           <div class="col-md-6 mb-3">
@@ -996,97 +1043,94 @@ $conn->close();
   </div>
 
   <!-- LAND Section -->
-        <div class="carousel-item active">
-          <!-- LAND Section -->
-          <section class="container my-5" id="land-section">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-              <h4 class="section-title">
-                </a>
-                LAND
-              </h4>
-            </div>
+  <div class="carousel-item active">
+    <!-- LAND Section -->
+    <section class="container my-5" id="land-section">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="section-title">
+          </a>
+          LAND
+        </h4>
+      </div>
 
-            <div class="card border-0 shadow p-4 rounded-3">
-              <!-- Quick Actions Row -->
-              <div class="row mb-4">
-                <?php
-                // Get the property ID from the current URL (e.g., FAAS.php?id=140)
-                $p_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
-                ?>
-                <div class="col-md-6 mb-3">
-                  <a href="<?= ($is_active == 1) ? "Land.php?p_id=$p_id" : '#' ?>"
-                    class="btn w-100 py-2 text-white text-decoration-none <?= ($is_active == 0) ? 'disabled' : '' ?>"
-                    style="background-color: #379777; border-color: #2e8266; pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
-                    <i class="fas fa-plus-circle me-2"></i>Add Land
-                  </a>
-                </div>
-              </div>
-
-              <!-- Toggle Section -->
-              <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded">
-                <span class="fw-bold me-3">Show/Hide</span>
-                <div class="form-check form-switch m-0">
-                  <input class="form-check-input" type="checkbox" id="showToggle" checked style="margin-left: 0;">
-                </div>
-              </div>
-
-              <!-- Value Table -->
-              <div class="table-responsive" id="landTableContainer">
-                <table class="table table-borderless text-center">
-                  <thead class="border-bottom border-2">
-                    <tr class="border-bottom border-2">
-                      <th class="bold" style="width: 10%;">OCT/TCT Number</th>
-                      <th class="bold">Area (sq m)</th>
-                      <th class="bold">Market Value</th>
-                      <th class="bold">Assessed Value</th>
-                      <th class="bold" style="width: 10%;">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php if (!empty($landRecords)): ?>
-                      <?php foreach ($landRecords as $record): ?>
-                        <tr class="border-bottom border-3">
-                          <td><?= htmlspecialchars($record['oct_no']) ?></td>
-                          <td><?= htmlspecialchars($record['area']) ?></td>
-                          <td><?= number_format($record['market_value'], 2) ?></td>
-                          <td>
-                            <?= isset($record['assess_value']) ? number_format($record['assess_value'], 2) : '0.00' ?>
-                          </td>
-                          <td>
-                            <div class="btn-group" role="group">
-                              <a href="LAND_Edit.php?p_id=<?= urlencode($p_id); ?>&land_id=<?= urlencode($record['land_id']); ?>"
-                                class="btn btn-sm btn-primary" title="Edit">
-                                <i class="bi bi-pencil"></i>
-                              </a>
-                              <a href="<?= ($is_active == 1)
-                                ? 'print-layout.php?p_id=' . urlencode($p_id) . '&land_id=' . urlencode($record['land_id'])
-                                : '#' ?>"
-                                class="btn btn-sm btn-secondary ml-3 <?= ($is_active == 0) ? 'disabled' : '' ?>"
-                                title="View" target="_blank"
-                                style="pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
-                                <i class="bi bi-printer"></i>
-                              </a>
-                              <a href="ViewAll.php?p_id=<?= urlencode($p_id); ?>"
-                              class="btn btn-sm btn-info ml-3"
-                              title="View All">
-                              <i class="bi bi-eye"></i>
-                            </a>
-                            </div>
-                          </td>
-                        </tr>
-                      <?php endforeach; ?>
-                    <?php else: ?>
-                      <tr>
-                        <td colspan="6" class="text-center">No records found</td>
-                      </tr>
-                    <?php endif; ?>
-                  </tbody>
-                </table>
-              </div>
-
-            </div>
-          </section>
+      <div class="card border-0 shadow p-4 rounded-3">
+        <!-- Quick Actions Row -->
+        <div class="row mb-4">
+          <?php
+          // Get the property ID from the current URL (e.g., FAAS.php?id=140)
+          $p_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
+          ?>
+          <div class="col-md-6 mb-3">
+            <a href="<?= ($is_active == 1) ? "Land.php?p_id=$p_id" : '#' ?>"
+              class="btn w-100 py-2 text-white text-decoration-none <?= ($is_active == 0) ? 'disabled' : '' ?>"
+              style="background-color: #379777; border-color: #2e8266; pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
+              <i class="fas fa-plus-circle me-2"></i>Add Land
+            </a>
+          </div>
         </div>
+
+        <!-- Toggle Section -->
+        <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded">
+          <span class="fw-bold me-3">Show/Hide</span>
+          <div class="form-check form-switch m-0">
+            <input class="form-check-input" type="checkbox" id="showToggle" checked style="margin-left: 0;">
+          </div>
+        </div>
+
+        <!-- Value Table -->
+        <div class="table-responsive" id="landTableContainer">
+          <table class="table table-borderless text-center">
+            <thead class="border-bottom border-2">
+              <tr class="border-bottom border-2">
+                <th class="bold" style="width: 10%;">OCT/TCT Number</th>
+                <th class="bold">Area (sq m)</th>
+                <th class="bold">Market Value</th>
+                <th class="bold">Assessed Value</th>
+                <th class="bold" style="width: 10%;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php if (!empty($landRecords)): ?>
+                <?php foreach ($landRecords as $record): ?>
+                  <tr class="border-bottom border-3">
+                    <td><?= htmlspecialchars($record['oct_no']) ?></td>
+                    <td><?= htmlspecialchars($record['area']) ?></td>
+                    <td><?= number_format($record['market_value'], 2) ?></td>
+                    <td>
+                      <?= isset($record['assess_value']) ? number_format($record['assess_value'], 2) : '0.00' ?>
+                    </td>
+                    <td>
+                      <div class="btn-group" role="group">
+                        <a href="LAND_Edit.php?p_id=<?= urlencode($p_id); ?>&land_id=<?= urlencode($record['land_id']); ?>"
+                          class="btn btn-sm btn-primary" title="Edit">
+                          <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="<?= ($is_active == 1)
+                          ? 'print-layout.php?p_id=' . urlencode($p_id) . '&land_id=' . urlencode($record['land_id'])
+                          : '#' ?>" class="btn btn-sm btn-secondary ml-3 <?= ($is_active == 0) ? 'disabled' : '' ?>"
+                          title="View" target="_blank" style="pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
+                          <i class="bi bi-printer"></i>
+                        </a>
+                        <a href="ViewAll.php?p_id=<?= urlencode($p_id); ?>" class="btn btn-sm btn-info ml-3"
+                          title="View All">
+                          <i class="bi bi-eye"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="6" class="text-center">No records found</td>
+                </tr>
+              <?php endif; ?>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+  </div>
 
   <!-- Memoranda Section -->
   <section class="container my-5">
@@ -1317,7 +1361,7 @@ $conn->close();
 
       // Get input values
       const arpNumber = document.getElementById('arpNumber').value;
-      const propertyNumber = document.getElementById('propertyNumber').value;
+      const propertyNumber = getPropertyNumberDigits();
       const taxability = document.getElementById('taxability').value;
       const effectivity = document.getElementById('effectivity').value;
 
