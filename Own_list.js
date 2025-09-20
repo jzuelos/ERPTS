@@ -1,6 +1,7 @@
 let currentPage = 1;
 const rowsPerPage = 5;
 let currentFilteredRows = [];
+let viewAllMode = false; // ✅ new flag
 
 // Handle Enter key on search
 function handleEnter(event) {
@@ -13,61 +14,55 @@ function handleEnter(event) {
 // Function to handle Enter key press in the modal search
 function handleModalSearch(event) {
   if (event.key === "Enter") {
-    event.preventDefault(); 
-    viewAllSearch(); 
+    event.preventDefault();
+    viewAllSearch();
   }
 }
 
-// Function to search the modal table based on the input
+// Function to search the modal table
 function viewAllSearch() {
-  const input = document.getElementById("modalSearchInput").value.toLowerCase(); 
-  const table = document.getElementById("modalTable");
-  const rows = table.getElementsByTagName("tr"); 
-  const modalTableBody = document.getElementById("modalTableBody"); 
+  const input = document.getElementById("modalSearchInput").value.toLowerCase();
+  const rows = document
+    .getElementById("modalTable")
+    .getElementsByTagName("tr");
 
-  if (input === "") {
-    for (let row of rows) {
-      row.style.display = ""; 
-    }
-    return; 
-  }
-
-  for (let i = 1; i < rows.length; i++) { 
+  for (let i = 1; i < rows.length; i++) {
     const cells = rows[i].getElementsByTagName("td");
-    let matchSearch = false;
+    let match = false;
 
-    for (let j = 0; j < cells.length; j++) { 
-      const cellText = cells[j].textContent.toLowerCase(); 
-      if (cellText.includes(input)) { 
-        matchSearch = true;
-        break; 
+    for (let j = 0; j < cells.length; j++) {
+      if (cells[j].textContent.toLowerCase().includes(input)) {
+        match = true;
+        break;
       }
     }
 
-    rows[i].style.display = matchSearch ? "" : "none"; 
+    rows[i].style.display = match ? "" : "none";
   }
 }
-
 
 // Main search filter
 function filterTable() {
   const input = document.getElementById("searchInput").value.toLowerCase();
-  const table = document.getElementById("propertyTable");
-  const allRows = Array.from(table.querySelectorAll("tbody tr"));
+  const allRows = Array.from(
+    document.querySelectorAll("#propertyTable tbody tr")
+  );
 
-  currentFilteredRows = allRows.filter(row => {
-    const cells = row.getElementsByTagName("td");
-    return Array.from(cells).some(cell =>
+  currentFilteredRows = allRows.filter(row =>
+    Array.from(row.getElementsByTagName("td")).some(cell =>
       cell.textContent.toLowerCase().includes(input)
-    );
-  });
+    )
+  );
 
-  // Hide all initially
   allRows.forEach(row => (row.style.display = "none"));
 
-  // Update pagination and reset to page 1
-  updatePagination(currentFilteredRows);
-  displayPage(1);
+  if (viewAllMode) {
+    // ✅ If in View All mode, show all filtered
+    currentFilteredRows.forEach(row => (row.style.display = ""));
+  } else {
+    updatePagination(currentFilteredRows);
+    displayPage(1);
+  }
 }
 
 // Build pagination dropdown
@@ -93,11 +88,12 @@ function updatePagination(filteredRows) {
 
 // Display rows for current page
 function displayPage(page) {
+  if (viewAllMode) return; // ✅ Skip pagination in View All mode
+
   const startIndex = (page - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
 
   currentFilteredRows.forEach(row => (row.style.display = "none"));
-
   currentFilteredRows.slice(startIndex, endIndex).forEach(row => {
     row.style.display = "";
   });
@@ -111,47 +107,58 @@ function displayPage(page) {
 function togglePaginationButtons(totalPages) {
   document
     .getElementById("nextBtn")
-    .classList.toggle("disabled", currentPage >= totalPages);
+    .classList.toggle("disabled", currentPage >= totalPages || viewAllMode);
   document
     .getElementById("backBtn")
-    .classList.toggle("disabled", currentPage <= 1);
+    .classList.toggle("disabled", currentPage <= 1 || viewAllMode);
+}
+
+// ✅ Handle View All toggle
+function toggleViewAll() {
+  viewAllMode = !viewAllMode;
+
+  if (viewAllMode) {
+    // Show all
+    currentFilteredRows.forEach(row => (row.style.display = ""));
+    document.getElementById("pageSelect").disabled = true;
+    togglePaginationButtons(0);
+  } else {
+    // Back to paginated view
+    document.getElementById("pageSelect").disabled = false;
+    updatePagination(currentFilteredRows);
+    displayPage(1);
+  }
 }
 
 // Initial Setup
 document.addEventListener("DOMContentLoaded", () => {
-  const allRows = Array.from(
-    document.getElementById("propertyTable").querySelectorAll("tbody tr")
+  currentFilteredRows = Array.from(
+    document.querySelectorAll("#propertyTable tbody tr")
   );
-  currentFilteredRows = allRows;
 
   updatePagination(currentFilteredRows);
   displayPage(1);
 
-  // Dropdown change
+  // Pagination events
   document.getElementById("pageSelect").addEventListener("change", e => {
     displayPage(parseInt(e.target.value));
   });
-
-  // Next button
   document.getElementById("nextBtn").addEventListener("click", () => {
     const totalPages = Math.ceil(currentFilteredRows.length / rowsPerPage);
-    if (currentPage < totalPages) {
-      displayPage(currentPage + 1);
-    }
+    if (currentPage < totalPages) displayPage(currentPage + 1);
+  });
+  document.getElementById("backBtn").addEventListener("click", () => {
+    if (currentPage > 1) displayPage(currentPage - 1);
   });
 
-  // Back button
-  document.getElementById("backBtn").addEventListener("click", () => {
-    if (currentPage > 1) {
-      displayPage(currentPage - 1);
-    }
-  });
+  // ✅ View All button
+  document
+    .querySelector(".btn-info[data-bs-target='#viewAllModal']")
+    .addEventListener("click", toggleViewAll);
 
   // Reset modal search on open
-  $('#viewAllModal').on('show.bs.modal', function () {
+  $('#viewAllModal').on("show.bs.modal", () => {
     document.getElementById("modalSearchInput").value = "";
-    viewAllSearch(); // Reset rows when opening modal
+    viewAllSearch();
   });
 });
-
-
