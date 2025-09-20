@@ -31,6 +31,29 @@ if ($result->num_rows > 0) {
     $owners[] = $row;
   }
 }
+
+// ✅ Fetch municipalities
+$municipalities_stmt = $conn->prepare("SELECT m_id, m_description FROM municipality");
+$municipalities_stmt->execute();
+$municipalities_result = $municipalities_stmt->get_result();
+
+// ✅ Fetch districts
+$districts_stmt = $conn->prepare("SELECT district_id, description, m_id FROM district");
+$districts_stmt->execute();
+$districts_result = $districts_stmt->get_result();
+$districts = [];
+while ($row = $districts_result->fetch_assoc()) {
+  $districts[] = $row;
+}
+
+// ✅ Fetch barangays
+$barangays_stmt = $conn->prepare("SELECT brgy_id, brgy_name, m_id FROM brgy");
+$barangays_stmt->execute();
+$barangays_result = $barangays_stmt->get_result();
+$barangays = [];
+while ($row = $barangays_result->fetch_assoc()) {
+  $barangays[] = $row;
+}
 ?>
 
 <!doctype html>
@@ -39,12 +62,10 @@ if ($result->num_rows > 0) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
-    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-KyZXEJr+8+6g5K4r53m5s3xmw1Is0J6wBd04YOeFvXOsZTgmYF9flT/qe6LZ9s+0" crossorigin="anonymous">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" 
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
+      crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="header.css">
@@ -100,22 +121,22 @@ if ($result->num_rows > 0) {
                 <td><?= htmlspecialchars($owner['house_no'] . ', ' . $owner['street'] . ', ' . $owner['barangay'] . ', ' . $owner['city'] . ', ' . $owner['district'] . ', ' . $owner['province']) ?></td>
                 <td><?= htmlspecialchars($owner['own_info']) ?></td>
                 <td>
-                  <button class="btn btn-primary"
-                    data-toggle="modal"
-                    data-target="#editModal"
-                    data-id="<?= htmlspecialchars($owner['own_id']) ?>"
-                    data-fname="<?= htmlspecialchars($owner['own_fname']) ?>"
-                    data-mname="<?= htmlspecialchars($owner['own_mname']) ?>"
-                    data-sname="<?= htmlspecialchars($owner['own_surname']) ?>"
-                    data-tin="<?= htmlspecialchars($owner['tin_no'] ?? '') ?>"
-                    data-house="<?= htmlspecialchars($owner['house_no']) ?>"
-                    data-street="<?= htmlspecialchars($owner['street']) ?>"
-                    data-barangay="<?= htmlspecialchars($owner['barangay']) ?>"
-                    data-district="<?= htmlspecialchars($owner['district']) ?>"
-                    data-city="<?= htmlspecialchars($owner['city']) ?>"
-                    data-province="<?= htmlspecialchars($owner['province']) ?>">
-                    EDIT
-                  </button>
+                 <button class="btn btn-primary"
+                  data-bs-toggle="modal"
+                  data-bs-target="#editModal"
+                  data-id="<?= htmlspecialchars($owner['own_id']) ?>"
+                  data-fname="<?= htmlspecialchars($owner['own_fname']) ?>"
+                  data-mname="<?= htmlspecialchars($owner['own_mname']) ?>"
+                  data-sname="<?= htmlspecialchars($owner['own_surname']) ?>"
+                  data-tin="<?= htmlspecialchars($owner['tin_no'] ?? '') ?>"
+                  data-house="<?= htmlspecialchars($owner['house_no']) ?>"
+                  data-street="<?= htmlspecialchars($owner['street']) ?>"
+                  data-barangay="<?= htmlspecialchars($owner['barangay']) ?>"
+                  data-district="<?= htmlspecialchars($owner['district']) ?>"
+                  data-city="<?= htmlspecialchars($owner['city']) ?>"
+                  data-province="<?= htmlspecialchars($owner['province']) ?>">
+                  EDIT
+                </button>
                 </td>
               </tr>
             <?php endforeach; ?>
@@ -129,112 +150,133 @@ if ($result->num_rows > 0) {
     </div>
 
     <div class="d-flex align-items-center mt-3">
-      <a href="javascript:void(0)" id="backBtn" class="mr-2"><<<</a>
-      <span class="mr-2">Page:</span>
-      <select id="pageSelect" class="form-control form-control-sm w-auto mr-2"></select>
-      <a href="javascript:void(0)" id="nextBtn" class="ml-2">>></a>
+        <a href="javascript:void(0)" id="backBtn" class="mr-2">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    <span class="mr-2">Page:</span>
+    <select id="pageSelect" class="form-control form-control-sm w-auto mr-2"></select>
+    <a href="javascript:void(0)" id="nextBtn" class="ml-2">
+      <i class="fas fa-chevron-right"></i>
+    </a>
     </div>
       <!-- View All Button -->
       <div class="d-flex justify-content-between mt-3">
         <a href="Add_POwner.php" class="btn btn-success add-owner-button">Add Owner</a>
-        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#viewAllModal">View All</button>
+        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#viewAllModal">View All</button>
       </div>
   </section>
 
 
-  <!-- Edit Modal -->
-  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editModalLabel">Edit Owner Information</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <!-- Basic Information -->
-          <h5>Basic Information</h5>
-          <form>
-            <div class="form-row">
-              <div class="form-group col-md-4">
-                <label for="firstName">First Name</label>
-                <input type="text" class="form-control" id="firstName" placeholder="Enter first name" maxlength="20">
-              </div>
-              <div class="form-group col-md-4">
-                <label for="middleName">Middle Name</label>
-                <input type="text" class="form-control" id="middleName" placeholder="Enter middle name" maxlength="20">
-              </div>
-              <div class="form-group col-md-4">
-                <label for="surname">Surname</label>
-                <input type="text" class="form-control" id="surname" placeholder="Enter surname" maxlength="20">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="tinNo">TIN No.</label>
-              <input type="text" class="form-control" id="tinNo" placeholder="Enter TIN number" maxlength="15">
-            </div>
-
-            <!-- Address Fields -->
-            <div class="form-row">
-              <div class="form-group col-md-6">
-                <label for="houseNumber">House Number</label>
-                <input type="text" class="form-control" id="houseNumber" placeholder="Enter house number" maxlength="10">
-              </div>
-              <div class="form-group col-md-6">
-                <label for="street">Street</label>
-                <input type="text" class="form-control" id="street" placeholder="Enter street" maxlength="50">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-6">
-                <label for="barangay">Barangay</label>
-                <input type="text" class="form-control" id="barangay" placeholder="Enter barangay" maxlength="50">
-              </div>
-              <div class="form-group col-md-6">
-                <label for="district">District</label>
-                <input type="text" class="form-control" id="district" placeholder="Enter district" maxlength="50">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-6">
-                <label for="city">City</label>
-                <input type="text" class="form-control" id="city" placeholder="Enter city" maxlength="50">
-              </div>
-              <div class="form-group col-md-6">
-                <label for="province">Province</label>
-                <input type="text" class="form-control" id="province" placeholder="Enter province" maxlength="50">
-              </div>
-            </div>
-
-            <!-- Owner Information -->
-            <h5>Owner Information</h5>
-            <div class="form-row">
-              <div class="form-group col-md-4">
-                <label for="telephone">Telephone</label>
-                <input type="text" class="form-control" id="telephone" placeholder="Enter telephone number" maxlength="11">
-              </div>
-              <div class="form-group col-md-4">
-                <label for="fax">Fax</label>
-                <input type="text" class="form-control" id="fax" placeholder="Enter fax number" maxlength="15">
-              </div>
-              <div class="form-group col-md-4">
-                <label for="email">Email</label>
-                <input type="email" class="form-control" id="email" placeholder="Enter email address" maxlength="50">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="website">Website</label>
-              <input type="text" class="form-control" id="website" placeholder="Enter website" maxlength="100">
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Save Changes</button>
-        </div>
+ <!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-lg border-0 rounded-3">
+      
+      <!-- Header -->
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title fw-bold" id="editModalLabel">Edit Owner Information</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+
+      <!-- Body -->
+      <div class="modal-body">
+        <form class="needs-validation" novalidate>
+
+          <!-- Basic Information -->
+          <h6 class="fw-bold border-bottom pb-2 mb-3">Basic Information</h6>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="firstName" class="form-label">First Name</label>
+              <input type="text" class="form-control" id="firstName" maxlength="20">
+            </div>
+            <div class="col-md-4">
+              <label for="middleName" class="form-label">Middle Name</label>
+              <input type="text" class="form-control" id="middleName" maxlength="20">
+            </div>
+            <div class="col-md-4">
+              <label for="surname" class="form-label">Surname</label>
+              <input type="text" class="form-control" id="surname" maxlength="20">
+            </div>
+            <div class="col-md-6">
+              <label for="tinNo" class="form-label">TIN No.</label>
+              <input type="text" class="form-control" id="tinNo" maxlength="15">
+            </div>
+          </div>
+
+          <!-- Address Information -->
+          <h6 class="fw-bold border-bottom pb-2 mt-4 mb-3">Address</h6>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="houseNumber" class="form-label">House Number</label>
+              <input type="text" class="form-control" id="houseNumber" maxlength="10">
+            </div>
+            <div class="col-md-4">
+              <label for="street" class="form-label">Street</label>
+              <input type="text" class="form-control" id="street" maxlength="50">
+            </div>
+            <div class="col-md-4">
+              <label for="barangay" class="form-label"><span class="text-danger">*</span> Barangay</label>
+              <select class="form-select" id="barangay" name="barangay" required>
+                <option value="" selected disabled>Select Barangay</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="district" class="form-label"><span class="text-danger">*</span> District</label>
+              <select class="form-select" id="district" name="district" required>
+                <option value="" selected disabled>Select District</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="city" class="form-label"><span class="text-danger">*</span> Municipality / City</label>
+              <select class="form-select" id="city" name="city" required>
+                <option value="" selected disabled>Select Municipality</option>
+                <?php while ($row = $municipalities_result->fetch_assoc()) { ?>
+                  <option value="<?= htmlspecialchars($row['m_id']) ?>">
+                    <?= htmlspecialchars($row['m_description']) ?>
+                  </option>
+                <?php } ?>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="province" class="form-label">Province</label>
+              <input type="text" class="form-control" id="province" value="Camarines Norte" readonly>
+            </div>
+          </div>
+
+          <!-- Contact Information -->
+          <h6 class="fw-bold border-bottom pb-2 mt-4 mb-3">Contact Information</h6>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="telephone" class="form-label">Telephone</label>
+              <input type="text" class="form-control" id="telephone" maxlength="11">
+            </div>
+            <div class="col-md-4">
+              <label for="fax" class="form-label">Fax</label>
+              <input type="text" class="form-control" id="fax" maxlength="15">
+            </div>
+            <div class="col-md-4">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" maxlength="50">
+            </div>
+            <div class="col-12">
+              <label for="website" class="form-label">Website</label>
+              <input type="text" class="form-control" id="website" maxlength="100">
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+
     </div>
   </div>
+</div>
+
+
 
 <!-- View All Modal -->
 <div class="modal fade" id="viewAllModal" tabindex="-1" aria-labelledby="viewAllModalLabel" aria-hidden="true">
@@ -283,7 +325,8 @@ if ($result->num_rows > 0) {
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
       </div>
     </div>
   </div>
@@ -301,18 +344,11 @@ if ($result->num_rows > 0) {
   <!-- jQuery (latest version) -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-  <!-- Bootstrap 4.5.2 JS and Popper.js -->
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Your custom JS files -->
-  <script src="http://localhost/ERPTS/main_layout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" 
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" 
+        crossorigin="anonymous"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>      
+
   <script src="http://localhost/ERPTS/Own_list.js"></script>
 
 

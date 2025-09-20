@@ -1,11 +1,12 @@
-let currentPage = 1; // Global current page variable
-const rowsPerPage = 5; // Rows displayed per page
+let currentPage = 1;
+const rowsPerPage = 5;
+let currentFilteredRows = [];
 
-// Function to handle Enter key press (for both modal and main table)
+// Handle Enter key on search
 function handleEnter(event) {
   if (event.key === "Enter") {
-    event.preventDefault(); 
-    filterTable(); 
+    event.preventDefault();
+    filterTable();
   }
 }
 
@@ -24,7 +25,6 @@ function viewAllSearch() {
   const rows = table.getElementsByTagName("tr"); 
   const modalTableBody = document.getElementById("modalTableBody"); 
 
-
   if (input === "") {
     for (let row of rows) {
       row.style.display = ""; 
@@ -32,11 +32,9 @@ function viewAllSearch() {
     return; 
   }
 
-
   for (let i = 1; i < rows.length; i++) { 
     const cells = rows[i].getElementsByTagName("td");
     let matchSearch = false;
-
 
     for (let j = 0; j < cells.length; j++) { 
       const cellText = cells[j].textContent.toLowerCase(); 
@@ -46,61 +44,38 @@ function viewAllSearch() {
       }
     }
 
-
     rows[i].style.display = matchSearch ? "" : "none"; 
-}
+  }
 }
 
+
+// Main search filter
 function filterTable() {
-  const input = document.getElementById("searchInput").value.toLowerCase(); 
+  const input = document.getElementById("searchInput").value.toLowerCase();
   const table = document.getElementById("propertyTable");
-  const tr = Array.from(table.getElementsByTagName("tr")).slice(1); 
+  const allRows = Array.from(table.querySelectorAll("tbody tr"));
 
-  let filteredRows = []; 
+  currentFilteredRows = allRows.filter(row => {
+    const cells = row.getElementsByTagName("td");
+    return Array.from(cells).some(cell =>
+      cell.textContent.toLowerCase().includes(input)
+    );
+  });
 
-  console.log("Starting filterTable function with search term:", input);
+  // Hide all initially
+  allRows.forEach(row => (row.style.display = "none"));
 
-
-  if (input === "") {
-    for (let row of tr) {
-      row.style.display = ""; 
-    }
-    return; 
-  }
-
-  for (let row of tr) {
-    const td = row.getElementsByTagName("td");
-
-   
-    let matchSearch = false;
-    for (let i = 0; i < td.length - 1; i++) { 
-      const cellText = td[i].textContent.toLowerCase(); 
-      if (cellText.includes(input)) { 
-        matchSearch = true;
-        break; 
-      }
-    }
-
-    if (matchSearch) {
-      filteredRows.push(row);
-      row.style.display = "";
-      console.log(`Row matches search: ${row.innerHTML}`);
-    } else {
-      row.style.display = "none";
-    }
-  }
-
-  updatePagination(filteredRows); // Update pagination for the filtered rows
-  displayPage(1, filteredRows); // Reset to the first page for filtered results
-  console.log("Filtered Rows:", filteredRows.length);
+  // Update pagination and reset to page 1
+  updatePagination(currentFilteredRows);
+  displayPage(1);
 }
 
+// Build pagination dropdown
 function updatePagination(filteredRows) {
   const pageSelect = document.getElementById("pageSelect");
-  pageSelect.innerHTML = ""; // Clear current options
+  pageSelect.innerHTML = "";
 
-  const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
-  console.log(`Total pages calculated: ${totalPages} for ${filteredRows.length} filtered rows`);
+  const totalPages = Math.ceil(filteredRows.length / rowsPerPage) || 1;
 
   for (let i = 1; i <= totalPages; i++) {
     const option = document.createElement("option");
@@ -109,53 +84,74 @@ function updatePagination(filteredRows) {
     pageSelect.appendChild(option);
   }
 
-  currentPage = Math.min(currentPage, totalPages);
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
+
   pageSelect.value = currentPage;
-  togglePaginationButtons(filteredRows);
+  togglePaginationButtons(totalPages);
 }
 
-function displayPage(page, filteredRows) {
+// Display rows for current page
+function displayPage(page) {
   const startIndex = (page - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
 
-  console.log(`Displaying page ${page}: Showing rows from index ${startIndex} to ${endIndex - 1}`);
-  filteredRows.forEach(row => row.style.display = "none");
-  filteredRows.slice(startIndex, endIndex).forEach(row => row.style.display = "");
+  currentFilteredRows.forEach(row => (row.style.display = "none"));
 
-  currentPage = page; // Update global currentPage
-  togglePaginationButtons(filteredRows);
+  currentFilteredRows.slice(startIndex, endIndex).forEach(row => {
+    row.style.display = "";
+  });
+
+  currentPage = page;
+  document.getElementById("pageSelect").value = page;
+  togglePaginationButtons(Math.ceil(currentFilteredRows.length / rowsPerPage));
 }
 
-function togglePaginationButtons(filteredRows) {
-  const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
-  document.getElementById("nextBtn").disabled = currentPage >= totalPages;
-  document.getElementById("backBtn").disabled = currentPage <= 1;
+// Enable/disable back/next buttons
+function togglePaginationButtons(totalPages) {
+  document
+    .getElementById("nextBtn")
+    .classList.toggle("disabled", currentPage >= totalPages);
+  document
+    .getElementById("backBtn")
+    .classList.toggle("disabled", currentPage <= 1);
 }
 
-// Event listener for the page dropdown
-document.getElementById("pageSelect").addEventListener("change", (event) => {
-  const selectedPage = parseInt(event.target.value);
-  const filteredRows = Array.from(document.getElementById("propertyTable").getElementsByTagName("tr")).slice(1);
-  displayPage(selectedPage, filteredRows);
-});
-
-// Event listener for the "Next" button
-document.getElementById("nextBtn").addEventListener("click", () => {
-  const filteredRows = Array.from(document.getElementById("propertyTable").getElementsByTagName("tr")).slice(1);
-  if (currentPage < Math.ceil(filteredRows.length / rowsPerPage)) {
-    displayPage(currentPage + 1, filteredRows);
-  }
-});
-
-// Event listener for the "Back" button
-document.getElementById("backBtn").addEventListener("click", () => {
-  const filteredRows = Array.from(document.getElementById("propertyTable").getElementsByTagName("tr")).slice(1);
-  if (currentPage > 1) {
-    displayPage(currentPage - 1, filteredRows);
-  }
-});
-
-// Initial setup - display the first page of all rows
+// Initial Setup
 document.addEventListener("DOMContentLoaded", () => {
-  filterTable();
+  const allRows = Array.from(
+    document.getElementById("propertyTable").querySelectorAll("tbody tr")
+  );
+  currentFilteredRows = allRows;
+
+  updatePagination(currentFilteredRows);
+  displayPage(1);
+
+  // Dropdown change
+  document.getElementById("pageSelect").addEventListener("change", e => {
+    displayPage(parseInt(e.target.value));
+  });
+
+  // Next button
+  document.getElementById("nextBtn").addEventListener("click", () => {
+    const totalPages = Math.ceil(currentFilteredRows.length / rowsPerPage);
+    if (currentPage < totalPages) {
+      displayPage(currentPage + 1);
+    }
+  });
+
+  // Back button
+  document.getElementById("backBtn").addEventListener("click", () => {
+    if (currentPage > 1) {
+      displayPage(currentPage - 1);
+    }
+  });
+
+  // Reset modal search on open
+  $('#viewAllModal').on('show.bs.modal', function () {
+    document.getElementById("modalSearchInput").value = "";
+    viewAllSearch(); // Reset rows when opening modal
+  });
 });
+
+
