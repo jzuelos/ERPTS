@@ -4,9 +4,21 @@ if (!isset($_SESSION['user_id'])) {
   header("Location: index.php");
   exit;
 }
+
+// prevent caching
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
+
+include 'database.php';
+$conn = Database::getInstance();
+
+// fetch logs with username
+$sql = "SELECT a.log_id, a.action, a.log_time, u.username
+        FROM activity_log a
+        JOIN users u ON a.user_id = u.user_id
+        ORDER BY a.log_time DESC";
+$result = $conn->query($sql);
 ?>
 
 <!doctype html>
@@ -49,36 +61,22 @@ header("Pragma: no-cache");
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1</td>
-              <td>Logged in to the system</td>
-              <td>2024-09-09 09:15:23</td>
-              <td>admin</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Viewed Real Property Records</td>
-              <td>2024-09-09 09:45:10</td>
-              <td>jdoe</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>Updated Property Record #1045</td>
-              <td>2024-09-09 10:20:34</td>
-              <td>maria</td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td>Generated Tax Report</td>
-              <td>2024-09-09 11:05:47</td>
-              <td>admin</td>
-            </tr>
-            <tr>
-              <td>5</td>
-              <td>Logged out of the system</td>
-              <td>2024-09-09 11:30:12</td>
-              <td>jdoe</td>
-            </tr>
+            <?php
+            if ($result->num_rows > 0) {
+              $no = 1;
+              while ($row = $result->fetch_assoc()) {
+                echo "<tr>
+                        <td>{$no}</td>
+                        <td>{$row['action']}</td>
+                        <td>{$row['log_time']}</td>
+                        <td>{$row['username']}</td>
+                      </tr>";
+                $no++;
+              }
+            } else {
+              echo "<tr><td colspan='4' class='text-center text-muted'>No activity logs found.</td></tr>";
+            }
+            ?>
           </tbody>
         </table>
       </div>

@@ -11,6 +11,19 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+/**
+ * Function to log user activity
+ */
+function logActivity($conn, $userId, $action)
+{
+    $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
+    if ($stmt) {
+        $stmt->bind_param("is", $userId, $action);
+        $stmt->execute();
+        $stmt->close();
+    }
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Capture and sanitize form data
     $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -44,7 +57,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $conn->prepare("INSERT INTO users (username, password, last_name, first_name, middle_name, gender, birthdate, marital_status, tin, house_number, street, barangay, district, municipality, province, contact_number, email, user_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
     if ($stmt) {
-        // Bind parameters
         $stmt->bind_param(
             "ssssssssssssssssss",
             $username,
@@ -67,8 +79,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $user_type
         );
 
-        // Execute statement and check for errors
         if ($stmt->execute()) {
+            // ✅ Log admin activity instead of the new user
+            if (isset($_SESSION['user_id'])) {
+                logActivity($conn, $_SESSION['user_id'], "Created new user: $username");
+            }
+
             $_SESSION['message'] = "New user created successfully!";
             header("Location: " . $_SERVER['PHP_SELF']);
             exit;
