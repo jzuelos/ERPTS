@@ -1,111 +1,175 @@
-// Function to show the modal for editing Owner's Information
-function showOISModal() {
-  // Populate modal fields with current values if necessary
-  document.getElementById('ownerNameModal').value = document.getElementById('ownerName').value;
-  document.getElementById('firstNameModal').value = document.getElementById('firstName').value;
-  document.getElementById('middleNameModal').value = document.getElementById('middleName').value;
-  document.getElementById('lastNameModal').value = document.getElementById('lastName').value;
+// ==============================
+// Utility Functions
+// ==============================
 
-  // Enable the form fields inside the modal
-  document.getElementById('ownerNameModal').disabled = false;
-  document.getElementById('firstNameModal').disabled = false;
-  document.getElementById('middleNameModal').disabled = false;
-  document.getElementById('lastNameModal').disabled = false;
+// Capitalize first letter of each word in a field
+function capitalizeFirstLetter(element) {
+  element.value = element.value.replace(/\b\w/g, char => char.toUpperCase());
+}
 
-  // Show the modal
-  var myModal = new bootstrap.Modal(document.getElementById('editOwnerModal'), {
-    keyboard: false
+// Restrict field to numeric input
+function restrictToNumbers(element) {
+  element.value = element.value.replace(/[^0-9]/g, '');
+}
+
+// Reset all forms inside modals
+function resetForm() {
+  const modals = document.querySelectorAll('.modal');
+  modals.forEach(modal => {
+    const forms = modal.querySelectorAll('form');
+    forms.forEach(form => {
+      form.reset();
+      form.querySelectorAll("input, select, textarea").forEach(field => {
+        if (["text", "textarea", "email", "date"].includes(field.type)) {
+          field.value = "";
+        } else if (["checkbox", "radio"].includes(field.type)) {
+          field.checked = field.defaultChecked;
+        } else if (field.tagName === "SELECT") {
+          field.selectedIndex = 0;
+        }
+      });
+    });
   });
+}
+
+// ==============================
+// RPU Identification Section
+// ==============================
+let arpData = {};
+
+function toggleEdit() {
+  const editButton = document.getElementById('editRPUButton');
+  const inputs = document.querySelectorAll('#rpu-identification-section input, #rpu-identification-section select');
+  const isEditMode = editButton.textContent === 'Edit';
+
+  if (isEditMode) {
+    editButton.textContent = 'Save';
+    inputs.forEach(input => input.disabled = false);
+  } else {
+    saveRPUData();
+    editButton.textContent = 'Edit';
+    inputs.forEach(input => input.disabled = true);
+  }
+}
+
+function saveRPUData() {
+  const propertyId = new URLSearchParams(window.location.search).get('id');
+  const faasIdText = document.body.innerHTML.match(/Faas ID:\s*(\d+)/);
+  const faasId = faasIdText ? faasIdText[1] : null;
+
+  if (!faasId) {
+    alert("Error: FAAS ID not found on the page.");
+    return;
+  }
+
+  const arpNumber = document.getElementById('arpNumber').value;
+  const propertyNumber = getPropertyNumberDigits();
+  const taxability = document.getElementById('taxability').value;
+  const effectivity = document.getElementById('effectivity').value;
+
+  arpData = { faasId, arpNumber, propertyNumber, taxability, effectivity };
+
+  console.log("Sending ARP Data:", arpData);
+
+  fetch('FAASrpuID.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(arpData)
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Success');
+      } else {
+        alert('Failed to insert data: ' + data.error);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred while inserting the data.');
+    });
+}
+
+// ==============================
+// Owner Information Section
+// ==============================
+let editingOwnerId = null;
+
+function showOISModal() {
+  resetOwnerForm();
+  document.getElementById('ownerModalLabel').textContent = editingOwnerId ? 'Edit Owner' : 'Add Owner';
+  const myModal = new bootstrap.Modal(document.getElementById('editOwnerModal'));
   myModal.show();
 }
 
-let editingOwnerId = null;
+function editOwner(ownerId) {
+  editingOwnerId = ownerId;
+  showOISModal();
+}
+
+function resetOwnerForm() {
+  const form = document.getElementById('editOwnerForm');
+  if (form) form.reset();
+  editingOwnerId = null;
+}
 
 function saveOwnerData() {
   const propertyId = new URLSearchParams(window.location.search).get('id');
-  const forms = document.querySelectorAll("#editOwnerModal form");
+  const ownerType = document.querySelector('input[name="owner_type"]:checked')?.value || 'individual';
 
-  forms.forEach(form => {
-    const ownerId = form.dataset.ownerId;
-    const first = form.querySelector(".firstNameModal").value;
-    const middle = form.querySelector(".middleNameModal").value;
-    const last = form.querySelector(".lastNameModal").value;
+  let ownerData = { property_id: propertyId, owner_type: ownerType };
 
-    fetch(window.location.href, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        action: "update_owner",
-        property_id: propertyId,
-        owner_id: ownerId,
-        first_name: first,
-        middle_name: middle,
-        last_name: last,
-        owner_type: 'individual'
-      })
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          location.reload();
-        } else {
-          alert("Error: " + data.error);
-        }
-      });
-  });
-}
+  if (ownerType === 'company') {
+    ownerData.company_name = document.getElementById('companyName')?.value.trim() || '';
+    if (!ownerData.company_name) {
+      alert('Company name is required');
+      return;
+    }
+  } else {
+    ownerData.first_name = document.getElementById('firstName')?.value.trim() || '';
+    ownerData.middle_name = document.getElementById('middleName')?.value.trim() || '';
+    ownerData.last_name = document.getElementById('lastName')?.value.trim() || '';
+    if (!ownerData.first_name || !ownerData.last_name) {
+      alert('First name and last name are required');
+      return;
+    }
+  }
 
-function addOwnerData() {
-  const propertyId = new URLSearchParams(window.location.search).get('id');
-  const first = prompt("Enter first name:");
-  const middle = prompt("Enter middle name:");
-  const last = prompt("Enter last name:");
-
-  if (!first || !last) return;
+  if (editingOwnerId) {
+    ownerData.action = 'update_owner';
+    ownerData.owner_id = editingOwnerId;
+  } else {
+    ownerData.action = 'add_owner';
+  }
 
   fetch(window.location.href, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      action: "add_owner",
-      property_id: propertyId,
-      first_name: first,
-      middle_name: middle,
-      last_name: last,
-      owner_type: 'individual'
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(ownerData)
   })
     .then(res => res.json())
     .then(data => {
       if (data.success) {
+        bootstrap.Modal.getInstance(document.getElementById('editOwnerModal')).hide();
         location.reload();
       } else {
-        alert("Error: " + data.error);
+        alert("Error: " + (data.error || 'Unknown error occurred'));
       }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred while saving the owner data.');
     });
 }
 
 function removeOwner(ownerId) {
-  if (!confirm('Are you sure you want to remove this owner from the property?')) {
-    return;
-  }
-
+  if (!confirm('Are you sure you want to remove this owner from the property?')) return;
   const propertyId = new URLSearchParams(window.location.search).get('id');
 
   fetch(window.location.href, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      action: "remove_owner",
-      owner_id: ownerId,
-      property_id: propertyId
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "remove_owner", owner_id: ownerId, property_id: propertyId })
   })
     .then(res => res.json())
     .then(data => {
@@ -121,15 +185,10 @@ function removeOwner(ownerId) {
     });
 }
 
-function editOwner(ownerId) {
-  editingOwnerId = ownerId;
-  // Show modal for editing - you'll need to implement based on your modal structure
-  var myModal = new bootstrap.Modal(document.getElementById('editOwnerModal'));
-  myModal.show();
-}
-// Function to show the modal for editing Property Information
+// ==============================
+// Property Information Section
+// ==============================
 function showEditPropertyModal() {
-  // Populate modal fields with current values if necessary
   document.getElementById('streetModal').value = document.getElementById('street').value;
   document.getElementById('barangayModal').value = document.getElementById('barangay').value;
   document.getElementById('municipalityModal').value = document.getElementById('municipality').value;
@@ -137,112 +196,84 @@ function showEditPropertyModal() {
   document.getElementById('houseNumberModal').value = document.getElementById('houseNumber').value;
   document.getElementById('landAreaModal').value = document.getElementById('landArea').value;
 
-  // Show the modal
-  var myModal = new bootstrap.Modal(document.getElementById('editPropertyModal'), {
-    keyboard: false
-  });
+  const myModal = new bootstrap.Modal(document.getElementById('editPropertyModal'), { keyboard: false });
   myModal.show();
 }
 
-// Function to save the Property Information data from the modal
 function savePropertyData() {
-  // Get data from modal fields
-  var propertyId = document.getElementById('propertyIdModal').value;
-  var street = document.getElementById('streetModal').value;
-  var barangay = document.getElementById('barangayModal').value;
-  var municipality = document.getElementById('municipalityModal').value;
-  var province = document.getElementById('provinceModal').value;
-  var houseNumber = document.getElementById('houseNumberModal').value;
-  var landArea = document.getElementById('landAreaModal').value;
+  const propertyId = document.getElementById('propertyIdModal').value;
+  const street = document.getElementById('streetModal').value;
+  const barangay = document.getElementById('barangayModal').value;
+  const municipality = document.getElementById('municipalityModal').value;
+  const province = document.getElementById('provinceModal').value;
+  const houseNumber = document.getElementById('houseNumberModal').value;
+  const landArea = document.getElementById('landAreaModal').value;
 
-  // Log to check if values are being captured
   console.log("Saving property with ID:", propertyId);
 
-  // Create an AJAX request
-  var xhr = new XMLHttpRequest();
+  const xhr = new XMLHttpRequest();
   xhr.open("POST", "FAASupdate_property.php", true);
   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-  // Handle response
   xhr.onreadystatechange = function () {
     if (xhr.readyState === 4 && xhr.status === 200) {
-      console.log("Response:", xhr.responseText); // Debugging
+      console.log("Response:", xhr.responseText);
       alert("Property information updated successfully!");
-      var myModal = bootstrap.Modal.getInstance(document.getElementById('editPropertyModal'));
+      const myModal = bootstrap.Modal.getInstance(document.getElementById('editPropertyModal'));
       myModal.hide();
     }
   };
 
-  // Send data to PHP script (no zone number anymore)
-  xhr.send("property_id=" + encodeURIComponent(propertyId) +
+  xhr.send(
+    "property_id=" + encodeURIComponent(propertyId) +
     "&street=" + encodeURIComponent(street) +
     "&barangay=" + encodeURIComponent(barangay) +
     "&municipality=" + encodeURIComponent(municipality) +
     "&province=" + encodeURIComponent(province) +
     "&houseNumber=" + encodeURIComponent(houseNumber) +
-    "&landArea=" + encodeURIComponent(landArea));
+    "&landArea=" + encodeURIComponent(landArea)
+  );
 }
 
-//Function to show Plant and Trees modal
+// ==============================
+// Plants, Trees & Valuation
+// ==============================
 function showPnTModal() {
-  console.log("Edit button clicked!"); // Debugging message
-
-  // Populate modal fields with current values from the main form
   document.getElementById('marketValueModal').value = document.getElementById('marketValue').value;
   document.getElementById('assessedValueModal').value = document.getElementById('assessedValue').value;
-
-  // Show the modal
-  var myModal = new bootstrap.Modal(document.getElementById('editPlantsTreesModal'), {
-    keyboard: false
-  });
+  const myModal = new bootstrap.Modal(document.getElementById('editPlantsTreesModal'), { keyboard: false });
   myModal.show();
 }
 
 function savePlantsTreesData() {
-  console.log("Saving data!"); // Debugging message
-
-  // Get data from modal fields and save back to the main form
   document.getElementById('marketValue').value = document.getElementById('marketValueModal').value;
   document.getElementById('assessedValue').value = document.getElementById('assessedValueModal').value;
-
-  // Hide the modal after saving
-  var myModalElement = document.getElementById('editPlantsTreesModal');
-  var myModal = bootstrap.Modal.getInstance(myModalElement);  // Get the modal instance
-  myModal.hide();  // Close the modal
+  bootstrap.Modal.getInstance(document.getElementById('editPlantsTreesModal')).hide();
 }
 
 function saveValuationData() {
-  console.log("Saving data!"); // Debugging message
-
-  // Get data from modal fields and save back to the main form
   document.getElementById('landMarketValue').value = document.getElementById('landMarketValueModal').value;
   document.getElementById('landAssessedValue').value = document.getElementById('landAssessedValueModal').value;
   document.getElementById('plantsMarketValue').value = document.getElementById('plantsMarketValueModal').value;
   document.getElementById('plantsAssessedValue').value = document.getElementById('plantsAssessedValueModal').value;
 
-  // Calculate the Total Values (for Market Value and Assessed Value)
   let landMarket = parseFloat(document.getElementById('landMarketValue').value.replace(/,/g, '')) || 0;
   let plantsMarket = parseFloat(document.getElementById('plantsMarketValue').value.replace(/,/g, '')) || 0;
-  let totalMarketValue = landMarket + plantsMarket;
-  document.getElementById('totalMarketValue').value = totalMarketValue.toLocaleString();
+  document.getElementById('totalMarketValue').value = (landMarket + plantsMarket).toLocaleString();
 
   let landAssessed = parseFloat(document.getElementById('landAssessedValue').value.replace(/,/g, '')) || 0;
   let plantsAssessed = parseFloat(document.getElementById('plantsAssessedValue').value.replace(/,/g, '')) || 0;
-  let totalAssessedValue = landAssessed + plantsAssessed;
-  document.getElementById('totalAssessedValue').value = totalAssessedValue.toLocaleString();
+  document.getElementById('totalAssessedValue').value = (landAssessed + plantsAssessed).toLocaleString();
 
-  // Hide the modal after saving
-  var myModalElement = document.getElementById('editValuationModal');
-  var myModal = bootstrap.Modal.getInstance(myModalElement);  // Get the modal instance
-  myModal.hide();  // Close the modal
+  bootstrap.Modal.getInstance(document.getElementById('editValuationModal')).hide();
 }
 
-
+// ==============================
+// Land Modal
+// ==============================
 function handleLandModal() {
-  // Get references to modal elements
   const editLandModal = new bootstrap.Modal(document.getElementById('editLandModal'));
 
-  // Get references to form fields
   const octTctNumber = document.getElementById('octTctNumber');
   const surveyNumber = document.getElementById('surveyNumber');
   const north = document.getElementById('north');
@@ -262,7 +293,6 @@ function handleLandModal() {
   const adminAddressMunicipality = document.getElementById('adminAddressMunicipality');
   const adminAddressProvince = document.getElementById('adminAddressProvince');
 
-  // Get references to modal fields
   const octTctNumberModal = document.getElementById('octTctNumberModal');
   const surveyNumberModal = document.getElementById('surveyNumberModal');
   const northModal = document.getElementById('northModal');
@@ -282,7 +312,6 @@ function handleLandModal() {
   const adminAddressMunicipalityModal = document.getElementById('adminAddressMunicipalityModal');
   const adminAddressProvinceModal = document.getElementById('adminAddressProvinceModal');
 
-  // Function to populate the modal with current data from the form
   function populateModal() {
     octTctNumberModal.value = octTctNumber.value;
     surveyNumberModal.value = surveyNumber.value;
@@ -304,7 +333,6 @@ function handleLandModal() {
     adminAddressProvinceModal.value = adminAddressProvince.value;
   }
 
-  // Function to save changes from the modal back to the main form
   function saveChanges() {
     octTctNumber.value = octTctNumberModal.value;
     surveyNumber.value = surveyNumberModal.value;
@@ -324,18 +352,40 @@ function handleLandModal() {
     adminAddressDistrict.value = adminAddressDistrictModal.value;
     adminAddressMunicipality.value = adminAddressMunicipalityModal.value;
     adminAddressProvince.value = adminAddressProvinceModal.value;
-
-    // Close the modal after saving changes
     editLandModal.hide();
   }
 
-  // Attach the populateModal function to the edit button (before opening modal)
   document.querySelector('button[data-bs-target="#editLandModal"]').addEventListener('click', populateModal);
-
-  // Attach the saveChanges function to the Save button inside the modal
-  const saveButton = document.querySelector('.modal-footer .btn-primary');
-  saveButton.addEventListener('click', saveChanges);
+  document.querySelector('#editLandModal .modal-footer .btn-primary').addEventListener('click', saveChanges);
 }
 
-// Initialize the handleLandModal function
-handleLandModal();
+document.addEventListener("DOMContentLoaded", () => {
+  // Input formatting listeners
+  const fieldsToCapitalize = [
+    'ownerName', 'firstName', 'middleName', 'lastName',
+    'ownerNameModal', 'firstNameModal', 'middleNameModal', 'lastNameModal',
+    'streetModal', 'barangayModal', 'municipalityModal', 'provinceModal'
+  ];
+  fieldsToCapitalize.forEach(fieldId => {
+    const inputField = document.getElementById(fieldId);
+    if (inputField) {
+      inputField.addEventListener("input", () => capitalizeFirstLetter(inputField));
+    }
+  });
+
+  const ardNumberField = document.getElementById("ardNumberModal");
+  if (ardNumberField) {
+    ardNumberField.addEventListener("input", () => restrictToNumbers(ardNumberField));
+  }
+
+  // Toggle land table display
+  const toggle = document.getElementById("showToggle");
+  const tableContainer = document.getElementById("landTableContainer");
+  if (toggle && tableContainer) {
+    toggle.addEventListener("change", () => {
+      tableContainer.style.display = toggle.checked ? "block" : "none";
+    });
+  }
+
+  handleLandModal();
+});
