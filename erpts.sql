@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.2
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 20, 2025 at 03:49 PM
+-- Generation Time: Sep 21, 2025 at 08:36 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,37 @@ SET time_zone = "+00:00";
 --
 -- Database: `erpts`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `activity_log`
+--
+
+CREATE TABLE `activity_log` (
+  `log_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `action` varchar(255) NOT NULL,
+  `log_time` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `activity_log`
+--
+
+INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
+(1, 12, 'Logged out of the system', '2025-09-21 13:05:14'),
+(2, 9, 'Logged out of the system', '2025-09-21 13:05:23'),
+(3, 9, 'Logged out of the system', '2025-09-21 13:08:00'),
+(4, 9, 'Logged in to the system', '2025-09-21 13:08:14'),
+(5, 12, 'Created new user: test', '2025-09-21 13:17:28'),
+(6, 9, 'Created new user: test2', '2025-09-21 13:20:15'),
+(7, 9, 'Updated user ID: 13', '2025-09-21 13:23:22'),
+(8, 9, 'Logged in to the system', '2025-09-21 13:34:52'),
+(9, 9, 'Added Municipality: Eefgsdgehjhqa', '2025-09-21 13:41:58'),
+(10, 9, 'Added Barangay: 312312', '2025-09-21 13:45:24'),
+(11, 9, 'Logged in to the system', '2025-09-21 15:19:01'),
+(12, 9, 'Logged in to the system', '2025-09-21 17:25:56');
 
 -- --------------------------------------------------------
 
@@ -350,9 +381,9 @@ CREATE TABLE `certification` (
 --
 
 INSERT INTO `certification` (`cert_id`, `verified`, `noted`, `recom_approval`, `recom_date`, `plotted`, `appraised`, `appraised_date`, `approved`, `approved_date`, `idle`, `contested`, `land_id`) VALUES
-(17, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-09-20', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-09-20', 'Lingon, Nestor Jacolbia', '2025-09-20', 0, 0, 55),
-(18, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-28', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-28', 'Lingon, Nestor Jacolbia', '2025-04-28', 0, 0, 56),
-(19, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-08-27', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-08-27', 'Lingon, Nestor Jacolbia', '2025-08-27', 0, 0, 57);
+(1, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-09-20', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-09-20', 'Lingon, Nestor Jacolbia', '2025-09-20', 0, 0, 55),
+(2, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-28', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-28', 'Lingon, Nestor Jacolbia', '2025-04-28', 0, 0, 56),
+(3, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-08-27', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-08-27', 'Lingon, Nestor Jacolbia', '2025-08-27', 0, 0, 57);
 
 -- --------------------------------------------------------
 
@@ -376,7 +407,10 @@ INSERT INTO `classification` (`c_id`, `c_code`, `c_description`, `c_uv`, `c_stat
 (5, 'CO213', 'Residential', 35.00, 'Active'),
 (6, 'AG34', 'Agricultural', 50.00, 'Active'),
 (7, 'CO234', 'Commercial', 46.00, 'Inactive'),
-(8, 'IN432', 'Industrial', 54.00, 'Active');
+(8, 'IN432', 'Industrial', 54.00, 'Active'),
+(9, 'MI101', 'Mineral', 72.00, 'Active'),
+(10, 'TI102', 'Timberland', 65.00, 'Active'),
+(11, 'SP103', 'Special', 48.00, 'Active');
 
 -- --------------------------------------------------------
 
@@ -440,7 +474,7 @@ INSERT INTO `faas` (`faas_id`, `pro_id`, `rpu_idno`) VALUES
 
 CREATE TABLE `land` (
   `land_id` int(50) NOT NULL,
-  `oct_no` int(50) NOT NULL,
+  `oct_no` varchar(50) NOT NULL,
   `survey_no` varchar(250) NOT NULL,
   `north` varchar(255) DEFAULT NULL,
   `east` varchar(255) DEFAULT NULL,
@@ -480,9 +514,9 @@ CREATE TABLE `land` (
 --
 
 INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `north`, `east`, `south`, `west`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`, `adjust_factor`, `adjust_percent`, `adjust_value`, `adjust_mv`, `assess_lvl`, `assess_value`, `faas_id`, `created_at`, `updated_at`) VALUES
-(55, 12345, '42322', 'Lot 15', 'Barangay Road', 'Rice Field', 'River', 'Bounded by residential and agricultural lands', 'Cruz', 'Juan', 'Dela', '09345678901', 'juan.cruz@example.com', 'Rizal Street', 'Kalamunding', 'District 1', 'Daet', 'Camarines Norte', 'Residential lot with improvements', 'Agricultural', '', 23, 'SC', 20.00, 460.00, 'Depreciation', 17.00, -381.80, 78.20, 20.00, 15.64, 33, '2025-08-27 16:41:18', '2025-09-20 08:44:08'),
-(56, 1234, '3412', 'Lot 22', 'Barangay Road', 'Vacant Lot', 'Riverbank', 'Commercial property near public market', 'Reyes', 'Maria', 'Lopez', '09181234567', 'maria.reyes@example.com', 'Mabini Street', 'Gahon', 'District 2', 'Daet', 'Camarines Norte', 'Commercial lot', 'Commercial', 'Business Establishment', 432, 'Commercial', 34.00, 14688.00, 'Standard', 0.00, 0.00, 14688.00, 34.00, 4993.92, 33, '2025-08-27 16:41:18', '2025-09-09 14:40:08'),
-(57, 3421, '4321', 'Highway', 'Residential Subdivision', 'Barangay Hall', 'Rice Field', 'Prime residential land near highway', 'Santos', 'Pedro', 'Gonzales', '09201234567', 'pedro.santos@example.com', 'Quezon Avenue', 'Bagasbas', 'District 3', 'Daet', 'Camarines Norte', 'Residential land', 'Residential', 'Vacant Lot', 800, 'Residential', 200.00, 160000.00, 'Standard', 0.00, 0.00, 160000.00, 65.00, 104000.00, 36, '2025-08-27 16:41:18', '2025-09-09 14:40:08');
+(55, '12345', '42322', 'Lot 15', 'Barangay Road', 'Rice Field', 'River', 'Bounded by residential and agricultural lands', 'Cruz', 'Juan', 'Dela', '09345678901', 'juan.cruz@example.com', 'Rizal Street', 'Kalamunding', 'District 1', 'Daet', 'Camarines Norte', 'Residential lot with improvements', 'Agricultural', '', 23, 'SC', 20.00, 460.00, 'Depreciation', 17.00, -381.80, 78.20, 20.00, 15.64, 33, '2025-08-27 16:41:18', '2025-09-20 08:44:08'),
+(56, '1234', '3412', 'Lot 22', 'Barangay Road', 'Vacant Lot', 'Riverbank', 'Commercial property near public market', 'Reyes', 'Maria', 'Lopez', '09181234567', 'maria.reyes@example.com', 'Mabini Street', 'Gahon', 'District 2', 'Daet', 'Camarines Norte', 'Commercial lot', 'Commercial', 'Business Establishment', 432, 'Commercial', 34.00, 14688.00, 'Standard', 0.00, 0.00, 14688.00, 34.00, 4993.92, 33, '2025-08-27 16:41:18', '2025-09-09 14:40:08'),
+(57, '3421', '4321', 'Highway', 'Residential Subdivision', 'Barangay Hall', 'Rice Field', 'Prime residential land near highway', 'Santos', 'Pedro', 'Gonzales', '09201234567', 'pedro.santos@example.com', 'Quezon Avenue', 'Bagasbas', 'District 3', 'Daet', 'Camarines Norte', 'Residential land', 'Residential', 'Vacant Lot', 800, 'Residential', 200.00, 160000.00, 'Standard', 0.00, 0.00, 160000.00, 65.00, 104000.00, 36, '2025-08-27 16:41:18', '2025-09-09 14:40:08');
 
 -- --------------------------------------------------------
 
@@ -505,9 +539,7 @@ CREATE TABLE `land_use` (
 
 INSERT INTO `land_use` (`lu_id`, `report_code`, `lu_code`, `lu_description`, `lu_al`, `lu_status`) VALUES
 (2, 'SC', '43', 'SC', 100.00, 'Active'),
-(3, 'SC', 'CS244', '', 54.00, 'Active'),
-(4, 'SC', '65', 'Hello World', 0.00, 'Active'),
-(5, 'SC', 'C2', 'DFS', 342.00, 'Active'),
+(5, 'SC', 'C2', 'DFS', 101.00, 'Active'),
 (6, 'RES', 'R1', 'Residential Zone – Single Family', 80.00, 'Active'),
 (7, 'RES', 'R2', 'Residential Zone – Multi Family', 90.00, 'Active'),
 (8, 'RES', 'R3', 'Residential Zone – Condominium', 100.00, 'Active'),
@@ -562,6 +594,12 @@ CREATE TABLE `owners_tb` (
   `own_fname` varchar(20) NOT NULL,
   `own_mname` varchar(20) NOT NULL,
   `own_surname` varchar(20) NOT NULL,
+  `owner_type` enum('individual','company') DEFAULT 'individual',
+  `company_name` varchar(100) DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_by` int(11) DEFAULT NULL,
+  `created_at_owner` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at_owner` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `date_birth` date DEFAULT NULL,
   `tin_no` int(20) NOT NULL,
   `house_no` varchar(20) NOT NULL,
@@ -577,22 +615,38 @@ CREATE TABLE `owners_tb` (
 -- Dumping data for table `owners_tb`
 --
 
-INSERT INTO `owners_tb` (`own_id`, `own_fname`, `own_mname`, `own_surname`, `date_birth`, `tin_no`, `house_no`, `street`, `barangay`, `district`, `city`, `province`, `own_info`) VALUES
-(8, 'Renz', 'Balce', 'Dioneda', '2015-09-16', 0, '5', 'Purok', 'Bulala', 'District 1', 'Santa Elena', 'Camarines Norte', 'Telephone: 09922007821, Fax: , Email: rdioneda4@gmail.com, Website: '),
-(9, 'Jonard', 'Balce', 'Canaria', '2017-09-08', 0, '1', 'Purok 3', 'Alawihao', 'District 2', 'Santa elena', 'Camarines norte', 'Telephone: 09473846382, Fax: , Email: jonard@gmail.com, Website: '),
-(10, 'Rommel James', 'Balce', 'Gacho', '2016-09-15', 0, '3', 'Purok 2', 'Bagacay', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09738265234, Fax: , Email: rommel@gmail.com, Website: '),
-(11, 'John Lloyd', 'Balce', 'Zuelos', '2018-09-17', 0, '1', 'Purok 2', 'Kalamunding', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09643826422, Fax: , Email: jzuelos@gmail.com, Website: '),
-(12, 'Mark', 'Balce', 'Bertillo', '2019-09-17', 0, '3', 'Purok 1', 'Pasig', 'District 2', 'Daet', 'Camarines norte', 'Telephone: 09634618435, Fax: , Email: markbertillo@gmail.com, Website:'),
-(13, 'Jose', 'Manuel', 'Del Rosario', '1980-05-12', 123456789, '25', 'Rizal Street', 'Bagasbas', 'District 1', 'Daet', 'Camarines Norte', 'Telephone: 09171234567, Email: jose.rosario@example.com'),
-(14, 'Maria', 'Luisa', 'Santos', '1975-03-08', 987654321, '12', 'Quezon Avenue', 'Lag-on', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09181234567, Email: maria.santos@example.com'),
-(15, 'Antonio', 'Reyes', 'Cruz', '1968-11-20', 123987654, '40', 'Mabini Street', 'Gubat', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09201234567, Email: antonio.cruz@example.com'),
-(16, 'Carmen', 'Lopez', 'Reyes', '1990-01-15', 456123789, '5', 'Burgos Street', 'Pamorangon', 'District 3', 'Daet', 'Camarines Norte', 'Telephone: 09301234567, Email: carmen.reyes@example.com'),
-(17, 'Pedro', 'Gonzales', 'Santos', '1985-07-22', 321654987, '18', 'Bonifacio Street', 'Mambalite', 'District 1', 'Daet', 'Camarines Norte', 'Telephone: 09401234567, Email: pedro.santos@example.com'),
-(18, 'Juan', 'Domingo', 'Reyes', '1972-09-10', 741852963, '8', 'San Roque', 'Awitan', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09501234567, Email: juan.reyes@example.com'),
-(19, 'Isabel', 'Fernandez', 'Cruz', '1992-04-18', 852369741, '33', 'Del Pilar Street', 'Dogongan', 'District 3', 'Daet', 'Camarines Norte', 'Telephone: 09601234567, Email: isabel.cruz@example.com'),
-(20, 'Francisco', 'Dela', 'Ramos', '1988-02-25', 963852741, '50', 'San Vicente', 'Gahonon', 'District 1', 'Daet', 'Camarines Norte', 'Telephone: 09701234567, Email: francisco.ramos@example.com'),
-(21, 'Rosario', 'Mendoza', 'Lopez', '1979-06-14', 147258369, '7', 'Magsaysay Avenue', 'Calasgasan', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09801234567, Email: rosario.lopez@example.com'),
-(22, 'Guillermo', 'Torres', 'Delos Santos', '1965-12-30', 369258147, '60', 'Libertad Street', 'Magang', 'District 3', 'Daet', 'Camarines Norte', 'Telephone: 09901234567, Email: guillermo.torres@example.com');
+INSERT INTO `owners_tb` (`own_id`, `own_fname`, `own_mname`, `own_surname`, `owner_type`, `company_name`, `created_by`, `updated_by`, `created_at_owner`, `updated_at_owner`, `date_birth`, `tin_no`, `house_no`, `street`, `barangay`, `district`, `city`, `province`, `own_info`) VALUES
+(8, 'Renz', 'Balce', 'Dioneda', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '2015-09-16', 0, '5', 'Purok', '201', '', '8', 'Camarines Norte', 'Telephone: 09922007821, Fax: , Email: rdioneda4@gmail.com, Website: '),
+(9, 'Renz', 'Balce', 'Dioneda', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '2017-09-08', 0, '5', 'Purok', '95', '5', '5', 'Camarines Norte', 'Telephone: 09473846382, Fax: , Email: jonard@gmail.com, Website: '),
+(10, 'Rommel James', 'Balce', 'Gacho', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '2016-09-15', 0, '3', 'Purok 2', 'Bagacay', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09738265234, Fax: , Email: rommel@gmail.com, Website: '),
+(11, 'John Lloyd', 'Balce', 'Zuelos', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '2018-09-17', 0, '1', 'Purok 2', 'Kalamunding', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09643826422, Fax: , Email: jzuelos@gmail.com, Website: '),
+(12, 'Mark', 'Balce', 'Bertillo', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '2019-09-17', 0, '3', 'Purok 1', 'Pasig', 'District 2', 'Daet', 'Camarines norte', 'Telephone: 09634618435, Fax: , Email: markbertillo@gmail.com, Website:'),
+(13, 'Jose', 'Manuel', 'Del Rosario', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1980-05-12', 123456789, '25', 'Rizal Street', 'Bagasbas', 'District 1', 'Daet', 'Camarines Norte', 'Telephone: 09171234567, Email: jose.rosario@example.com'),
+(14, 'Maria', 'Luisa', 'Santos', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1975-03-08', 987654321, '12', 'Quezon Avenue', 'Lag-on', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09181234567, Email: maria.santos@example.com'),
+(15, 'Antonio', 'Reyes', 'Cruz', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1968-11-20', 123987654, '40', 'Mabini Street', 'Gubat', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09201234567, Email: antonio.cruz@example.com'),
+(16, 'Carmen', 'Lopez', 'Reyes', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1990-01-15', 456123789, '5', 'Burgos Street', 'Pamorangon', 'District 3', 'Daet', 'Camarines Norte', 'Telephone: 09301234567, Email: carmen.reyes@example.com'),
+(17, 'Pedro', 'Gonzales', 'Santos', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1985-07-22', 321654987, '18', 'Bonifacio Street', 'Mambalite', 'District 1', 'Daet', 'Camarines Norte', 'Telephone: 09401234567, Email: pedro.santos@example.com'),
+(18, 'Juan', 'Domingo', 'Reyes', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1972-09-10', 741852963, '8', 'San Roque', 'Awitan', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09501234567, Email: juan.reyes@example.com'),
+(19, 'Isabel', 'Fernandez', 'Cruz', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1992-04-18', 852369741, '33', 'Del Pilar Street', 'Dogongan', 'District 3', 'Daet', 'Camarines Norte', 'Telephone: 09601234567, Email: isabel.cruz@example.com'),
+(20, 'Francisco', 'Dela', 'Ramos', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1988-02-25', 963852741, '50', 'San Vicente', 'Gahonon', 'District 1', 'Daet', 'Camarines Norte', 'Telephone: 09701234567, Email: francisco.ramos@example.com'),
+(21, 'Rosario', 'Mendoza', 'Lopez', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1979-06-14', 147258369, '7', 'Magsaysay Avenue', 'Calasgasan', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09801234567, Email: rosario.lopez@example.com'),
+(22, 'Guillermo', 'Torres', 'Delos Santos', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1965-12-30', 369258147, '60', 'Libertad Street', 'Magang', 'District 3', 'Daet', 'Camarines Norte', 'Telephone: 09901234567, Email: guillermo.torres@example.com');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `owner_audit_log`
+--
+
+CREATE TABLE `owner_audit_log` (
+  `log_id` int(11) NOT NULL,
+  `action` varchar(50) NOT NULL,
+  `owner_id` int(11) NOT NULL,
+  `property_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `details` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -604,18 +658,20 @@ CREATE TABLE `propertyowner` (
   `pO_id` int(50) NOT NULL,
   `property_id` int(50) NOT NULL,
   `owner_id` int(50) NOT NULL,
-  `is_retained` tinyint(1) NOT NULL DEFAULT 1
+  `is_retained` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `propertyowner`
 --
 
-INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`) VALUES
-(62, 144, 12, 1),
-(63, 144, 9, 1),
-(66, 147, 12, 1),
-(72, 157, 12, 1);
+INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`, `created_at`, `created_by`) VALUES
+(62, 144, 12, 1, '2025-09-21 13:37:29', NULL),
+(63, 144, 9, 1, '2025-09-21 13:37:29', NULL),
+(66, 147, 12, 1, '2025-09-21 13:37:29', NULL),
+(72, 157, 12, 1, '2025-09-21 13:37:29', NULL);
 
 -- --------------------------------------------------------
 
@@ -625,15 +681,16 @@ INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`) 
 
 CREATE TABLE `province` (
   `province_id` int(11) NOT NULL,
-  `province_name` varchar(255) NOT NULL
+  `province_name` varchar(255) NOT NULL,
+  `province_code` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `province`
 --
 
-INSERT INTO `province` (`province_id`, `province_name`) VALUES
-(1, 'Camarines Norte');
+INSERT INTO `province` (`province_id`, `province_name`, `province_code`) VALUES
+(1, 'Camarines Norte', 25);
 
 -- --------------------------------------------------------
 
@@ -666,7 +723,7 @@ CREATE TABLE `p_info` (
 --
 
 INSERT INTO `p_info` (`p_id`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`, `created_at`, `updated_at`, `is_active`, `disabled_at`, `disabled_by`) VALUES
-(144, 23, 1, 'Camarines Norte', 'Daet', 'District 1', 'Kalamunding', 'Rizal Street', 0, 302, 'Residential lot with Affidavit and Barangay Cleara', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-09-20 13:22:18', 1, NULL, NULL),
+(144, 23, 1, 'Camarines Norte', 'Labo', 'District 1', 'Kalamunding', 'Calabasa Street', 0, 302, 'Residential lot with Affidavit and Barangay Cleara', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-09-21 18:03:49', 1, NULL, NULL),
 (147, 23, 3, 'Camarines Norte', 'Daet', 'District 2', 'Gahon', 'Mabini Street', 0, 453, 'Commercial lot with Affidavit and Barangay Clearan', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-09-20 13:22:18', 1, NULL, NULL),
 (156, 42134, 4, 'Camarines Norte', 'Daet', 'District 2', 'Bagasbas', 'Quezon Avenue', 1, 432, 'Agricultural lot with supporting affidavit', 'Affidavit', '2025-09-05 14:01:18', '2025-09-20 13:22:18', 0, '2025-09-13 14:29:21', 9),
 (157, 5345, 4, 'Camarines Norte', 'Daet', 'District 2', 'Camambugan', 'San Roque', 0, 5345, 'Residential lot with Barangay Clearance', 'Barangay Clearance', '2025-09-05 14:13:20', '2025-09-20 13:22:18', 1, NULL, NULL);
@@ -718,8 +775,8 @@ CREATE TABLE `rpu_dec` (
 --
 
 INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `pro_assess`, `pro_date`, `mun_assess`, `mun_date`, `td_cancel`, `previous_pin`, `tax_year`, `entered_by`, `entered_year`, `prev_own`, `prev_assess`, `faas_id`, `total_property_value`) VALUES
-(28, 2342, 'Provincial Assessor Juan Dela Cruz', '2025-08-13', 'Municipal Assessor Maria Reyes', '2025-07-29', 0, 112233, '2025-08-05', 101, '2025-08-20', 'Pedro Santos', 2720.00, 33, 38401.00),
-(29, 5345435, 'Provincial Assessor Juan Dela Cruz', '2025-07-15', 'Municipal Assessor Maria Reyes', '2025-07-16', 0, 445566, '2025-08-01', 102, '2025-08-20', 'Josefina Bautista', 5000.00, 36, 264000.00);
+(1, 1484394354, 'Provincial Assessor Juan Dela Cruz', '2025-07-15', 'Municipal Assessor Maria Reyes', '2025-07-16', 0, 148, '2025-08-01', 0, '2025-08-20', 'Josefina Bautista', 5000.00, 36, 264000.00),
+(2, 148533432, 'Provincial Assessor Juan Dela Cruz', '2025-09-20', 'Municipal Assessor Maria Reyes', '2025-09-21', 0, 148, '2025-09-25', 0, '2025-09-26', 'Juan Dela Cruz', 20157.00, 33, 300000.00);
 
 -- --------------------------------------------------------
 
@@ -730,7 +787,7 @@ INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `pro_assess`, `pro_date`, `mun_assess
 CREATE TABLE `rpu_idnum` (
   `rpu_id` int(50) NOT NULL,
   `arp` int(50) NOT NULL,
-  `pin` int(50) NOT NULL,
+  `pin` varchar(13) DEFAULT NULL,
   `taxability` varchar(20) NOT NULL,
   `effectivity` varchar(255) NOT NULL,
   `faas_id` int(50) NOT NULL
@@ -741,9 +798,9 @@ CREATE TABLE `rpu_idnum` (
 --
 
 INSERT INTO `rpu_idnum` (`rpu_id`, `arp`, `pin`, `taxability`, `effectivity`, `faas_id`) VALUES
-(46, 2147483647, 34564234, 'Special Property', '2024', 33),
-(62, 42342, 23423, 'Exempt Property', '2025', 36),
-(63, 423234, 423423, 'Taxable Property', '2004', 42);
+(46, 123456786, '0000034564234', 'special', '2024', 33),
+(62, 42342, '1234567891011', 'exempt', '2025', 36),
+(63, 423234, '0000000423423', 'taxable', '2004', 42);
 
 -- --------------------------------------------------------
 
@@ -764,19 +821,24 @@ CREATE TABLE `subclass` (
 --
 
 INSERT INTO `subclass` (`sc_id`, `sc_code`, `sc_description`, `sc_uv`, `sc_status`) VALUES
-(1, 'RA', '32', 56.00, 'Active'),
-(2, 'IA', '43', 45.00, 'Active'),
-(3, '', '34', 78.00, 'Active'),
-(4, 'RA1', 'Residential – Single Detached', 100.00, 'Active'),
-(5, 'RA2', 'Residential – Townhouse', 120.00, 'Active'),
-(6, 'RA3', 'Residential – Condominium', 150.00, 'Active'),
-(7, 'CA1', 'Commercial – Retail Store', 200.00, 'Active'),
-(8, 'CA2', 'Commercial – Office Building', 250.00, 'Active'),
-(9, 'IA1', 'Industrial – Light Manufacturing', 300.00, 'Active'),
-(10, 'IA2', 'Industrial – Heavy Manufacturing', 350.00, 'Active'),
-(11, 'AG1', 'Agricultural – Rice Farm', 50.00, 'Active'),
-(12, 'AG2', 'Agricultural – Coconut Plantation', 60.00, 'Active'),
-(13, 'MX1', 'Mixed-Use – Residential and Commercial', 180.00, 'Active');
+(1, 'RA1', 'Single Detached', 100.00, 'Active'),
+(2, 'RA2', 'Townhouse', 120.00, 'Active'),
+(3, 'RA3', 'Condominium', 150.00, 'Active'),
+(4, 'CA1', 'Retail Store', 200.00, 'Active'),
+(5, 'CA2', 'Office Building', 250.00, 'Active'),
+(6, 'IA1', 'Light Manufacturing', 300.00, 'Active'),
+(7, 'IA2', 'Heavy Manufacturing', 350.00, 'Active'),
+(8, 'AG1', 'Rice Farm', 50.00, 'Active'),
+(9, 'AG2', 'Coconut Plantation', 60.00, 'Active'),
+(10, 'MX1', 'Residential and Commercial', 180.00, 'Active'),
+(11, 'MI1', 'Quarry Site', 70.00, 'Active'),
+(12, 'MI2', 'Mining Area', 85.00, 'Active'),
+(13, 'SP1', 'Hospital', 90.00, 'Active'),
+(14, 'SP2', 'School', 95.00, 'Active'),
+(15, 'SP3', 'Government Building', 88.00, 'Active'),
+(16, 'SP4', 'Church', 80.00, 'Active'),
+(17, 'TI1', 'Forest Land', 60.00, 'Active'),
+(18, 'TI2', 'Mangrove Area', 55.00, 'Active');
 
 -- --------------------------------------------------------
 
@@ -795,6 +857,13 @@ CREATE TABLE `transactions` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `transaction_type` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `transactions`
+--
+
+INSERT INTO `transactions` (`transaction_id`, `transaction_code`, `name`, `contact_number`, `description`, `status`, `created_at`, `updated_at`, `transaction_type`) VALUES
+(26, '52061', 'James', '09344532342', 'New Discovery', 'Completed', '2025-09-21 16:03:38', '2025-09-21 16:03:49', 'New Declaration of Real Property');
 
 -- --------------------------------------------------------
 
@@ -818,6 +887,7 @@ CREATE TABLE `transaction_files` (
 CREATE TABLE `transaction_logs` (
   `log_id` int(11) NOT NULL,
   `transaction_id` int(11) NOT NULL,
+  `transaction_code` varchar(50) DEFAULT NULL,
   `action` varchar(50) NOT NULL,
   `details` text DEFAULT NULL,
   `user_id` int(11) NOT NULL,
@@ -828,26 +898,28 @@ CREATE TABLE `transaction_logs` (
 -- Dumping data for table `transaction_logs`
 --
 
-INSERT INTO `transaction_logs` (`log_id`, `transaction_id`, `action`, `details`, `user_id`, `created_at`) VALUES
-(34, 21, 'Document Uploaded', 'uploads/transaction_21/tx_68c70d34a5cda_premium_photo-1666900440561-94dcb6865554.avif', 9, '2025-09-14 18:45:08'),
-(35, 21, 'Created', 'Transaction created', 9, '2025-09-14 18:45:08'),
-(36, 21, 'Document Uploaded', 'uploads/transaction_21/tx_68c70d41598a0_photo-1500462918059-b1a0cb512f1d.avif', 9, '2025-09-14 18:45:21'),
-(37, 21, 'Updated', 'Transaction updated', 9, '2025-09-14 18:45:21'),
-(38, 21, 'Document Deleted', 'Deleted document: uploads/transaction_21/tx_68c70d41598a0_photo-1500462918059-b1a0cb512f1d.avif', 9, '2025-09-14 18:45:33'),
-(39, 22, 'Created', 'Transaction created', 9, '2025-09-14 18:48:24'),
-(40, 22, 'Document Uploaded', 'uploads/transaction_22/tx_68c70e5f3cc72_premium_photo-1666900440561-94dcb6865554.avif', 9, '2025-09-14 18:50:07'),
-(41, 22, 'Document Uploaded', 'uploads/transaction_22/tx_68c70e5f3d936_photo-1493612276216-ee3925520721.avif', 9, '2025-09-14 18:50:07'),
-(42, 22, 'Document Uploaded', 'uploads/transaction_22/tx_68c70e5f3e6b6_photo-1500462918059-b1a0cb512f1d.avif', 9, '2025-09-14 18:50:07'),
-(43, 22, 'Updated', 'Transaction updated', 9, '2025-09-14 18:50:07'),
-(44, 22, 'Deleted', 'Transaction deleted', 9, '2025-09-14 18:51:35'),
-(45, 23, 'Document Uploaded', 'uploads/transaction_23/tx_68c70f2ad733a_premium_photo-1666900440561-94dcb6865554.avif', 9, '2025-09-14 18:53:30'),
-(46, 23, 'Created', 'Transaction created', 9, '2025-09-14 18:53:30'),
-(47, 23, 'Updated', 'Transaction updated', 9, '2025-09-15 15:58:48'),
-(48, 23, 'Updated', 'Transaction updated', 9, '2025-09-15 16:54:45'),
-(49, 23, 'Deleted', 'Transaction deleted', 9, '2025-09-15 16:55:16'),
-(50, 21, 'Deleted', 'Transaction deleted', 9, '2025-09-15 16:56:01'),
-(51, 24, 'Created', 'Transaction created', 10, '2025-09-14 17:12:23'),
-(52, 25, 'Created', 'Transaction created', 10, '2025-09-16 10:49:03');
+INSERT INTO `transaction_logs` (`log_id`, `transaction_id`, `transaction_code`, `action`, `details`, `user_id`, `created_at`) VALUES
+(34, 21, NULL, 'Document Uploaded', 'uploads/transaction_21/tx_68c70d34a5cda_premium_photo-1666900440561-94dcb6865554.avif', 9, '2025-09-14 18:45:08'),
+(35, 21, NULL, 'Created', 'Transaction created', 9, '2025-09-14 18:45:08'),
+(36, 21, NULL, 'Document Uploaded', 'uploads/transaction_21/tx_68c70d41598a0_photo-1500462918059-b1a0cb512f1d.avif', 9, '2025-09-14 18:45:21'),
+(37, 21, NULL, 'Updated', 'Transaction updated', 9, '2025-09-14 18:45:21'),
+(38, 21, NULL, 'Document Deleted', 'Deleted document: uploads/transaction_21/tx_68c70d41598a0_photo-1500462918059-b1a0cb512f1d.avif', 9, '2025-09-14 18:45:33'),
+(39, 22, NULL, 'Created', 'Transaction created', 9, '2025-09-14 18:48:24'),
+(40, 22, NULL, 'Document Uploaded', 'uploads/transaction_22/tx_68c70e5f3cc72_premium_photo-1666900440561-94dcb6865554.avif', 9, '2025-09-14 18:50:07'),
+(41, 22, NULL, 'Document Uploaded', 'uploads/transaction_22/tx_68c70e5f3d936_photo-1493612276216-ee3925520721.avif', 9, '2025-09-14 18:50:07'),
+(42, 22, NULL, 'Document Uploaded', 'uploads/transaction_22/tx_68c70e5f3e6b6_photo-1500462918059-b1a0cb512f1d.avif', 9, '2025-09-14 18:50:07'),
+(43, 22, NULL, 'Updated', 'Transaction updated', 9, '2025-09-14 18:50:07'),
+(44, 22, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-14 18:51:35'),
+(45, 23, NULL, 'Document Uploaded', 'uploads/transaction_23/tx_68c70f2ad733a_premium_photo-1666900440561-94dcb6865554.avif', 9, '2025-09-14 18:53:30'),
+(46, 23, NULL, 'Created', 'Transaction created', 9, '2025-09-14 18:53:30'),
+(47, 23, NULL, 'Updated', 'Transaction updated', 9, '2025-09-15 15:58:48'),
+(48, 23, NULL, 'Updated', 'Transaction updated', 9, '2025-09-15 16:54:45'),
+(49, 23, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-15 16:55:16'),
+(50, 21, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-15 16:56:01'),
+(51, 24, NULL, 'Created', 'Transaction created', 10, '2025-09-14 17:12:23'),
+(52, 25, NULL, 'Created', 'Transaction created', 10, '2025-09-16 10:49:03'),
+(53, 26, '52061', 'Created', 'Transaction created', 9, '2025-09-21 16:03:38'),
+(54, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-21 16:03:49');
 
 -- --------------------------------------------------------
 
@@ -884,11 +956,18 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `last_name`, `first_name`, `middle_name`, `gender`, `birthdate`, `marital_status`, `tin`, `house_number`, `street`, `barangay`, `district`, `municipality`, `province`, `contact_number`, `email`, `status`, `user_type`) VALUES
 (9, 'admin', '$2y$10$uJGu7hoKfqtqSLE2EyV2GetTumt1zHaZOnvIpBeGC5dcwWBr25fc.', 'Admin', 'Admin', 'Admin', 'Male', '2001-11-11', 'Single', '000-123-456-789', '5', 'Purok', '66', '18', '14', 'Camarines Norte', '09123456789', 'johnlloydzuelos@gmail.com', 1, 'admin'),
-(11, 'dioneda', '$2y$10$dOOZplrD0.Lkexf7eX34z.a6yX1zJcfzkjC6NhtScOTiumbw/rw6m', 'Dioneda', 'Renz', 'Balce', 'Male', '2003-11-14', 'Married', 'NA', '5', 'Purok', '95', NULL, '5', 'Camarines Norte', '09922007821', 'rdioneda4@gmail.com', 0, 'user');
+(12, 'user', '$2y$10$gmDQWOOqOOy8uUra8gGPQOA.FUDHTpucmbrNQ7mk..FbM/3ndQNt2', 'Cruz', 'Juan', 'Dela', 'Male', '2000-01-01', 'Single', 'NA', '1', 'Purok 1', '4', NULL, '1', 'Camarines Norte', '09123456789', 'user@email.com', 1, 'user');
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `activity_log`
+--
+ALTER TABLE `activity_log`
+  ADD PRIMARY KEY (`log_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `brgy`
@@ -947,6 +1026,15 @@ ALTER TABLE `municipality`
 --
 ALTER TABLE `owners_tb`
   ADD PRIMARY KEY (`own_id`);
+
+--
+-- Indexes for table `owner_audit_log`
+--
+ALTER TABLE `owner_audit_log`
+  ADD PRIMARY KEY (`log_id`),
+  ADD KEY `owner_id` (`owner_id`),
+  ADD KEY `property_id` (`property_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `propertyowner`
@@ -1013,7 +1101,8 @@ ALTER TABLE `transaction_files`
 ALTER TABLE `transaction_logs`
   ADD PRIMARY KEY (`log_id`),
   ADD KEY `transaction_id` (`transaction_id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `transaction_code` (`transaction_code`);
 
 --
 -- Indexes for table `users`
@@ -1027,6 +1116,12 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `activity_log`
+--
+ALTER TABLE `activity_log`
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
 -- AUTO_INCREMENT for table `brgy`
 --
 ALTER TABLE `brgy`
@@ -1036,13 +1131,13 @@ ALTER TABLE `brgy`
 -- AUTO_INCREMENT for table `certification`
 --
 ALTER TABLE `certification`
-  MODIFY `cert_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `cert_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `classification`
 --
 ALTER TABLE `classification`
-  MODIFY `c_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `c_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `district`
@@ -1081,6 +1176,12 @@ ALTER TABLE `owners_tb`
   MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
+-- AUTO_INCREMENT for table `owner_audit_log`
+--
+ALTER TABLE `owner_audit_log`
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `propertyowner`
 --
 ALTER TABLE `propertyowner`
@@ -1108,7 +1209,7 @@ ALTER TABLE `region`
 -- AUTO_INCREMENT for table `rpu_dec`
 --
 ALTER TABLE `rpu_dec`
-  MODIFY `dec_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `dec_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `rpu_idnum`
@@ -1120,13 +1221,13 @@ ALTER TABLE `rpu_idnum`
 -- AUTO_INCREMENT for table `subclass`
 --
 ALTER TABLE `subclass`
-  MODIFY `sc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `sc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
-  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `transaction_files`
@@ -1138,13 +1239,13 @@ ALTER TABLE `transaction_files`
 -- AUTO_INCREMENT for table `transaction_logs`
 --
 ALTER TABLE `transaction_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Constraints for dumped tables
@@ -1173,6 +1274,14 @@ ALTER TABLE `land`
 --
 ALTER TABLE `municipality`
   ADD CONSTRAINT `municipality_ibfk_1` FOREIGN KEY (`r_id`) REFERENCES `region` (`r_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `owner_audit_log`
+--
+ALTER TABLE `owner_audit_log`
+  ADD CONSTRAINT `fk_audit_owner` FOREIGN KEY (`owner_id`) REFERENCES `owners_tb` (`own_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_audit_property` FOREIGN KEY (`property_id`) REFERENCES `p_info` (`p_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_audit_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `propertyowner`
