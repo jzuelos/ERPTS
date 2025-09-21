@@ -145,7 +145,7 @@ if ($result && $result->num_rows > 0) {
 
     <!-- Recent Activity Section -->
     <div class="recent-activity">
-      <h3><i class="fas fa-history"></i> Recent Transaction Activity</h3>
+      <h3><i class="fas fa-history"></i> Transaction Log</h3>
 
       <!-- Filters -->
       <div class="d-flex justify-content-between align-items-center mb-3">

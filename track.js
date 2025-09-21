@@ -165,66 +165,70 @@ function loadActivity() {
 
       if (!Array.isArray(data) || data.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" class="text-center">No recent activity.</td></tr>`;
+        populateDateFilter([]); // clear filter
         return;
       }
 
+      // Build rows and collect dates
+      const datesSet = new Set();
+
       data.forEach(item => {
-        const createdAtRaw = item.created_at || "";
+        const createdAtRaw = item.created_at || ""; // e.g. "2024-05-12 14:23:45"
+        const dateOnly = createdAtRaw ? createdAtRaw.split(" ")[0] : ""; // "YYYY-MM-DD"
+        if (dateOnly) datesSet.add(dateOnly);
+
         const tcode = item.t_code || ("#" + (item.transaction_id || ""));
         const actionRaw = item.action || "";
         const detailsRaw = item.details || "";
         const user = item.user || "";
 
         const details = detailsRaw.length > 120 ? detailsRaw.slice(0, 117) + "..." : detailsRaw;
-
         const prettyDate = formatTimestamp(createdAtRaw);
 
+        // create row element and set first cell's data-date attribute
         const tr = document.createElement("tr");
         tr.innerHTML = `
-    <td style="white-space:nowrap">${prettyDate}</td>
-    <td>${escapeHtml(tcode)}</td>
-    <td style="max-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" 
-        title="${escapeHtml(actionRaw)}">
-        ${escapeHtml(actionRaw)}
-    </td>
-    <td style="max-width:400px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" 
-        title="${escapeHtml(detailsRaw)}">
-        ${escapeHtml(details)}
-    </td>
-    <td>${escapeHtml(user)}</td>
-  `;
+          <td data-date="${escapeHtml(createdAtRaw)}" style="white-space:nowrap">${escapeHtml(prettyDate)}</td>
+          <td>${escapeHtml(tcode)}</td>
+          <td style="max-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"
+              title="${escapeHtml(actionRaw)}">${escapeHtml(actionRaw)}</td>
+          <td style="max-width:400px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"
+              title="${escapeHtml(detailsRaw)}">${escapeHtml(details)}</td>
+          <td>${escapeHtml(user)}</td>
+        `;
         tbody.appendChild(tr);
       });
-      populateDateFilter(data);
+
+      // Populate date filter with sorted dates (newest first)
+      populateDateFilter(Array.from(datesSet));
+
       initActivityTable();
     })
     .catch(err => {
       console.error("Error loading activity:", err);
       tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Failed to load activity.</td></tr>`;
+      populateDateFilter([]); // clear filter on error
     });
 
-  // Populate date filter dropdown
-  function populateDateFilter(data) {
+  // Populate date filter dropdown (accepts array of date strings "YYYY-MM-DD")
+  function populateDateFilter(datesArr) {
     const dateFilter = document.getElementById("dateFilter");
-    const dates = new Set();
+    if (!dateFilter) return;
 
-    data.forEach(item => {
-      if (item.created_at) {
-        dates.add(item.created_at.split(" ")[0]); // YYYY-MM-DD
-      }
-    });
+    // Remove duplicates already handled; sort descending (newest first)
+    const sorted = (datesArr || []).slice().sort((a, b) => b.localeCompare(a));
 
     // clear and add "All"
     dateFilter.innerHTML = `<option value="">All Dates</option>`;
 
-    [...dates].sort().forEach(date => {
+    sorted.forEach(date => {
+      // show YYYY-MM-DD but you can format label if you want
       const opt = document.createElement("option");
-      opt.value = date;
-      opt.textContent = date;
+      opt.value = date; // value used for filtering
+      opt.textContent = date; // you can use a prettier format here if desired
       dateFilter.appendChild(opt);
     });
   }
-
 }
 
 // small helper: try to format 'YYYY-MM-DD HH:MM:SS' or ISO strings, else return input
