@@ -250,7 +250,7 @@ document.addEventListener("DOMContentLoaded", () => {
   toggleFilters();
   printAllCheck.addEventListener("change", toggleFilters);
 
-  // ✅ NEW: Disable Print All if user changes anything
+  //  NEW: Disable Print All if user changes anything
   function checkFilters() {
     const hasValue = formElements.some(el => el.value && el.value !== "");
     if (hasValue) {
@@ -266,7 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
     el.addEventListener("input", checkFilters);
   });
 
-  // ✅ Municipality change → auto-fill district + barangays
+  //  Municipality change → auto-fill district + barangays
   citySelect.addEventListener("change", () => {
     const m_id = citySelect.value;
 
@@ -301,7 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
     checkFilters(); // also re-check printAll status
   });
 
-  // ✅ Date validation
+  //  Date validation
   toDate.addEventListener("change", () => {
     toDate.classList.remove("is-invalid");
     if (fromDate.value && toDate.value < fromDate.value) {
@@ -315,7 +315,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ✅ Print button
+  //  Print button
   printBtn.addEventListener("click", e => {
     e.preventDefault();
 
@@ -345,7 +345,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.open("report-print.php?" + params.toString(), "_blank");
   });
 
-  // ✅ Reset button logic
+  //  Reset button logic
   resetBtn.addEventListener("click", () => {
     formElements.forEach(el => {
       if (el.tagName === "SELECT") {
@@ -363,7 +363,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Reset district + barangay dropdowns
     districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
     barangaySelect.innerHTML = '<option value="" disabled selected>Select Barangay</option>';
-    barangaySelect.disabled = true;
   });
 });
 </script>
