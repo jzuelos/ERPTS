@@ -19,49 +19,114 @@ function showOISModal() {
   myModal.show();
 }
 
+let editingOwnerId = null;
+
 function saveOwnerData() {
-  // Retrieve data from the modal form
-  var ownerName = document.getElementById('ownerNameModal').value;
-  var firstName = document.getElementById('firstNameModal').value;
-  var middleName = document.getElementById('middleNameModal').value;
-  var lastName = document.getElementById('lastNameModal').value;
+  const propertyId = new URLSearchParams(window.location.search).get('id');
+  const forms = document.querySelectorAll("#editOwnerModal form");
 
-  // Process the data (e.g., send it via AJAX or form submission)
-  var ownerData = {
-      owner_name: ownerName,
-      first_name: firstName,
-      middle_name: middleName,
-      last_name: lastName
-  };
+  forms.forEach(form => {
+    const ownerId = form.dataset.ownerId;
+    const first = form.querySelector(".firstNameModal").value;
+    const middle = form.querySelector(".middleNameModal").value;
+    const last = form.querySelector(".lastNameModal").value;
 
-  // For demonstration, log the data
-  console.log(ownerData);
-  // You would send this data to the server (e.g., via AJAX)
+    fetch(window.location.href, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "update_owner",
+        property_id: propertyId,
+        owner_id: ownerId,
+        first_name: first,
+        middle_name: middle,
+        last_name: last,
+        owner_type: 'individual'
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        } else {
+          alert("Error: " + data.error);
+        }
+      });
+  });
 }
 
 function addOwnerData() {
-    // Get the data from the form fields
-    var ownerName = document.getElementById('ownerNameModal').value;
-    var firstName = document.getElementById('firstNameModal').value;
-    var middleName = document.getElementById('middleNameModal').value;
-    var lastName = document.getElementById('lastNameModal').value;
+  const propertyId = new URLSearchParams(window.location.search).get('id');
+  const first = prompt("Enter first name:");
+  const middle = prompt("Enter middle name:");
+  const last = prompt("Enter last name:");
 
-    // Create a new row in the table
-    var table = document.querySelector('#editOwnerModal table tbody');
-    var newRow = table.insertRow();
-    
-    // Insert the new owner's data into the new row
-    newRow.innerHTML = `
-        <td class="text-center">New ID</td>
-        <td class="text-center"><input type="checkbox" name="owner_selection[]" value="New ID"></td>
-        <td class="text-center">${ownerName}</td>
-        <td class="text-center">${firstName} ${middleName} ${lastName}</td>
-    `;
+  if (!first || !last) return;
 
-    // Optionally, reset the form fields after adding the owner
-    document.getElementById('editOwnerForm').reset();
+  fetch(window.location.href, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      action: "add_owner",
+      property_id: propertyId,
+      first_name: first,
+      middle_name: middle,
+      last_name: last,
+      owner_type: 'individual'
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert("Error: " + data.error);
+      }
+    });
 }
 
+function removeOwner(ownerId) {
+  if (!confirm('Are you sure you want to remove this owner from the property?')) {
+    return;
+  }
+
+  const propertyId = new URLSearchParams(window.location.search).get('id');
+
+  fetch(window.location.href, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      action: "remove_owner",
+      owner_id: ownerId,
+      property_id: propertyId
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert("Error: " + (data.error || 'Failed to remove owner'));
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred while removing the owner.');
+    });
+}
+
+function editOwner(ownerId) {
+  editingOwnerId = ownerId;
+  // Show modal for editing - you'll need to implement based on your modal structure
+  var myModal = new bootstrap.Modal(document.getElementById('editOwnerModal'));
+  myModal.show();
+}
 // Function to show the modal for editing Property Information
 function showEditPropertyModal() {
   // Populate modal fields with current values if necessary
@@ -99,7 +164,7 @@ function savePropertyData() {
   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
   // Handle response
-  xhr.onreadystatechange = function() {
+  xhr.onreadystatechange = function () {
     if (xhr.readyState === 4 && xhr.status === 200) {
       console.log("Response:", xhr.responseText); // Debugging
       alert("Property information updated successfully!");
@@ -110,12 +175,12 @@ function savePropertyData() {
 
   // Send data to PHP script (no zone number anymore)
   xhr.send("property_id=" + encodeURIComponent(propertyId) +
-           "&street=" + encodeURIComponent(street) +
-           "&barangay=" + encodeURIComponent(barangay) +
-           "&municipality=" + encodeURIComponent(municipality) +
-           "&province=" + encodeURIComponent(province) +
-           "&houseNumber=" + encodeURIComponent(houseNumber) +
-           "&landArea=" + encodeURIComponent(landArea));
+    "&street=" + encodeURIComponent(street) +
+    "&barangay=" + encodeURIComponent(barangay) +
+    "&municipality=" + encodeURIComponent(municipality) +
+    "&province=" + encodeURIComponent(province) +
+    "&houseNumber=" + encodeURIComponent(houseNumber) +
+    "&landArea=" + encodeURIComponent(landArea));
 }
 
 //Function to show Plant and Trees modal
