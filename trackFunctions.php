@@ -15,24 +15,63 @@ if ($conn->connect_error) {
  * @param string $action
  * @param string|null $details
  * @param int|null $user_id
+ * @param string|null $transaction_code  // optional, will try to fetch if null
+ * @return bool
  */
-function logActivity($transaction_id, $action, $details = null, $user_id = null)
+function logActivity($transaction_id, $action, $details = null, $user_id = null, $transaction_code = null)
 {
     global $conn;
 
+    // try session user if not provided
     if ($user_id === null && isset($_SESSION['user_id'])) {
         $user_id = intval($_SESSION['user_id']);
     }
 
-    $stmt = $conn->prepare("
-        INSERT INTO transaction_logs (transaction_id, action, details, user_id)
-        VALUES (?, ?, ?, ?)
-    ");
-    if (!$stmt)
-        return false;
+    // If transaction_code not supplied, attempt to fetch it (best-effort)
+    if ($transaction_code === null) {
+        $stmtGet = $conn->prepare("SELECT transaction_code FROM transactions WHERE transaction_id = ? LIMIT 1");
+        if ($stmtGet) {
+            $stmtGet->bind_param("i", $transaction_id);
+            if ($stmtGet->execute()) {
+                $res = $stmtGet->get_result();
+                if ($row = $res->fetch_assoc()) {
+                    $transaction_code = $row['transaction_code'] ?? null;
+                }
+            }
+            $stmtGet->close();
+        }
+    }
 
-    $stmt->bind_param("issi", $transaction_id, $action, $details, $user_id);
-    return $stmt->execute();
+    // Insert with/without user_id (handle nullable user_id cleanly)
+    if ($user_id === null) {
+        $stmt = $conn->prepare("
+            INSERT INTO transaction_logs (transaction_id, transaction_code, action, details)
+            VALUES (?, ?, ?, ?)
+        ");
+        if (!$stmt) {
+            error_log("logActivity prepare failed (no user): " . $conn->error);
+            return false;
+        }
+        $stmt->bind_param("isss", $transaction_id, $transaction_code, $action, $details);
+    } else {
+        $user_id = intval($user_id);
+        $stmt = $conn->prepare("
+            INSERT INTO transaction_logs (transaction_id, transaction_code, action, details, user_id)
+            VALUES (?, ?, ?, ?, ?)
+        ");
+        if (!$stmt) {
+            error_log("logActivity prepare failed (with user): " . $conn->error);
+            return false;
+        }
+        $stmt->bind_param("isssi", $transaction_id, $transaction_code, $action, $details, $user_id);
+    }
+
+    $ok = $stmt->execute();
+    if (!$ok) {
+        error_log("logActivity execute failed: " . $stmt->error);
+    }
+    $stmt->close();
+    return $ok;
 }
 
 // ---------- GET ALL ---------- 
@@ -104,7 +143,7 @@ function handleMultipleUploads($transaction_id, $fieldName = 't_file')
             $stmt = $conn->prepare("INSERT INTO transaction_files (transaction_id, file_path) VALUES (?, ?)");
             $stmt->bind_param("is", $transaction_id, $relativePath);
             if ($stmt->execute()) {
-                logActivity($transaction_id, "Document Uploaded", $relativePath, $_SESSION['user_id']);
+                logActivity($transaction_id, "Document Uploaded", $relativePath, $_SESSION['user_id'], $transaction_code);
             }
         }
     }
@@ -138,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if ($stmt->execute()) {
                 $transaction_id = $stmt->insert_id;
                 handleMultipleUploads($transaction_id);
-                logActivity($transaction_id, "Created", "Transaction created", $_SESSION['user_id']);
+                logActivity($transaction_id, "Created", "Transaction created", $_SESSION['user_id'], $transaction_code);
                 echo json_encode(["success" => true, "message" => "Transaction saved successfully!", "transaction_id" => $transaction_id]);
             } else {
                 echo json_encode(["success" => false, "message" => $stmt->error]);
@@ -169,7 +208,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
             if ($stmt->execute()) {
                 handleMultipleUploads($transaction_id);
-                logActivity($transaction_id, "Updated", "Transaction updated", $_SESSION['user_id']);
+                logActivity($transaction_id, "Updated", "Transaction updated", $_SESSION['user_id'], $transaction_code);
+
                 echo json_encode(["success" => true, "message" => "Transaction updated successfully!"]);
             } else {
                 echo json_encode(["success" => false, "message" => $stmt->error]);
@@ -273,8 +313,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'getActivity') {
                 l.action,
                 l.details,
                 l.created_at,
-                t.transaction_code AS t_code,
-                u.username AS user
+                COALESCE(l.transaction_code, t.transaction_code, CONCAT('#', l.transaction_id)) AS t_code,
+                COALESCE(u.username, 'System') AS user
             FROM transaction_logs l
             LEFT JOIN transactions t ON l.transaction_id = t.transaction_id
             LEFT JOIN users u ON l.user_id = u.user_id
