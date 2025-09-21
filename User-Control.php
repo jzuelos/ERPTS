@@ -7,6 +7,17 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+/**
+ * Function to log activity
+ */
+function logActivity($conn, $userId, $action)
+{
+    $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action) VALUES (?, ?)");
+    $stmt->bind_param("is", $userId, $action);
+    $stmt->execute();
+    $stmt->close();
+}
+
 // Function to update user details with input filtering
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
     // Server-side filtering & sanitization
@@ -16,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
     $middle_name = filter_input(INPUT_POST, 'middle_name', FILTER_SANITIZE_STRING);
     $last_name = filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_STRING);
     $gender = filter_input(INPUT_POST, 'gender', FILTER_SANITIZE_STRING);
-    $birthdate = filter_input(INPUT_POST, 'birthdate', FILTER_SANITIZE_STRING); // use string or date validator if needed
+    $birthdate = filter_input(INPUT_POST, 'birthdate', FILTER_SANITIZE_STRING);
     $marital_status = filter_input(INPUT_POST, 'marital_status', FILTER_SANITIZE_STRING);
     $tin = filter_input(INPUT_POST, 'tin', FILTER_SANITIZE_STRING);
     $contact_number = filter_input(INPUT_POST, 'contact_number', FILTER_SANITIZE_STRING);
@@ -83,6 +94,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
     }
 
     if ($stmt->execute()) {
+        // Log the action
+        $adminId = $_SESSION['user_id'] ?? null; // who performed the update
+        $actionMsg = "Updated user ID: " . $userId;
+        if ($adminId) {
+            logActivity($conn, $adminId, $actionMsg);
+        }
+
         echo "<script>alert('User updated successfully!'); window.location.href='User-Control.php';</script>";
     } else {
         echo "<script>alert('Error updating user: " . $stmt->error . "');</script>";
@@ -104,7 +122,6 @@ if ($result) {
 $conn->close();
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -114,10 +131,10 @@ $conn->close();
     <title>User Control</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-KyZXEJr+8+6g5K4r53m5s3xmw1Is0J6wBd04YOeFvXOsZTgmYF9flT/qe6LZ9s+0" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KyZXEJr+8+6g5K4r53m5s3xmw1Is0J6wBd04YOeFvXOsZTgmYF9flT/qe6LZ9s+0" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
         integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
@@ -127,7 +144,7 @@ $conn->close();
 </head>
 
 <body>
-      <?php include 'header.php'; ?>
+    <?php include 'header.php'; ?>
 
     <!-- Main Content -->
     <section class="section-user-management">
@@ -136,12 +153,12 @@ $conn->close();
             <div class="alert alert-info text-center" role="alert">
                 Logged in as Admin
             </div>
-            
+
             <div class="mb-4 d-flex justify-content-start">
-      <a href="Admin-Page-2.php" class="btn btn-outline-secondary btn-sm">
-        <i class="fas fa-arrow-left"></i> Back
-      </a>
-    </div>
+                <a href="Admin-Page-2.php" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
             <h3 class="mb-4">Users</h3>
             <div class="button-group mb-4">
                 <a href="ADD_User.php" class="btn btn-outline-primary">Add User</a>
@@ -343,10 +360,10 @@ $conn->close();
     <!-- Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function () {
-            $("input[name='userStatusFilter']").change(function () {
+        $(document).ready(function() {
+            $("input[name='userStatusFilter']").change(function() {
                 var showDisabled = $("#showDisabled").is(":checked");
-                $("tbody tr").each(function () {
+                $("tbody tr").each(function() {
                     var statusText = $(this).find("td:eq(4)").text().trim();
                     if (statusText === "Disabled") {
                         $(this).toggle(showDisabled);
@@ -356,13 +373,13 @@ $conn->close();
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
