@@ -135,28 +135,81 @@ function fetchOwners($conn)
 }
 
 // Fetch junction table (propertyowner) owner IDs
-function fetchPropertyOwnerIDs($conn, $property_id)
+function fetchOwnersByIds($conn, $owner_ids)
 {
-  $stmt = $conn->prepare("SELECT owner_id FROM propertyowner WHERE property_id = ?");
-  $stmt->bind_param("i", $property_id);
-  $stmt->execute();
-  $result = $stmt->get_result();
-  return array_column($result->fetch_all(MYSQLI_ASSOC), 'owner_id');
+  if (empty($owner_ids)) {
+    return [];
+  }
+
+  $ids = implode(',', array_map('intval', $owner_ids));
+  $sql = "
+        SELECT own_id, 
+               CONCAT(own_fname, ' ', COALESCE(own_mname, ''), ' ', own_surname) AS owner_name,
+               own_fname AS first_name, 
+               own_mname AS middle_name, 
+               own_surname AS last_name,
+               COALESCE(owner_type, 'individual') as owner_type,
+               company_name
+        FROM owners_tb
+        WHERE own_id IN ($ids)
+    ";
+  $result = $conn->query($sql);
+  return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 }
 
 // Fetch owner details by a list of IDs
-function fetchOwnersByIds($conn, $owner_ids)
+function fetchOwnersWithDetails($conn, $property_id)
 {
-  $ids = implode(',', array_map('intval', $owner_ids));
   $sql = "
-    SELECT own_id, 
-           CONCAT(own_fname, ', ', own_mname, ' ', own_surname) AS owner_name,
-           own_fname AS first_name, own_mname AS middle_name, own_surname AS last_name
-    FROM owners_tb
-    WHERE own_id IN ($ids)
-  ";
-  $result = $conn->query($sql);
+        SELECT 
+            o.own_id,
+            o.own_fname AS first_name,
+            o.own_mname AS middle_name,
+            o.own_surname AS last_name,
+            COALESCE(o.owner_type, 'individual') as owner_type,
+            o.company_name,
+            CASE 
+                WHEN COALESCE(o.owner_type, 'individual') = 'company' THEN 
+                    COALESCE(o.company_name, 'Unnamed Company')
+                ELSE CONCAT(
+                    TRIM(COALESCE(o.own_fname, '')), 
+                    CASE WHEN o.own_mname IS NOT NULL AND TRIM(o.own_mname) != '' 
+                         THEN CONCAT(' ', TRIM(o.own_mname)) 
+                         ELSE '' END,
+                    CASE WHEN o.own_surname IS NOT NULL AND TRIM(o.own_surname) != ''
+                         THEN CONCAT(' ', TRIM(o.own_surname))
+                         ELSE '' END
+                )
+            END AS display_name
+        FROM propertyowner po
+        JOIN owners_tb o ON po.owner_id = o.own_id
+        WHERE po.property_id = ?
+        ORDER BY 
+            o.owner_type DESC, 
+            CASE WHEN o.owner_type = 'company' THEN o.company_name ELSE o.own_surname END,
+            o.own_fname
+    ";
+
+  $stmt = $conn->prepare($sql);
+  if (!$stmt) {
+    error_log("SQL prepare failed: " . $conn->error);
+    return [];
+  }
+
+  $stmt->bind_param("i", $property_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+
   return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+}
+
+//fetch property owner ids
+function fetchPropertyOwnerIDs($conn, $property_id) {
+    $stmt = $conn->prepare("SELECT owner_id FROM propertyowner WHERE property_id = ?");
+    $stmt->bind_param("i", $property_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return array_column($result->fetch_all(MYSQLI_ASSOC), 'owner_id');
 }
 
 function fetchFaasInfo($conn, $property_id)
@@ -267,7 +320,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 
     // Fetch owner details
     if (!empty($owner_ids)) {
-      $owners_details = fetchOwnersByIds($conn, $owner_ids);
+      $owners_details = fetchOwnersWithDetails($conn, $property_id);
     }
 
     // Fetch land records
@@ -393,30 +446,157 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 //Add Owner Save/Insert in same file
+
+// === 3. REPLACE the AJAX owner handling section (around line 400-500) ===
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST)) {
   $data = json_decode(file_get_contents("php://input"), true);
+
   if ($data && isset($data['action'])) {
-    if ($data['action'] === 'update_owner') {
-      $stmt = $conn->prepare("UPDATE owners_tb SET own_fname=?, own_mname=?, own_surname=? WHERE own_id=?");
-      $stmt->bind_param("sssi", $data['first_name'], $data['middle_name'], $data['last_name'], $data['owner_id']);
-      $ok = $stmt->execute();
-      echo json_encode(["success" => $ok, "error" => $stmt->error]);
+    // CSRF protection
+    if (!isset($_SESSION['user_id'])) {
+      echo json_encode(["success" => false, "error" => "Unauthorized"]);
       exit;
     }
 
-    if ($data['action'] === 'add_owner') {
-      $stmt = $conn->prepare("INSERT INTO owners_tb (own_fname, own_mname, own_surname) VALUES (?, ?, ?)");
-      $stmt->bind_param("sss", $data['first_name'], $data['middle_name'], $data['last_name']);
-      $ok = $stmt->execute();
-      $new_id = $stmt->insert_id;
-      if ($ok) {
-        $link = $conn->prepare("INSERT INTO propertyowner (property_id, owner_id) VALUES (?, ?)");
-        $link->bind_param("ii", $data['property_id'], $new_id);
-        $link->execute();
-      }
-      echo json_encode(["success" => $ok, "error" => $stmt->error]);
-      exit;
+    $response = ["success" => false, "error" => "Unknown action"];
+
+    switch ($data['action']) {
+      case 'update_owner':
+        // Validate input
+        $owner_id = intval($data['owner_id'] ?? 0);
+        $first_name = trim($data['first_name'] ?? '');
+        $middle_name = trim($data['middle_name'] ?? '');
+        $last_name = trim($data['last_name'] ?? '');
+        $owner_type = $data['owner_type'] ?? 'individual';
+        $company_name = trim($data['company_name'] ?? '');
+
+        if ($owner_id <= 0) {
+          $response = ["success" => false, "error" => "Invalid owner ID"];
+          break;
+        }
+
+        // Validation based on owner type
+        if ($owner_type === 'company') {
+          if (empty($company_name)) {
+            $response = ["success" => false, "error" => "Company name is required"];
+            break;
+          }
+        } else {
+          if (empty($first_name) || empty($last_name)) {
+            $response = ["success" => false, "error" => "First name and last name are required for individuals"];
+            break;
+          }
+        }
+
+        $stmt = $conn->prepare("UPDATE owners_tb SET own_fname=?, own_mname=?, own_surname=?, owner_type=?, company_name=? WHERE own_id=?");
+        $stmt->bind_param("sssssi", $first_name, $middle_name, $last_name, $owner_type, $company_name, $owner_id);
+
+        if ($stmt->execute()) {
+          $response = ["success" => true, "message" => "Owner updated successfully"];
+        } else {
+          $response = ["success" => false, "error" => "Database error: " . $stmt->error];
+        }
+        break;
+
+      case 'add_owner':
+        $property_id = intval($data['property_id'] ?? 0);
+        $first_name = trim($data['first_name'] ?? '');
+        $middle_name = trim($data['middle_name'] ?? '');
+        $last_name = trim($data['last_name'] ?? '');
+        $owner_type = $data['owner_type'] ?? 'individual';
+        $company_name = trim($data['company_name'] ?? '');
+
+        if ($property_id <= 0) {
+          $response = ["success" => false, "error" => "Invalid property ID"];
+          break;
+        }
+
+        // Validation based on owner type
+        if ($owner_type === 'company') {
+          if (empty($company_name)) {
+            $response = ["success" => false, "error" => "Company name is required"];
+            break;
+          }
+        } else {
+          if (empty($first_name) || empty($last_name)) {
+            $response = ["success" => false, "error" => "First name and last name are required for individuals"];
+            break;
+          }
+        }
+
+        $conn->begin_transaction();
+        try {
+          // Insert owner
+          $stmt = $conn->prepare("INSERT INTO owners_tb (own_fname, own_mname, own_surname, owner_type, company_name) VALUES (?, ?, ?, ?, ?)");
+          $stmt->bind_param("sssss", $first_name, $middle_name, $last_name, $owner_type, $company_name);
+
+          if (!$stmt->execute()) {
+            throw new Exception("Failed to create owner");
+          }
+
+          $new_owner_id = $stmt->insert_id;
+
+          // Link to property
+          $link_stmt = $conn->prepare("INSERT INTO propertyowner (property_id, owner_id) VALUES (?, ?)");
+          $link_stmt->bind_param("ii", $property_id, $new_owner_id);
+
+          if (!$link_stmt->execute()) {
+            throw new Exception("Failed to link owner to property");
+          }
+
+          $conn->commit();
+          $response = ["success" => true, "owner_id" => $new_owner_id, "message" => "Owner added successfully"];
+
+        } catch (Exception $e) {
+          $conn->rollback();
+          $response = ["success" => false, "error" => $e->getMessage()];
+        }
+        break;
+
+      case 'remove_owner':
+        $owner_id = intval($data['owner_id'] ?? 0);
+        $property_id = intval($data['property_id'] ?? 0);
+
+        if ($owner_id <= 0 || $property_id <= 0) {
+          $response = ["success" => false, "error" => "Invalid owner or property ID"];
+          break;
+        }
+
+        $conn->begin_transaction();
+        try {
+          // Remove from junction table
+          $stmt = $conn->prepare("DELETE FROM propertyowner WHERE property_id = ? AND owner_id = ?");
+          $stmt->bind_param("ii", $property_id, $owner_id);
+
+          if (!$stmt->execute() || $stmt->affected_rows === 0) {
+            throw new Exception("Owner not found or already removed");
+          }
+
+          // Check if owner is linked to other properties
+          $check_stmt = $conn->prepare("SELECT COUNT(*) as count FROM propertyowner WHERE owner_id = ?");
+          $check_stmt->bind_param("i", $owner_id);
+          $check_stmt->execute();
+          $result = $check_stmt->get_result()->fetch_assoc();
+
+          // If orphaned, optionally remove from owners_tb
+          if ($result['count'] == 0) {
+            $delete_stmt = $conn->prepare("DELETE FROM owners_tb WHERE own_id = ?");
+            $delete_stmt->bind_param("i", $owner_id);
+            $delete_stmt->execute();
+          }
+
+          $conn->commit();
+          $response = ["success" => true, "message" => "Owner removed successfully"];
+
+        } catch (Exception $e) {
+          $conn->rollback();
+          $response = ["success" => false, "error" => $e->getMessage()];
+        }
+        break;
     }
+
+    echo json_encode($response);
+    exit;
   }
 }
 
@@ -520,60 +700,60 @@ $conn->close();
 
     <div class="card border-0 shadow p-4 rounded-3">
       <div id="owner-info" class="row">
-        <?php if (count($owners_details) > 1): ?>
-          <!-- Multiple owners: treat as Company -->
-          <div class="col-md-12 mb-4">
-            <form>
-              <div class="mb-3 w-50">
-                <label for="companyName" class="form-label">Company</label>
-                <input type="text" class="form-control" id="companyName"
-                  value="<?php echo htmlspecialchars(implode(' / ', array_column($owners_details, 'owner_name'))); ?>"
-                  placeholder="Enter Company" disabled>
-              </div>
-            </form>
-          </div>
-
-        <?php elseif (count($owners_details) === 1): ?>
-          <!-- Single owner: show Owner + split name fields -->
-          <?php $owner = $owners_details[0]; ?>
-          <div class="col-md-12 mb-4">
-            <form>
-              <div class="mb-3 w-50">
-                <label for="ownerName" class="form-label">Owner</label>
-                <input type="text" class="form-control" id="ownerName"
-                  value="<?php echo htmlspecialchars($owner['owner_name']); ?>" placeholder="Enter Owner" disabled>
-              </div>
-            </form>
-          </div>
-          <div class="col-md-12">
-            <h6 class="mb-3">Name</h6>
-            <form class="row">
-              <div class="col-md-4 mb-3">
-                <label for="firstName" class="form-label">First Name</label>
-                <input type="text" class="form-control" id="firstName"
-                  value="<?php echo htmlspecialchars($owner['first_name']); ?>" placeholder="Enter First Name" disabled>
-              </div>
-              <div class="col-md-4 mb-3">
-                <label for="middleName" class="form-label">Middle Name</label>
-                <input type="text" class="form-control" id="middleName"
-                  value="<?php echo htmlspecialchars($owner['middle_name']); ?>" placeholder="Enter Middle Name" disabled>
-              </div>
-              <div class="col-md-4 mb-3">
-                <label for="lastName" class="form-label">Last Name</label>
-                <input type="text" class="form-control" id="lastName"
-                  value="<?php echo htmlspecialchars($owner['last_name']); ?>" placeholder="Enter Last Name" disabled>
-              </div>
-            </form>
-          </div>
-        <?php else: ?>
+        <?php if (empty($owners_details)): ?>
           <!-- No owners -->
           <div class="col-md-12 mb-4">
-            <form>
-              <div class="mb-3 w-50">
-                <label for="noOwner" class="form-label">Owner</label>
-                <input type="text" class="form-control" id="noOwner" value="No owner assigned" disabled>
+            <div class="alert alert-warning" role="alert">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              No owner assigned to this property
+            </div>
+          </div>
+        <?php else: ?>
+          <!-- Display all owners properly -->
+          <div class="col-md-12 mb-4">
+            <h6 class="mb-3">Property Owners (<?= count($owners_details) ?>)</h6>
+            <?php foreach ($owners_details as $index => $owner): ?>
+              <div class="owner-item mb-3 p-3 bg-light rounded">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="owner-details flex-grow-1">
+                    <?php if (($owner['owner_type'] ?? 'individual') === 'company'): ?>
+                      <div class="mb-2">
+                        <span class="badge bg-primary me-2">Company</span>
+                        <strong><?= htmlspecialchars($owner['display_name']) ?></strong>
+                      </div>
+                      <?php if (!empty($owner['first_name']) || !empty($owner['last_name'])): ?>
+                        <div class="text-muted small">
+                          Contact:
+                          <?= htmlspecialchars(trim($owner['first_name'] . ' ' . $owner['middle_name'] . ' ' . $owner['last_name'])) ?>
+                        </div>
+                      <?php endif; ?>
+                    <?php else: ?>
+                      <div class="mb-2">
+                        <span class="badge bg-info me-2">Individual</span>
+                        <strong><?= htmlspecialchars($owner['display_name']) ?></strong>
+                      </div>
+                      <div class="row text-muted small">
+                        <div class="col-md-4">First: <?= htmlspecialchars($owner['first_name']) ?></div>
+                        <div class="col-md-4">Middle: <?= htmlspecialchars($owner['middle_name']) ?></div>
+                        <div class="col-md-4">Last: <?= htmlspecialchars($owner['last_name']) ?></div>
+                      </div>
+                    <?php endif; ?>
+                  </div>
+                  <div class="owner-actions">
+                    <button type="button" class="btn btn-sm btn-outline-primary me-1"
+                      onclick="editOwner(<?= $owner['own_id'] ?>)" <?= $disableButton ?>>
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <?php if (count($owners_details) > 1): ?>
+                      <button type="button" class="btn btn-sm btn-outline-danger"
+                        onclick="removeOwner(<?= $owner['own_id'] ?>)" <?= $disableButton ?>>
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    <?php endif; ?>
+                  </div>
+                </div>
               </div>
-            </form>
+            <?php endforeach; ?>
           </div>
         <?php endif; ?>
       </div>
@@ -1436,48 +1616,97 @@ $conn->close();
   </script>
 
   <script>
+    let editingOwnerId = null;
+
+    function showOISModal() {
+      resetOwnerForm();
+      document.getElementById('ownerModalLabel').textContent = 'Add Owner';
+      editingOwnerId = null;
+
+      var myModal = new bootstrap.Modal(document.getElementById('editOwnerModal'));
+      myModal.show();
+    }
+
+    function editOwner(ownerId) {
+      // This would need owner data - for now just show modal for editing
+      document.getElementById('ownerModalLabel').textContent = 'Edit Owner';
+      editingOwnerId = ownerId;
+
+      var myModal = new bootstrap.Modal(document.getElementById('editOwnerModal'));
+      myModal.show();
+    }
+
     function saveOwnerData() {
       const propertyId = new URLSearchParams(window.location.search).get('id');
-      const forms = document.querySelectorAll("#editOwnerModal form");
+      const ownerType = document.querySelector('input[name="owner_type"]:checked')?.value || 'individual';
 
-      forms.forEach(form => {
-        const ownerId = form.dataset.ownerId;
-        const first = form.querySelector(".firstNameModal").value;
-        const middle = form.querySelector(".middleNameModal").value;
-        const last = form.querySelector(".lastNameModal").value;
+      let ownerData = {
+        property_id: propertyId,
+        owner_type: ownerType
+      };
 
-        fetch(window.location.href, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            action: "update_owner",
-            property_id: propertyId,
-            owner_id: ownerId,
-            first_name: first,
-            middle_name: middle,
-            last_name: last
-          })
+      // Get form data based on owner type
+      if (ownerType === 'company') {
+        ownerData.company_name = document.getElementById('companyName')?.value.trim() || '';
+        ownerData.first_name = document.getElementById('companyFirstName')?.value.trim() || '';
+        ownerData.middle_name = document.getElementById('companyMiddleName')?.value.trim() || '';
+        ownerData.last_name = document.getElementById('companyLastName')?.value.trim() || '';
+
+        if (!ownerData.company_name) {
+          alert('Company name is required');
+          return;
+        }
+      } else {
+        ownerData.first_name = document.getElementById('firstName')?.value.trim() || '';
+        ownerData.middle_name = document.getElementById('middleName')?.value.trim() || '';
+        ownerData.last_name = document.getElementById('lastName')?.value.trim() || '';
+
+        if (!ownerData.first_name || !ownerData.last_name) {
+          alert('First name and last name are required');
+          return;
+        }
+      }
+
+      // Determine action
+      if (editingOwnerId) {
+        ownerData.action = 'update_owner';
+        ownerData.owner_id = editingOwnerId;
+      } else {
+        ownerData.action = 'add_owner';
+      }
+
+      fetch(window.location.href, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(ownerData)
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('editOwnerModal')).hide();
+            location.reload();
+          } else {
+            alert("Error: " + (data.error || 'Unknown error occurred'));
+          }
         })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success) {
-              location.reload();
-            } else {
-              alert("Error: " + data.error);
-            }
-          });
-      });
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while saving the owner data.');
+        });
     }
 
     function addOwnerData() {
-      const propertyId = new URLSearchParams(window.location.search).get('id');
-      const first = prompt("Enter first name:");
-      const middle = prompt("Enter middle name:");
-      const last = prompt("Enter last name:");
+      showOISModal();
+    }
 
-      if (!first || !last) return;
+    function removeOwner(ownerId) {
+      if (!confirm('Are you sure you want to remove this owner from the property?')) {
+        return;
+      }
+
+      const propertyId = new URLSearchParams(window.location.search).get('id');
 
       fetch(window.location.href, {
         method: "POST",
@@ -1485,11 +1714,9 @@ $conn->close();
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          action: "add_owner",
-          property_id: propertyId,
-          first_name: first,
-          middle_name: middle,
-          last_name: last
+          action: "remove_owner",
+          owner_id: ownerId,
+          property_id: propertyId
         })
       })
         .then(res => res.json())
@@ -1497,9 +1724,21 @@ $conn->close();
           if (data.success) {
             location.reload();
           } else {
-            alert("Error: " + data.error);
+            alert("Error: " + (data.error || 'Failed to remove owner'));
           }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while removing the owner.');
         });
+    }
+
+    function resetOwnerForm() {
+      const form = document.getElementById('editOwnerForm');
+      if (form) {
+        form.reset();
+      }
+      editingOwnerId = null;
     }
   </script>
 
