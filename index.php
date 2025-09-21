@@ -16,11 +16,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
   $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
-  // Check if username and password are not empty
   if (empty($username) || empty($password)) {
     $_SESSION['error'] = "Username or password cannot be empty!";
   } else {
-    // Query the database to check if the user exists
     $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
 
     if ($stmt) {
@@ -31,15 +29,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       if ($result && $result->num_rows > 0) {
         $user = $result->fetch_assoc();
 
-        // First check if account is active
         if ($user['status'] == 1) {
-          // Active account → check password
           if (password_verify($password, $user['password'])) {
+            // ✅ Set session variables
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['user_type'] = $user['user_type'];
-            $_SESSION['first_name'] = $user['first_name'];  // ✅ Store first_name in session
+            $_SESSION['first_name'] = $user['first_name'];
             $_SESSION['logged_in'] = true;
+
+            // ✅ Insert login activity
+            $stmtLog = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
+            $action = "Logged in to the system";
+            $stmtLog->bind_param("is", $user['user_id'], $action);
+            $stmtLog->execute();
+            $stmtLog->close();
 
             header("Location: Home.php");
             exit();
@@ -47,7 +51,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['error'] = "Incorrect password!";
           }
         } else {
-          // Inactive account
           $_SESSION['error'] = "Your account is inactive. Please contact the administrator.";
         }
       } else {
@@ -57,7 +60,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
       $_SESSION['error'] = "Error preparing statement: " . $conn->error;
     }
-
   }
 }
 $conn->close();
