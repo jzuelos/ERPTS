@@ -36,98 +36,9 @@ $user_role = $_SESSION['user_type'] ?? 'user';
   <div class="container my-5" id="property-carousel-section">
     <div id="propertyCarousel" class="carousel slide" data-bs-ride="false">
       <div class="carousel-inner">
-        
-      
-        <!-- LAND Section -->
-        <div class="carousel-item active">
-          <!-- LAND Section -->
-          <section class="container my-5" id="land-section">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-              <h4 class="section-title">
-                </a>
-                LAND
-              </h4>
-            </div>
-
-            <div class="card border-0 shadow p-4 rounded-3">
-              <!-- Quick Actions Row -->
-              <div class="row mb-4">
-                <?php
-                // Get the property ID from the current URL (e.g., FAAS.php?id=140)
-                $p_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
-                ?>
-                <div class="col-md-6 mb-3">
-                  <a href="<?= ($is_active == 1) ? "Land.php?p_id=$p_id" : '#' ?>"
-                    class="btn w-100 py-2 text-white text-decoration-none <?= ($is_active == 0) ? 'disabled' : '' ?>"
-                    style="background-color: #379777; border-color: #2e8266; pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
-                    <i class="fas fa-plus-circle me-2"></i>Add Land
-                  </a>
-                </div>
-              </div>
-
-              <!-- Toggle Section -->
-              <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded">
-                <span class="fw-bold me-3">Show/Hide</span>
-                <div class="form-check form-switch m-0">
-                  <input class="form-check-input" type="checkbox" id="showToggle" checked style="margin-left: 0;">
-                </div>
-              </div>
-
-              <!-- Value Table -->
-              <div class="table-responsive" id="landTableContainer">
-                <table class="table table-borderless text-center">
-                  <thead class="border-bottom border-2">
-                    <tr class="border-bottom border-2">
-                      <th class="bold" style="width: 10%;">OCT/TCT Number</th>
-                      <th class="bold">Area (sq m)</th>
-                      <th class="bold">Market Value</th>
-                      <th class="bold">Assessed Value</th>
-                      <th class="bold" style="width: 10%;">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php if (!empty($landRecords)): ?>
-                      <?php foreach ($landRecords as $record): ?>
-                        <tr class="border-bottom border-3">
-                          <td><?= htmlspecialchars($record['oct_no']) ?></td>
-                          <td><?= htmlspecialchars($record['area']) ?></td>
-                          <td><?= number_format($record['market_value'], 2) ?></td>
-                          <td>
-                            <?= isset($record['assess_value']) ? number_format($record['assess_value'], 2) : '0.00' ?>
-                          </td>
-                          <td>
-                            <div class="btn-group" role="group">
-                              <a href="LAND_Edit.php?p_id=<?= urlencode($p_id); ?>&land_id=<?= urlencode($record['land_id']); ?>"
-                                class="btn btn-sm btn-primary" title="Edit">
-                                <i class="bi bi-pencil"></i>
-                              </a>
-                              <a href="<?= ($is_active == 1)
-                                ? 'print-layout.php?p_id=' . urlencode($p_id) . '&land_id=' . urlencode($record['land_id'])
-                                : '#' ?>"
-                                class="btn btn-sm btn-secondary ml-3 <?= ($is_active == 0) ? 'disabled' : '' ?>"
-                                title="View" target="_blank"
-                                style="pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
-                                <i class="bi bi-printer"></i>
-                              </a>
-                            </div>
-                          </td>
-                        </tr>
-                      <?php endforeach; ?>
-                    <?php else: ?>
-                      <tr>
-                        <td colspan="6" class="text-center">No records found</td>
-                      </tr>
-                    <?php endif; ?>
-                  </tbody>
-                </table>
-              </div>
-
-            </div>
-          </section>
-        </div>
 
         <!-- PLANTS AND TREES Section -->
-        <div class="carousel-item">
+        <div class="carousel-item active">
           <section class="container my-5" id="plants-trees-section">
             <div class="d-flex justify-content-between align-items-center mb-4">
               <h4 class="section-title">
