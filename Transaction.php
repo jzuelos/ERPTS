@@ -33,64 +33,64 @@ header("Pragma: no-cache");
   <!-- Header -->
   <?php include 'header.php'; ?>
 
-  <!-- Main Menu -->
-  <main class="container my-5 flex-grow-1">
-    <section class="w-100" style="max-width: 1100px; margin: auto;">
-      <div class="status-container mb-5 text-center">
-        <h3 class="text-secondary" style="font-size: 2rem;">Transaction</h3>
+ <!-- Main Menu -->
+<main class="container d-flex flex-column justify-content-center align-items-center my-5 flex-grow-1">
+  <section class="w-100" style="max-width: 1100px;">
+    <div class="status-container mb-5 text-center">
+      <h3 class="text-secondary" style="font-size: 2rem;">Transaction</h3>
+    </div>
+
+    <div class="row justify-content-center">
+      <!-- Permanent Cancellation -->
+      <div class="col-md-3 mb-4">
+        <a href="Real-Property-Unit-List.php" class="text-decoration-none">
+          <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+            <div class="card-body d-flex align-items-center justify-content-center text-center">
+              <i class="fas fa-ban me-3" style="font-size: 2rem; color: red;"></i>
+              <h5 class="fw-bold mb-0" style="font-size: 1.25rem;">Permanent Cancellation</h5>
+            </div>
+          </div>
+        </a>
       </div>
 
-      <div class="row justify-content-center">
-        <!-- Permanent Cancellation -->
-        <div class="col-md-3 mb-4">
-          <a href="Real-Property-Unit-List.php" class="text-decoration-none">
-            <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
-              <div class="card-body d-flex align-items-center justify-content-center text-center">
-                <i class="fas fa-ban me-3" style="font-size: 2rem; color: red;"></i>
-                <h5 class="fw-bold mb-0" style="font-size: 1.25rem;">Permanent Cancellation</h5>
-              </div>
+      <!-- Track Transaction -->
+      <div class="col-md-3 mb-4">
+        <a href="Track.php" class="text-decoration-none">
+          <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+            <div class="card-body d-flex align-items-center justify-content-center text-center">
+              <i class="fas fa-route me-3" style="font-size: 2rem;"></i>
+              <h5 class="fw-bold mb-0" style="font-size: 1.25rem;">Track Transaction</h5>
             </div>
-          </a>
-        </div>
-
-        <!-- Track Transaction -->
-        <div class="col-md-3 mb-4">
-          <a href="Track.php" class="text-decoration-none">
-            <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
-              <div class="card-body d-flex align-items-center justify-content-center text-center">
-                <i class="fas fa-route me-3" style="font-size: 2rem;"></i>
-                <h5 class="fw-bold mb-0" style="font-size: 1.25rem;">Track Transaction</h5>
-              </div>
-            </div>
-          </a>
-        </div>
-
-        <!-- Approved Transactions -->
-        <div class="col-md-3 mb-4">
-          <a href="Approved.php" class="text-decoration-none">
-            <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
-              <div class="card-body d-flex align-items-center justify-content-center text-center">
-                <i class="fas fa-check-circle me-3 text-success" style="font-size: 2rem;"></i>
-                <h5 class="fw-bold mb-0" style="font-size: 1.25rem;">Approved</h5>
-              </div>
-            </div>
-          </a>
-        </div>
-
-        <!-- Pending Transactions -->
-        <div class="col-md-3 mb-4">
-          <a href="Pending.php" class="text-decoration-none">
-            <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
-              <div class="card-body d-flex align-items-center justify-content-center text-center">
-                <i class="fas fa-clock me-3 text-warning" style="font-size: 2rem;"></i>
-                <h5 class="fw-bold mb-0" style="font-size: 1.25rem;">Pending</h5>
-              </div>
-            </div>
-          </a>
-        </div>
+          </div>
+        </a>
       </div>
-    </section>
-  </main>
+
+      <!-- Approved Transactions -->
+      <div class="col-md-3 mb-4">
+        <a href="Approved.php" class="text-decoration-none">
+          <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+            <div class="card-body d-flex align-items-center justify-content-center text-center">
+              <i class="fas fa-check-circle me-3 text-success" style="font-size: 2rem;"></i>
+              <h5 class="fw-bold mb-0" style="font-size: 1.25rem;">Approved</h5>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Pending Transactions -->
+      <div class="col-md-3 mb-4">
+        <a href="Pending.php" class="text-decoration-none">
+          <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
+            <div class="card-body d-flex align-items-center justify-content-center text-center">
+              <i class="fas fa-clock me-3 text-warning" style="font-size: 2rem;"></i>
+              <h5 class="fw-bold mb-0" style="font-size: 1.25rem;">Pending</h5>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
 
   <!-- Footer -->
   <footer class="bg-light text-center py-3 mt-auto">
