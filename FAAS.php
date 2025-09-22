@@ -1023,7 +1023,7 @@ $conn->close();
   <!--Declaration of Property-->
   <section class="container mt-5" id="declaration-section">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h4 class="mb-0">Declaration of Property</h4>
+      <h4 class="mb-0">Tax Declaration of Property</h4>
       <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
         data-bs-target="#editDeclarationProperty <?= $disableButton ?>">Edit</button>
     </div>
@@ -1383,28 +1383,27 @@ $conn->close();
 
 
 
-  <!-- Floating Dropdown Menu (Bottom Right of Page) -->
-  <div class="dropdown" style="position:fixed; bottom:20px; right:20px; z-index:1050;">
-    <button id="mapMenuBtn"
-      class="btn btn-danger btn-lg rounded-circle d-flex align-items-center justify-content-center" type="button"
-      aria-expanded="false" style="width:60px; height:60px;">
-      <i class="fas fa-bars fa-1x"></i>
-    </button>
-    <ul class="dropdown-menu shadow">
-      <li><a class="dropdown-item scroll-link" href="#owner-info-section"><i class="fas fa-user"></i> Owner's Info</a>
-      </li>
-      <li><a class="dropdown-item scroll-link" href="#property-info-section"><i class="fas fa-home"></i> Property
-          Info</a></li>
-      <li><a class="dropdown-item scroll-link" href="#rpu-identification-section"><i class="fas fa-id-card"></i> RPU
-          Identification</a></li>
-      <li><a class="dropdown-item scroll-link" href="#declaration-section"><i class="fas fa-file-alt"></i>
-          Declaration</a></li>
-      <li><a class="dropdown-item scroll-link" href="#property-carousel-section"><i class="bi-building-fill"></i>
-          Land</a></li>
-      <li><a class="dropdown-item scroll-link" href="#valuation-section"><i class="fas fa-balance-scale"></i>
-          Valuation</a></li>
-    </ul>
-  </div>
+ <!-- Floating Dropdown Menu (Bottom Right of Page) -->
+<div class="dropdown" style="position:fixed; bottom:20px; right:20px; z-index:1050;">
+  <button id="mapMenuBtn"
+    class="btn btn-danger btn-lg rounded-circle d-flex align-items-center justify-content-center"
+    type="button"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    style="width:60px; height:60px;">
+    <i class="fas fa-bars fa-1x"></i>
+  </button>
+
+  <ul class="dropdown-menu shadow dropdown-menu-end" style="bottom:100%; right:0;">
+    <li><a class="dropdown-item scroll-link" href="#owner-info-section"><i class="fas fa-user"></i> Owner's Info</a></li>
+    <li><a class="dropdown-item scroll-link" href="#property-info-section"><i class="fas fa-home"></i> Property Info</a></li>
+    <li><a class="dropdown-item scroll-link" href="#rpu-identification-section"><i class="fas fa-id-card"></i> RPU Identification</a></li>
+    <li><a class="dropdown-item scroll-link" href="#declaration-section"><i class="fas fa-file-alt"></i> Tax Declaration</a></li>
+    <li><a class="dropdown-item scroll-link" href="#land-section"><i class="bi-building-fill"></i> Land</a></li>
+    <li><a class="dropdown-item scroll-link" href="#valuation-section"><i class="fas fa-balance-scale"></i> Valuation</a></li>
+  </ul>
+</div>
+
   </section>
 
   <!-- Footer -->

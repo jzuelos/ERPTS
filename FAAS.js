@@ -1,6 +1,5 @@
-// ==============================
+
 // Utility Functions
-// ==============================
 
 // Capitalize first letter of each word in a field
 function capitalizeFirstLetter(element) {
@@ -32,9 +31,8 @@ function resetForm() {
   });
 }
 
-// ==============================
+
 // RPU Identification Section
-// ==============================
 let arpData = {};
 
 function toggleEdit() {
@@ -90,9 +88,7 @@ function saveRPUData() {
     });
 }
 
-// ==============================
 // Owner Information Section
-// ==============================
 let editingOwnerId = null;
 
 function showOISModal() {
@@ -185,9 +181,7 @@ function removeOwner(ownerId) {
     });
 }
 
-// ==============================
 // Property Information Section
-// ==============================
 function showEditPropertyModal() {
   document.getElementById('streetModal').value = document.getElementById('street').value;
   document.getElementById('barangayModal').value = document.getElementById('barangay').value;
@@ -235,9 +229,7 @@ function savePropertyData() {
   );
 }
 
-// ==============================
 // Plants, Trees & Valuation
-// ==============================
 function showPnTModal() {
   document.getElementById('marketValueModal').value = document.getElementById('marketValue').value;
   document.getElementById('assessedValueModal').value = document.getElementById('assessedValue').value;
@@ -268,9 +260,8 @@ function saveValuationData() {
   bootstrap.Modal.getInstance(document.getElementById('editValuationModal')).hide();
 }
 
-// ==============================
+
 // Land Modal
-// ==============================
 function handleLandModal() {
   const editLandModal = new bootstrap.Modal(document.getElementById('editLandModal'));
 
