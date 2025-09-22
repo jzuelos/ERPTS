@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 22, 2025 at 07:29 AM
+-- Generation Time: Sep 22, 2025 at 06:37 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -50,7 +50,8 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (9, 9, 'Added Municipality: Eefgsdgehjhqa', '2025-09-21 13:41:58'),
 (10, 9, 'Added Barangay: 312312', '2025-09-21 13:45:24'),
 (11, 9, 'Logged in to the system', '2025-09-21 15:19:01'),
-(12, 9, 'Logged in to the system', '2025-09-21 17:25:56');
+(12, 9, 'Logged in to the system', '2025-09-21 17:25:56'),
+(13, 9, 'Logged in to the system', '2025-09-22 16:20:38');
 
 -- --------------------------------------------------------
 
@@ -731,6 +732,32 @@ INSERT INTO `p_info` (`p_id`, `house_no`, `block_no`, `province`, `city`, `distr
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `received_papers`
+--
+
+CREATE TABLE `received_papers` (
+  `received_id` int(11) NOT NULL,
+  `transaction_id` int(11) NOT NULL,
+  `transaction_code` varchar(10) NOT NULL,
+  `client_name` varchar(255) NOT NULL,
+  `contact_number` varchar(20) DEFAULT NULL,
+  `transaction_type` varchar(100) DEFAULT NULL,
+  `received_by` int(11) DEFAULT NULL,
+  `received_date` datetime NOT NULL DEFAULT current_timestamp(),
+  `notes` text DEFAULT NULL,
+  `status` enum('received','processing','ready_for_pickup','completed') DEFAULT 'received'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `received_papers`
+--
+
+INSERT INTO `received_papers` (`received_id`, `transaction_id`, `transaction_code`, `client_name`, `contact_number`, `transaction_type`, `received_by`, `received_date`, `notes`, `status`) VALUES
+(14, 39, '76224', 'Renz', '+635234523423', 'Simple Transfer of Ownership', 9, '2025-09-23 00:24:08', '', 'received');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `region`
 --
 
@@ -858,13 +885,6 @@ CREATE TABLE `transactions` (
   `transaction_type` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `transactions`
---
-
-INSERT INTO `transactions` (`transaction_id`, `transaction_code`, `name`, `contact_number`, `description`, `status`, `created_at`, `updated_at`, `transaction_type`) VALUES
-(26, '52061', 'James', '09344532342', 'New Discovery', 'Completed', '2025-09-21 16:03:38', '2025-09-21 16:03:49', 'New Declaration of Real Property');
-
 -- --------------------------------------------------------
 
 --
@@ -899,16 +919,6 @@ CREATE TABLE `transaction_logs` (
 --
 
 INSERT INTO `transaction_logs` (`log_id`, `transaction_id`, `transaction_code`, `action`, `details`, `user_id`, `created_at`) VALUES
-(34, 21, NULL, 'Document Uploaded', 'uploads/transaction_21/tx_68c70d34a5cda_premium_photo-1666900440561-94dcb6865554.avif', 9, '2025-09-14 18:45:08'),
-(35, 21, NULL, 'Created', 'Transaction created', 9, '2025-09-14 18:45:08'),
-(36, 21, NULL, 'Document Uploaded', 'uploads/transaction_21/tx_68c70d41598a0_photo-1500462918059-b1a0cb512f1d.avif', 9, '2025-09-14 18:45:21'),
-(37, 21, NULL, 'Updated', 'Transaction updated', 9, '2025-09-14 18:45:21'),
-(38, 21, NULL, 'Document Deleted', 'Deleted document: uploads/transaction_21/tx_68c70d41598a0_photo-1500462918059-b1a0cb512f1d.avif', 9, '2025-09-14 18:45:33'),
-(39, 22, NULL, 'Created', 'Transaction created', 9, '2025-09-14 18:48:24'),
-(40, 22, NULL, 'Document Uploaded', 'uploads/transaction_22/tx_68c70e5f3cc72_premium_photo-1666900440561-94dcb6865554.avif', 9, '2025-09-14 18:50:07'),
-(41, 22, NULL, 'Document Uploaded', 'uploads/transaction_22/tx_68c70e5f3d936_photo-1493612276216-ee3925520721.avif', 9, '2025-09-14 18:50:07'),
-(42, 22, NULL, 'Document Uploaded', 'uploads/transaction_22/tx_68c70e5f3e6b6_photo-1500462918059-b1a0cb512f1d.avif', 9, '2025-09-14 18:50:07'),
-(43, 22, NULL, 'Updated', 'Transaction updated', 9, '2025-09-14 18:50:07'),
 (44, 22, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-14 18:51:35'),
 (45, 23, NULL, 'Document Uploaded', 'uploads/transaction_23/tx_68c70f2ad733a_premium_photo-1666900440561-94dcb6865554.avif', 9, '2025-09-14 18:53:30'),
 (46, 23, NULL, 'Created', 'Transaction created', 9, '2025-09-14 18:53:30'),
@@ -919,7 +929,65 @@ INSERT INTO `transaction_logs` (`log_id`, `transaction_id`, `transaction_code`, 
 (51, 24, NULL, 'Created', 'Transaction created', 10, '2025-09-14 17:12:23'),
 (52, 25, NULL, 'Created', 'Transaction created', 10, '2025-09-16 10:49:03'),
 (53, 26, '52061', 'Created', 'Transaction created', 9, '2025-09-21 16:03:38'),
-(54, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-21 16:03:49');
+(54, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-21 16:03:49'),
+(55, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:38:26'),
+(56, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:38:36'),
+(57, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:40:03'),
+(58, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:42:03'),
+(59, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:42:20'),
+(60, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:47:39'),
+(61, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:48:06'),
+(62, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:48:32'),
+(63, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:49:14'),
+(64, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:51:24'),
+(65, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 09:05:59'),
+(66, 26, '52061', 'Document Uploaded', 'uploads/transaction_26/tx_68d1164b5f730_premium_photo-1666900440561-94dcb6865554.avif', 9, '2025-09-22 09:26:35'),
+(67, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 09:26:35'),
+(68, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 09:51:00'),
+(69, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 09:51:58'),
+(70, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 10:02:00'),
+(71, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 10:03:42'),
+(72, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 10:09:14'),
+(73, 27, '76474', 'Created', 'Transaction created', 9, '2025-09-22 10:11:37'),
+(74, 28, '92305', 'Created', 'Transaction created', 9, '2025-09-22 10:30:36'),
+(75, 29, '11390', 'Created', 'Transaction created', 9, '2025-09-22 10:31:26'),
+(76, 28, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-22 10:43:33'),
+(77, 29, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-22 10:43:36'),
+(78, 30, '45582', 'Created', 'Transaction created', 9, '2025-09-22 10:43:55'),
+(79, 30, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-22 10:46:32'),
+(80, 31, '92110', 'Created', 'Transaction created', 9, '2025-09-22 10:47:26'),
+(81, 31, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-22 10:49:38'),
+(82, 32, '06313', 'Created', 'Transaction created', 9, '2025-09-22 10:49:51'),
+(83, 32, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-22 10:50:41'),
+(84, 33, '80938', 'Created', 'Transaction created', 9, '2025-09-22 10:50:51'),
+(85, 33, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-22 10:56:40'),
+(86, 27, '76474', 'Updated', 'Transaction updated', 9, '2025-09-22 15:06:31'),
+(87, 27, '76474', 'Papers Received', 'Papers received by client', 9, '2025-09-22 15:40:47'),
+(88, 27, '76474', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:01:18'),
+(89, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 16:04:39'),
+(90, 26, '52061', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:08:25'),
+(91, 34, '43012', 'Created', 'Transaction created', 9, '2025-09-22 16:08:54'),
+(92, 35, '57158', 'Created', 'Transaction created', 9, '2025-09-22 16:09:07'),
+(93, 26, '52061', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:12:46'),
+(94, 35, '57158', 'Updated', 'Transaction updated', 9, '2025-09-22 16:15:32'),
+(95, 35, '57158', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:15:35'),
+(96, 34, '43012', 'Updated', 'Transaction updated', 9, '2025-09-22 16:17:18'),
+(97, 34, '43012', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:17:24'),
+(98, 36, '97303', 'Created', 'Transaction created', 9, '2025-09-22 16:18:17'),
+(99, 37, '26437', 'Created', 'Transaction created', 9, '2025-09-22 16:18:28'),
+(100, 37, '26437', 'Updated', 'Transaction updated', 9, '2025-09-22 16:18:34'),
+(101, 37, '26437', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:18:56'),
+(102, 36, '97303', 'Updated', 'Transaction updated', 9, '2025-09-22 16:19:24'),
+(103, 36, '97303', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:19:27'),
+(104, 38, '22474', 'Created', 'Transaction created', 9, '2025-09-22 16:21:00'),
+(105, 38, '22474', 'Updated', 'Transaction updated', 9, '2025-09-22 16:21:04'),
+(106, 38, '22474', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:21:08'),
+(107, 39, '76224', 'Created', 'Transaction created', 9, '2025-09-22 16:22:22'),
+(108, 40, '86054', 'Created', 'Transaction created', 9, '2025-09-22 16:22:36'),
+(109, 40, '86054', 'Updated', 'Transaction updated', 9, '2025-09-22 16:22:43'),
+(110, 40, '86054', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:23:02'),
+(111, 39, '76224', 'Updated', 'Transaction updated', 9, '2025-09-22 16:24:05'),
+(112, 39, '76224', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:24:08');
 
 -- --------------------------------------------------------
 
@@ -1057,6 +1125,14 @@ ALTER TABLE `p_info`
   ADD PRIMARY KEY (`p_id`);
 
 --
+-- Indexes for table `received_papers`
+--
+ALTER TABLE `received_papers`
+  ADD PRIMARY KEY (`received_id`),
+  ADD UNIQUE KEY `unique_transaction` (`transaction_id`),
+  ADD KEY `received_by` (`received_by`);
+
+--
 -- Indexes for table `region`
 --
 ALTER TABLE `region`
@@ -1119,7 +1195,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `brgy`
@@ -1200,6 +1276,12 @@ ALTER TABLE `p_info`
   MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
 
 --
+-- AUTO_INCREMENT for table `received_papers`
+--
+ALTER TABLE `received_papers`
+  MODIFY `received_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
 -- AUTO_INCREMENT for table `region`
 --
 ALTER TABLE `region`
@@ -1227,19 +1309,19 @@ ALTER TABLE `subclass`
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
-  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `transaction_files`
 --
 ALTER TABLE `transaction_files`
-  MODIFY `file_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `file_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `transaction_logs`
 --
 ALTER TABLE `transaction_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=113;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -1290,6 +1372,12 @@ ALTER TABLE `propertyowner`
   ADD CONSTRAINT `property_id` FOREIGN KEY (`property_id`) REFERENCES `p_info` (`p_id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `received_papers`
+--
+ALTER TABLE `received_papers`
+  ADD CONSTRAINT `received_papers_ibfk_2` FOREIGN KEY (`received_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL;
+
+--
 -- Constraints for table `rpu_dec`
 --
 ALTER TABLE `rpu_dec`
@@ -1305,7 +1393,7 @@ ALTER TABLE `rpu_idnum`
 -- Constraints for table `transaction_files`
 --
 ALTER TABLE `transaction_files`
-  ADD CONSTRAINT `transaction_files_ibfk_1` FOREIGN KEY (`transaction_id`) REFERENCES `transactions` (`transaction_id`);
+  ADD CONSTRAINT `transaction_files_ibfk_1` FOREIGN KEY (`transaction_id`) REFERENCES `transactions` (`transaction_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
