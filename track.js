@@ -12,6 +12,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
   loadTransactions();
   loadActivity();
+
+  const contactInput = document.getElementById('contactInput');
+
+  if (contactInput) {
+    contactInput.addEventListener('input', function (e) {
+      let val = e.target.value;
+
+      // Always start with +63
+      if (!val.startsWith('+63')) {
+        val = '+63' + val.replace(/\D/g, ''); // remove non-digits
+      } else {
+        // keep only digits after +63
+        val = '+63' + val.slice(3).replace(/\D/g, '');
+      }
+
+      // limit to 13 chars total (+63 + 10 digits)
+      if (val.length > 13) val = val.slice(0, 13);
+
+      e.target.value = val;
+    });
+
+    // optional: place cursor after +63 when focusing
+    contactInput.addEventListener('focus', function () {
+      if (contactInput.value === '+63') {
+        contactInput.setSelectionRange(3, 3);
+      }
+    });
+  }
 });
 
 function openModal(id = null) {

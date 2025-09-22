@@ -210,7 +210,8 @@ if ($result && $result->num_rows > 0) {
 
           <input type="text" id="nameInput" name="t_name" class="form-control mb-2" placeholder="Name">
 
-          <input type="text" id="contactInput" name="t_contact" class="form-control mb-2" placeholder="Contact Number">
+          <input type="tel" id="contactInput" class="form-control" placeholder="Enter mobile number" maxlength="13"
+            value="+63">
 
           <input type="text" id="transactionInput" name="t_description" class="form-control mb-2"
             placeholder="Transaction Description">
