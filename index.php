@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['logged_in'] = true;
 
             // ✅ Insert login activity
-            $stmtLog = $conn->prepare("INSERT INTO act  ivity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
+            $stmtLog = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
             $action = "Logged in to the system";
             $stmtLog->bind_param("is", $user['user_id'], $action);
             $stmtLog->execute();

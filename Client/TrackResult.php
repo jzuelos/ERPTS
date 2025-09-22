@@ -48,15 +48,15 @@ if (isset($_GET['id'])) {
         .timeline-step.completed { border-color: green; }
         .timeline-step.completed .step-circle { background: green; }
         .timeline-step.active { border-color: orange; }
-        /* 🔶 Active = orange with pulse */
+        /* Active = yellow for pending/in progress */
         .timeline-step.active:before {
             content: '';
             position: absolute;
             left: -11px; top: 15px;
             width: 15px; height: 15px;
             border-radius: 50%;
-            background-color: orange;
-            box-shadow: 0 0 0 2px orange;
+            background-color: #FFD700; /* yellow */
+            box-shadow: 0 0 0 2px #FFD700;
             animation: pulse 1.5s infinite;
         }
         .timeline-step.upcoming { border-color: #aaa; }
@@ -79,9 +79,9 @@ if (isset($_GET['id'])) {
         .step-title { display: inline-block; font-weight: bold; }
         .step-date { margin-left: 25px; color: #555; font-size: 14px; }
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255,165,0, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255,165,0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255,165,0, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(255,215,0, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255,215,0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,215,0, 0); }
         }
     </style>
 </head>
@@ -105,27 +105,38 @@ $allStatuses = [
     "Received"
 ];
 
-$currentStatus = strtolower(trim($transaction['status']));
+// Normalize database status for timeline logic
+$dbStatus = strtolower(trim($transaction['status']));
+if ($dbStatus === 'in progress') {
+    $currentStatus = 'processing paper';
+} else {
+    $currentStatus = $dbStatus;
+}
 
-// Loop through statuses
+// Find index of current status in $allStatuses
+$allNormalized = array_map('strtolower', $allStatuses);
+$currentIndex = array_search($currentStatus, $allNormalized);
+
 foreach ($allStatuses as $i => $statusName):
     $normalized = strtolower($statusName);
-
-    // Default
     $class = "upcoming";
     $dateToShow = "";
 
     if ($i === 0) {
-        // First status: always completed (created_at)
+        // First status always green
         $class = "completed";
         $dateToShow = date("m-d-Y h:i A", strtotime($transaction['created_at']));
     } else {
-        if ($currentStatus === $normalized) {
-            $class = "active"; // current status = orange (see CSS)
-        } elseif (
-            array_search($currentStatus, array_map('strtolower', $allStatuses)) > $i
-        ) {
-            $class = "completed"; // past statuses = green
+        if ($i < $currentIndex) {
+            $class = "completed"; // all previous statuses green
+        } elseif ($i === $currentIndex) {
+            if ($normalized === 'completed' || $normalized === 'received') {
+                $class = "completed"; // these turn green immediately when current
+            } else {
+                $class = "active"; // pending/in progress yellow
+            }
+        } else {
+            $class = "upcoming"; // grey
         }
 
         // Date from logs if available
