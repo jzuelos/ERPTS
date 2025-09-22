@@ -4,7 +4,7 @@ body {
     background-color: #f4f7fa;
     margin: 0;
     padding: 0;
-    padding-top: 70px; 
+    padding-top: 70px; /* Space for the fixed navbar */
 }
 
 .main-content {

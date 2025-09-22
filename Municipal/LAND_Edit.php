@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 
-require_once '../database.php';
+require_once 'database.php';
 $conn = Database::getInstance();
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
@@ -275,13 +275,13 @@ echo "<script>
     integrity="sha384-KyZXEJr+8+6g5K4r53m5s3xmw1Is0J6wBd04YOeFvXOsZTgmYF9flT/qe6LZ9s+0" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="../main_layout.css">
-  <link rel="stylesheet" href="../header.css"> <!-- Custom CSS -->
-  <link rel="stylesheet" href="FAAS.css">
+  <link rel="stylesheet" href="header.css"> 
+  <link rel="stylesheet" href="../FAAS.css">
   <title>Electronic Real Property Tax System</title>
 </head>
 
 <body>
-      <?php include '../header.php'; ?>
+      <?php include 'header.php'; ?>
 
   <!-- LAND Section -->
   <section class="container my-5" id="rpu-identification-section">

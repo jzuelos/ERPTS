@@ -3,7 +3,7 @@ session_start();  //Start session at the top to access session variables
 
 // Check if the user is logged in by verifying if 'user_id' exists in the session
 if (!isset($_SESSION['user_id'])) {
-  header("Location: ../index.php"); // Redirect to login page if user is not logged in
+  header("Location: index.php"); // Redirect to login page if user is not logged in
   exit; // Stop further execution after redirection
 }
 
@@ -25,21 +25,44 @@ if ($conn->connect_error) {
 }
 
 // Fetch property units along with their owners, sorted by latest ID first
-$sql = "SELECT p.p_id, p.house_no, p.block_no, p.barangay, p.province, p.city, p.district, p.land_area,
-               CONCAT(o.own_fname, ', ', o.own_mname, ' ', o.own_surname) AS owner
-        FROM p_info p
-        LEFT JOIN owners_tb o ON p.ownId_Fk = o.own_id
-        ORDER BY p.p_id DESC"; // Sort by latest p_id first
+$sql = "
+SELECT 
+  p.p_id,
+  p.street,
+  p.block_no,
+  p.barangay,
+  p.province,
+  p.city,
+  p.district,
+  p.land_area,
+  p.is_active,
+  GROUP_CONCAT(DISTINCT CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname) SEPARATOR ' / ') AS owner
+FROM p_info p
+LEFT JOIN faas f ON f.pro_id = p.p_id
+LEFT JOIN propertyowner po ON po.property_id = p.p_id
+LEFT JOIN owners_tb o ON o.own_id = po.owner_id
+GROUP BY p.p_id
+ORDER BY p.p_id DESC
+";
 
 $propertyUnits = [];
 $result = $conn->query($sql);
 
-if ($result->num_rows > 0) {
-  while ($row = $result->fetch_assoc()) {
-    $propertyUnits[] = $row;
+if ($result) {
+  if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+      // Ensure owner key exists (so your existing HTML that uses $unit['owner'] works)
+      $row['owner'] = isset($row['owner']) ? $row['owner'] : '';
+      $propertyUnits[] = $row;
+    }
+  } else {
+    // No rows found in the SELECT — return an empty array (don't echo raw text into page)
+    $propertyUnits = [];
   }
 } else {
-  echo "No records found";
+  // SQL error — helpful for debugging but you can remove or log instead in production
+  echo "SQL error: " . $conn->error;
+  $propertyUnits = [];
 }
 
 // Fetch barangay options for the dropdown
@@ -47,9 +70,10 @@ $barangayOptions = '';
 $barangayQuery = "SELECT brgy_id, brgy_name FROM brgy";
 $barangayResult = $conn->query($barangayQuery);
 
-if ($barangayResult->num_rows > 0) {
+if ($barangayResult && $barangayResult->num_rows > 0) {
   while ($barangayRow = $barangayResult->fetch_assoc()) {
-    $barangayOptions .= '<option value="' . $barangayRow['brgy_id'] . '">' . $barangayRow['brgy_name'] . '</option>';
+    $barangayOptions .= '<option value="' . strtolower($barangayRow['brgy_name']) . '">'
+      . $barangayRow['brgy_name'] . '</option>';
   }
 } else {
   $barangayOptions = '<option value="">No Barangays Available</option>';
@@ -65,26 +89,23 @@ if ($barangayResult->num_rows > 0) {
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Bootstrap CSS -->
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KyZXEJr+8+6g5K4r53m5s3xmw1Is0J6wBd04YOeFvXOsZTgmYF9flT/qe6LZ9s+0" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
-    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-  <link rel="stylesheet" href="../main_layout.css">
-  <link rel="stylesheet" href="../header.css">
+  <link rel="stylesheet" href="main_layout.css">
+  <link rel="stylesheet" href="header.css">
   <link rel="stylesheet" href="Real-Property-Unit-List.css">
   <title>Electronic Real Property Tax System</title>
 </head>
 
 <body>
   <!-- Header Navigation -->
-  <?php include '../header.php'; ?>
+  <?php include 'header.php'; ?>
 
   <!-- Main Body -->
   <section class="container mt-5">
-  <div class="mb-4 d-flex justify-content-start">
+    <div class="mb-4 d-flex justify-content-start">
       <a href="Home.php" class="btn btn-outline-secondary btn-sm">
         <i class="fas fa-arrow-left"></i> Back
       </a>
@@ -92,69 +113,78 @@ if ($barangayResult->num_rows > 0) {
     <div class="card p-4">
       <h3 class="mb-4">Real Property Units List</h3>
       <div class="form-row mb-4">
-        <div class="col-auto">
-          <label for="searchInput" class="sr-only">Search</label>
-          <div class="input-group">
+        <div class="row mb-4 align-items-center">
+          <!-- search input: medium width on md+, full width on xs -->
+          <div class="col-12 col-md-6 col-lg-5 mb-2 mb-md-0">
             <input type="text" class="form-control" id="searchInput" placeholder="Search" onkeyup="filterTable()">
-            <select class="custom-select" id="barangayDropdown" name="barangay">
-              <!-- Dropdown for barangay selection -->
-              <option selected value="">All Barangay</option>
-              <?php echo $barangayOptions; ?> <!-- PHP-generated barangay options -->
-            </select>
+          </div>
+
+          <div class="col-8 col-sm-6 col-md-3 col-lg-2 mb-2 mb-md-0">
+            <div class="d-flex">
+              <!-- Dropdown -->
+              <select class="form-select me-2" id="barangayDropdown" name="barangay">
+                <option selected value="">All Barangay</option>
+                <?php echo $barangayOptions; ?>
+              </select>
+
+              <!-- Button -->
+              <button type="button" class="btn btn-success" onclick="filterTable()">Search</button>
+            </div>
+          </div>
+
+          <!-- action buttons -->
+          <div class="col-12 col-md-3 col-lg-5 text-md-end">
+            <a href="Add-New-Real-Property-Unit.php" class="btn btn-success">Add new RPU</a>
           </div>
         </div>
 
-        <div class="col-auto">
-          <button type="button" class="btn btn-success btn-hover" onclick="filterTable()">Search</button>
-          <a href="Add-New-Real-Property-Unit.php" class="btn btn-success btn-hover">Add new RPU</a>
+        <!-- Table -->
+        <div class="table-responsive">
+          <table class="table table-bordered text-start modern-table" id="propertyTable"> <!-- Responsive table -->
+            <thead>
+              <tr>
+                <th>OD ID</th>
+                <th>Owner</th>
+                <th>Location <br><small>(Street, Barangay, City, Province)</small></th>
+                <th>Land Area</th>
+                <th>Edit</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <?php foreach ($propertyUnits as $unit):
+                $ownerRaw = isset($unit['owner']) ? $unit['owner'] : '';
+                $owner = trim((string) $ownerRaw) !== '' ? $ownerRaw : 'None';
+                $rowClass = ($unit['is_active'] == 0) ? 'table-secondary' : ''; // highlight inactive
+              ?>
+                <tr class="<?= $rowClass ?>">
+                  <td><?= htmlspecialchars($unit['p_id']) ?></td>
+                  <td><?= htmlspecialchars($owner) ?></td>
+                  <td>
+                    <?= htmlspecialchars("{$unit['street']}, {$unit['barangay']}, {$unit['city']}, {$unit['province']}") ?>
+                  </td>
+                  <td><?= htmlspecialchars($unit['land_area']) ?></td>
+                  <td><a href="FAAS.php?id=<?= htmlspecialchars($unit['p_id']) ?>" class="btn btn-primary">EDIT</a></td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-controls mt-3">
+          <label for="pageSelect">Page: </label>
+          <select id="pageSelect" onchange="changePage()"></select>
+        </div>
+
+        <!-- View All Button -->
+        <div class="view-all-container d-flex mt-3">
+          <div class="ml-auto">
+            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#viewAllModal">View
+              All</button>
+          </div>
         </div>
       </div>
-
-      <!-- Table -->
-      <div class="table-responsive">
-        <table class="table table-bordered text-center modern-table" id="propertyTable"> <!-- Responsive table -->
-          <thead>
-            <tr>
-              <th>OD ID</th>
-              <th>Owner</th>
-              <th>Location <br><small>(Barangay, City, Province)</small></th>
-              <th>Land Area</th>
-              <th>Edit</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            <?php
-            // Display the fetched data in table rows
-            foreach ($propertyUnits as $unit) {
-              echo "<tr>
-                  <td>{$unit['p_id']}</td>
-                  <td>{$unit['owner']}</td>
-                  <td>{$unit['house_no']}, {$unit['barangay']}, {$unit['city']}, {$unit['province']}</td>
-                  <td>{$unit['land_area']}</td>
-                  <td><a href='FAAS.php?id={$unit['p_id']}' class='btn btn-primary'>EDIT</a></td>
-                </tr>";
-            }
-            ?>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination Controls -->
-      <div class="pagination-controls mt-3">
-        <label for="pageSelect">Page: </label>
-        <select id="pageSelect" onchange="changePage()"></select>
-      </div>
-
-      <!-- View All Button -->
-      <div class="view-all-container d-flex mt-3">
-        <div class="ml-auto">
-          <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#viewAllModal">View
-            All</button>
-        </div>
-      </div>
-    </div>
   </section>
-
 
   <!-- View All Modal -->
   <div class="modal fade" id="viewAllModal" tabindex="-1" aria-labelledby="viewAllModalLabel" aria-hidden="true">
@@ -173,7 +203,7 @@ if ($barangayResult->num_rows > 0) {
 
           <!-- Modal Table -->
           <div class="table-responsive">
-            <table class="table table-bordered text-center modern-table" id="propertyTable">
+            <table class="table table-bordered text-center modern-table" id="modalPropertyTable">
               <thead>
                 <tr>
                   <th>OD ID</th>
@@ -186,12 +216,15 @@ if ($barangayResult->num_rows > 0) {
                 <?php
                 // Display the fetched data in modal table rows
                 foreach ($propertyUnits as $unit) {
+                  $ownerRaw = isset($unit['owner']) ? $unit['owner'] : '';
+                  $owner = trim((string) $ownerRaw) !== '' ? $ownerRaw : 'None';
+
                   echo "<tr>
-                      <td>{$unit['p_id']}</td>
-                      <td>{$unit['owner']}</td>
-                      <td>{$unit['house_no']}, {$unit['barangay']}, {$unit['city']}, {$unit['province']}</td>
-                      <td>{$unit['land_area']}</td>
-                    </tr>";
+                    <td>" . htmlspecialchars($unit['p_id']) . "</td>
+                    <td>" . htmlspecialchars($owner) . "</td>
+                    <td>" . htmlspecialchars($unit['street'] . ', ' . $unit['barangay'] . ', ' . $unit['city'] . ', ' . $unit['province']) . "</td>
+                    <td>" . htmlspecialchars($unit['land_area']) . "</td>
+                  </tr>";
                 }
                 ?>
               </tbody>
@@ -205,11 +238,10 @@ if ($barangayResult->num_rows > 0) {
     </div>
   </div>
 
-
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
-    <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span>
+      <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span>
     </div>
   </footer>
   <script>
@@ -262,7 +294,6 @@ if ($barangayResult->num_rows > 0) {
     }
 
     document.addEventListener("DOMContentLoaded", initializeTable);
-
   </script>
   <script>
     // Function to reset the modal when the close button is clicked
@@ -278,7 +309,7 @@ if ($barangayResult->num_rows > 0) {
       tableBody.innerHTML = '';
       var propertyUnits = <?php echo json_encode($propertyUnits); ?>;
 
-      propertyUnits.forEach(function (unit) {
+      propertyUnits.forEach(function(unit) {
         var row = `<tr>
                 <td>${unit.p_id}</td>
                 <td>${unit.owner}</td>
@@ -295,11 +326,11 @@ if ($barangayResult->num_rows > 0) {
       var searchQuery = document.getElementById("modalSearchInput").value.toLowerCase();
       var tableRows = document.getElementById("modalTableBody").getElementsByTagName("tr");
 
-      Array.from(tableRows).forEach(function (row) {
+      Array.from(tableRows).forEach(function(row) {
         var cells = row.getElementsByTagName("td");
         var matchFound = false;
 
-        Array.from(cells).forEach(function (cell) {
+        Array.from(cells).forEach(function(cell) {
           if (cell.innerText.toLowerCase().includes(searchQuery)) {
             matchFound = true;
           }
@@ -307,7 +338,6 @@ if ($barangayResult->num_rows > 0) {
         row.style.display = matchFound ? "" : "none";
       });
     }
-
   </script>
   <script src="http://localhost/ERPTS/Real-Property-Unit-List.js"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -318,11 +348,6 @@ if ($barangayResult->num_rows > 0) {
     crossorigin="anonymous"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

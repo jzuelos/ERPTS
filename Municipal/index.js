@@ -1,10 +1,10 @@
-// Function to toggle password visibility
+// Eyecandy password toggle
 function togglePasswordVisibility(passwordField, toggleButton, eyeIcon) {
 
     const type = passwordField.type === 'password' ? 'text' : 'password';
     passwordField.type = type;
 
-    // Change the icon based on the visibility of the password
+    // change icon for visibility
     if (type === 'password') {
       eyeIcon.classList.remove('fa-eye-slash');
       eyeIcon.classList.add('fa-eye');

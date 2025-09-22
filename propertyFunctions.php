@@ -6,10 +6,9 @@ $conn = Database::getInstance();
 // Activity Logging Function with error check
 function logActivity($user_id, $action) {
     global $conn;
-    $log_time = date("Y-m-d H:i:s"); // Current timestamp
 
-    // Prepare the statement
-    $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, ?)");
+    // Use the same method as in index.php and logout.php for the timestamp (NOW())
+    $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
     
     // Check if prepare statement was successful
     if ($stmt === false) {
@@ -18,7 +17,7 @@ function logActivity($user_id, $action) {
     }
 
     // Bind parameters
-    $stmt->bind_param("iss", $user_id, $action, $log_time);
+    $stmt->bind_param("is", $user_id, $action);
 
     // Execute the statement and check for success
     if ($stmt->execute()) {
@@ -30,12 +29,11 @@ function logActivity($user_id, $action) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
     // Simulating user_id retrieval from session (replace with actual session variable)
     session_start();
     $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1; // Default to 1 for testing
 
-    // ✅ Handle Deletion (common for all tables)
+    // Handle Deletion (common for all tables)
     if (isset($_POST['action']) && $_POST['action'] === 'delete' && isset($_POST['id']) && isset($_POST['table'])) {
         $id = intval($_POST['id']); // ensure numeric
         $table = $_POST['table'];
@@ -55,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $col = $primaryKey[$table];
 
         $stmt = $conn->prepare("DELETE FROM $table WHERE $col = ?");
-        $stmt->bind_param("i", $id); // ✅ primary key is integer
+        $stmt->bind_param("i", $id); // primary key is integer
         $success = $stmt->execute();
 
         // Log the deletion action
@@ -72,10 +70,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $stmt->close();
         $conn->close();
-        exit; // ✅ Stop further insert logic after deletion
+        exit; // Stop further insert logic after deletion
     }
 
-    // ✅ Handle Classification Form
+    // Handle Classification Form
     if (isset($_POST['c_code']) && isset($_POST['c_description']) && isset($_POST['c_uv']) && isset($_POST['c_status'])) {
         $c_code = $_POST['c_code'];
         $c_description = $_POST['c_description'];
@@ -102,7 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
     }
 
-    // ✅ Handle Land Use Form
+    // Handle Land Use Form
     elseif (isset($_POST['report_code']) && isset($_POST['lu_code']) && isset($_POST['lu_description']) && isset($_POST['lu_al']) && isset($_POST['lu_status'])) {
         $report_code = $_POST['report_code'];
         $lu_code = $_POST['lu_code'];
@@ -130,7 +128,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
     }
 
-    // ✅ Handle Sub-Classes Form
+    // Handle Sub-Classes Form
     elseif (isset($_POST['sc_code']) && isset($_POST['sc_description']) && isset($_POST['sc_uv']) && isset($_POST['sc_status'])) {
         $sc_code = $_POST['sc_code'];
         $sc_description = $_POST['sc_description'];
@@ -159,3 +157,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $conn->close();
 }
+?>

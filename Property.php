@@ -5,14 +5,46 @@ ini_set('display_errors', 1);
 
 require_once 'database.php';
 $conn = Database::getInstance();
+
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
+}
+
+// Activity Logging Function
+function logActivity($user_id, $action)
+{
+  global $conn;
+  $log_time = date("Y-m-d H:i:s"); // Current timestamp
+
+  // Prepare the statement
+  $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, ?)");
+
+  // Check if prepare statement was successful
+  if ($stmt === false) {
+    error_log("Failed to prepare log statement: " . $conn->error);
+    return false;
+  }
+
+  // Bind parameters
+  $stmt->bind_param("iss", $user_id, $action, $log_time);
+
+  // Execute the statement and check for success
+  if ($stmt->execute()) {
+    return true;
+  } else {
+    error_log("Failed to execute log statement: " . $stmt->error);
+    return false;
+  }
 }
 
 // Handle AJAX updates
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
   $action = $_POST['action'];
 
+  // Simulate retrieving user_id from session (replace with actual session variable)
+  $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1; // Default to 1 for testing
+
+  // Update Classification
   if ($action === 'update_classification') {
     $code = $_POST['code'];
     $description = $_POST['description'];
@@ -21,10 +53,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
     $stmt = $conn->prepare("UPDATE classification SET c_description=?, c_uv=?, c_status=? WHERE c_code=?");
     $stmt->bind_param("sdss", $description, $assessment, $status, $code);
-    echo $stmt->execute() ? "success" : "error";
+    $result = $stmt->execute() ? "success" : "error";
+
+    // Log the update action
+    if ($result === "success") {
+      $log_action = "Updated classification with code: $code";
+      logActivity($user_id, $log_action); // Log activity
+    }
+
+    echo $result;
     exit;
   }
 
+  // Update Land Use (Actual Uses)
   if ($action === 'update_actual_uses') {
     $reportCode = $_POST['reportCode'];
     $code = $_POST['code'];
@@ -34,10 +75,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
     $stmt = $conn->prepare("UPDATE land_use SET lu_description=?, lu_al=?, lu_status=? WHERE report_code=? AND lu_code=?");
     $stmt->bind_param("sdsss", $description, $assessment, $status, $reportCode, $code);
-    echo $stmt->execute() ? "success" : "error";
+    $result = $stmt->execute() ? "success" : "error";
+
+    // Log the update action
+    if ($result === "success") {
+      $log_action = "Updated land use for reportCode: $reportCode, luCode: $code";
+      logActivity($user_id, $log_action); // Log activity
+    }
+
+    echo $result;
     exit;
   }
 
+  // Update Sub-Classes
   if ($action === 'update_sub_classes') {
     $code = $_POST['code'];
     $description = $_POST['description'];
@@ -46,12 +96,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
     $stmt = $conn->prepare("UPDATE subclass SET sc_description=?, sc_uv=?, sc_status=? WHERE sc_code=?");
     $stmt->bind_param("sdss", $description, $assessment, $status, $code);
-    echo $stmt->execute() ? "success" : "error";
+    $result = $stmt->execute() ? "success" : "error";
+
+    // Log the update action
+    if ($result === "success") {
+      $log_action = "Updated subclass with code: $code";
+      logActivity($user_id, $log_action); // Log activity
+    }
+
+    echo $result;
     exit;
   }
 }
 ?>
-
 
 <!doctype html>
 <html lang="en">
@@ -74,6 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
   <link rel="stylesheet" href="Location.css">
   <title>Electronic Real Property Tax System</title>
 </head>
+
 <body>
   <!-- Header Navigation -->
   <?php include 'header.php'; ?>
@@ -173,7 +231,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
               ?>
             </tbody>
           </table>
-              
+
           <!-- Actual Uses Table -->
           <table class="table table-hover align-middle mb-0 d-none text-start" id="actualUsesTable">
             <thead class="table-light">
@@ -368,7 +426,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     </div>
   </div>
 
-
   <!-- Edit Actual Uses Modal -->
   <div class="modal fade" id="editActualUsesModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
@@ -416,8 +473,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     </div>
   </div>
 
-
-
   <!-- Edit Sub-Classes Modal -->
   <div class="modal fade" id="editSubClassesModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
@@ -461,24 +516,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     </div>
   </div>
 
-  <!--Delete Confirmation Modal-->  
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title" id="deleteModalLabel"><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Are you sure you want to delete this record? <strong>This action cannot be undone.</strong>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
+  <!--Delete Confirmation Modal-->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="deleteModalLabel"><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this record? <strong>This action cannot be undone.</strong>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
   <!-- Add Property Category Modal -->
   <!-- Confirmation Modal -->
@@ -599,7 +654,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             </div>
             <div class="form-group">
               <label for="reportDescription">Description</label>
-              <input type="text" class="form-control" id="reportDescription" placeholder="Enter Description" maxlength="100"required>
+              <input type="text" class="form-control" id="reportDescription" placeholder="Enter Description" maxlength="100" required>
             </div>
             <div class="form-group">
               <label for="reportAssessmentLevel">Assessment Level (%)</label>
@@ -628,7 +683,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     </div>
   </div>
 
-
   <!-- Sub-Classes Modal -->
   <div class="modal fade" id="subClassesModal" tabindex="-1" role="dialog" aria-labelledby="subClassesModalLabel"
     aria-hidden="true">
@@ -644,12 +698,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           <form id="subClassesForm">
             <div class="form-group">
               <label for="subClassesCode">Code</label>
-              <input type="text" class="form-control" id="subClassesCode" placeholder="Enter Code" maxlenght="6"required>
+              <input type="text" class="form-control" id="subClassesCode" placeholder="Enter Code" maxlenght="6" required>
             </div>
             <div class="form-group">
               <label for="subClassesDescription">Description</label>
               <input type="text" class="form-control" id="subClassesDescription" placeholder="Enter Description"
-                 maxlenght="100 "required>
+                maxlenght="100 " required>
             </div>
             <div class="form-group">
               <label for="unitValue">Unit Value</label>
@@ -684,15 +738,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     </div>
   </div>
 
-
-
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start">
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
       <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span>
     </div>
   </footer>
-
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -702,7 +753,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
   <script src="Property.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-              
+
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       let selectedForm = "";
@@ -872,51 +923,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     });
   </script>
   <script>
-document.addEventListener("DOMContentLoaded", function () {
-  let deleteId = null;
-  let deleteTable = null;
+    document.addEventListener("DOMContentLoaded", function() {
+      let deleteId = null;
+      let deleteTable = null;
 
-  // When delete button is clicked
-  document.querySelectorAll(".delete-btn").forEach(button => {
-    button.addEventListener("click", function () {
-      deleteId = this.getAttribute("data-id");
-      deleteTable = this.getAttribute("data-table");
-      // Show modal
-      let modal = new bootstrap.Modal(document.getElementById("deleteModal"));
-      modal.show();
-    });
-  });
-
-  // When confirm delete is clicked
-  document.getElementById("confirmDeleteBtn").addEventListener("click", function () {
-    if (deleteId && deleteTable) {
-      // Example AJAX call (adjust according to your backend)
-      fetch("delete.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `id=${deleteId}&table=${deleteTable}`
-      })
-      .then(response => response.text())
-      .then(data => {
-        // Optionally remove row from table
-        document.querySelector(`[data-id='${deleteId}'][data-table='${deleteTable}']`).closest("tr").remove();
-
-        // Hide modal
-        let modalEl = document.getElementById("deleteModal");
-        let modal = bootstrap.Modal.getInstance(modalEl);
-        modal.hide();
+      // When delete button is clicked
+      document.querySelectorAll(".delete-btn").forEach(button => {
+        button.addEventListener("click", function() {
+          deleteId = this.getAttribute("data-id");
+          deleteTable = this.getAttribute("data-table");
+          // Show modal
+          let modal = new bootstrap.Modal(document.getElementById("deleteModal"));
+          modal.show();
+        });
       });
-    }
-  });
-});
-</script>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const tables = ["classificationTable", "actualUsesTable", "subClassesTable"];
-    const rowsPerPage = 5;
+      // When confirm delete is clicked
+      document.getElementById("confirmDeleteBtn").addEventListener("click", function() {
+        if (deleteId && deleteTable) {
+          // Example AJAX call (adjust according to your backend)
+          fetch("delete.php", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+              },
+              body: `id=${deleteId}&table=${deleteTable}`
+            })
+            .then(response => response.text())
+            .then(data => {
+              // Optionally remove row from table
+              document.querySelector(`[data-id='${deleteId}'][data-table='${deleteTable}']`).closest("tr").remove();
 
-    tables.forEach(tableId => {
+              // Hide modal
+              let modalEl = document.getElementById("deleteModal");
+              let modal = bootstrap.Modal.getInstance(modalEl);
+              modal.hide();
+            });
+        }
+      });
+    });
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const tables = ["classificationTable", "actualUsesTable", "subClassesTable"];
+      const rowsPerPage = 5;
+
+      tables.forEach(tableId => {
         const table = document.getElementById(tableId);
         const tbody = table.querySelector("tbody");
         const rows = Array.from(tbody.querySelectorAll("tr"));
@@ -930,65 +983,39 @@ document.addEventListener("DOMContentLoaded", function () {
         let currentPage = 1;
 
         function renderPage(page) {
-            if (table.classList.contains("d-none")) {
-                pagination.style.display = "none";
-                return;
-            } else {
-                pagination.style.display = "flex";
-            }
+          if (table.classList.contains("d-none")) {
+            pagination.style.display = "none";
+            return;
+          } else {
+            pagination.style.display = "flex";
+          }
 
-            currentPage = page;
-            tbody.innerHTML = "";
-            const start = (page - 1) * rowsPerPage;
-            const end = start + rowsPerPage;
-            rows.slice(start, end).forEach(row => tbody.appendChild(row));
+          currentPage = page;
+          tbody.innerHTML = "";
+          const start = (page - 1) * rowsPerPage;
+          const end = start + rowsPerPage;
+          rows.slice(start, end).forEach(row => tbody.appendChild(row));
 
-            pagination.innerHTML = "";
+          pagination.innerHTML = "";
 
             // Previous arrow
             const prevBtn = document.createElement("button");
-            prevBtn.textContent = "<";
-            prevBtn.classList.add("btn", "btn-sm", "me-1");
+            prevBtn.innerHTML = "&laquo;";
+            prevBtn.classList.add("btn", "btn-sm", "btn-outline-success");
             prevBtn.disabled = page === 1;
             prevBtn.addEventListener("click", () => renderPage(currentPage - 1));
             pagination.appendChild(prevBtn);
 
-            // Page numbers or input
-            if (totalPages <= 10) {
-                for (let i = 1; i <= totalPages; i++) {
-                    const btn = document.createElement("button");
-                    btn.textContent = i;
-                    btn.classList.add("btn", "btn-sm", "me-1");
-                    if (i === page) btn.classList.add("btn-primary");
-                    else btn.classList.add("btn-outline-primary");
-
-                    btn.addEventListener("click", () => renderPage(i));
-                    pagination.appendChild(btn);
-                }
-            } else {
-                const input = document.createElement("input");
-                input.type = "number";
-                input.min = 1;
-                input.max = totalPages;
-                input.value = page;
-                input.style.width = "60px";
-                input.classList.add("form-control", "d-inline-block", "me-1");
-                input.addEventListener("change", () => {
-                    let val = parseInt(input.value);
-                    if (val >= 1 && val <= totalPages) renderPage(val);
-                    else input.value = currentPage;
-                });
-                pagination.appendChild(input);
-                const span = document.createElement("span");
-                span.textContent = ` / ${totalPages}`;
-                span.classList.add("me-1", "align-middle");
-                pagination.appendChild(span);
-            }
+            // Current page text
+            const pageInfo = document.createElement("span");
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+            pageInfo.classList.add("mx-2", "fw-semibold");
+            pagination.appendChild(pageInfo);
 
             // Next arrow
             const nextBtn = document.createElement("button");
-            nextBtn.textContent = ">";
-            nextBtn.classList.add("btn", "btn-sm");
+            nextBtn.innerHTML = "&raquo;";
+            nextBtn.classList.add("btn", "btn-sm", "btn-outline-success");
             nextBtn.disabled = page === totalPages;
             nextBtn.addEventListener("click", () => renderPage(currentPage + 1));
             pagination.appendChild(nextBtn);
@@ -998,11 +1025,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Watch for table visibility changes
         const observer = new MutationObserver(() => renderPage(1));
-        observer.observe(table, { attributes: true, attributeFilter: ["class"] });
+        observer.observe(table, {
+          attributes: true,
+          attributeFilter: ["class"]
+        });
+      });
     });
-});
-</script>
-
+  </script>
 </body>
-
 </html>

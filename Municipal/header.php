@@ -15,16 +15,10 @@ $user_role = $_SESSION['user_type'] ?? 'user'; // Default to 'user' if role is n
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <?php if ($user_role === 'admin'): ?>
-      <button onclick="location.href='Admin-Page-2.php'" class="btn btn-warning ms-2 me-auto admin-dashboard-btn">
-        Admin Dashboard
-      </button>
-    <?php endif; ?>
-
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <a class="nav-link px-3" href="/ERPTS/Home.php">Home</a>
+          <a class="nav-link px-3" href="Home.php">Home</a>
         </li>
 
         <li class="nav-item dropdown">
@@ -32,24 +26,24 @@ $user_role = $_SESSION['user_type'] ?? 'user'; // Default to 'user' if role is n
             RPU Management
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="/ERPTS/Real-Property-Unit-List.php">RPU List</a>
-            <a class="dropdown-item" href="/ERPTS/Real-Property-Unit-List.php">FAAS</a>
-            <a class="dropdown-item" href="/ERPTS/Tax-Declaration-List.php">Tax Declaration</a>
+            <a class="dropdown-item" href="Real-Property-Unit-List.php">RPU List</a>
+            <a class="dropdown-item" href="Real-Property-Unit-List.php">FAAS</a>
+            <a class="dropdown-item" href="Tax-Declaration-List.php">Tax Declaration</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="/ERPTS/Track.php">Track Paper</a>
+            <a class="dropdown-item" href="Track.php">Track Paper</a>
           </div>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link px-3" href="/ERPTS/Transaction.php">Transaction</a>
+          <a class="nav-link px-3" href="Transaction.php">Transaction</a>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link px-3" href="/ERPTS/Reports.php">Reports</a>
+          <a class="nav-link px-3" href="Reports.php">Reports</a>
         </li>
 
         <li class="nav-item ms-3">
-          <a href="/ERPTS/logout.php" class="btn btn-danger">Log Out</a>
+          <a href="logout.php" class="btn btn-danger">Log Out</a>
         </li>
       </ul>
     </div>

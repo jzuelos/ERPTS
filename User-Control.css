@@ -9,9 +9,13 @@ body {
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
+    margin: 20px auto; 
+    width: 80%;       
+    max-width: 1500px;
+    min-height: 750px; 
+    height: 40%;     
+    box-sizing: border-box; 
 }
-
 
 .table {
     border-radius: 8px;

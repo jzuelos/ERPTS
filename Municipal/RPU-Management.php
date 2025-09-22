@@ -3,7 +3,7 @@
 
   // Check if the user is logged in by verifying if 'user_id' exists in the session
   if (!isset($_SESSION['user_id'])) {
-    header("Location: ../index.php"); // Redirect to login page if user is not logged in
+    header("Location: index.php"); // Redirect to login page if user is not logged in
     exit; // Stop further execution after redirection
   }
 
@@ -31,14 +31,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="../main_layout.css">
-  <link rel="stylesheet" href="../header.css">
+  <link rel="stylesheet" href="header.css">
   <link rel="stylesheet" href="RPU-Management.css">
   <title>Electronic Real Property Tax System</title>
 </head>
 
 <body>
   <!-- Header Navigation -->
-  <?php include '../header.php'; ?>
+  <?php include 'header.php'; ?>
 
 <!-- RPU Management Section -->
 <main class="container my-5 d-flex justify-content-center align-items-center flex-column">

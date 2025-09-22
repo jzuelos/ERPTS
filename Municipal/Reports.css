@@ -17,6 +17,7 @@ body {
   padding: 30px;
 }
 
+
 /* Form Group Styles */
 .form-group {
   margin-bottom: 1.5rem;
@@ -89,4 +90,30 @@ hr {
 /* Right-aligned Text for Buttons */
 .text-right {
   margin-top: 20px;
+}
+
+/* Center the card itself */
+.center-form-wrapper {
+  display: flex;
+  justify-content: center; /* horizontal center */
+  padding: 50px 0;
+}
+
+.center-form-wrapper .card {
+  width: 90%;
+  max-width: 1000px;
+  padding: 30px;
+}
+
+/* Center form groups inside the card */
+.center-form-wrapper .card form {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center all form groups horizontally */
+}
+
+.center-form-wrapper .card form .form-group,
+.center-form-wrapper .card form .form-row {
+  width: 100%;       /* Keep inputs full width */
+  max-width: 600px;  /* Optional: limit max width of each group */
 }
