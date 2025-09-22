@@ -55,6 +55,33 @@ function logActivity($transaction_id, $action, $details = null, $user_id = null,
     }
 }
 
+/**
+ * Delete transaction uploads folder
+ */
+function deleteTransactionFolder($transaction_id)
+{
+    $folder = __DIR__ . "/uploads/transaction_" . $transaction_id;
+
+    if (!is_dir($folder)) {
+        return;
+    }
+
+    $files = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($folder, RecursiveDirectoryIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST
+    );
+
+    foreach ($files as $file) {
+        if ($file->isDir()) {
+            rmdir($file->getPathname());
+        } else {
+            unlink($file->getPathname());
+        }
+    }
+
+    rmdir($folder);
+}
+
 // Only handle confirming transaction
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -118,13 +145,7 @@ try {
     }
     $insertStmt->close();
 
-    // Optionally delete related child records first (e.g., transaction_files)
-    $childStmt = $conn->prepare("DELETE FROM transaction_files WHERE transaction_id = ?");
-    $childStmt->bind_param("i", $transaction_id);
-    $childStmt->execute();
-    $childStmt->close();
-
-    // Delete the original transaction
+    // Delete the original transaction (cascades to transaction_files)
     $deleteStmt = $conn->prepare("DELETE FROM transactions WHERE transaction_id = ?");
     $deleteStmt->bind_param("i", $transaction_id);
     if (!$deleteStmt->execute()) {
@@ -133,6 +154,9 @@ try {
     $deleteStmt->close();
 
     $conn->commit();
+
+    // Delete uploads folder
+    deleteTransactionFolder($transaction_id);
 
     // Log activity
     $details = "Papers received by client" . ($notes ? " - Notes: " . $notes : "");
