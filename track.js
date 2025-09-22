@@ -34,8 +34,18 @@ function openModal(id = null) {
       document.getElementById('nameInput').value = tx.name || '';
       document.getElementById('contactInput').value = tx.contact || '';
       document.getElementById('transactionInput').value = tx.transaction || '';
+      document.getElementById('transactionInput').disabled = false; // Enable for edit
       document.getElementById('transactionType').value = tx.transaction_type || '';
-      document.getElementById('statusInput').value = tx.status || '';
+      
+      // For edit mode: only show "In Progress" and "Completed" options
+      const statusSelect = document.getElementById('statusInput');
+      statusSelect.innerHTML = `
+        <option value="" disabled selected hidden>Select Status</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Completed">Completed</option>
+      `;
+      statusSelect.value = tx.status || '';
+      
       editId = id;
     }
   }
@@ -54,13 +64,89 @@ function openModal(id = null) {
     document.getElementById('nameInput').value = '';
     document.getElementById('contactInput').value = '';
     document.getElementById('transactionInput').value = '';
-    document.getElementById('statusInput').selectedIndex = 0;
+    document.getElementById('transactionInput').disabled = true; // Disable initially for add mode
     document.getElementById('transactionType').selectedIndex = 0;
+    
+    // For add mode: only show "Pending" option
+    const statusSelect = document.getElementById('statusInput');
+    statusSelect.innerHTML = `
+      <option value="" disabled selected hidden>Select Status</option>
+      <option value="Pending">Pending</option>
+    `;
+    statusSelect.selectedIndex = 0;
+    
     editId = null;
   }
 
   transactionModal.show();
 }
+
+// Generate auto-message based on transaction type and status
+function generateAutoMessage() {
+  const statusSelect = document.getElementById('statusInput');
+  const transactionInput = document.getElementById('transactionInput');
+  const transactionCode = document.getElementById('transactionID').value;
+  const transactionType = document.getElementById('transactionType').value;
+  const selectedStatus = statusSelect.value;
+  
+  if (!selectedStatus || !transactionType) return;
+  
+  const now = new Date();
+  const dateString = now.toLocaleDateString('en-US', {
+    month: '2-digit',
+    day: '2-digit',
+    year: 'numeric'
+  });
+  
+  // Shortened transaction type names for SMS
+  const typeAbbrev = {
+    'Simple Transfer of Ownership': 'Transfer of Ownership',
+    'New Declaration of Real Property': 'New Property Declaration', 
+    'Revision/Correction': 'Property Revision',
+    'Consolidation': 'Property Consolidation'
+  };
+  
+  const shortType = typeAbbrev[transactionType] || transactionType;
+  let autoMessage = '';
+  
+  switch(selectedStatus) {
+    case 'Pending':
+      autoMessage = `${shortType} request #${transactionCode} received ${dateString}. Your application is now pending review.`;
+      break;
+    case 'In Progress':
+      autoMessage = `${shortType} #${transactionCode} is being processed. Documents under review as of ${dateString}.`;
+      break;
+    case 'Completed':
+      autoMessage = `${shortType} #${transactionCode} completed ${dateString}. Ready for pickup at our office.`;
+      break;
+  }
+  
+  // Ensure message stays under 150 characters for GSM-7
+  if (autoMessage.length > 150) {
+    autoMessage = autoMessage.substring(0, 147) + '...';
+  }
+  
+  transactionInput.value = autoMessage;
+  transactionInput.disabled = false; // Enable so user can modify if needed
+}
+
+// Handle status change to auto-generate description
+function handleStatusChange() {
+  generateAutoMessage();
+}
+
+// Handle transaction type change to auto-generate description
+function handleTransactionTypeChange() {
+  generateAutoMessage();
+}
+
+// Add event listener for status change
+document.addEventListener('DOMContentLoaded', function() {
+  const statusSelect = document.getElementById('statusInput');
+  if (statusSelect) {
+    statusSelect.addEventListener('change', handleStatusChange);
+  }
+});
 
 function closeModal() {
   if (transactionModal) {
@@ -236,7 +322,7 @@ function formatTimestamp(s) {
   if (!s) return "";
   // convert "YYYY-MM-DD HH:MM:SS" -> "YYYY-MM-DDTHH:MM:SS" then try Date()
   let iso = s.replace(' ', 'T');
-  // if string lacks seconds or timezone, don't break — try Date parse and fallback
+  // if string lacks seconds or timezone, don't break – try Date parse and fallback
   const d = new Date(iso);
   if (!isNaN(d.getTime())) {
     return d.toLocaleString();
@@ -648,4 +734,3 @@ function initActivityTable() {
 
   paginate();
 }
-

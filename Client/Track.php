@@ -21,6 +21,7 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
     }
 }
 ?>
+
 <!doctype html>
 <html lang="en">
 
@@ -62,7 +63,7 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
                         </div>
                     <?php endif; ?>
 
-                    <form action="track.php" method="get">
+                    <form action="" method="get">
                         <div class="form-group row align-items-center">
                             <label for="transactionId" class="col-md-3 col-form-label text-md-right text-primary-custom font-weight-bold">Transaction ID</label>
                             <div class="col-md-7">

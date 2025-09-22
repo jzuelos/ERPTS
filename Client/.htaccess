@@ -1,0 +1,6 @@
+RewriteEngine On
+
+# Redirect root to Track.php
+RewriteRule ^$ Track.php [L]
+
+# Let all other files (TrackResult.php etc.) load normally
