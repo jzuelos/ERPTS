@@ -7,7 +7,9 @@ if (isset($_GET['id'])) {
     $id = $conn->real_escape_string($_GET['id']);
     
     // Fetch transaction
-    $sql = "SELECT * FROM transactions WHERE transaction_id = '$id' OR transaction_code = '$id' LIMIT 1";
+    $sql = "SELECT * FROM transactions 
+            WHERE transaction_id = '$id' OR transaction_code = '$id' 
+            LIMIT 1";
     $result = $conn->query($sql);
 
     if ($result && $result->num_rows > 0) {
@@ -17,13 +19,15 @@ if (isset($_GET['id'])) {
     }
 
     // Fetch logs
-    $logs_sql = "SELECT * FROM transaction_logs WHERE transaction_id = '{$transaction['transaction_id']}' ORDER BY created_at ASC";
+    $logs_sql = "SELECT * FROM transaction_logs 
+                 WHERE transaction_id = '{$transaction['transaction_id']}' 
+                 ORDER BY created_at ASC";
     $logs_result = $conn->query($logs_sql);
 
     $logs = [];
     if ($logs_result && $logs_result->num_rows > 0) {
         while ($row = $logs_result->fetch_assoc()) {
-            $logs[] = $row;
+            $logs[strtolower(trim($row['action']))] = $row['created_at']; // map action => datetime
         }
     }
 } else {
@@ -37,6 +41,49 @@ if (isset($_GET['id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Track and Trace Result</title>
     <link rel="stylesheet" href="result.css">
+    <style>
+        /* Basic timeline coloring */
+        .timeline-step { margin: 15px 0; padding: 10px; border-left: 4px solid #ccc; position: relative; }
+        .timeline-step .step-circle { width: 15px; height: 15px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+        .timeline-step.completed { border-color: green; }
+        .timeline-step.completed .step-circle { background: green; }
+        .timeline-step.active { border-color: orange; }
+        /* 🔶 Active = orange with pulse */
+        .timeline-step.active:before {
+            content: '';
+            position: absolute;
+            left: -11px; top: 15px;
+            width: 15px; height: 15px;
+            border-radius: 50%;
+            background-color: orange;
+            box-shadow: 0 0 0 2px orange;
+            animation: pulse 1.5s infinite;
+        }
+        .timeline-step.upcoming { border-color: #aaa; }
+        .timeline-step.upcoming:before {
+            content: '';
+            position: absolute;
+            left: -11px; top: 15px;
+            width: 15px; height: 15px;
+            border-radius: 50%;
+            background: #aaa;
+        }
+        .timeline-step.completed:before {
+            content: '';
+            position: absolute;
+            left: -11px; top: 15px;
+            width: 15px; height: 15px;
+            border-radius: 50%;
+            background: green;
+        }
+        .step-title { display: inline-block; font-weight: bold; }
+        .step-date { margin-left: 25px; color: #555; font-size: 14px; }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255,165,0, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255,165,0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,165,0, 0); }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -58,57 +105,41 @@ $allStatuses = [
     "Received"
 ];
 
-// Extract reached actions from logs
-$reachedStatuses = array_map(function($log) {
-    return strtolower(trim($log['action']));
-}, $logs);
+$currentStatus = strtolower(trim($transaction['status']));
 
 // Loop through statuses
 foreach ($allStatuses as $i => $statusName):
     $normalized = strtolower($statusName);
 
-    // Default flags
-    $isReached = false;
-    $isActive = false;
+    // Default
+    $class = "upcoming";
+    $dateToShow = "";
 
     if ($i === 0) {
-        // First status: always completed (green)
-        $isReached = true;
-        $isActive = (count($reachedStatuses) === 0); 
+        // First status: always completed (created_at)
+        $class = "completed";
+        $dateToShow = date("m-d-Y h:i A", strtotime($transaction['created_at']));
     } else {
-        // For other statuses, check logs
-        $isReached = in_array($normalized, $reachedStatuses);
-        $isActive = ($isReached && $i === count($reachedStatuses));
+        if ($currentStatus === $normalized) {
+            $class = "active"; // current status = orange (see CSS)
+        } elseif (
+            array_search($currentStatus, array_map('strtolower', $allStatuses)) > $i
+        ) {
+            $class = "completed"; // past statuses = green
+        }
+
+        // Date from logs if available
+        if (isset($logs[$normalized])) {
+            $dateToShow = date("m-d-Y h:i A", strtotime($logs[$normalized]));
+        }
     }
 ?>
-    <div class="timeline-step 
-        <?php 
-            if ($isActive) echo ' active'; 
-            elseif ($isReached) echo ' completed'; 
-            else echo ' upcoming'; 
-        ?>">
-        
-        <div class="step-circle"></div>
+    <div class="timeline-step <?php echo $class; ?>">
         <div class="step-title"><?php echo htmlspecialchars($statusName); ?></div>
-        <div class="step-date">
-            <?php 
-            if ($i === 0) {
-                // Always show transaction created_at date
-                echo date("m-d-Y", strtotime($transaction['created_at']));
-            } elseif ($isReached) {
-                foreach ($logs as $log) {
-                    if (strtolower(trim($log['action'])) === $normalized) {
-                        echo date("m-d-Y", strtotime($log['created_at']));
-                        break;
-                    }
-                }
-            }
-            ?>
-        </div>
+        <div class="step-date"><?php echo $dateToShow; ?></div>
     </div>
 <?php endforeach; ?>
 
-        
         <a href="Track.php" class="track-new-btn">Track New ID</a>
         
         <div class="details-section">
@@ -124,7 +155,7 @@ foreach ($allStatuses as $i => $statusName):
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Date Started:</span>
-                    <span class="detail-value"><?php echo date("m-d-Y", strtotime($transaction['created_at'])); ?></span>
+                    <span class="detail-value"><?php echo date("m-d-Y h:i A", strtotime($transaction['created_at'])); ?></span>
                 </div>
             </div>
         </div>
