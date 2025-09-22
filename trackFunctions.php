@@ -149,6 +149,32 @@ function handleMultipleUploads($transaction_id, $fieldName = 't_file')
     }
 }
 
+function sendSMS($to, $message)
+{
+    $apiKey = 'YOUR_SEMAPHORE_API_KEY'; //to do
+
+    $data = [
+        'apikey' => $apiKey,
+        'number' => $to,
+        'message' => $message
+    ];
+
+    $ch = curl_init('https://api.semaphore.co/api/v4/messages');
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+    $response = curl_exec($ch);
+    $err = curl_error($ch);
+    curl_close($ch);
+
+    if ($err) {
+        error_log("SMS send error: $err");
+        return false;
+    }
+
+    return $response; // Returns API response
+}
+
 // ---------- POST actions ----------
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
@@ -178,6 +204,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $transaction_id = $stmt->insert_id;
                 handleMultipleUploads($transaction_id);
                 logActivity($transaction_id, "Created", "Transaction created", $_SESSION['user_id'], $transaction_code);
+                // SEND SMS via Semaphore
+                if (!empty($contact) && !empty($description)) {
+                    sendSMS($contact, $description);
+                }
+                
                 echo json_encode(["success" => true, "message" => "Transaction saved successfully!", "transaction_id" => $transaction_id]);
             } else {
                 echo json_encode(["success" => false, "message" => $stmt->error]);
@@ -209,6 +240,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if ($stmt->execute()) {
                 handleMultipleUploads($transaction_id);
                 logActivity($transaction_id, "Updated", "Transaction updated", $_SESSION['user_id'], $transaction_code);
+                // SEND SMS via Semaphore
+                if (!empty($contact) && !empty($description)) {
+                    sendSMS($contact, $description);
+                }
 
                 echo json_encode(["success" => true, "message" => "Transaction updated successfully!"]);
             } else {

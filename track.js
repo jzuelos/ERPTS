@@ -36,7 +36,7 @@ function openModal(id = null) {
       document.getElementById('transactionInput').value = tx.transaction || '';
       document.getElementById('transactionInput').disabled = false; // Enable for edit
       document.getElementById('transactionType').value = tx.transaction_type || '';
-      
+
       // For edit mode: only show "In Progress" and "Completed" options
       const statusSelect = document.getElementById('statusInput');
       statusSelect.innerHTML = `
@@ -45,7 +45,7 @@ function openModal(id = null) {
         <option value="Completed">Completed</option>
       `;
       statusSelect.value = tx.status || '';
-      
+
       editId = id;
     }
   }
@@ -66,7 +66,7 @@ function openModal(id = null) {
     document.getElementById('transactionInput').value = '';
     document.getElementById('transactionInput').disabled = true; // Disable initially for add mode
     document.getElementById('transactionType').selectedIndex = 0;
-    
+
     // For add mode: only show "Pending" option
     const statusSelect = document.getElementById('statusInput');
     statusSelect.innerHTML = `
@@ -74,7 +74,7 @@ function openModal(id = null) {
       <option value="Pending">Pending</option>
     `;
     statusSelect.selectedIndex = 0;
-    
+
     editId = null;
   }
 
@@ -88,44 +88,44 @@ function generateAutoMessage() {
   const transactionCode = document.getElementById('transactionID').value;
   const transactionType = document.getElementById('transactionType').value;
   const selectedStatus = statusSelect.value;
-  
+
   if (!selectedStatus || !transactionType) return;
-  
+
   const now = new Date();
   const dateString = now.toLocaleDateString('en-US', {
     month: '2-digit',
     day: '2-digit',
     year: 'numeric'
   });
-  
+
   // Shortened transaction type names for SMS
   const typeAbbrev = {
     'Simple Transfer of Ownership': 'Transfer of Ownership',
-    'New Declaration of Real Property': 'New Property Declaration', 
+    'New Declaration of Real Property': 'New Property Declaration',
     'Revision/Correction': 'Property Revision',
     'Consolidation': 'Property Consolidation'
   };
-  
+
   const shortType = typeAbbrev[transactionType] || transactionType;
   let autoMessage = '';
-  
-  switch(selectedStatus) {
+
+  switch (selectedStatus) {
     case 'Pending':
-      autoMessage = `${shortType} request #${transactionCode} received ${dateString}. Your application is now pending review.`;
+      autoMessage = `${shortType} request #${transactionCode} received ${dateString}. Your application is now pending review. For more info. visit https://erptstrack.erpts.online`;
       break;
     case 'In Progress':
-      autoMessage = `${shortType} #${transactionCode} is being processed. Documents under review as of ${dateString}.`;
+      autoMessage = `${shortType} #${transactionCode} is being processed. Documents under review as of ${dateString}. For more info. visit https://erptstrack.erpts.online`;
       break;
     case 'Completed':
-      autoMessage = `${shortType} #${transactionCode} completed ${dateString}. Ready for pickup at our office.`;
+      autoMessage = `${shortType} #${transactionCode} completed ${dateString}. Ready for pickup at our office. For more info. visit https://erptstrack.erpts.online`;
       break;
   }
-  
-  // Ensure message stays under 150 characters for GSM-7
-  if (autoMessage.length > 150) {
-    autoMessage = autoMessage.substring(0, 147) + '...';
+
+  // Ensure message stays under 160 characters for GSM-7
+  if (autoMessage.length > 160) {
+    autoMessage = autoMessage.substring(0, 157) + '...';
   }
-  
+
   transactionInput.value = autoMessage;
   transactionInput.disabled = false; // Enable so user can modify if needed
 }
@@ -141,7 +141,7 @@ function handleTransactionTypeChange() {
 }
 
 // Add event listener for status change
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   const statusSelect = document.getElementById('statusInput');
   if (statusSelect) {
     statusSelect.addEventListener('change', handleStatusChange);
