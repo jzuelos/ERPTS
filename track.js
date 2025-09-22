@@ -462,19 +462,129 @@ function checkTransaction(transactionId) {
   }
 }
 
+// Updated JavaScript functions for received papers functionality
+
 //Confirmation Modals
 function confirmTransaction(transactionId) {
+  // Find the transaction to check if it's completed
+  const transaction = transactions.find(t => t.id === transactionId);
+
+  if (!transaction) {
+    alert('Transaction not found');
+    return;
+  }
+
+  if (transaction.status !== 'Completed') {
+    alert('Only completed transactions can be confirmed for receipt');
+    return;
+  }
+
   currentTransactionId = transactionId;
+
+  // Update modal content to show transaction details
+  const modalBody = document.querySelector('#confirmModal .modal-body');
+  modalBody.innerHTML = `
+    <div class="alert alert-info">
+      <h6><i class="fas fa-info-circle"></i> Transaction Details</h6>
+      <strong>Code:</strong> ${transaction.t_code}<br>
+      <strong>Client:</strong> ${transaction.name}<br>
+      <strong>Contact:</strong> ${transaction.contact}<br>
+      <strong>Type:</strong> ${transaction.transaction_type}<br>
+      <strong>Status:</strong> <span class="badge bg-success">${transaction.status}</span>
+    </div>
+    <p><strong>Are you sure you want to confirm that the papers have been received by the client?</strong></p>
+    <p class="text-muted small">This action will mark the transaction as "Papers Received" and create a permanent record in the system.</p>
+    <div class="mb-3">
+      <label for="confirmNotes" class="form-label">Additional Notes (Optional):</label>
+      <textarea id="confirmNotes" class="form-control" rows="3" placeholder="Enter any additional notes about the receipt (e.g., received by, special instructions, etc.)..."></textarea>
+    </div>
+  `;
+
   let confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
   confirmModal.show();
 }
+
+// Confirm Transaction Functionality
+
 let currentTransactionId = null;
-document.getElementById("confirmBtn").addEventListener("click", function () {
-  if (currentTransactionId) {
-    console.log("Confirmed transaction:", currentTransactionId);
-    // TODO: send AJAX request to PHP to update status in DB
+
+// Show confirmation modal
+function confirmTransaction(transactionId) {
+  const transaction = transactions.find(t => t.id === transactionId);
+
+  if (!transaction) {
+    alert('Transaction not found');
+    return;
   }
-  bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
+
+  if (transaction.status !== 'Completed') {
+    alert('Only completed transactions can be confirmed for receipt');
+    return;
+  }
+
+  currentTransactionId = transactionId;
+
+  const modalBody = document.querySelector('#confirmModal .modal-body');
+  modalBody.innerHTML = `
+    <div class="alert alert-info">
+      <h6><i class="fas fa-info-circle"></i> Transaction Details</h6>
+      <strong>Code:</strong> ${transaction.t_code}<br>
+      <strong>Client:</strong> ${transaction.name}<br>
+      <strong>Contact:</strong> ${transaction.contact}<br>
+      <strong>Type:</strong> ${transaction.transaction_type}<br>
+      <strong>Status:</strong> <span class="badge bg-success">${transaction.status}</span>
+    </div>
+    <p><strong>Are you sure you want to confirm that the papers have been received by the client?</strong></p>
+    <p class="text-muted small">This action will mark the transaction as "Papers Received" and create a permanent record in the system.</p>
+    <div class="mb-3">
+      <label for="confirmNotes" class="form-label">Additional Notes (Optional):</label>
+      <textarea id="confirmNotes" class="form-control" rows="3" placeholder="Enter any additional notes..."></textarea>
+    </div>
+  `;
+
+  new bootstrap.Modal(document.getElementById('confirmModal')).show();
+}
+
+// Confirm button listener
+document.addEventListener('DOMContentLoaded', function () {
+  const confirmBtn = document.getElementById("confirmBtn");
+  if (confirmBtn) {
+    confirmBtn.addEventListener("click", function () {
+      if (!currentTransactionId) return;
+
+      const notes = document.getElementById('confirmNotes')?.value || '';
+
+      confirmBtn.disabled = true;
+      confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Confirming...';
+
+      const formData = new FormData();
+      formData.append('action', 'confirmTransaction');
+      formData.append('transaction_id', currentTransactionId);
+      formData.append('notes', notes);
+
+      fetch('receivedPapers.php', { method: 'POST', body: formData })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message + '\n\nReceived on: ' + (data.received_date || 'Now'));
+            if (typeof loadTransactions === 'function') loadTransactions();
+            if (typeof loadActivity === 'function') loadActivity();
+            bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
+          } else {
+            alert('Error: ' + (data.message || 'Unknown error occurred'));
+          }
+        })
+        .catch(err => {
+          console.error('Error confirming transaction:', err);
+          alert('An error occurred while confirming the transaction. Please try again.');
+        })
+        .finally(() => {
+          confirmBtn.disabled = false;
+          confirmBtn.innerHTML = '<i class="fas fa-check"></i> Yes, Confirm';
+          currentTransactionId = null;
+        });
+    });
+  }
 });
 
 function showRequirements() {
