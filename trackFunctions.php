@@ -123,16 +123,33 @@ if (isset($_GET['action']) && $_GET['action'] === 'getDocuments') {
 function handleMultipleUploads($transaction_id, $fieldName = 't_file')
 {
     global $conn;
-    if (!isset($_FILES[$fieldName]) || !is_array($_FILES[$fieldName]['name']))
+
+    if (!isset($_FILES[$fieldName]) || !is_array($_FILES[$fieldName]['name'])) {
         return;
+    }
+
+    // 🔹 Fetch transaction_code once
+    $transaction_code = null;
+    $stmtGet = $conn->prepare("SELECT transaction_code FROM transactions WHERE transaction_id = ? LIMIT 1");
+    if ($stmtGet) {
+        $stmtGet->bind_param("i", $transaction_id);
+        $stmtGet->execute();
+        $res = $stmtGet->get_result();
+        if ($row = $res->fetch_assoc()) {
+            $transaction_code = $row['transaction_code'];
+        }
+        $stmtGet->close();
+    }
 
     $uploadDir = __DIR__ . "/uploads/transaction_" . $transaction_id . "/";
-    if (!is_dir($uploadDir))
+    if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0755, true);
+    }
 
     foreach ($_FILES[$fieldName]['name'] as $key => $name) {
-        if ($_FILES[$fieldName]['error'][$key] !== UPLOAD_ERR_OK)
+        if ($_FILES[$fieldName]['error'][$key] !== UPLOAD_ERR_OK) {
             continue;
+        }
 
         $safeName = preg_replace("/[^A-Za-z0-9_\.-]/", "_", basename($name));
         $fileName = uniqid("tx_") . "_" . $safeName;
@@ -143,11 +160,14 @@ function handleMultipleUploads($transaction_id, $fieldName = 't_file')
             $stmt = $conn->prepare("INSERT INTO transaction_files (transaction_id, file_path) VALUES (?, ?)");
             $stmt->bind_param("is", $transaction_id, $relativePath);
             if ($stmt->execute()) {
+                // 🔹 Log with transaction_code (if found)
                 logActivity($transaction_id, "Document Uploaded", $relativePath, $_SESSION['user_id'], $transaction_code);
             }
+            $stmt->close();
         }
     }
 }
+
 
 /*
 function sendSMS($to, $message)
