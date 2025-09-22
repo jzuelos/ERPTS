@@ -22,14 +22,21 @@ if ($conn->connect_error) {
 // Fetch faas_id from GET parameter
 $property_id = $_GET['id'] ?? null;
 
-// Check property active status
+// Default values
 $is_active = 1;
+$disabled_at = null;
+
 if ($property_id) {
-  $stmt = $conn->prepare("SELECT is_active FROM p_info WHERE p_id = ?");
+  $stmt = $conn->prepare("SELECT is_active, disabled_at FROM p_info WHERE p_id = ?");
   $stmt->bind_param("i", $property_id);
   $stmt->execute();
-  $is_active = $stmt->get_result()->fetch_assoc()['is_active'] ?? 1;
+  $row = $stmt->get_result()->fetch_assoc();
+  $stmt->close();
+
+  $is_active = $row['is_active'] ?? 1;
+  $disabled_at = $row['disabled_at'] ?? null;
 }
+
 $disableButton = ($is_active == 0) ? 'disabled' : '';
 
 // === Disable property (Cancel RPU by disabling p_info) ===
@@ -204,12 +211,13 @@ function fetchOwnersWithDetails($conn, $property_id)
 }
 
 //fetch property owner ids
-function fetchPropertyOwnerIDs($conn, $property_id) {
-    $stmt = $conn->prepare("SELECT owner_id FROM propertyowner WHERE property_id = ?");
-    $stmt->bind_param("i", $property_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    return array_column($result->fetch_all(MYSQLI_ASSOC), 'owner_id');
+function fetchPropertyOwnerIDs($conn, $property_id)
+{
+  $stmt = $conn->prepare("SELECT owner_id FROM propertyowner WHERE property_id = ?");
+  $stmt->bind_param("i", $property_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  return array_column($result->fetch_all(MYSQLI_ASSOC), 'owner_id');
 }
 
 function fetchFaasInfo($conn, $property_id)
@@ -650,6 +658,8 @@ $conn->close();
   <?php if ($is_active == 0): ?>
     <div class="alert alert-warning text-center my-3">
       <strong>The RPU no longer appears in listings with all information tied to it discarded</strong>
+      <br>
+      <small>Disabled on: <?= htmlspecialchars($disabled_at) ?></small>
     </div>
   <?php endif; ?>
 
@@ -663,8 +673,6 @@ $conn->close();
         </a>
         <h4 class="ms-3 mb-0">Owner's Information</h4>
       </div>
-      <button type="button" class="btn btn-outline-primary btn-sm" id="editOwnerBtn" onclick="showOISModal()"
-        <?= $disableButton ?>>Edit</button>
     </div>
 
     <?php
@@ -1383,26 +1391,28 @@ $conn->close();
 
 
 
- <!-- Floating Dropdown Menu (Bottom Right of Page) -->
-<div class="dropdown" style="position:fixed; bottom:20px; right:20px; z-index:1050;">
-  <button id="mapMenuBtn"
-    class="btn btn-danger btn-lg rounded-circle d-flex align-items-center justify-content-center"
-    type="button"
-    data-bs-toggle="dropdown"
-    aria-expanded="false"
-    style="width:60px; height:60px;">
-    <i class="fas fa-bars fa-1x"></i>
-  </button>
+  <!-- Floating Dropdown Menu (Bottom Right of Page) -->
+  <div class="dropdown" style="position:fixed; bottom:20px; right:20px; z-index:1050;">
+    <button id="mapMenuBtn"
+      class="btn btn-danger btn-lg rounded-circle d-flex align-items-center justify-content-center" type="button"
+      data-bs-toggle="dropdown" aria-expanded="false" style="width:60px; height:60px;">
+      <i class="fas fa-bars fa-1x"></i>
+    </button>
 
-  <ul class="dropdown-menu shadow dropdown-menu-end" style="bottom:100%; right:0;">
-    <li><a class="dropdown-item scroll-link" href="#owner-info-section"><i class="fas fa-user"></i> Owner's Info</a></li>
-    <li><a class="dropdown-item scroll-link" href="#property-info-section"><i class="fas fa-home"></i> Property Info</a></li>
-    <li><a class="dropdown-item scroll-link" href="#rpu-identification-section"><i class="fas fa-id-card"></i> RPU Identification</a></li>
-    <li><a class="dropdown-item scroll-link" href="#declaration-section"><i class="fas fa-file-alt"></i> Tax Declaration</a></li>
-    <li><a class="dropdown-item scroll-link" href="#land-section"><i class="bi-building-fill"></i> Land</a></li>
-    <li><a class="dropdown-item scroll-link" href="#valuation-section"><i class="fas fa-balance-scale"></i> Valuation</a></li>
-  </ul>
-</div>
+    <ul class="dropdown-menu shadow dropdown-menu-end" style="bottom:100%; right:0;">
+      <li><a class="dropdown-item scroll-link" href="#owner-info-section"><i class="fas fa-user"></i> Owner's Info</a>
+      </li>
+      <li><a class="dropdown-item scroll-link" href="#property-info-section"><i class="fas fa-home"></i> Property
+          Info</a></li>
+      <li><a class="dropdown-item scroll-link" href="#rpu-identification-section"><i class="fas fa-id-card"></i> RPU
+          Identification</a></li>
+      <li><a class="dropdown-item scroll-link" href="#declaration-section"><i class="fas fa-file-alt"></i> Tax
+          Declaration</a></li>
+      <li><a class="dropdown-item scroll-link" href="#land-section"><i class="bi-building-fill"></i> Land</a></li>
+      <li><a class="dropdown-item scroll-link" href="#valuation-section"><i class="fas fa-balance-scale"></i>
+          Valuation</a></li>
+    </ul>
+  </div>
 
   </section>
 
