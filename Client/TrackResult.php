@@ -78,6 +78,39 @@ if (isset($_GET['id'])) {
         }
         .step-title { display: inline-block; font-weight: bold; }
         .step-date { margin-left: 25px; color: #555; font-size: 14px; }
+        .completion-message { 
+            margin-left: 25px; 
+            color: #2e7d32; 
+            font-size: 13px; 
+            font-style: italic;
+            background: #e8f5e8;
+            padding: 5px 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+            border-left: 3px solid #4caf50;
+        }
+        .pending-message { 
+            margin-left: 25px; 
+            color: #f57c00; 
+            font-size: 13px; 
+            font-style: italic;
+            background: #fff3e0;
+            padding: 5px 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+            border-left: 3px solid #ff9800;
+        }
+        .processing-message { 
+            margin-left: 25px; 
+            color: #1976d2; 
+            font-size: 13px; 
+            font-style: italic;
+            background: #e3f2fd;
+            padding: 5px 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+            border-left: 3px solid #2196f3;
+        }
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(255,215,0, 0.7); }
             70% { box-shadow: 0 0 0 10px rgba(255,215,0, 0); }
@@ -92,7 +125,7 @@ if (isset($_GET['id'])) {
         </div>
         
         <div class="order-id">
-            ORDER ID: <?php echo htmlspecialchars($transaction['transaction_code']); ?>
+            Transaction Code: <?php echo htmlspecialchars($transaction['transaction_code']); ?>
         </div>
         
 <?php
@@ -148,6 +181,37 @@ foreach ($allStatuses as $i => $statusName):
     <div class="timeline-step <?php echo $class; ?>">
         <div class="step-title"><?php echo htmlspecialchars($statusName); ?></div>
         <div class="step-date"><?php echo $dateToShow; ?></div>
+        <?php 
+        if ($normalized === 'pending' && $class === 'active'):
+            // Calculate estimated completion (7 days from creation)
+            $estimatedDate = date("M d, Y", strtotime($transaction['created_at'] . ' +7 days'));
+        ?>
+            <div class="pending-message">
+                ⏳ Your transaction is currently in queue and will be reviewed by our staff shortly.<br>
+                <strong>Estimated completion:</strong> <?php echo $estimatedDate; ?> (within 7 business days)
+            </div>
+        <?php elseif ($normalized === 'processing paper' && $class === 'active'):
+            // Calculate remaining time based on creation date
+            $createdDate = strtotime($transaction['created_at']);
+            $currentDate = time();
+            $daysPassed = floor(($currentDate - $createdDate) / (60 * 60 * 24));
+            $remainingDays = max(0, 7 - $daysPassed);
+            $estimatedDate = date("M d, Y", strtotime($transaction['created_at'] . ' +7 days'));
+        ?>
+            <div class="processing-message">
+                📋 Your documents are currently being processed by our team.<br>
+                <strong>Estimated completion:</strong> <?php echo $estimatedDate; ?> 
+                <?php if ($remainingDays > 0): ?>
+                    (approximately <?php echo $remainingDays; ?> <?php echo $remainingDays == 1 ? 'day' : 'days'; ?> remaining)
+                <?php else: ?>
+                    (processing may be completed soon)
+                <?php endif; ?>
+            </div>
+        <?php elseif ($normalized === 'completed' && $class === 'completed'): ?>
+            <div class="completion-message">
+                📄 Document processing has been completed. Your papers are ready for pickup at our office during business hours.
+            </div>
+        <?php endif; ?>
     </div>
 <?php endforeach; ?>
 
