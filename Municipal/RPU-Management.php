@@ -30,7 +30,7 @@
     integrity="sha384-KyZXEJr+8+6g5K4r53m5s3xmw1Is0J6wBd04YOeFvXOsZTgmYF9flT/qe6LZ9s+0" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="main_layout.css">
+  <link rel="stylesheet" href="../main_layout.css">
   <link rel="stylesheet" href="header.css">
   <link rel="stylesheet" href="RPU-Management.css">
   <title>Electronic Real Property Tax System</title>

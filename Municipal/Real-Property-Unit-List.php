@@ -17,7 +17,7 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once 'database.php';
+require_once '../database.php';
 
 $conn = Database::getInstance();
 if ($conn->connect_error) {

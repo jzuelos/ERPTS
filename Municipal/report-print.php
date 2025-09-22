@@ -39,7 +39,7 @@
 <body>
 
   <?php
-  require_once "database.php";
+  require_once "../database.php";
   $conn = Database::getInstance();
 
   date_default_timezone_set('Asia/Manila');

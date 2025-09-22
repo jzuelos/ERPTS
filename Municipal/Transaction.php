@@ -24,7 +24,7 @@ header("Pragma: no-cache");
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="main_layout.css">
+  <link rel="stylesheet" href="../main_layout.css">
   <link rel="stylesheet" href="header.css">
   <link rel="stylesheet" href="Transaction.css">
 </head>

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once "database.php";
+require_once "../database.php";
 $conn = Database::getInstance();
 
 // Check if the user is logged in by verifying if 'user_id' exists in the session

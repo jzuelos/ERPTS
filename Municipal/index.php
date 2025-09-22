@@ -4,7 +4,7 @@ session_start(); // Start session at the top
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once 'database.php'; // Include your database connection
+require_once '../database.php'; 
 
 $conn = Database::getInstance();
 if ($conn->connect_error) {
@@ -90,7 +90,7 @@ $conn->close();
     <div class="card-container d-flex flex-row">
       <div class="card login-card">
         <div class="logo-container">
-          <img src="images/coconut_.__1_-removebg-preview1.png" alt="ERPTS Logo" class="logo">
+          <img src="../images/coconut_.__1_-removebg-preview1.png" alt="ERPTS Logo" class="logo">
         </div>
         <h2 class="text-center">LOG IN</h2>
 
