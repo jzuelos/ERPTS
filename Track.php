@@ -215,8 +215,9 @@ if ($result && $result->num_rows > 0) {
           <input type="text" id="transactionInput" name="t_description" class="form-control mb-2"
             placeholder="Transaction Description">
 
+          <!-- Transaction Type Select - Add the onchange event -->
           <select id="transactionType" name="transactionType" class="form-select mb-2" required
-            onchange="showRequirements()">
+            onchange="handleTransactionTypeChange(); showRequirements();">
             <option value="" disabled selected hidden>Select Transaction</option>
             <option value="Simple Transfer of Ownership">Simple Transfer of Ownership</option>
             <option value="New Declaration of Real Property">New Declaration of Real Property</option>
@@ -227,7 +228,8 @@ if ($result && $result->num_rows > 0) {
           <!-- Checklist container -->
           <div id="requirementsText" class="alert alert-info mt-2" style="display:none; white-space:pre-line;"></div>
 
-          <select id="statusInput" name="t_status" class="form-select mb-2" required>
+          <!-- Status Input - Add the onchange event -->
+          <select id="statusInput" name="t_status" class="form-select mb-2" required onchange="handleStatusChange()">
             <option value="" disabled selected hidden>Select Status</option>
             <option value="Pending">Pending</option>
             <option value="In Progress">In Progress</option>
@@ -346,4 +348,5 @@ if ($result && $result->num_rows > 0) {
   </script>
 
 </body>
+
 </html>
