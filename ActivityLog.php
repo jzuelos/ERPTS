@@ -13,12 +13,52 @@ header("Pragma: no-cache");
 include 'database.php';
 $conn = Database::getInstance();
 
-// fetch logs with username
-$sql = "SELECT a.log_id, a.action, a.log_time, u.username
-        FROM activity_log a
-        JOIN users u ON a.user_id = u.user_id
-        ORDER BY a.log_time DESC";
-$result = $conn->query($sql);
+// Get filter inputs
+$start_date = $_GET['start_date'] ?? '';
+$end_date = $_GET['end_date'] ?? '';
+
+// Pagination setup
+$limit = 10; // logs per page
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+
+// Build WHERE clause for date filter
+$where = [];
+$params = [];
+if ($start_date) {
+    $where[] = "DATE(a.log_time) >= ?";
+    $params[] = $start_date;
+}
+if ($end_date) {
+    $where[] = "DATE(a.log_time) <= ?";
+    $params[] = $end_date;
+}
+$where_sql = $where ? "WHERE " . implode(" AND ", $where) : "";
+
+// Count total rows for pagination
+$stmt_count = $conn->prepare("SELECT COUNT(*) as total 
+                              FROM activity_log a
+                              JOIN users u ON a.user_id = u.user_id
+                              $where_sql");
+if ($params) $stmt_count->bind_param(str_repeat("s", count($params)), ...$params);
+$stmt_count->execute();
+$total_rows = $stmt_count->get_result()->fetch_assoc()['total'];
+$total_pages = ceil($total_rows / $limit);
+
+// Fetch logs with pagination
+$stmt = $conn->prepare("SELECT a.log_id, a.action, a.log_time, u.username
+                        FROM activity_log a
+                        JOIN users u ON a.user_id = u.user_id
+                        $where_sql
+                        ORDER BY a.log_time DESC
+                        LIMIT ? OFFSET ?");
+$params[] = $limit;
+$params[] = $offset;
+
+$types = str_repeat("s", count($params)-2)."ii"; // last two are integers
+$stmt->bind_param($types, ...$params);
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 <!doctype html>
@@ -50,6 +90,18 @@ $result = $conn->query($sql);
 
       <h4 class="mb-3"><i class="fas fa-history me-2"></i> Activity Log</h4>
 
+      <form method="get" class="row g-3 mb-3">
+        <div class="col-auto">
+          <input type="date" name="start_date" class="form-control" value="<?= htmlspecialchars($start_date) ?>" placeholder="Start Date">
+        </div>
+        <div class="col-auto">
+          <input type="date" name="end_date" class="form-control" value="<?= htmlspecialchars($end_date) ?>" placeholder="End Date">
+        </div>
+        <div class="col-auto">
+          <button type="submit" class="btn btn-success">Filter</button>
+        </div>
+      </form>
+
       <div class="table-responsive">
         <table class="table table-striped table-hover align-middle text-start">
           <thead class="table-dark">
@@ -80,6 +132,28 @@ $result = $conn->query($sql);
           </tbody>
         </table>
       </div>
+      <nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">
+    <?php if($page > 1): ?>
+      <li class="page-item">
+        <a class="page-link" href="?page=<?= $page-1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Previous</a>
+      </li>
+    <?php endif; ?>
+
+    <?php for($p=1; $p<=$total_pages; $p++): ?>
+      <li class="page-item <?= $p==$page?'active':'' ?>">
+        <a class="page-link" href="?page=<?= $p ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>"><?= $p ?></a>
+      </li>
+    <?php endfor; ?>
+
+    <?php if($page < $total_pages): ?>
+      <li class="page-item">
+        <a class="page-link" href="?page=<?= $page+1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Next</a>
+      </li>
+    <?php endif; ?>
+  </ul>
+</nav>
+
     </div>
   </main>
 
