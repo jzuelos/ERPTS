@@ -998,53 +998,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
           pagination.innerHTML = "";
 
-          // Previous arrow
-          const prevBtn = document.createElement("button");
-          prevBtn.textContent = "<";
-          prevBtn.classList.add("btn", "btn-sm", "me-1");
-          prevBtn.disabled = page === 1;
-          prevBtn.addEventListener("click", () => renderPage(currentPage - 1));
-          pagination.appendChild(prevBtn);
+            // Previous arrow
+            const prevBtn = document.createElement("button");
+            prevBtn.innerHTML = "&laquo;";
+            prevBtn.classList.add("btn", "btn-sm", "btn-outline-success");
+            prevBtn.disabled = page === 1;
+            prevBtn.addEventListener("click", () => renderPage(currentPage - 1));
+            pagination.appendChild(prevBtn);
 
-          // Page numbers or input
-          if (totalPages <= 10) {
-            for (let i = 1; i <= totalPages; i++) {
-              const btn = document.createElement("button");
-              btn.textContent = i;
-              btn.classList.add("btn", "btn-sm", "me-1");
-              if (i === page) btn.classList.add("btn-primary");
-              else btn.classList.add("btn-outline-primary");
+            // Current page text
+            const pageInfo = document.createElement("span");
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+            pageInfo.classList.add("mx-2", "fw-semibold");
+            pagination.appendChild(pageInfo);
 
-              btn.addEventListener("click", () => renderPage(i));
-              pagination.appendChild(btn);
-            }
-          } else {
-            const input = document.createElement("input");
-            input.type = "number";
-            input.min = 1;
-            input.max = totalPages;
-            input.value = page;
-            input.style.width = "60px";
-            input.classList.add("form-control", "d-inline-block", "me-1");
-            input.addEventListener("change", () => {
-              let val = parseInt(input.value);
-              if (val >= 1 && val <= totalPages) renderPage(val);
-              else input.value = currentPage;
-            });
-            pagination.appendChild(input);
-            const span = document.createElement("span");
-            span.textContent = ` / ${totalPages}`;
-            span.classList.add("me-1", "align-middle");
-            pagination.appendChild(span);
-          }
-
-          // Next arrow
-          const nextBtn = document.createElement("button");
-          nextBtn.textContent = ">";
-          nextBtn.classList.add("btn", "btn-sm");
-          nextBtn.disabled = page === totalPages;
-          nextBtn.addEventListener("click", () => renderPage(currentPage + 1));
-          pagination.appendChild(nextBtn);
+            // Next arrow
+            const nextBtn = document.createElement("button");
+            nextBtn.innerHTML = "&raquo;";
+            nextBtn.classList.add("btn", "btn-sm", "btn-outline-success");
+            nextBtn.disabled = page === totalPages;
+            nextBtn.addEventListener("click", () => renderPage(currentPage + 1));
+            pagination.appendChild(nextBtn);
         }
 
         renderPage(1);

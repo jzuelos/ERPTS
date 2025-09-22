@@ -144,6 +144,7 @@ if ($conn->connect_error) {
               <?php } ?>
             </tbody>
           </table>
+          <div id="municipalityPagination" class="mt-3"></div>
 
           <!-- District Table -->
           <table class="table table-hover align-middle mb-0 d-none" id="districtTable">
@@ -179,6 +180,7 @@ if ($conn->connect_error) {
               <?php } ?>
             </tbody>
           </table>
+          <div id="districtPagination" class="mt-3 d-none"></div>
 
           <!-- Barangay Table -->
           <table class="table table-hover align-middle mb-0 d-none" id="barangayTable">
@@ -214,32 +216,8 @@ if ($conn->connect_error) {
               <?php } ?>
             </tbody>
           </table>
-
+          <div id="barangayPagination" class="mt-3 d-none"></div>      
         </div>
-      </div>
-      <!-- Pagination -->
-      <div class="d-flex justify-content-center mt-3">
-        <nav>
-          <ul class="pagination">
-            <?php if ($page > 1): ?>
-              <li class="page-item">
-                <a class="page-link" href="?page=<?= $page - 1; ?>">Previous</a>
-              </li>
-            <?php endif; ?>
-
-            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-              <li class="page-item <?= $i == $page ? 'active' : ''; ?>">
-                <a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a>
-              </li>
-            <?php endfor; ?>
-
-            <?php if ($page < $totalPages): ?>
-              <li class="page-item">
-                <a class="page-link" href="?page=<?= $page + 1; ?>">Next</a>
-              </li>
-            <?php endif; ?>
-          </ul>
-        </nav>
       </div>
     </div>
 

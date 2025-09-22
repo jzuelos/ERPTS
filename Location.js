@@ -317,37 +317,35 @@ function showToastMessage(message) {
 
 // Location.js
 
-// Function to handle switching between location types
+//Change Table Function
 function changeLocationType(type) {
-  // Update the dropdown button label
+  // Update dropdown label
   const dropdownButton = document.getElementById('locationTypeDropdown');
-  if (dropdownButton) {
-    dropdownButton.innerText = type;
-  }
+  if (dropdownButton) dropdownButton.innerText = type;
 
-  // Get the table elements
-  const municipalityTable = document.getElementById('municipalityTable');
-  const districtTable = document.getElementById('districtTable');
-  const barangayTable = document.getElementById('barangayTable');
+  // Tables + paginations
+  const tables = {
+    Municipality: {table: "municipalityTable", pagination: "municipalityPagination", reset: resetMunicipality},
+    District: {table: "districtTable", pagination: "districtPagination", reset: resetDistrict},
+    Barangay: {table: "barangayTable", pagination: "barangayPagination", reset: resetBarangay}
+  };
 
-  // Hide all tables
-  if (municipalityTable) municipalityTable.classList.add('d-none');
-  if (districtTable) districtTable.classList.add('d-none');
-  if (barangayTable) barangayTable.classList.add('d-none');
+  // Hide all
+  Object.values(tables).forEach(t => {
+    document.getElementById(t.table).classList.add("d-none");
+    document.getElementById(t.pagination).classList.add("d-none");
+  });
 
-  // Show the selected table
-  switch (type) {
-    case 'Municipality':
-      if (municipalityTable) municipalityTable.classList.remove('d-none');
-      break;
-    case 'District':
-      if (districtTable) districtTable.classList.remove('d-none');
-      break;
-    case 'Barangay':
-      if (barangayTable) barangayTable.classList.remove('d-none');
-      break;
+  // Show selected
+  document.getElementById(tables[type].table).classList.remove("d-none");
+  document.getElementById(tables[type].pagination).classList.remove("d-none");
+
+  // Reset pagination to first page
+  if (typeof tables[type].reset === "function") {
+    tables[type].reset();
   }
 }
+
 
 //Delete Function for Main Table
 document.addEventListener("DOMContentLoaded", () => {
@@ -370,3 +368,78 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.hide();
   });
 });
+
+function paginateTable(tableId, paginationId, rowsPerPage = 10) {
+  const table = document.getElementById(tableId);
+  const tbody = table.querySelector("tbody");
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+  const pagination = document.getElementById(paginationId);
+
+  let currentPage = 1;
+  const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+  function renderTable() {
+    // Hide all rows first
+    rows.forEach((row, index) => {
+      row.style.display = "none";
+      if (
+        index >= (currentPage - 1) * rowsPerPage &&
+        index < currentPage * rowsPerPage
+      ) {
+        row.style.display = "";
+      }
+    });
+  }
+
+  function renderPagination() {
+    pagination.innerHTML = "";
+
+    // Previous button
+    const prevBtn = document.createElement("button");
+    prevBtn.className = "btn btn-sm btn-outline-success me-2";
+    prevBtn.innerHTML = "&laquo; Prev";
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+        renderPagination();
+      }
+    });
+    pagination.appendChild(prevBtn);
+
+    // Current page indicator
+    const pageIndicator = document.createElement("span");
+    pageIndicator.className = "mx-2";
+    pageIndicator.innerText = `Page ${currentPage} of ${totalPages}`;
+    pagination.appendChild(pageIndicator);
+
+    // Next button
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "btn btn-sm btn-outline-success ms-2";
+    nextBtn.innerHTML = "Next &raquo;";
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.addEventListener("click", () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderTable();
+        renderPagination();
+      }
+    });
+    pagination.appendChild(nextBtn);
+  }
+
+  // Initial render
+  renderTable();
+  renderPagination();
+}
+
+// Initialize after DOM is ready
+let resetMunicipality, resetDistrict, resetBarangay;
+document.addEventListener("DOMContentLoaded", function () {
+  resetMunicipality = paginateTable("municipalityTable", "municipalityPagination", 10);
+  resetDistrict = paginateTable("districtTable", "districtPagination", 10);
+  resetBarangay = paginateTable("barangayTable", "barangayPagination", 10);
+});
+
+
