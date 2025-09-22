@@ -1,3 +1,26 @@
+<?php
+require_once "../database.php"; // adjust path
+
+$conn = Database::getInstance();
+$error = null;
+
+// Handle search
+if (isset($_GET['id']) && $_GET['id'] !== '') {
+    $id = $conn->real_escape_string($_GET['id']);
+
+    $sql = "SELECT * FROM transactions WHERE transaction_id = '$id' OR transaction_code = '$id' LIMIT 1";
+    $result = $conn->query($sql);
+
+    if ($result && $result->num_rows > 0) {
+        // ✅ Found transaction → redirect
+        header("Location: TrackResult.php?id=" . urlencode($id));
+        exit;
+    } else {
+        // ❌ Not found → show error on same page
+        $error = "No transaction found!";
+    }
+}
+?>
 <!doctype html>
 <html lang="en">
 
@@ -31,16 +54,25 @@
                     <h5 class="mb-0 text-white"><i class="fas fa-search mr-2"></i>Search Transaction</h5>
                 </div>
                 <div class="card-body p-4">
+                    
+                    <!-- Error Alert -->
+                    <?php if ($error): ?>
+                        <div id="errorAlert" class="alert alert-danger">
+                            <?php echo $error; ?>
+                        </div>
+                    <?php endif; ?>
+
                     <form action="track.php" method="get">
                         <div class="form-group row align-items-center">
                             <label for="transactionId" class="col-md-3 col-form-label text-md-right text-primary-custom font-weight-bold">Transaction ID</label>
                             <div class="col-md-7">
-                                <input type="text" class="form-control form-control-custom" id="transactionId" name="id" placeholder="Enter your tracking number" required>
+                                <input type="text" class="form-control form-control-custom" id="transactionId" name="id" placeholder="Enter your tracking number" required
+                                    value="<?php echo isset($_GET['id']) ? htmlspecialchars($_GET['id']) : ''; ?>">
                             </div>
                             <div class="col-md-2">
-                            <button type="submit" formaction="TrackResult.php" class="btn btn-primary-custom btn-block py-2">
+                                <button type="submit" class="btn btn-primary-custom btn-block py-2">
                                     <i class="fas fa-paper-plane mr-2"></i>Track
-                            </button>
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -104,8 +136,6 @@
 <!-- Spacer before footer -->
 <div style="height: 80px;"></div>
 
-
-
 <!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
@@ -119,6 +149,21 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
     integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
+
+<script>
+// Auto-hide error message after 4 seconds
+document.addEventListener("DOMContentLoaded", function () {
+    let errorAlert = document.getElementById("errorAlert");
+    if (errorAlert) {
+        setTimeout(() => {
+            errorAlert.classList.add("fade");
+            errorAlert.style.transition = "opacity 0.5s ease";
+            errorAlert.style.opacity = "0";
+            setTimeout(() => errorAlert.remove(), 500); // remove after fade
+        }, 2000); // 2 seconds
+    }
+});
+</script>
 
 </body>
 </html>
