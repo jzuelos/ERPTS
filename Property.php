@@ -74,7 +74,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
   <link rel="stylesheet" href="Location.css">
   <title>Electronic Real Property Tax System</title>
 </head>
-
 <body>
   <!-- Header Navigation -->
   <?php include 'header.php'; ?>
@@ -173,9 +172,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
               }
               ?>
             </tbody>
-
           </table>
-
+              
           <!-- Actual Uses Table -->
           <table class="table table-hover align-middle mb-0 d-none text-start" id="actualUsesTable">
             <thead class="table-light">
@@ -704,7 +702,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
   <script src="Property.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
+              
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       let selectedForm = "";
@@ -913,6 +911,97 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const tables = ["classificationTable", "actualUsesTable", "subClassesTable"];
+    const rowsPerPage = 5;
+
+    tables.forEach(tableId => {
+        const table = document.getElementById(tableId);
+        const tbody = table.querySelector("tbody");
+        const rows = Array.from(tbody.querySelectorAll("tr"));
+        const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+        // Create pagination container
+        const pagination = document.createElement("div");
+        pagination.classList.add("mt-3", "pagination-container");
+        table.parentNode.appendChild(pagination);
+
+        let currentPage = 1;
+
+        function renderPage(page) {
+            if (table.classList.contains("d-none")) {
+                pagination.style.display = "none";
+                return;
+            } else {
+                pagination.style.display = "flex";
+            }
+
+            currentPage = page;
+            tbody.innerHTML = "";
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            rows.slice(start, end).forEach(row => tbody.appendChild(row));
+
+            pagination.innerHTML = "";
+
+            // Previous arrow
+            const prevBtn = document.createElement("button");
+            prevBtn.textContent = "<";
+            prevBtn.classList.add("btn", "btn-sm", "me-1");
+            prevBtn.disabled = page === 1;
+            prevBtn.addEventListener("click", () => renderPage(currentPage - 1));
+            pagination.appendChild(prevBtn);
+
+            // Page numbers or input
+            if (totalPages <= 10) {
+                for (let i = 1; i <= totalPages; i++) {
+                    const btn = document.createElement("button");
+                    btn.textContent = i;
+                    btn.classList.add("btn", "btn-sm", "me-1");
+                    if (i === page) btn.classList.add("btn-primary");
+                    else btn.classList.add("btn-outline-primary");
+
+                    btn.addEventListener("click", () => renderPage(i));
+                    pagination.appendChild(btn);
+                }
+            } else {
+                const input = document.createElement("input");
+                input.type = "number";
+                input.min = 1;
+                input.max = totalPages;
+                input.value = page;
+                input.style.width = "60px";
+                input.classList.add("form-control", "d-inline-block", "me-1");
+                input.addEventListener("change", () => {
+                    let val = parseInt(input.value);
+                    if (val >= 1 && val <= totalPages) renderPage(val);
+                    else input.value = currentPage;
+                });
+                pagination.appendChild(input);
+                const span = document.createElement("span");
+                span.textContent = ` / ${totalPages}`;
+                span.classList.add("me-1", "align-middle");
+                pagination.appendChild(span);
+            }
+
+            // Next arrow
+            const nextBtn = document.createElement("button");
+            nextBtn.textContent = ">";
+            nextBtn.classList.add("btn", "btn-sm");
+            nextBtn.disabled = page === totalPages;
+            nextBtn.addEventListener("click", () => renderPage(currentPage + 1));
+            pagination.appendChild(nextBtn);
+        }
+
+        renderPage(1);
+
+        // Watch for table visibility changes
+        const observer = new MutationObserver(() => renderPage(1));
+        observer.observe(table, { attributes: true, attributeFilter: ["class"] });
+    });
+});
+</script>
 
 </body>
 
