@@ -1,12 +1,6 @@
 <?php
 session_start();
 
-// Redirect to login if not authenticated
-if (!isset($_SESSION['user_id'])) {
-  header("Location: index.php");
-  exit;
-}
-
 // Cache control headers
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
@@ -15,6 +9,7 @@ header("Pragma: no-cache");
 require_once 'database.php';
 $conn = Database::getInstance();
 
+// Check connection (only works for mysqli, remove if using PDO)
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
@@ -453,161 +448,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 }
 
-//Add Owner Save/Insert in same file
-
-// === 3. REPLACE the AJAX owner handling section (around line 400-500) ===
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST)) {
-  $data = json_decode(file_get_contents("php://input"), true);
-
-  if ($data && isset($data['action'])) {
-    // CSRF protection
-    if (!isset($_SESSION['user_id'])) {
-      echo json_encode(["success" => false, "error" => "Unauthorized"]);
-      exit;
-    }
-
-    $response = ["success" => false, "error" => "Unknown action"];
-
-    switch ($data['action']) {
-      case 'update_owner':
-        // Validate input
-        $owner_id = intval($data['owner_id'] ?? 0);
-        $first_name = trim($data['first_name'] ?? '');
-        $middle_name = trim($data['middle_name'] ?? '');
-        $last_name = trim($data['last_name'] ?? '');
-        $owner_type = $data['owner_type'] ?? 'individual';
-        $company_name = trim($data['company_name'] ?? '');
-
-        if ($owner_id <= 0) {
-          $response = ["success" => false, "error" => "Invalid owner ID"];
-          break;
-        }
-
-        // Validation based on owner type
-        if ($owner_type === 'company') {
-          if (empty($company_name)) {
-            $response = ["success" => false, "error" => "Company name is required"];
-            break;
-          }
-        } else {
-          if (empty($first_name) || empty($last_name)) {
-            $response = ["success" => false, "error" => "First name and last name are required for individuals"];
-            break;
-          }
-        }
-
-        $stmt = $conn->prepare("UPDATE owners_tb SET own_fname=?, own_mname=?, own_surname=?, owner_type=?, company_name=? WHERE own_id=?");
-        $stmt->bind_param("sssssi", $first_name, $middle_name, $last_name, $owner_type, $company_name, $owner_id);
-
-        if ($stmt->execute()) {
-          $response = ["success" => true, "message" => "Owner updated successfully"];
-        } else {
-          $response = ["success" => false, "error" => "Database error: " . $stmt->error];
-        }
-        break;
-
-      case 'add_owner':
-        $property_id = intval($data['property_id'] ?? 0);
-        $first_name = trim($data['first_name'] ?? '');
-        $middle_name = trim($data['middle_name'] ?? '');
-        $last_name = trim($data['last_name'] ?? '');
-        $owner_type = $data['owner_type'] ?? 'individual';
-        $company_name = trim($data['company_name'] ?? '');
-
-        if ($property_id <= 0) {
-          $response = ["success" => false, "error" => "Invalid property ID"];
-          break;
-        }
-
-        // Validation based on owner type
-        if ($owner_type === 'company') {
-          if (empty($company_name)) {
-            $response = ["success" => false, "error" => "Company name is required"];
-            break;
-          }
-        } else {
-          if (empty($first_name) || empty($last_name)) {
-            $response = ["success" => false, "error" => "First name and last name are required for individuals"];
-            break;
-          }
-        }
-
-        $conn->begin_transaction();
-        try {
-          // Insert owner
-          $stmt = $conn->prepare("INSERT INTO owners_tb (own_fname, own_mname, own_surname, owner_type, company_name) VALUES (?, ?, ?, ?, ?)");
-          $stmt->bind_param("sssss", $first_name, $middle_name, $last_name, $owner_type, $company_name);
-
-          if (!$stmt->execute()) {
-            throw new Exception("Failed to create owner");
-          }
-
-          $new_owner_id = $stmt->insert_id;
-
-          // Link to property
-          $link_stmt = $conn->prepare("INSERT INTO propertyowner (property_id, owner_id) VALUES (?, ?)");
-          $link_stmt->bind_param("ii", $property_id, $new_owner_id);
-
-          if (!$link_stmt->execute()) {
-            throw new Exception("Failed to link owner to property");
-          }
-
-          $conn->commit();
-          $response = ["success" => true, "owner_id" => $new_owner_id, "message" => "Owner added successfully"];
-
-        } catch (Exception $e) {
-          $conn->rollback();
-          $response = ["success" => false, "error" => $e->getMessage()];
-        }
-        break;
-
-      case 'remove_owner':
-        $owner_id = intval($data['owner_id'] ?? 0);
-        $property_id = intval($data['property_id'] ?? 0);
-
-        if ($owner_id <= 0 || $property_id <= 0) {
-          $response = ["success" => false, "error" => "Invalid owner or property ID"];
-          break;
-        }
-
-        $conn->begin_transaction();
-        try {
-          // Remove from junction table
-          $stmt = $conn->prepare("DELETE FROM propertyowner WHERE property_id = ? AND owner_id = ?");
-          $stmt->bind_param("ii", $property_id, $owner_id);
-
-          if (!$stmt->execute() || $stmt->affected_rows === 0) {
-            throw new Exception("Owner not found or already removed");
-          }
-
-          // Check if owner is linked to other properties
-          $check_stmt = $conn->prepare("SELECT COUNT(*) as count FROM propertyowner WHERE owner_id = ?");
-          $check_stmt->bind_param("i", $owner_id);
-          $check_stmt->execute();
-          $result = $check_stmt->get_result()->fetch_assoc();
-
-          // If orphaned, optionally remove from owners_tb
-          if ($result['count'] == 0) {
-            $delete_stmt = $conn->prepare("DELETE FROM owners_tb WHERE own_id = ?");
-            $delete_stmt->bind_param("i", $owner_id);
-            $delete_stmt->execute();
-          }
-
-          $conn->commit();
-          $response = ["success" => true, "message" => "Owner removed successfully"];
-
-        } catch (Exception $e) {
-          $conn->rollback();
-          $response = ["success" => false, "error" => $e->getMessage()];
-        }
-        break;
-    }
-
-    echo json_encode($response);
-    exit;
-  }
-}
-
 // General owners list
 $owners = fetchOwners($conn);
 
@@ -678,7 +518,7 @@ $conn->close();
     <?php
     if (!empty($property_id)) {
       $no_declaration = empty($rpu_declaration); // true if no rpu_dec present
-    
+
       if ($is_active == 0): ?>
         <!-- Property already disabled -->
         <span class="btn btn-outline-secondary disabled" title="This property is already inactive.">
@@ -702,7 +542,7 @@ $conn->close();
         <span class="btn btn-secondary disabled" title="Cannot disable: tax declaration exists for this property">
           <i class="fas fa-ban"></i> Cannot cancel RPU with TD encoded
         </span>
-      <?php endif;
+    <?php endif;
     }
     ?>
 
@@ -721,7 +561,13 @@ $conn->close();
           <div class="col-md-12 mb-4">
             <h6 class="mb-3">Property Owners (<?= count($owners_details) ?>)</h6>
             <?php foreach ($owners_details as $index => $owner): ?>
-              <div class="owner-item mb-3 p-3 bg-light rounded">
+              <div class="owner-item mb-3 p-3 bg-light rounded"
+                data-owner-id="<?= (int)$owner['own_id'] ?>"
+                data-owner-type="<?= htmlspecialchars($owner['owner_type'] ?? 'individual', ENT_QUOTES) ?>"
+                data-company="<?= htmlspecialchars($owner['company_name'] ?? '', ENT_QUOTES) ?>"
+                data-first="<?= htmlspecialchars($owner['first_name'] ?? '', ENT_QUOTES) ?>"
+                data-middle="<?= htmlspecialchars($owner['middle_name'] ?? '', ENT_QUOTES) ?>"
+                data-last="<?= htmlspecialchars($owner['last_name'] ?? '', ENT_QUOTES) ?>">
                 <div class="d-flex justify-content-between align-items-start">
                   <div class="owner-details flex-grow-1">
                     <?php if (($owner['owner_type'] ?? 'individual') === 'company'): ?>
@@ -732,7 +578,7 @@ $conn->close();
                       <?php if (!empty($owner['first_name']) || !empty($owner['last_name'])): ?>
                         <div class="text-muted small">
                           Contact:
-                          <?= htmlspecialchars(trim($owner['first_name'] . ' ' . $owner['middle_name'] . ' ' . $owner['last_name'])) ?>
+                          <?= htmlspecialchars(trim(($owner['first_name'] ?? '') . ' ' . ($owner['middle_name'] ?? '') . ' ' . ($owner['last_name'] ?? ''))) ?>
                         </div>
                       <?php endif; ?>
                     <?php else: ?>
@@ -741,20 +587,22 @@ $conn->close();
                         <strong><?= htmlspecialchars($owner['display_name']) ?></strong>
                       </div>
                       <div class="row text-muted small">
-                        <div class="col-md-4">First: <?= htmlspecialchars($owner['first_name']) ?></div>
-                        <div class="col-md-4">Middle: <?= htmlspecialchars($owner['middle_name']) ?></div>
-                        <div class="col-md-4">Last: <?= htmlspecialchars($owner['last_name']) ?></div>
+                        <div class="col-md-4">First: <?= htmlspecialchars($owner['first_name'] ?? '') ?></div>
+                        <div class="col-md-4">Middle: <?= htmlspecialchars($owner['middle_name'] ?? '') ?></div>
+                        <div class="col-md-4">Last: <?= htmlspecialchars($owner['last_name'] ?? '') ?></div>
                       </div>
                     <?php endif; ?>
                   </div>
+
                   <div class="owner-actions">
+                    <!-- pass the element; editOwner will use .closest('.owner-item') -->
                     <button type="button" class="btn btn-sm btn-outline-primary me-1"
-                      onclick="editOwner(<?= $owner['own_id'] ?>)" <?= $disableButton ?>>
+                      onclick="editOwner(this)" <?= $disableButton ?>>
                       <i class="fas fa-edit"></i>
                     </button>
                     <?php if (count($owners_details) > 1): ?>
                       <button type="button" class="btn btn-sm btn-outline-danger"
-                        onclick="removeOwner(<?= $owner['own_id'] ?>)" <?= $disableButton ?>>
+                        onclick="removeOwner(<?= (int)$owner['own_id'] ?>)" <?= $disableButton ?>>
                         <i class="fas fa-trash"></i>
                       </button>
                     <?php endif; ?>
@@ -768,47 +616,36 @@ $conn->close();
     </div>
   </section>
 
-
   <!-- Modal for Editing Owner's Information -->
-  <div class="modal fade" id="editOwnerModal" tabindex="-1" aria-labelledby="editOwnerModalLabel" aria-hidden="true">
+  <div class="modal fade" id="editOwnerModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
-      <div class="modal-content">
+      <form id="editOwnerForm" class="modal-content" method="POST" action="<?= htmlspecialchars($_SERVER['PHP_SELF'] . '?id=' . $property_id) ?>">
+        <input type="hidden" name="action" value="update">
+        <input type="hidden" name="id" class="ownerIdInput" value="">
         <div class="modal-header">
-          <h5 class="modal-title" id="editOwnerModalLabel">Edit Owner's Information</h5>
+          <h5 class="modal-title">Edit Owner</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <!-- Owner Info (Editable) -->
-          <form id="editOwnerForm" data-owner-id="<?= $owner['own_id'] ?>">
-            <div class="mb-3">
-              <label class="form-label">Company or Owner</label>
-              <input type="text" class="form-control" value="<?= htmlspecialchars($owner['owner_name']) ?>"
-                maxlength="20" disabled>
-            </div>
-            <h6 class="mb-3">Name</h6>
-            <div class="mb-3">
-              <label class="form-label">First Name</label>
-              <input type="text" class="form-control firstNameModal"
-                value="<?= htmlspecialchars($owner['first_name']) ?>" maxlength="20">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Middle Name</label>
-              <input type="text" class="form-control middleNameModal"
-                value="<?= htmlspecialchars($owner['middle_name']) ?>" maxlength="20">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Last Name</label>
-              <input type="text" class="form-control lastNameModal" value="<?= htmlspecialchars($owner['last_name']) ?>"
-                maxlength="20">
-            </div>
-            <hr class="my-4">
-          </form>
+          <div class="mb-3">
+            <label class="form-label">First Name</label>
+            <input name="first_name" type="text" class="form-control firstNameModal" maxlength="50">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Middle Name</label>
+            <input name="middle_name" type="text" class="form-control middleNameModal" maxlength="50">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Last Name</label>
+            <input name="last_name" type="text" class="form-control lastNameModal" maxlength="50">
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="saveOwnerData()">Save changes</button>
-          <button type="button" class="btn btn-success" onclick="addOwnerData()">Add</button>
+          <!-- normal submit posts back to same PHP file and you handle $_POST['action']=='update' -->
+          <button type="submit" class="btn btn-primary">Save changes</button>
         </div>
-      </div>
+      </form>
     </div>
   </div>
 
@@ -957,7 +794,7 @@ $conn->close();
           </div>
 
           <script>
-            (function () {
+            (function() {
               const input = document.getElementById('propertyNumber');
               const MAX = 13; // digits only
 
@@ -988,7 +825,7 @@ $conn->close();
               });
 
               // helper for enabling/disabling
-              window.togglePropertyNumberInput = function (enable) {
+              window.togglePropertyNumberInput = function(enable) {
                 input.disabled = !enable;
                 if (enable) {
                   input.focus();
@@ -997,7 +834,7 @@ $conn->close();
               };
 
               // helper for saving: always returns digits-only
-              window.getPropertyNumberDigits = function () {
+              window.getPropertyNumberDigits = function() {
                 return digitsOnly(input.value);
               };
             })();
@@ -1109,7 +946,7 @@ $conn->close();
           <div class="col-md-6 mb-3">
             <label for="previousAssessedValue" class="form-label">Previous Assessed Value</label>
             <input type="text" class="form-control" id="previousAssessedValue" placeholder="Enter Assessed Value"
-              value="<?= htmlspecialchars($rpu_declaration['prev_assess'] ?? '') ?>" disabled>
+              value="₱<?= htmlspecialchars($rpu_declaration['prev_assess'] ?? '') ?>" disabled>
           </div>
         </div>
 
@@ -1283,9 +1120,9 @@ $conn->close();
                   <tr class="border-bottom border-3">
                     <td><?= htmlspecialchars($record['oct_no']) ?></td>
                     <td><?= htmlspecialchars($record['area']) ?></td>
-                    <td><?= number_format($record['market_value'], 2) ?></td>
+                    <td>₱<?= number_format($record['market_value'], 2) ?></td>
                     <td>
-                      <?= isset($record['assess_value']) ? number_format($record['assess_value'], 2) : '0.00' ?>
+                      ₱<?= isset($record['assess_value']) ? number_format($record['assess_value'], 2) : '0.00' ?>
                     </td>
                     <td>
                       <div class="btn-group" role="group">
@@ -1294,8 +1131,8 @@ $conn->close();
                           <i class="bi bi-pencil"></i>
                         </a>
                         <a href="<?= ($is_active == 1)
-                          ? 'print-layout.php?p_id=' . urlencode($p_id) . '&land_id=' . urlencode($record['land_id'])
-                          : '#' ?>" class="btn btn-sm btn-secondary ml-3 <?= ($is_active == 0) ? 'disabled' : '' ?>"
+                                    ? 'print-layout.php?p_id=' . urlencode($p_id) . '&land_id=' . urlencode($record['land_id'])
+                                    : '#' ?>" class="btn btn-sm btn-secondary ml-3 <?= ($is_active == 0) ? 'disabled' : '' ?>"
                           title="View" target="_blank" style="pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
                           <i class="bi bi-printer"></i>
                         </a>
@@ -1357,11 +1194,11 @@ $conn->close();
             <td>Land</td>
             <td class="text-center">
               <input type="text" class="form-control text-center" id="landMarketValue"
-                value="<?= number_format($totalMarketValue ?? 0, 2) ?>" disabled>
+                value="₱<?= number_format($totalMarketValue ?? 0, 2) ?>" disabled>
             </td>
             <td class="text-center">
               <input type="text" class="form-control text-center" id="landAssessedValue"
-                value="<?= number_format($totalAssessedValue ?? 0, 2) ?>" disabled>
+                value="₱<?= number_format($totalAssessedValue ?? 0, 2) ?>" disabled>
             </td>
           </tr>
           <tr>
@@ -1377,11 +1214,11 @@ $conn->close();
             <td>Total</td>
             <td class="text-center">
               <input type="text" class="form-control text-center" id="totalMarketValue"
-                value="<?= number_format($totalMarketValue ?? 0, 2) ?>" disabled>
+                value="₱<?= number_format($totalMarketValue ?? 0, 2) ?>" disabled>
             </td>
             <td class="text-center">
               <input type="text" class="form-control text-center" id="totalAssessedValue"
-                value="<?= number_format($totalAssessedValue ?? 0, 2) ?>" disabled>
+                value="₱<?= number_format($totalAssessedValue ?? 0, 2) ?>" disabled>
             </td>
           </tr>
         </tbody>

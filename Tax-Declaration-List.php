@@ -98,7 +98,7 @@ $result = $conn->query($sql);
             <th class="text-center">ACTIONS</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="text-center">
           <?php
           if ($result && $result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
@@ -111,7 +111,7 @@ $result = $conn->query($sql);
                   echo "<td>" . htmlspecialchars($dec_id) . "</td>";
                   echo "<td>" . htmlspecialchars($owner_names) . "</td>";
                   echo "<td>" . htmlspecialchars($row['arp_no']) . "</td>";
-                  echo "<td>" . htmlspecialchars($row['total_property_value']) . "</td>";
+                  echo "<td>₱ " . htmlspecialchars($row['total_property_value']) . "</td>";
                   echo "<td>" . htmlspecialchars($row['tax_year']) . "</td>";
                   if (!empty($p_id)) {
                       echo "<td class='text-center'><a href='FAAS.php?id={$p_id}' class='btn btn-success btn-sm'><i class='fas fa-edit'></i></a </td>";
