@@ -8,12 +8,20 @@ $error = null;
 if (isset($_GET['id']) && $_GET['id'] !== '') {
     $id = $conn->real_escape_string($_GET['id']);
 
-    $sql = "SELECT * FROM transactions WHERE transaction_id = '$id' OR transaction_code = '$id' LIMIT 1";
-    $result = $conn->query($sql);
+    // Query for transaction_code in both tables
+    $sqlTransactions = "SELECT * FROM transactions WHERE transaction_code = '$id' LIMIT 1";
+    $resultTransactions = $conn->query($sqlTransactions);
 
-    if ($result && $result->num_rows > 0) {
-        // ✅ Found transaction → redirect
-        header("Location: TrackResult.php?id=" . urlencode($id));
+    $sqlReceivedPapers = "SELECT * FROM received_papers WHERE transaction_code = '$id' LIMIT 1";
+    $resultReceivedPapers = $conn->query($sqlReceivedPapers);
+
+    if ($resultTransactions && $resultTransactions->num_rows > 0) {
+        // ✅ Found in transactions → redirect to TrackResult.php
+        header("Location: TrackResult.php?id=" . urlencode($id) . "&source=transactions");
+        exit;
+    } elseif ($resultReceivedPapers && $resultReceivedPapers->num_rows > 0) {
+        // ✅ Found in received_papers → redirect to TrackResult.php
+        header("Location: TrackResult.php?id=" . urlencode($id) . "&source=received_papers");
         exit;
     } else {
         // ❌ Not found → show error on same page
