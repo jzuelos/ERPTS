@@ -599,24 +599,51 @@ $conn->close();
           <div class="col-md-12 mb-4">
             <h6 class="mb-3">Property Owners (<?= count($owners_details) ?>)</h6>
             <?php foreach ($owners_details as $index => $owner): ?>
-              <!-- in your loop: render owner row with data attributes -->
               <div class="owner-item mb-3 p-3 bg-light rounded"
                 data-owner-id="<?= (int)$owner['own_id'] ?>"
-                data-first="<?= htmlspecialchars($owner['first_name'], ENT_QUOTES) ?>"
-                data-middle="<?= htmlspecialchars($owner['middle_name'], ENT_QUOTES) ?>"
-                data-last="<?= htmlspecialchars($owner['last_name'], ENT_QUOTES) ?>">
-                <div class="d-flex justify-content-between">
-                  <div>
-                    <strong><?= htmlspecialchars($owner['display_name']) ?></strong>
+                data-owner-type="<?= htmlspecialchars($owner['owner_type'] ?? 'individual', ENT_QUOTES) ?>"
+                data-company="<?= htmlspecialchars($owner['company_name'] ?? '', ENT_QUOTES) ?>"
+                data-first="<?= htmlspecialchars($owner['first_name'] ?? '', ENT_QUOTES) ?>"
+                data-middle="<?= htmlspecialchars($owner['middle_name'] ?? '', ENT_QUOTES) ?>"
+                data-last="<?= htmlspecialchars($owner['last_name'] ?? '', ENT_QUOTES) ?>">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="owner-details flex-grow-1">
+                    <?php if (($owner['owner_type'] ?? 'individual') === 'company'): ?>
+                      <div class="mb-2">
+                        <span class="badge bg-primary me-2">Company</span>
+                        <strong><?= htmlspecialchars($owner['display_name']) ?></strong>
+                      </div>
+                      <?php if (!empty($owner['first_name']) || !empty($owner['last_name'])): ?>
+                        <div class="text-muted small">
+                          Contact:
+                          <?= htmlspecialchars(trim(($owner['first_name'] ?? '') . ' ' . ($owner['middle_name'] ?? '') . ' ' . ($owner['last_name'] ?? ''))) ?>
+                        </div>
+                      <?php endif; ?>
+                    <?php else: ?>
+                      <div class="mb-2">
+                        <span class="badge bg-info me-2">Individual</span>
+                        <strong><?= htmlspecialchars($owner['display_name']) ?></strong>
+                      </div>
+                      <div class="row text-muted small">
+                        <div class="col-md-4">First: <?= htmlspecialchars($owner['first_name'] ?? '') ?></div>
+                        <div class="col-md-4">Middle: <?= htmlspecialchars($owner['middle_name'] ?? '') ?></div>
+                        <div class="col-md-4">Last: <?= htmlspecialchars($owner['last_name'] ?? '') ?></div>
+                      </div>
+                    <?php endif; ?>
                   </div>
-                  <div>
+
+                  <div class="owner-actions">
                     <!-- pass the element; editOwner will use .closest('.owner-item') -->
-                    <button class="btn btn-sm btn-outline-primary" type="button"
-                      onclick="editOwner(this)">
+                    <button type="button" class="btn btn-sm btn-outline-primary me-1"
+                      onclick="editOwner(this)" <?= $disableButton ?>>
                       <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline-danger" type="button"
-                      onclick="removeOwner(<?= (int)$owner['own_id'] ?>)">🗑</button>
+                    <?php if (count($owners_details) > 1): ?>
+                      <button type="button" class="btn btn-sm btn-outline-danger"
+                        onclick="removeOwner(<?= (int)$owner['own_id'] ?>)" <?= $disableButton ?>>
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    <?php endif; ?>
                   </div>
                 </div>
               </div>
