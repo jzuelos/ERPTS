@@ -140,7 +140,7 @@ if ($result && $result->num_rows > 0) {
     </table>
     <!-- Pagination -->
     <div class="d-flex justify-content-center mt-3 mb-5">
-      <ul class="pagination" id="transactionPagination"></ul>
+        <ul id="transactionPagination" class="pagination justify-content-center my-3"></ul>
     </div>
 
     <!-- Recent Activity Section -->
@@ -183,11 +183,8 @@ if ($result && $result->num_rows > 0) {
         </table>
       </div>
 
-      <!-- Pagination -->
-      <nav>
-        <ul class="pagination justify-content-center" id="pagination">
-        </ul>
-      </nav>
+      <!-- Pagination container -->
+<div id="pagination" class="d-flex justify-content-center align-items-center my-3"></div>
     </div>
   </div>
 
@@ -312,40 +309,57 @@ if ($result && $result->num_rows > 0) {
 
   <!-- Script for Transaction Table Pagination -->
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const rowsPerPage = 10;
-      const tableBody = document.getElementById("transactionTable");
-      const pagination = document.getElementById("transactionPagination");
+document.addEventListener("DOMContentLoaded", function () {
+    const rowsPerPage = 10;
+    const tableBody = document.getElementById("transactionTable");
+    const pagination = document.getElementById("transactionPagination");
 
-      function paginate() {
-        const rows = Array.from(tableBody.querySelectorAll("tr"));
-        const totalPages = Math.ceil(rows.length / rowsPerPage);
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    const totalPages = Math.ceil(rows.length / rowsPerPage);
+    let currentPage = 1;
 
-        function showPage(page) {
-          rows.forEach((row, i) => {
-            row.style.display = (i >= (page - 1) * rowsPerPage && i < page * rowsPerPage) ? "" : "none";
-          });
-          pagination.querySelectorAll("li").forEach((li, i) => {
-            li.classList.toggle("active", i + 1 === page);
-          });
-        }
+    function renderPage(page) {
+        if (page < 1 || page > totalPages) return;
+        currentPage = page;
 
+        // Show only rows for the current page
+        rows.forEach((row, i) => {
+            row.style.display = i >= (page - 1) * rowsPerPage && i < page * rowsPerPage ? "" : "none";
+        });
+
+        renderPagination();
+    }
+
+    function renderPagination() {
         pagination.innerHTML = "";
-        for (let i = 1; i <= totalPages; i++) {
-          const li = document.createElement("li");
-          li.className = "page-item";
-          li.innerHTML = `<a href="#" class="page-link">${i}</a>`;
-          li.addEventListener("click", e => {
-            e.preventDefault();
-            showPage(i);
-          });
-          pagination.appendChild(li);
-        }
 
-        if (totalPages > 0) showPage(1);
-      }
-      paginate();
-    });
+        // Previous arrow
+        const prevBtn = document.createElement("button");
+        prevBtn.innerHTML = "&laquo;";
+        prevBtn.classList.add("btn", "btn-sm", "btn-outline-success", "me-2");
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.addEventListener("click", () => renderPage(currentPage - 1));
+        pagination.appendChild(prevBtn);
+
+        // Current page text
+        const pageInfo = document.createElement("span");
+        pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+        pageInfo.classList.add("mx-2", "fw-semibold");
+        pagination.appendChild(pageInfo);
+
+        // Next arrow
+        const nextBtn = document.createElement("button");
+        nextBtn.innerHTML = "&raquo;";
+        nextBtn.classList.add("btn", "btn-sm", "btn-outline-success", "ms-2");
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.addEventListener("click", () => renderPage(currentPage + 1));
+        pagination.appendChild(nextBtn);
+    }
+
+    if (totalPages > 0) renderPage(1);
+});
+
+
   </script>
 
 </body>

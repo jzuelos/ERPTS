@@ -784,91 +784,85 @@ function initActivityTable() {
 
   let rows = Array.from(tableBody.querySelectorAll("tr"));
   let currentPage = 1;
+  let visibleRows = [...rows]; // keep a persistent array of visible rows
 
   function filterRows() {
     const searchText = searchInput.value.toLowerCase();
     const filterDate = dateFilter.value;
 
-    rows.forEach(row => {
+    visibleRows = rows.filter(row => {
       const rowText = row.innerText.toLowerCase();
       const rowDate = row.cells[0]?.getAttribute("data-date")?.split(" ")[0];
       const matchesSearch = rowText.includes(searchText);
       const matchesDate = !filterDate || rowDate === filterDate;
-
-      row.style.display = (matchesSearch && matchesDate) ? "" : "none";
+      return matchesSearch && matchesDate;
     });
 
     currentPage = 1; // reset page when filter changes
-    paginate();
+    showPage(currentPage);
+    renderPagination();
   }
 
-  function paginate() {
-    const visibleRows = rows.filter(r => r.style.display !== "none");
-    const totalPages = Math.ceil(visibleRows.length / rowsPerPage);
+  function showPage(page) {
+    visibleRows.forEach((row, index) => {
+      row.style.display =
+        index >= (page - 1) * rowsPerPage && index < page * rowsPerPage
+          ? ""
+          : "none";
+    });
+  }
 
+  function renderPagination() {
+    const totalPages = Math.ceil(visibleRows.length / rowsPerPage);
     pagination.innerHTML = "";
 
-    // Previous button
+    const ul = document.createElement("ul");
+    ul.classList.add("pagination", "justify-content-center");
+
+    // Previous
     const prevLi = document.createElement("li");
     prevLi.classList.add("page-item");
-    prevLi.innerHTML = `<a class="page-link" href="#">Previous</a>`;
-    prevLi.classList.toggle("disabled", currentPage === 1);
+    if (currentPage === 1) prevLi.classList.add("disabled");
+    prevLi.innerHTML = `<a class="page-link" href="#">&laquo; Previous</a>`;
     prevLi.addEventListener("click", e => {
       e.preventDefault();
       if (currentPage > 1) {
         currentPage--;
-        showPage(currentPage, visibleRows);
+        showPage(currentPage);
+        renderPagination();
       }
     });
-    pagination.appendChild(prevLi);
+    ul.appendChild(prevLi);
 
-    // Page numbers
-    for (let i = 1; i <= totalPages; i++) {
-      const li = document.createElement("li");
-      li.classList.add("page-item");
-      if (i === currentPage) li.classList.add("active");
-      li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-      li.addEventListener("click", e => {
-        e.preventDefault();
-        currentPage = i;
-        showPage(currentPage, visibleRows);
-      });
-      pagination.appendChild(li);
-    }
+    // Page indicator
+    const pageLi = document.createElement("li");
+    pageLi.classList.add("page-item", "disabled");
+    pageLi.innerHTML = `<span class="page-link">Page ${currentPage} of ${totalPages}</span>`;
+    ul.appendChild(pageLi);
 
-    // Next button
+    // Next
     const nextLi = document.createElement("li");
     nextLi.classList.add("page-item");
-    nextLi.innerHTML = `<a class="page-link" href="#">Next</a>`;
-    nextLi.classList.toggle("disabled", currentPage === totalPages);
+    if (currentPage === totalPages) nextLi.classList.add("disabled");
+    nextLi.innerHTML = `<a class="page-link" href="#">Next &raquo;</a>`;
     nextLi.addEventListener("click", e => {
       e.preventDefault();
       if (currentPage < totalPages) {
         currentPage++;
-        showPage(currentPage, visibleRows);
+        showPage(currentPage);
+        renderPagination();
       }
     });
-    pagination.appendChild(nextLi);
+    ul.appendChild(nextLi);
 
-    if (totalPages > 0) showPage(currentPage, visibleRows);
-  }
-
-  function showPage(page, visibleRows) {
-    visibleRows.forEach((row, index) => {
-      row.style.display = (index >= (page - 1) * rowsPerPage && index < page * rowsPerPage) ? "" : "none";
-    });
-
-    // update active page
-    pagination.querySelectorAll(".page-item").forEach((li, i) => {
-      if (i > 0 && i <= pagination.childElementCount - 2) {
-        li.classList.toggle("active", parseInt(li.innerText) === page);
-      }
-    });
+    pagination.appendChild(ul);
   }
 
   // Event listeners
   searchInput.oninput = filterRows;
   dateFilter.onchange = filterRows;
 
-  paginate();
+  // Initial render
+  showPage(currentPage);
+  renderPagination();
 }
