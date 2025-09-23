@@ -287,21 +287,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
   handleLandModal();
 });
-
-function editOwner(btn) {
-  const ownerDiv = btn.closest('.owner-item');
-  const id = ownerDiv.dataset.ownerId;
-  const first = ownerDiv.dataset.first || '';
-  const middle = ownerDiv.dataset.middle || '';
-  const last = ownerDiv.dataset.last || '';
-
-  // fill inputs
-  document.querySelector('.ownerIdInput').value = id;
-  document.querySelector('.firstNameModal').value = first;
-  document.querySelector('.middleNameModal').value = middle;
-  document.querySelector('.lastNameModal').value = last;
-
-  // show modal
-  const modal = new bootstrap.Modal(document.getElementById('editOwnerModal'));
-  modal.show();
-}

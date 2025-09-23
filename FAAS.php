@@ -14,44 +14,6 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-// Handle the modal form POST (non-AJAX)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update') {
-  // Simple CSRF suggestion: you could check a token here.
-  $owner_id = intval($_POST['id'] ?? 0);
-  $first = trim($_POST['first_name'] ?? '');
-  $middle = trim($_POST['middle_name'] ?? '');
-  $last = trim($_POST['last_name'] ?? '');
-
-  // Basic validation
-  if ($owner_id <= 0) {
-    $_SESSION['flash_error'] = 'Invalid owner id.';
-  } else {
-    // Prepare and run update (adjust table/column names to match your DB)
-    $stmt = $conn->prepare("
-            UPDATE owners_tb
-               SET own_fname = ?, own_mname = ?, own_surname = ?
-             WHERE own_id = ?
-        ");
-
-    if ($stmt) {
-      $stmt->bind_param('sssi', $first, $middle, $last, $owner_id);
-      if ($stmt->execute()) {
-        $_SESSION['flash_success'] = 'Owner updated successfully.';
-      } else {
-        $_SESSION['flash_error'] = 'Failed to update owner: ' . $stmt->error;
-      }
-      $stmt->close();
-    } else {
-      $_SESSION['flash_error'] = 'DB prepare failed: ' . $conn->error;
-    }
-  }
-
-  // Redirect back so the page reloads and shows updated data (Post/Redirect/Get)
-  $return_id = isset($_GET['id']) ? intval($_GET['id']) : '';
-  header('Location: ' . $_SERVER['PHP_SELF'] . ($return_id ? '?id=' . urlencode($return_id) : ''));
-  exit;
-}
-
 // Fetch faas_id from GET parameter
 $property_id = $_GET['id'] ?? null;
 
