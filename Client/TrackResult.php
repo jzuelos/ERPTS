@@ -27,6 +27,7 @@ if (isset($_GET['id'])) {
             $receivedPaper = $resultReceivedPapers->fetch_assoc();
             $transaction = $receivedPaper; // Directly use received_papers data
             $source = 'received_papers'; // Mark source as received_papers
+            $receivedDate = $receivedPaper['received_date']; // Store the received date
         } else {
             die("<h2 style='text-align:center;color:red;'>Transaction not found!</h2>");
         }
@@ -58,24 +59,107 @@ if (isset($_GET['id'])) {
     <title>Track and Trace Result</title>
     <link rel="stylesheet" href="result.css">
     <style>
-      /* Timeline container */
-            .timeline-step {
-                position: relative;
-                padding-left: 50px;
-                margin: 30px 0;
-                font-family: "Segoe UI", Tahoma, sans-serif;
+        /* Timeline container */
+        .timeline-step {
+            position: relative;
+            padding-left: 50px;
+            margin: 30px 0;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+        }
+
+        /* Vertical line */
+        .timeline-step::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 24px;
+            width: 3px;
+            height: 100%;
+            background: #e0e0e0;
+            z-index: 1;
+        }
+
+        /* Step circle */
+        .timeline-step::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 15px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #bbb;
+            border: 3px solid #fff;
+            z-index: 2;
+            box-shadow: 0 0 0 2px #bbb;
+        }
+
+        /* Completed steps */
+        .timeline-step.completed::before {
+            background: #4caf50;
+        }
+
+        .timeline-step.completed::after {
+            background: #4caf50;
+            box-shadow: 0 0 0 2px #4caf50;
+        }
+
+        /* Active step */
+        .timeline-step.active::before {
+            background: #FFD700;
+        }
+
+        .timeline-step.active::after {
+            background: #FFD700;
+            box-shadow: 0 0 0 5px rgba(255, 215, 0, 0.5);
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Upcoming step */
+        .timeline-step.upcoming::before {
+            background: #ccc;
+        }
+
+        .timeline-step.upcoming::after {
+            background: #ccc;
+            box-shadow: 0 0 0 2px #ccc;
+        }
+
+        /* Text beside step */
+        .step-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .step-date {
+            display: block;
+            margin-left: 5px;
+            color: #777;
+            font-size: 13px;
+        }
+
+        /* Received date */
+        .received-date-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .received-date-value {
+            margin-left: 10px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* Pulse animation for active */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
             }
 
-            /* Vertical line */
-            .timeline-step::before {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: 24px;
-                width: 3px;
-                height: 100%;
-                background: #e0e0e0;
-                z-index: 1;
+            70% {
+                box-shadow: 0 0 0 15px rgba(255, 215, 0, 0);
             }
 
             /* Step circle */
@@ -202,6 +286,7 @@ if (isset($_GET['id'])) {
                 70% { box-shadow: 0 0 0 15px rgba(255,215,0,0); }
                 100% { box-shadow: 0 0 0 0 rgba(255,215,0,0); }
             }
+        }
     </style>
 </head>
 
@@ -263,6 +348,14 @@ if (isset($_GET['id'])) {
                 if (isset($logs[$normalized])) {
                     $dateToShow = date("m-d-Y h:i A", strtotime($logs[$normalized]));
                 }
+
+                // If the status is "Received", handle it separately and show received date
+                if ($normalized === 'received') {
+                    // You might want to store the received date in the received_papers table
+                    if (isset($receivedDate)) {
+                        $dateToShow = date("m-d-Y h:i A", strtotime($receivedDate));
+                    }
+                }
             }
 
             // If source is 'received_papers', make everything green
@@ -291,7 +384,7 @@ if (isset($_GET['id'])) {
                     $estimatedDate = date("M d, Y", strtotime($transaction['created_at'] . ' +7 days'));
                 ?>
                     <div class="processing-message">
-                         Your documents are currently being processed by our team.<br>
+                        Your documents are currently being processed by our team.<br>
                         <strong>Estimated completion:</strong> <?php echo $estimatedDate; ?>
                         <?php if ($remainingDays > 0): ?>
                             (approximately <?php echo $remainingDays; ?> <?php echo $remainingDays == 1 ? 'day' : 'days'; ?> remaining)
@@ -299,27 +392,37 @@ if (isset($_GET['id'])) {
                             (processing may be completed soon)
                         <?php endif; ?>
                     </div>
-                <?php elseif ($normalized === 'completed' && $class === 'completed'): ?>
+                <?php elseif ($normalized === 'completed' && $class === 'completed' && $source !== 'received_papers'): ?>
                     <div class="completion-message">
-                         Document processing has been completed. Your papers are ready for pickup at our office during business hours.
+                        Document processing has been completed. Your papers are ready for pickup at our office during business hours.
                     </div>
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>
+
 
         <a href="Track.php" class="track-new-btn">Track New ID</a>
 
         <div class="details-section">
             <h2>Transaction Details</h2>
             <div class="details-grid">
-                <div class="detail-item">
-                    <span class="detail-label">Owner Name:</span>
-                    <span class="detail-value"><?php echo htmlspecialchars($transaction['name']); ?></span>
-                </div>
+                <?php if ($source == 'transactions'): ?>
+                    <div class="detail-item">
+                        <span class="detail-label">Owner Name:</span>
+                        <span class="detail-value"><?php echo htmlspecialchars($transaction['name']); ?></span>
+                    </div>
+                <?php elseif ($source == 'received_papers'): ?>
+                    <div class="detail-item">
+                        <span class="detail-label">Owner Name:</span>
+                        <span class="detail-value"><?php echo htmlspecialchars($transaction['client_name']); ?></span>
+                    </div>
+                <?php endif; ?>
+
                 <div class="detail-item">
                     <span class="detail-label">Contact Number:</span>
                     <span class="detail-value"><?php echo htmlspecialchars($transaction['contact_number']); ?></span>
                 </div>
+
                 <div class="detail-item">
                     <span class="detail-label">Date Started:</span>
                     <span class="detail-value"><?php echo date("m-d-Y h:i A", strtotime($transaction['created_at'])); ?></span>
