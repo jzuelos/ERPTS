@@ -166,7 +166,37 @@ if (isset($_GET['id'])) {
                 font-style: italic;
             }
 
-            /* Pulse animation for active */
+            .status-section {
+                font-family: "Segoe UI", Tahoma, sans-serif;
+                margin: 15px 0;
+            }
+
+            .status-title {
+                font-weight: 600;
+                margin-bottom: 6px;
+                font-size: 16px;
+            }
+
+            .status-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .status-bullet {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background: #4caf50; /* Green dot (can be changed per status) */
+                flex-shrink: 0;
+            }
+
+            .status-text {
+                font-size: 15px;
+                color: #333;
+            }
+
+        
             @keyframes pulse {
                 0% { box-shadow: 0 0 0 0 rgba(255,215,0,0.7); }
                 70% { box-shadow: 0 0 0 15px rgba(255,215,0,0); }
@@ -296,12 +326,17 @@ if (isset($_GET['id'])) {
                 </div>
             </div>
         </div>
+            <div class="status-section">
+                <div class="status-title">Current Status</div>
+                <div class="status-item">
+                    <span class="status-bullet"></span>
+                    <span class="status-text">
+                        <?php echo htmlspecialchars($transaction['status']); ?> – 
+                        <?php echo htmlspecialchars($transaction['description']); ?>
+                    </span>
+                </div>
+            </div>
 
-        <div class="status-section">
-            <div class="status-title">Current Status</div>
-            <div class="status-value"><?php echo htmlspecialchars($transaction['status']); ?></div>
-            <div class="status-value"><?php echo htmlspecialchars($transaction['description']); ?></div>
-        </div>
     </div>
 </body>
 
