@@ -285,14 +285,23 @@ if (isset($_GET['id'])) {
         <div class="details-section">
             <h2>Transaction Details</h2>
             <div class="details-grid">
-                <div class="detail-item">
-                    <span class="detail-label">Owner Name:</span>
-                    <span class="detail-value"><?php echo htmlspecialchars($transaction['client_name']); ?></span>
-                </div>
+                <?php if ($source == 'transactions'): ?>
+                    <div class="detail-item">
+                        <span class="detail-label">Owner Name:</span>
+                        <span class="detail-value"><?php echo htmlspecialchars($transaction['name']); ?></span>
+                    </div>
+                <?php elseif ($source == 'received_papers'): ?>
+                    <div class="detail-item">
+                        <span class="detail-label">Owner Name:</span>
+                        <span class="detail-value"><?php echo htmlspecialchars($transaction['client_name']); ?></span>
+                    </div>
+                <?php endif; ?>
+
                 <div class="detail-item">
                     <span class="detail-label">Contact Number:</span>
                     <span class="detail-value"><?php echo htmlspecialchars($transaction['contact_number']); ?></span>
                 </div>
+
                 <div class="detail-item">
                     <span class="detail-label">Date Started:</span>
                     <span class="detail-value"><?php echo date("m-d-Y h:i A", strtotime($transaction['created_at'])); ?></span>
@@ -303,16 +312,14 @@ if (isset($_GET['id'])) {
         <div class="status-section">
             <div class="status-title">Current Status</div>
             <div class="status-value"><?php echo htmlspecialchars($transaction['status']); ?></div>
-            <div class="status-value"><?php echo htmlspecialchars($transaction['description']); ?></div>
+
+            <?php if ($source == 'transactions'): ?>
+                <div class="status-value"><?php echo htmlspecialchars($transaction['description']); ?></div>
+            <?php elseif ($source == 'received_papers'): ?>
+                <div class="status-value"><?php echo htmlspecialchars($transaction['notes']); ?></div>
+            <?php endif; ?>
         </div>
 
-        <!-- Display the received date if available -->
-        <?php if ($source == 'received_papers' && isset($receivedDate)): ?>
-            <div class="timeline-step completed">
-                <div class="received-date-title">Received Date</div>
-                <div class="received-date-value"><?php echo date("m-d-Y h:i A", strtotime($receivedDate)); ?></div>
-            </div>
-        <?php endif; ?>
     </div>
 </body>
 
