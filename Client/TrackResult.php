@@ -284,7 +284,7 @@ if (isset($_GET['id'])) {
                             (processing may be completed soon)
                         <?php endif; ?>
                     </div>
-                <?php elseif ($normalized === 'completed' && $class === 'completed'): ?>
+                <?php elseif ($normalized === 'completed' && $class === 'completed' && $source !== 'received_papers'): ?>
                     <div class="completion-message">
                         📄 Document processing has been completed. Your papers are ready for pickup at our office during business hours.
                     </div>
