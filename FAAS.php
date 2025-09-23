@@ -946,7 +946,7 @@ $conn->close();
           <div class="col-md-6 mb-3">
             <label for="previousAssessedValue" class="form-label">Previous Assessed Value</label>
             <input type="text" class="form-control" id="previousAssessedValue" placeholder="Enter Assessed Value"
-              value="<?= htmlspecialchars($rpu_declaration['prev_assess'] ?? '') ?>" disabled>
+              value="₱<?= htmlspecialchars($rpu_declaration['prev_assess'] ?? '') ?>" disabled>
           </div>
         </div>
 
@@ -1120,9 +1120,9 @@ $conn->close();
                   <tr class="border-bottom border-3">
                     <td><?= htmlspecialchars($record['oct_no']) ?></td>
                     <td><?= htmlspecialchars($record['area']) ?></td>
-                    <td><?= number_format($record['market_value'], 2) ?></td>
+                    <td>₱<?= number_format($record['market_value'], 2) ?></td>
                     <td>
-                      <?= isset($record['assess_value']) ? number_format($record['assess_value'], 2) : '0.00' ?>
+                      ₱<?= isset($record['assess_value']) ? number_format($record['assess_value'], 2) : '0.00' ?>
                     </td>
                     <td>
                       <div class="btn-group" role="group">
@@ -1194,11 +1194,11 @@ $conn->close();
             <td>Land</td>
             <td class="text-center">
               <input type="text" class="form-control text-center" id="landMarketValue"
-                value="<?= number_format($totalMarketValue ?? 0, 2) ?>" disabled>
+                value="₱<?= number_format($totalMarketValue ?? 0, 2) ?>" disabled>
             </td>
             <td class="text-center">
               <input type="text" class="form-control text-center" id="landAssessedValue"
-                value="<?= number_format($totalAssessedValue ?? 0, 2) ?>" disabled>
+                value="₱<?= number_format($totalAssessedValue ?? 0, 2) ?>" disabled>
             </td>
           </tr>
           <tr>
@@ -1214,11 +1214,11 @@ $conn->close();
             <td>Total</td>
             <td class="text-center">
               <input type="text" class="form-control text-center" id="totalMarketValue"
-                value="<?= number_format($totalMarketValue ?? 0, 2) ?>" disabled>
+                value="₱<?= number_format($totalMarketValue ?? 0, 2) ?>" disabled>
             </td>
             <td class="text-center">
               <input type="text" class="form-control text-center" id="totalAssessedValue"
-                value="<?= number_format($totalAssessedValue ?? 0, 2) ?>" disabled>
+                value="₱<?= number_format($totalAssessedValue ?? 0, 2) ?>" disabled>
             </td>
           </tr>
         </tbody>

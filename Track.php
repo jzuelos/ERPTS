@@ -14,22 +14,30 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-// Fetch all transactions (include transaction_type now)
-$sql = "SELECT transaction_id, transaction_code, name, contact_number, description, transaction_type, status 
-        FROM transactions ORDER BY transaction_id DESC";
-$result = $conn->query($sql);
+// Pagination Setup
+$limit = 5; // rows
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
 
-// Get counts
+// Get total records
 $totalResult = $conn->query("SELECT COUNT(*) AS total FROM transactions");
 $totalCount = $totalResult->fetch_assoc()['total'];
+$totalPages = ceil($totalCount / $limit);
 
+// Get counts by status
 $inProgressResult = $conn->query("SELECT COUNT(*) AS total FROM transactions WHERE status='In Progress'");
 $inProgressCount = $inProgressResult->fetch_assoc()['total'];
 
 $completedResult = $conn->query("SELECT COUNT(*) AS total FROM transactions WHERE status='Completed'");
 $completedCount = $completedResult->fetch_assoc()['total'];
 
-// Prepare rows for the table
+// Fetch paginated transactions (include transaction_type now)
+$sql = "SELECT transaction_id, transaction_code, name, contact_number, description, transaction_type, status 
+        FROM transactions ORDER BY transaction_id DESC 
+        LIMIT $limit OFFSET $offset";
+$result = $conn->query($sql);
+
+// Table Rows
 $transactionRows = "";
 if ($result && $result->num_rows > 0) {
   while ($row = $result->fetch_assoc()) {
@@ -44,30 +52,32 @@ if ($result && $result->num_rows > 0) {
   <td>{$row['description']}</td>
   <td>{$transaction_type}</td>
   <td><span class='status-badge status-{$statusClass}'>{$row['status']}</span></td>
-  <td>
-    <button class='btn btn-sm btn-primary' onclick='openModal(" . $row['transaction_id'] . ")'>
-      <i class='fas fa-edit'></i> Edit
-    </button>
+<td>
+  <button class='btn btn-sm btn-primary me-1 mb-1' onclick='openModal(" . $row['transaction_id'] . ")'>
+    <i class='fas fa-edit'></i> Edit
+  </button>
 
-    <button class='btn btn-sm btn-danger' onclick='deleteTransaction(" . $row['transaction_id'] . ")'>
-      <i class='fas fa-trash'></i> Delete
-    </button>
+  <button class='btn btn-sm btn-danger me-1 mb-1' onclick='deleteTransaction(" . $row['transaction_id'] . ")'>
+    <i class='fas fa-trash'></i> Delete
+  </button>
 
-    <button class='btn btn-sm btn-dark' onclick='showDocuments(" . $row['transaction_id'] . ")'>
-      <i class='fas fa-file-alt'></i> Documents
-    </button>
-  </td>
-  <td>
-    <button class='btn btn-sm btn-success' onclick='confirmTransaction(" . $row['transaction_id'] . ")'>
-      <i class='fas fa-check'></i>
-    </button>
-  </td>
+  <button class='btn btn-sm btn-dark me-1 mb-1' onclick='showDocuments(" . $row['transaction_id'] . ")'>
+    <i class='fas fa-file-alt'></i> Documents
+  </button>
+</td>
+<td>
+  <button class='btn btn-sm btn-secondary mb-1' onclick='confirmTransaction(" . $row['transaction_id'] . ")'>
+    <i class='fas fa-check'></i>
+  </button>
+</td>
+
 </tr>";
   }
 } else {
   $transactionRows = "<tr><td colspan='8' class='text-center'>No transactions found</td></tr>";
 }
 ?>
+
 
 <!doctype html>
 <html lang="en">
@@ -117,31 +127,124 @@ if ($result && $result->num_rows > 0) {
       </div>
     </div>
 
-    <button class="btn btn-add" onclick="openModal()">
-      <i class="fas fa-plus"></i> Add Transaction
-    </button>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <!-- Add Transaction Button -->
+  <button class="btn btn-add" onclick="openModal()">
+    <i class="fas fa-plus"></i> Add Transaction
+  </button>
 
-    <table class="table table-borderless table-striped align-middle">
-      <thead class="table-light">
-        <tr>
-          <th>Transaction ID</th>
-          <th>Name</th>
-          <th>Contact Number</th>
-          <th>Description</th>
-          <th>Transaction Type</th>
-          <th>Status</th>
-          <th>Actions</th>
-          <th>Confirm</th>
-        </tr>
-      </thead>
-      <tbody id="transactionTable">
-        <?= $transactionRows ?>
-      </tbody>
-    </table>
-    <!-- Pagination -->
-    <div class="d-flex justify-content-center mt-3 mb-5">
-        <ul id="transactionPagination" class="pagination justify-content-center my-3"></ul>
-    </div>
+<!-- Toggle Button -->
+<button id="toggleBtn" class="btn btn-primary" onclick="toggleTables()">
+  <i class="fas fa-exchange-alt"></i> Show Received Table
+</button>
+</div>
+
+
+<!-- Transaction Table -->
+<div id="transactionSection">
+<table class="table table-borderless table-striped align-middle">
+  <thead class="table-light">
+    <tr>
+      <th>Transaction ID</th>
+      <th>Name</th>
+      <th>Contact Number</th>
+      <th>Description</th>
+      <th>Transaction Type</th>
+      <th>Status</th>
+      <th>Actions</th>
+      <th>Confirm</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?= $transactionRows ?>
+  </tbody>
+</table>
+<div class="d-flex justify-content-center mt-3 mb-5">
+  <ul class="pagination justify-content-center my-3">
+
+    <!-- Previous Button -->
+    <?php if ($page > 1): ?>
+      <li class="page-item">
+        <a class="page-link" href="?page=<?= $page - 1 ?>">&lt;</a>
+      </li>
+    <?php else: ?>
+      <li class="page-item disabled">
+        <span class="page-link">&lt;</span>
+      </li>
+    <?php endif; ?>
+
+    <!-- Page Info -->
+    <li class="page-item disabled">
+      <span class="page-link">
+        Page <?= $page ?> of <?= $totalPages ?>
+      </span>
+    </li>
+
+    <!-- Next Button -->
+    <?php if ($page < $totalPages): ?>
+      <li class="page-item">
+        <a class="page-link" href="?page=<?= $page + 1 ?>">&gt;</a>
+      </li>
+    <?php else: ?>
+      <li class="page-item disabled">
+        <span class="page-link">&gt;</span>
+      </li>
+    <?php endif; ?>
+
+  </ul>
+</div>
+</div>
+
+<!-- Received Table -->
+<div id="receivedSection" class="d-none">
+  <table class="table table-borderless table-striped align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>Transaction Code</th>
+        <th>Client Name</th>
+        <th>Contact Number</th>
+        <th>Transaction Type</th>
+        <th>Received Date</th>
+        <th>Notes</th>
+        <th>User</th>
+      </tr>
+    </thead>
+    <tbody id="receivedTable">
+      <tr>
+        <td>RCV-001</td>
+        <td>Juan Dela Cruz</td>
+        <td>09171234567</td>
+        <td>Application</td>
+        <td>2025-09-20</td>
+        <td>First submission</td>
+        <td>Admin</td>
+      </tr>
+      <tr>
+        <td>RCV-002</td>
+        <td>Maria Santos</td>
+        <td>09283456789</td>
+        <td>Renewal</td>
+        <td>2025-09-21</td>
+        <td>Needs verification</td>
+        <td>Clerk01</td>
+      </tr>
+      <tr>
+        <td>RCV-003</td>
+        <td>Pedro Ramirez</td>
+        <td>09981234567</td>
+        <td>Request</td>
+        <td>2025-09-22</td>
+        <td>Supporting docs attached</td>
+        <td>Staff02</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Received Pagination -->
+  <div class="d-flex justify-content-center mt-3 mb-5">
+    <ul id="receivedPagination" class="pagination justify-content-center my-3"></ul>
+  </div>
+</div>
 
     <!-- Recent Activity Section -->
     <div class="recent-activity">
@@ -307,61 +410,94 @@ if ($result && $result->num_rows > 0) {
   <script src="track.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Script for Transaction Table Pagination -->
+<!-- Script for Transaction Table Pagination -->
+   <script>
+  function initReceivedPagination() {
+  const rowsPerPage = 10; 
+  const table = document.getElementById("receivedTable");
+  const rows = table.querySelectorAll("tr");
+  const totalRows = rows.length;
+  const totalPages = Math.ceil(totalRows / rowsPerPage);
+  const pagination = document.getElementById("receivedPagination");
+
+  let currentPage = 1;
+
+  function renderTable() {
+    rows.forEach((row, index) => {
+      row.style.display =
+        index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage
+          ? ""
+          : "none";
+    });
+  }
+
+  function renderPagination() {
+    pagination.innerHTML = "";
+
+    // Prev Button
+    const prev = document.createElement("li");
+    prev.className = "page-item " + (currentPage === 1 ? "disabled" : "");
+    prev.innerHTML = `<a class="page-link" href="#">&lt;</a>`;
+    prev.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (currentPage > 1) {
+        currentPage--;
+        update();
+      }
+    });
+    pagination.appendChild(prev);
+
+    // Page Info
+    const info = document.createElement("li");
+    info.className = "page-item disabled";
+    info.innerHTML = `<span class="page-link">Page ${currentPage} of ${totalPages}</span>`;
+    pagination.appendChild(info);
+
+    // Next Button
+    const next = document.createElement("li");
+    next.className = "page-item " + (currentPage === totalPages ? "disabled" : "");
+    next.innerHTML = `<a class="page-link" href="#">&gt;</a>`;
+    next.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (currentPage < totalPages) {
+        currentPage++;
+        update();
+      }
+    });
+    pagination.appendChild(next);
+  }
+
+  function update() {
+    renderTable();
+    renderPagination();
+  }
+
+  update();
+}
+
+// Initialize pagination when page loads
+document.addEventListener("DOMContentLoaded", initReceivedPagination);
+</script>
+
   <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const rowsPerPage = 10;
-    const tableBody = document.getElementById("transactionTable");
-    const pagination = document.getElementById("transactionPagination");
+// Toggle between Transaction and Received tables
+  function toggleTables() {
+    const transactionSection = document.getElementById("transactionSection");
+    const receivedSection = document.getElementById("receivedSection");
+    const toggleBtn = document.getElementById("toggleBtn");
 
-    const rows = Array.from(tableBody.querySelectorAll("tr"));
-    const totalPages = Math.ceil(rows.length / rowsPerPage);
-    let currentPage = 1;
+    // Toggle visibility
+    transactionSection.classList.toggle("d-none");
+    receivedSection.classList.toggle("d-none");
 
-    function renderPage(page) {
-        if (page < 1 || page > totalPages) return;
-        currentPage = page;
-
-        // Show only rows for the current page
-        rows.forEach((row, i) => {
-            row.style.display = i >= (page - 1) * rowsPerPage && i < page * rowsPerPage ? "" : "none";
-        });
-
-        renderPagination();
+    // Update button text
+    if (receivedSection.classList.contains("d-none")) {
+      toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> Show Received Table';
+    } else {
+      toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> Show Transaction Table';
     }
-
-    function renderPagination() {
-        pagination.innerHTML = "";
-
-        // Previous arrow
-        const prevBtn = document.createElement("button");
-        prevBtn.innerHTML = "&laquo;";
-        prevBtn.classList.add("btn", "btn-sm", "btn-outline-success", "me-2");
-        prevBtn.disabled = currentPage === 1;
-        prevBtn.addEventListener("click", () => renderPage(currentPage - 1));
-        pagination.appendChild(prevBtn);
-
-        // Current page text
-        const pageInfo = document.createElement("span");
-        pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-        pageInfo.classList.add("mx-2", "fw-semibold");
-        pagination.appendChild(pageInfo);
-
-        // Next arrow
-        const nextBtn = document.createElement("button");
-        nextBtn.innerHTML = "&raquo;";
-        nextBtn.classList.add("btn", "btn-sm", "btn-outline-success", "ms-2");
-        nextBtn.disabled = currentPage === totalPages;
-        nextBtn.addEventListener("click", () => renderPage(currentPage + 1));
-        pagination.appendChild(nextBtn);
-    }
-
-    if (totalPages > 0) renderPage(1);
-});
-
-
-  </script>
-
+  }
+</script>
 </body>
 
 </html>

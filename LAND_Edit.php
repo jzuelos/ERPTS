@@ -263,9 +263,8 @@ echo "<script>
 
 <head>
   <!-- Required meta tags -->
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
   <!-- Bootstrap CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
@@ -577,7 +576,7 @@ echo "<script>
               <div class="mb-3">
                 <label for="marketValue" class="form-label">Market Value</label>
                 <input type="text" id="marketValue" class="form-control" placeholder="Enter market value"
-                  name="market_value" readonly value="<?php echo htmlspecialchars($land_data['market_value']); ?>">
+                  name="market_value" readonly value="₱<?php echo htmlspecialchars($land_data['market_value']); ?>">
               </div>
             </div>
           </div>
