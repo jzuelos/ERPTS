@@ -152,37 +152,6 @@ if (isset($_GET['id'])) {
             font-size: 14px;
         }
 
-                .status-section {
-            font-family: "Segoe UI", Tahoma, sans-serif;
-            margin: 15px 0;
-        }
-
-        .status-title {
-            font-weight: 600;
-            margin-bottom: 6px;
-            font-size: 16px;
-        }
-
-        .status-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .status-bullet {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #4caf50; /* Green dot (can be changed per status) */
-            flex-shrink: 0;
-        }
-
-        .status-text {
-            font-size: 15px;
-            color: #333;
-        }
-
-
         /* Pulse animation for active */
         @keyframes pulse {
             0% {
@@ -193,99 +162,8 @@ if (isset($_GET['id'])) {
                 box-shadow: 0 0 0 15px rgba(255, 215, 0, 0);
             }
 
-            /* Step circle */
-            .timeline-step::after {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: 15px;
-                width: 20px;
-                height: 20px;
-                border-radius: 50%;
-                background: #bbb;
-                border: 3px solid #fff;
-                z-index: 2;
-                box-shadow: 0 0 0 2px #bbb;
-            }
-
-            /* Completed steps */
-            .timeline-step.completed::before {
-                background: #4caf50;
-            }
-            .timeline-step.completed::after {
-                background: #4caf50;
-                box-shadow: 0 0 0 2px #4caf50;
-            }
-
-            /* Active step */
-            .timeline-step.active::before {
-                background: #FFD700;
-            }
-            .timeline-step.active::after {
-                background: #FFD700;
-                box-shadow: 0 0 0 5px rgba(255,215,0,0.5);
-                animation: pulse 1.5s infinite;
-            }
-
-            /* Upcoming step */
-            .timeline-step.upcoming::before {
-                background: #ccc;
-            }
-            .timeline-step.upcoming::after {
-                background: #ccc;
-                box-shadow: 0 0 0 2px #ccc;
-            }
-
-            /* Text beside step */
-            .step-title {
-                font-weight: 600;
-                font-size: 16px;
-                color: #333;
-            }
-
-            .step-date {
-                display: block;
-                margin-left: 5px;
-                color: #777;
-                font-size: 13px;
-            }
-
-            /* Messages under step */
-            .pending-message,
-            .processing-message,
-            .completion-message {
-                margin-top: 10px;
-                margin-left: 5px;
-                padding: 10px 12px;
-                border-radius: 6px;
-                font-size: 14px;
-                line-height: 1.5;
-            }
-
-            .pending-message {
-                background: #fff8e1;
-                border-left: 4px solid #ff9800;
-                color: #e65100;
-            }
-
-            .processing-message {
-                background: #e3f2fd;
-                border-left: 4px solid #2196f3;
-                color: #0d47a1;
-            }
-
-            .completion-message {
-                background: #e8f5e9;
-                border-left: 4px solid #4caf50;
-                color: #1b5e20;
-                font-style: italic;
-            }
-
-        
-            @keyframes pulse {
-                0% { box-shadow: 0 0 0 0 rgba(255,215,0,0.7); }
-                70% { box-shadow: 0 0 0 15px rgba(255,215,0,0); }
-                100% { box-shadow: 0 0 0 0 rgba(255,215,0,0); }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
             }
         }
     </style>
@@ -430,16 +308,17 @@ if (isset($_GET['id'])) {
                 </div>
             </div>
         </div>
-            <div class="status-section">
-                <div class="status-title">Current Status</div>
-                <div class="status-item">
-                    <span class="status-bullet"></span>
-                    <span class="status-text">
-                        <?php echo htmlspecialchars($transaction['status']); ?> – 
-                        <?php echo htmlspecialchars($transaction['description']); ?>
-                    </span>
-                </div>
-            </div>
+
+        <div class="status-section">
+            <div class="status-title">Current Status</div>
+            <div class="status-value"><?php echo htmlspecialchars($transaction['status']); ?></div>
+
+            <?php if ($source == 'transactions'): ?>
+                <div class="status-value"><?php echo htmlspecialchars($transaction['description']); ?></div>
+            <?php elseif ($source == 'received_papers'): ?>
+                <div class="status-value"><?php echo htmlspecialchars($transaction['notes']); ?></div>
+            <?php endif; ?>
+        </div>
 
     </div>
 </body>
