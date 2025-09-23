@@ -152,6 +152,37 @@ if (isset($_GET['id'])) {
             font-size: 14px;
         }
 
+                .status-section {
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            margin: 15px 0;
+        }
+
+        .status-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 16px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-bullet {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4caf50; /* Green dot (can be changed per status) */
+            flex-shrink: 0;
+        }
+
+        .status-text {
+            font-size: 15px;
+            color: #333;
+        }
+
+
         /* Pulse animation for active */
         @keyframes pulse {
             0% {
@@ -248,36 +279,6 @@ if (isset($_GET['id'])) {
                 border-left: 4px solid #4caf50;
                 color: #1b5e20;
                 font-style: italic;
-            }
-
-            .status-section {
-                font-family: "Segoe UI", Tahoma, sans-serif;
-                margin: 15px 0;
-            }
-
-            .status-title {
-                font-weight: 600;
-                margin-bottom: 6px;
-                font-size: 16px;
-            }
-
-            .status-item {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-
-            .status-bullet {
-                width: 10px;
-                height: 10px;
-                border-radius: 50%;
-                background: #4caf50; /* Green dot (can be changed per status) */
-                flex-shrink: 0;
-            }
-
-            .status-text {
-                font-size: 15px;
-                color: #333;
             }
 
         
