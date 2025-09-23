@@ -58,135 +58,120 @@ if (isset($_GET['id'])) {
     <title>Track and Trace Result</title>
     <link rel="stylesheet" href="result.css">
     <style>
-        /* Basic timeline coloring */
-        .timeline-step {
-            margin: 15px 0;
-            padding: 10px;
-            border-left: 4px solid #ccc;
-            position: relative;
-        }
-
-        .timeline-step .step-circle {
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-        }
-
-        .timeline-step.completed {
-            border-color: green;
-        }
-
-        .timeline-step.completed .step-circle {
-            background: green;
-        }
-
-        .timeline-step.active {
-            border-color: orange;
-        }
-
-        /* Active = yellow for pending/in progress */
-        .timeline-step.active:before {
-            content: '';
-            position: absolute;
-            left: -11px;
-            top: 15px;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background-color: #FFD700;
-            /* yellow */
-            box-shadow: 0 0 0 2px #FFD700;
-            animation: pulse 1.5s infinite;
-        }
-
-        .timeline-step.upcoming {
-            border-color: #aaa;
-        }
-
-        .timeline-step.upcoming:before {
-            content: '';
-            position: absolute;
-            left: -11px;
-            top: 15px;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background: #aaa;
-        }
-
-        .timeline-step.completed:before {
-            content: '';
-            position: absolute;
-            left: -11px;
-            top: 15px;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background: green;
-        }
-
-        .step-title {
-            display: inline-block;
-            font-weight: bold;
-        }
-
-        .step-date {
-            margin-left: 25px;
-            color: #555;
-            font-size: 14px;
-        }
-
-        .completion-message {
-            margin-left: 25px;
-            color: #2e7d32;
-            font-size: 13px;
-            font-style: italic;
-            background: #e8f5e8;
-            padding: 5px 8px;
-            border-radius: 4px;
-            margin-top: 5px;
-            border-left: 3px solid #4caf50;
-        }
-
-        .pending-message {
-            margin-left: 25px;
-            color: #f57c00;
-            font-size: 13px;
-            font-style: italic;
-            background: #fff3e0;
-            padding: 5px 8px;
-            border-radius: 4px;
-            margin-top: 5px;
-            border-left: 3px solid #ff9800;
-        }
-
-        .processing-message {
-            margin-left: 25px;
-            color: #1976d2;
-            font-size: 13px;
-            font-style: italic;
-            background: #e3f2fd;
-            padding: 5px 8px;
-            border-radius: 4px;
-            margin-top: 5px;
-            border-left: 3px solid #2196f3;
-        }
-
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+      /* Timeline container */
+            .timeline-step {
+                position: relative;
+                padding-left: 50px;
+                margin: 30px 0;
+                font-family: "Segoe UI", Tahoma, sans-serif;
             }
 
-            70% {
-                box-shadow: 0 0 0 10px rgba(255, 215, 0, 0);
+            /* Vertical line */
+            .timeline-step::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 24px;
+                width: 3px;
+                height: 100%;
+                background: #e0e0e0;
+                z-index: 1;
             }
 
-            100% {
-                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+            /* Step circle */
+            .timeline-step::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 15px;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: #bbb;
+                border: 3px solid #fff;
+                z-index: 2;
+                box-shadow: 0 0 0 2px #bbb;
             }
-        }
+
+            /* Completed steps */
+            .timeline-step.completed::before {
+                background: #4caf50;
+            }
+            .timeline-step.completed::after {
+                background: #4caf50;
+                box-shadow: 0 0 0 2px #4caf50;
+            }
+
+            /* Active step */
+            .timeline-step.active::before {
+                background: #FFD700;
+            }
+            .timeline-step.active::after {
+                background: #FFD700;
+                box-shadow: 0 0 0 5px rgba(255,215,0,0.5);
+                animation: pulse 1.5s infinite;
+            }
+
+            /* Upcoming step */
+            .timeline-step.upcoming::before {
+                background: #ccc;
+            }
+            .timeline-step.upcoming::after {
+                background: #ccc;
+                box-shadow: 0 0 0 2px #ccc;
+            }
+
+            /* Text beside step */
+            .step-title {
+                font-weight: 600;
+                font-size: 16px;
+                color: #333;
+            }
+
+            .step-date {
+                display: block;
+                margin-left: 5px;
+                color: #777;
+                font-size: 13px;
+            }
+
+            /* Messages under step */
+            .pending-message,
+            .processing-message,
+            .completion-message {
+                margin-top: 10px;
+                margin-left: 5px;
+                padding: 10px 12px;
+                border-radius: 6px;
+                font-size: 14px;
+                line-height: 1.5;
+            }
+
+            .pending-message {
+                background: #fff8e1;
+                border-left: 4px solid #ff9800;
+                color: #e65100;
+            }
+
+            .processing-message {
+                background: #e3f2fd;
+                border-left: 4px solid #2196f3;
+                color: #0d47a1;
+            }
+
+            .completion-message {
+                background: #e8f5e9;
+                border-left: 4px solid #4caf50;
+                color: #1b5e20;
+                font-style: italic;
+            }
+
+            /* Pulse animation for active */
+            @keyframes pulse {
+                0% { box-shadow: 0 0 0 0 rgba(255,215,0,0.7); }
+                70% { box-shadow: 0 0 0 15px rgba(255,215,0,0); }
+                100% { box-shadow: 0 0 0 0 rgba(255,215,0,0); }
+            }
     </style>
 </head>
 
@@ -264,7 +249,7 @@ if (isset($_GET['id'])) {
                     $estimatedDate = date("M d, Y", strtotime($transaction['created_at'] . ' +7 days'));
                 ?>
                     <div class="pending-message">
-                        ⏳ Your transaction is currently in queue and will be reviewed by our staff shortly.<br>
+                        Your transaction is currently in queue and will be reviewed by our staff shortly.<br>
                         <strong>Estimated completion:</strong> <?php echo $estimatedDate; ?> (within 7 business days)
                     </div>
                 <?php elseif ($normalized === 'processing paper' && $class === 'active'):
@@ -276,7 +261,7 @@ if (isset($_GET['id'])) {
                     $estimatedDate = date("M d, Y", strtotime($transaction['created_at'] . ' +7 days'));
                 ?>
                     <div class="processing-message">
-                        📋 Your documents are currently being processed by our team.<br>
+                         Your documents are currently being processed by our team.<br>
                         <strong>Estimated completion:</strong> <?php echo $estimatedDate; ?>
                         <?php if ($remainingDays > 0): ?>
                             (approximately <?php echo $remainingDays; ?> <?php echo $remainingDays == 1 ? 'day' : 'days'; ?> remaining)
@@ -286,7 +271,7 @@ if (isset($_GET['id'])) {
                     </div>
                 <?php elseif ($normalized === 'completed' && $class === 'completed' && $source !== 'received_papers'): ?>
                     <div class="completion-message">
-                        📄 Document processing has been completed. Your papers are ready for pickup at our office during business hours.
+                         Document processing has been completed. Your papers are ready for pickup at our office during business hours.
                     </div>
                 <?php endif; ?>
             </div>
