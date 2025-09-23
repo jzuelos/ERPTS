@@ -16,15 +16,15 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
     $resultReceivedPapers = $conn->query($sqlReceivedPapers);
 
     if ($resultTransactions && $resultTransactions->num_rows > 0) {
-        // ✅ Found in transactions → redirect to TrackResult.php
+        // Found in transactions → redirect to TrackResult.php
         header("Location: TrackResult.php?id=" . urlencode($id) . "&source=transactions");
         exit;
     } elseif ($resultReceivedPapers && $resultReceivedPapers->num_rows > 0) {
-        // ✅ Found in received_papers → redirect to TrackResult.php
+        //  Found in received_papers → redirect to TrackResult.php
         header("Location: TrackResult.php?id=" . urlencode($id) . "&source=received_papers");
         exit;
     } else {
-        // ❌ Not found → show error on same page
+        //  Not found → show error on same page
         $error = "No transaction found!";
     }
 }
