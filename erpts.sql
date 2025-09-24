@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 22, 2025 at 06:37 PM
+-- Generation Time: Sep 24, 2025 at 02:01 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -51,7 +51,9 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (10, 9, 'Added Barangay: 312312', '2025-09-21 13:45:24'),
 (11, 9, 'Logged in to the system', '2025-09-21 15:19:01'),
 (12, 9, 'Logged in to the system', '2025-09-21 17:25:56'),
-(13, 9, 'Logged in to the system', '2025-09-22 16:20:38');
+(13, 9, 'Logged in to the system', '2025-09-22 16:20:38'),
+(14, 9, 'Logged out of the system', '2025-09-23 15:02:53'),
+(15, 9, 'Logged in to the system', '2025-09-23 15:03:25');
 
 -- --------------------------------------------------------
 
@@ -621,7 +623,7 @@ INSERT INTO `owners_tb` (`own_id`, `own_fname`, `own_mname`, `own_surname`, `own
 (9, 'Renz', 'Balce', 'Dioneda', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '2017-09-08', 0, '5', 'Purok', '95', '5', '5', 'Camarines Norte', 'Telephone: 09473846382, Fax: , Email: jonard@gmail.com, Website: '),
 (10, 'Rommel James', 'Balce', 'Gacho', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '2016-09-15', 0, '3', 'Purok 2', 'Bagacay', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09738265234, Fax: , Email: rommel@gmail.com, Website: '),
 (11, 'John Lloyd', 'Balce', 'Zuelos', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '2018-09-17', 0, '1', 'Purok 2', 'Kalamunding', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09643826422, Fax: , Email: jzuelos@gmail.com, Website: '),
-(12, 'Mark', 'Balce', 'Bertillo', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '2019-09-17', 0, '3', 'Purok 1', 'Pasig', 'District 2', 'Daet', 'Camarines norte', 'Telephone: 09634618435, Fax: , Email: markbertillo@gmail.com, Website:'),
+(12, 'Mark', 'Odi', 'Bertillo', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-23 17:22:35', '2019-09-17', 0, '3', 'Purok 1', 'Pasig', 'District 2', 'Daet', 'Camarines norte', 'Telephone: 09634618435, Fax: , Email: markbertillo@gmail.com, Website:'),
 (13, 'Jose', 'Manuel', 'Del Rosario', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1980-05-12', 123456789, '25', 'Rizal Street', 'Bagasbas', 'District 1', 'Daet', 'Camarines Norte', 'Telephone: 09171234567, Email: jose.rosario@example.com'),
 (14, 'Maria', 'Luisa', 'Santos', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1975-03-08', 987654321, '12', 'Quezon Avenue', 'Lag-on', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09181234567, Email: maria.santos@example.com'),
 (15, 'Antonio', 'Reyes', 'Cruz', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1968-11-20', 123987654, '40', 'Mabini Street', 'Gubat', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09201234567, Email: antonio.cruz@example.com'),
@@ -645,9 +647,32 @@ CREATE TABLE `owner_audit_log` (
   `owner_id` int(11) NOT NULL,
   `property_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `tax-dec_id` int(11) NOT NULL,
   `details` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `owner_audit_log`
+--
+
+INSERT INTO `owner_audit_log` (`log_id`, `action`, `owner_id`, `property_id`, `user_id`, `tax-dec_id`, `details`, `created_at`) VALUES
+(1, 'Removed', 9, 144, 9, 2, 'Removed: Renz Balce Dioneda (Purok, 95, 5, Camarines Norte) from property 144', '2025-09-23 22:34:55'),
+(2, 'Added', 14, 144, 9, 2, 'Added: Maria Luisa Santos (Quezon Avenue, Lag-on, Daet, Camarines Norte) to property 144', '2025-09-23 22:34:55'),
+(3, 'Snapshot', 9, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 22:34:55'),
+(4, 'Snapshot', 14, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 22:34:55'),
+(5, 'Removed', 14, 144, 9, 2, 'Removed: Maria Luisa Santos (Quezon Avenue, Lag-on, Daet, Camarines Norte) from property 144', '2025-09-23 22:35:46'),
+(6, 'Added', 8, 144, 9, 2, 'Added: Renz Balce Dioneda (Purok, 201, 8, Camarines Norte) to property 144', '2025-09-23 22:35:46'),
+(7, 'Snapshot', 14, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 22:35:46'),
+(8, 'Snapshot', 8, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 22:35:46'),
+(9, 'Removed', 12, 144, 9, 2, 'Removed: Mark Odi Bertillo (Purok 1, Pasig, Daet, Camarines norte) from property 144', '2025-09-23 23:10:56'),
+(10, 'Added', 11, 144, 9, 2, 'Added: John Lloyd Balce Zuelos (Purok 2, Kalamunding, Labo, Camarines Norte) to property 144', '2025-09-23 23:10:56'),
+(11, 'Snapshot', 12, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 23:10:56'),
+(12, 'Snapshot', 11, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 23:10:56'),
+(13, 'Removed', 8, 144, 9, 2, 'Removed: Renz Balce Dioneda (Purok, 201, 8, Camarines Norte) from property 144', '2025-09-23 23:33:55'),
+(14, 'Added', 12, 144, 9, 2, 'Added: Mark Odi Bertillo (Purok 1, Pasig, Daet, Camarines norte) to property 144', '2025-09-23 23:33:55'),
+(15, 'Snapshot', 8, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 23:33:55'),
+(16, 'Snapshot', 12, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 23:33:55');
 
 -- --------------------------------------------------------
 
@@ -669,10 +694,14 @@ CREATE TABLE `propertyowner` (
 --
 
 INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`, `created_at`, `created_by`) VALUES
-(62, 144, 12, 1, '2025-09-21 13:37:29', NULL),
-(63, 144, 9, 1, '2025-09-21 13:37:29', NULL),
+(62, 144, 12, 0, '2025-09-21 13:37:29', NULL),
+(63, 144, 9, 0, '2025-09-21 13:37:29', NULL),
 (66, 147, 12, 1, '2025-09-21 13:37:29', NULL),
-(72, 157, 12, 1, '2025-09-21 13:37:29', NULL);
+(72, 157, 12, 1, '2025-09-21 13:37:29', NULL),
+(74, 144, 14, 0, '2025-09-23 22:34:55', 9),
+(75, 144, 8, 0, '2025-09-23 22:35:46', 9),
+(76, 144, 11, 1, '2025-09-23 23:10:56', 9),
+(77, 144, 12, 1, '2025-09-23 23:33:55', 9);
 
 -- --------------------------------------------------------
 
@@ -803,7 +832,7 @@ CREATE TABLE `rpu_dec` (
 
 INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `pro_assess`, `pro_date`, `mun_assess`, `mun_date`, `td_cancel`, `previous_pin`, `tax_year`, `entered_by`, `entered_year`, `prev_own`, `prev_assess`, `faas_id`, `total_property_value`) VALUES
 (1, 1484394354, 'Provincial Assessor Juan Dela Cruz', '2025-07-15', 'Municipal Assessor Maria Reyes', '2025-07-16', 0, 148, '2025-08-01', 0, '2025-08-20', 'Josefina Bautista', 5000.00, 36, 264000.00),
-(2, 148533432, 'Provincial Assessor Juan Dela Cruz', '2025-09-20', 'Municipal Assessor Maria Reyes', '2025-09-21', 0, 148, '2025-09-25', 0, '2025-09-26', 'Juan Dela Cruz', 20157.00, 33, 300000.00);
+(2, 0, '', '0000-00-00', '', '0000-00-00', 0, 0, '0000-00-00', 0, '0000-00-00', '', 0.00, 33, 20157.00);
 
 -- --------------------------------------------------------
 
@@ -1195,7 +1224,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `brgy`
@@ -1255,13 +1284,13 @@ ALTER TABLE `owners_tb`
 -- AUTO_INCREMENT for table `owner_audit_log`
 --
 ALTER TABLE `owner_audit_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `propertyowner`
 --
 ALTER TABLE `propertyowner`
-  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
 
 --
 -- AUTO_INCREMENT for table `province`
