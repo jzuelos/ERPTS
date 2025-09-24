@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 24, 2025 at 02:01 AM
+-- Generation Time: Sep 24, 2025 at 03:53 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -53,7 +53,8 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (12, 9, 'Logged in to the system', '2025-09-21 17:25:56'),
 (13, 9, 'Logged in to the system', '2025-09-22 16:20:38'),
 (14, 9, 'Logged out of the system', '2025-09-23 15:02:53'),
-(15, 9, 'Logged in to the system', '2025-09-23 15:03:25');
+(15, 9, 'Logged in to the system', '2025-09-23 15:03:25'),
+(16, 9, 'Logged in to the system', '2025-09-24 00:50:10');
 
 -- --------------------------------------------------------
 
@@ -619,21 +620,21 @@ CREATE TABLE `owners_tb` (
 --
 
 INSERT INTO `owners_tb` (`own_id`, `own_fname`, `own_mname`, `own_surname`, `owner_type`, `company_name`, `created_by`, `updated_by`, `created_at_owner`, `updated_at_owner`, `date_birth`, `tin_no`, `house_no`, `street`, `barangay`, `district`, `city`, `province`, `own_info`) VALUES
-(8, 'Renz', 'Balce', 'Dioneda', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '2015-09-16', 0, '5', 'Purok', '201', '', '8', 'Camarines Norte', 'Telephone: 09922007821, Fax: , Email: rdioneda4@gmail.com, Website: '),
-(9, 'Renz', 'Balce', 'Dioneda', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '2017-09-08', 0, '5', 'Purok', '95', '5', '5', 'Camarines Norte', 'Telephone: 09473846382, Fax: , Email: jonard@gmail.com, Website: '),
-(10, 'Rommel James', 'Balce', 'Gacho', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '2016-09-15', 0, '3', 'Purok 2', 'Bagacay', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09738265234, Fax: , Email: rommel@gmail.com, Website: '),
-(11, 'John Lloyd', 'Balce', 'Zuelos', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '2018-09-17', 0, '1', 'Purok 2', 'Kalamunding', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09643826422, Fax: , Email: jzuelos@gmail.com, Website: '),
-(12, 'Mark', 'Odi', 'Bertillo', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-23 17:22:35', '2019-09-17', 0, '3', 'Purok 1', 'Pasig', 'District 2', 'Daet', 'Camarines norte', 'Telephone: 09634618435, Fax: , Email: markbertillo@gmail.com, Website:'),
-(13, 'Jose', 'Manuel', 'Del Rosario', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1980-05-12', 123456789, '25', 'Rizal Street', 'Bagasbas', 'District 1', 'Daet', 'Camarines Norte', 'Telephone: 09171234567, Email: jose.rosario@example.com'),
-(14, 'Maria', 'Luisa', 'Santos', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1975-03-08', 987654321, '12', 'Quezon Avenue', 'Lag-on', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09181234567, Email: maria.santos@example.com'),
-(15, 'Antonio', 'Reyes', 'Cruz', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1968-11-20', 123987654, '40', 'Mabini Street', 'Gubat', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09201234567, Email: antonio.cruz@example.com'),
-(16, 'Carmen', 'Lopez', 'Reyes', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1990-01-15', 456123789, '5', 'Burgos Street', 'Pamorangon', 'District 3', 'Daet', 'Camarines Norte', 'Telephone: 09301234567, Email: carmen.reyes@example.com'),
-(17, 'Pedro', 'Gonzales', 'Santos', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1985-07-22', 321654987, '18', 'Bonifacio Street', 'Mambalite', 'District 1', 'Daet', 'Camarines Norte', 'Telephone: 09401234567, Email: pedro.santos@example.com'),
-(18, 'Juan', 'Domingo', 'Reyes', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1972-09-10', 741852963, '8', 'San Roque', 'Awitan', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09501234567, Email: juan.reyes@example.com'),
-(19, 'Isabel', 'Fernandez', 'Cruz', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1992-04-18', 852369741, '33', 'Del Pilar Street', 'Dogongan', 'District 3', 'Daet', 'Camarines Norte', 'Telephone: 09601234567, Email: isabel.cruz@example.com'),
-(20, 'Francisco', 'Dela', 'Ramos', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1988-02-25', 963852741, '50', 'San Vicente', 'Gahonon', 'District 1', 'Daet', 'Camarines Norte', 'Telephone: 09701234567, Email: francisco.ramos@example.com'),
-(21, 'Rosario', 'Mendoza', 'Lopez', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1979-06-14', 147258369, '7', 'Magsaysay Avenue', 'Calasgasan', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09801234567, Email: rosario.lopez@example.com'),
-(22, 'Guillermo', 'Torres', 'Delos Santos', 'individual', NULL, NULL, NULL, '2025-09-21 13:37:29', '2025-09-21 13:37:29', '1965-12-30', 369258147, '60', 'Libertad Street', 'Magang', 'District 3', 'Daet', 'Camarines Norte', 'Telephone: 09901234567, Email: guillermo.torres@example.com');
+(1, 'Juan', 'Santos', 'Dela Cruz', 'individual', NULL, NULL, NULL, '2025-09-24 01:03:40', '2025-09-24 01:03:40', '1985-05-10', 123456789, '12', 'Rizal St.', 'Barangay 1', 'District 1', 'Daet', 'Camarines Norte', 'Telephone: 09123456781, Email: juan.dc@example.com'),
+(2, 'Maria', 'Lopez', 'Reyes', 'individual', NULL, NULL, NULL, '2025-09-24 01:03:40', '2025-09-24 01:03:40', '1990-08-15', 987654321, '34', 'Bonifacio St.', 'Barangay 2', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09123456782, Email: maria.lr@example.com'),
+(3, 'Pedro', 'Manuel', 'Santos', 'individual', NULL, NULL, NULL, '2025-09-24 01:03:40', '2025-09-24 01:03:40', '1978-03-22', 456789123, '56', 'Mabini St.', 'Barangay 3', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09123456783, Email: pedro.ms@example.com'),
+(4, 'Jose', 'Antonio', 'Cruz', 'individual', NULL, NULL, NULL, '2025-09-24 01:03:40', '2025-09-24 01:03:40', '1982-07-30', 741852963, '78', 'Quezon Ave.', 'Barangay 4', 'District 2', 'Labo', 'Camarines Norte', 'Telephone: 09123456784, Email: jose.cr@example.com'),
+(5, 'Ana', 'Garcia', 'Torres', 'individual', NULL, NULL, NULL, '2025-09-24 01:03:40', '2025-09-24 01:03:40', '1995-11-02', 852369741, '90', 'Del Pilar St.', 'Barangay 5', 'District 3', 'Daet', 'Camarines Norte', 'Telephone: 09123456785, Email: ana.gt@example.com'),
+(6, 'Luis', 'Domingo', 'Fernandez', 'individual', NULL, NULL, NULL, '2025-09-24 01:03:40', '2025-09-24 01:03:40', '1987-01-12', 963852741, '21', 'San Vicente', 'Barangay 6', 'District 1', 'Daet', 'Camarines Norte', 'Telephone: 09123456786, Email: luis.df@example.com'),
+(7, 'Carmen', 'Santos', 'Gonzales', 'individual', NULL, NULL, NULL, '2025-09-24 01:03:40', '2025-09-24 01:03:40', '1992-04-25', 147258369, '32', 'Libertad St.', 'Barangay 7', 'District 2', 'Labo', 'Camarines Norte', 'Telephone: 09123456787, Email: carmen.sg@example.com'),
+(8, 'Miguel', 'Reyes', 'Del Rosario', 'individual', NULL, NULL, NULL, '2025-09-24 01:03:40', '2025-09-24 01:03:40', '1980-09-18', 369258147, '43', 'San Roque', 'Barangay 8', 'District 1', 'Daet', 'Camarines Norte', 'Telephone: 09123456788, Email: miguel.dr@example.com'),
+(9, 'Elena', 'Mendoza', 'Lopez', 'individual', NULL, NULL, NULL, '2025-09-24 01:03:40', '2025-09-24 01:03:40', '1993-02-14', 258147369, '54', 'Purok 1', 'Barangay 9', 'District 3', 'Labo', 'Camarines Norte', 'Telephone: 09123456789, Email: elena.ml@example.com'),
+(10, 'Francisco', 'Cruz', 'Santos', 'individual', NULL, NULL, NULL, '2025-09-24 01:03:40', '2025-09-24 01:03:40', '1975-06-08', 321654987, '65', 'Purok 2', 'Barangay 10', 'District 2', 'Daet', 'Camarines Norte', 'Telephone: 09123456790, Email: francisco.cs@example.com'),
+(11, 'Isabel', 'Delos', 'Ramos', 'individual', NULL, NULL, NULL, '2025-09-24 01:03:40', '2025-09-24 01:03:40', '1991-10-19', 741963852, '76', 'Burgos St.', 'Barangay 11', 'District 1', 'Labo', 'Camarines Norte', 'Telephone: 09123456791, Email: isabel.dr@example.com'),
+(12, 'Ramon', 'Torres', 'Mendoza', 'individual', NULL, NULL, NULL, '2025-09-24 01:03:40', '2025-09-24 01:03:40', '1983-12-05', 159753486, '87', 'San Isidro', 'Barangay 12', 'District 3', 'Daet', 'Camarines Norte', 'Telephone: 09123456792, Email: ramon.tm@example.com'),
+(13, 'Teresa', 'Lopez', 'Garcia', 'individual', NULL, NULL, NULL, '2025-09-24 01:03:40', '2025-09-24 01:03:40', '1996-07-23', 951357258, '98', 'Quezon St.', 'Barangay 13', 'District 2', 'Labo', 'Camarines Norte', 'Telephone: 09123456793, Email: teresa.lg@example.com'),
+(14, 'Ricardo', 'Santos', 'Cruz', 'individual', NULL, NULL, NULL, '2025-09-24 01:03:40', '2025-09-24 01:03:40', '1979-04-11', 753951456, '11', 'Rizal Ext.', 'Barangay 14', 'District 1', 'Daet', 'Camarines Norte', 'Telephone: 09123456794, Email: ricardo.sc@example.com'),
+(15, 'Lucia', 'Fernandez', 'Reyes', 'individual', NULL, NULL, NULL, '2025-09-24 01:03:40', '2025-09-24 01:03:40', '1988-09-29', 852147963, '22', 'Mabini Ext.', 'Barangay 15', 'District 3', 'Labo', 'Camarines Norte', 'Telephone: 09123456795, Email: lucia.fr@example.com');
 
 -- --------------------------------------------------------
 
@@ -672,7 +673,15 @@ INSERT INTO `owner_audit_log` (`log_id`, `action`, `owner_id`, `property_id`, `u
 (13, 'Removed', 8, 144, 9, 2, 'Removed: Renz Balce Dioneda (Purok, 201, 8, Camarines Norte) from property 144', '2025-09-23 23:33:55'),
 (14, 'Added', 12, 144, 9, 2, 'Added: Mark Odi Bertillo (Purok 1, Pasig, Daet, Camarines norte) to property 144', '2025-09-23 23:33:55'),
 (15, 'Snapshot', 8, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 23:33:55'),
-(16, 'Snapshot', 12, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 23:33:55');
+(16, 'Snapshot', 12, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 23:33:55'),
+(17, 'Removed', 12, 144, 9, 2, 'Removed: Mark Odi Bertillo (Purok 1, Pasig, Daet, Camarines norte) from property 144', '2025-09-24 00:51:05'),
+(18, 'Added', 10, 144, 9, 2, 'Added: Rommel James Balce Gacho (Purok 2, Bagacay, Labo, Camarines Norte) to property 144', '2025-09-24 00:51:05'),
+(19, 'Snapshot', 12, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-24 00:51:05'),
+(20, 'Snapshot', 10, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-24 00:51:05'),
+(21, 'Removed', 10, 144, 9, 2, 'Removed: Rommel James Balce Gacho (Purok 2, Bagacay, Labo, Camarines Norte) from property 144', '2025-09-24 00:53:05'),
+(22, 'Added', 22, 144, 9, 2, 'Added: Guillermo Torres Delos Santos (Libertad Street, Magang, Daet, Camarines Norte) to property 144', '2025-09-24 00:53:05'),
+(23, 'Snapshot', 10, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-24 00:53:05'),
+(24, 'Snapshot', 22, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-24 00:53:05');
 
 -- --------------------------------------------------------
 
@@ -701,7 +710,9 @@ INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`, 
 (74, 144, 14, 0, '2025-09-23 22:34:55', 9),
 (75, 144, 8, 0, '2025-09-23 22:35:46', 9),
 (76, 144, 11, 1, '2025-09-23 23:10:56', 9),
-(77, 144, 12, 1, '2025-09-23 23:33:55', 9);
+(77, 144, 12, 0, '2025-09-23 23:33:55', 9),
+(78, 144, 10, 0, '2025-09-24 00:51:05', 9),
+(79, 144, 22, 1, '2025-09-24 00:53:05', 9);
 
 -- --------------------------------------------------------
 
@@ -831,8 +842,8 @@ CREATE TABLE `rpu_dec` (
 --
 
 INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `pro_assess`, `pro_date`, `mun_assess`, `mun_date`, `td_cancel`, `previous_pin`, `tax_year`, `entered_by`, `entered_year`, `prev_own`, `prev_assess`, `faas_id`, `total_property_value`) VALUES
-(1, 1484394354, 'Provincial Assessor Juan Dela Cruz', '2025-07-15', 'Municipal Assessor Maria Reyes', '2025-07-16', 0, 148, '2025-08-01', 0, '2025-08-20', 'Josefina Bautista', 5000.00, 36, 264000.00),
-(2, 0, '', '0000-00-00', '', '0000-00-00', 0, 0, '0000-00-00', 0, '0000-00-00', '', 0.00, 33, 20157.00);
+(1, 1484394354, 'Provincial Assessor Maria Santos', '2025-08-05', 'Municipal Assessor Luis Cruz', '2025-08-06', 0, 110, '2025-08-07', 1, '2025-08-07', 'Ricardo Delos Reyes', 7000.00, 33, 280000.00),
+(3, 42342, 'Juan Dela Cruz', '2025-09-10', 'Maria Reyes', '2025-09-11', 0, 110, '2025-09-27', 2, '2025-09-23', 'None', 5000.00, 36, 264000.00);
 
 -- --------------------------------------------------------
 
@@ -854,9 +865,9 @@ CREATE TABLE `rpu_idnum` (
 --
 
 INSERT INTO `rpu_idnum` (`rpu_id`, `arp`, `pin`, `taxability`, `effectivity`, `faas_id`) VALUES
-(46, 123456786, '0000034564234', 'special', '2024', 33),
-(62, 42342, '1234567891011', 'exempt', '2025', 36),
-(63, 423234, '0000000423423', 'taxable', '2004', 42);
+(46, 123456786, '110-34564234-', 'taxable', '2025', 33),
+(62, 42342, '110-123456789', 'exempt', '2025', 36),
+(63, 423234, '110-42342342-', 'taxable', '2025', 42);
 
 -- --------------------------------------------------------
 
@@ -914,6 +925,14 @@ CREATE TABLE `transactions` (
   `transaction_type` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `transactions`
+--
+
+INSERT INTO `transactions` (`transaction_id`, `transaction_code`, `name`, `contact_number`, `description`, `status`, `created_at`, `updated_at`, `transaction_type`) VALUES
+(41, '95289', 'Jonard Canaria', '+639432441231', 'Property Revision request #37123 received 09/24/2025. Your application is now pending review. For more info. visit https://erptstrack.erpts.online', 'Pending', '2025-09-24 01:42:33', '2025-09-24 01:42:33', 'Revision/Correction'),
+(42, '12084', 'Rommel James Gacho', '+639645624523', 'Property Consolidation request #71641 received 09/24/2025. Your application is now pending review. For more info. visit https://erptstrack.erpts.online', 'Pending', '2025-09-24 01:46:22', '2025-09-24 01:46:22', 'Consolidation');
+
 -- --------------------------------------------------------
 
 --
@@ -926,6 +945,13 @@ CREATE TABLE `transaction_files` (
   `file_path` varchar(255) NOT NULL,
   `uploaded_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `transaction_files`
+--
+
+INSERT INTO `transaction_files` (`file_id`, `transaction_id`, `file_path`, `uploaded_at`) VALUES
+(50, 42, 'uploads/transaction_42/tx_68d34d6e2b15f_business-document-template_1435-229.jpg', '2025-09-24 01:46:22');
 
 -- --------------------------------------------------------
 
@@ -948,75 +974,8 @@ CREATE TABLE `transaction_logs` (
 --
 
 INSERT INTO `transaction_logs` (`log_id`, `transaction_id`, `transaction_code`, `action`, `details`, `user_id`, `created_at`) VALUES
-(44, 22, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-14 18:51:35'),
-(45, 23, NULL, 'Document Uploaded', 'uploads/transaction_23/tx_68c70f2ad733a_premium_photo-1666900440561-94dcb6865554.avif', 9, '2025-09-14 18:53:30'),
-(46, 23, NULL, 'Created', 'Transaction created', 9, '2025-09-14 18:53:30'),
-(47, 23, NULL, 'Updated', 'Transaction updated', 9, '2025-09-15 15:58:48'),
-(48, 23, NULL, 'Updated', 'Transaction updated', 9, '2025-09-15 16:54:45'),
-(49, 23, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-15 16:55:16'),
-(50, 21, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-15 16:56:01'),
-(51, 24, NULL, 'Created', 'Transaction created', 10, '2025-09-14 17:12:23'),
-(52, 25, NULL, 'Created', 'Transaction created', 10, '2025-09-16 10:49:03'),
-(53, 26, '52061', 'Created', 'Transaction created', 9, '2025-09-21 16:03:38'),
-(54, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-21 16:03:49'),
-(55, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:38:26'),
-(56, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:38:36'),
-(57, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:40:03'),
-(58, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:42:03'),
-(59, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:42:20'),
-(60, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:47:39'),
-(61, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:48:06'),
-(62, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:48:32'),
-(63, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:49:14'),
-(64, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 06:51:24'),
-(65, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 09:05:59'),
-(66, 26, '52061', 'Document Uploaded', 'uploads/transaction_26/tx_68d1164b5f730_premium_photo-1666900440561-94dcb6865554.avif', 9, '2025-09-22 09:26:35'),
-(67, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 09:26:35'),
-(68, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 09:51:00'),
-(69, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 09:51:58'),
-(70, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 10:02:00'),
-(71, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 10:03:42'),
-(72, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 10:09:14'),
-(73, 27, '76474', 'Created', 'Transaction created', 9, '2025-09-22 10:11:37'),
-(74, 28, '92305', 'Created', 'Transaction created', 9, '2025-09-22 10:30:36'),
-(75, 29, '11390', 'Created', 'Transaction created', 9, '2025-09-22 10:31:26'),
-(76, 28, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-22 10:43:33'),
-(77, 29, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-22 10:43:36'),
-(78, 30, '45582', 'Created', 'Transaction created', 9, '2025-09-22 10:43:55'),
-(79, 30, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-22 10:46:32'),
-(80, 31, '92110', 'Created', 'Transaction created', 9, '2025-09-22 10:47:26'),
-(81, 31, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-22 10:49:38'),
-(82, 32, '06313', 'Created', 'Transaction created', 9, '2025-09-22 10:49:51'),
-(83, 32, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-22 10:50:41'),
-(84, 33, '80938', 'Created', 'Transaction created', 9, '2025-09-22 10:50:51'),
-(85, 33, NULL, 'Deleted', 'Transaction deleted', 9, '2025-09-22 10:56:40'),
-(86, 27, '76474', 'Updated', 'Transaction updated', 9, '2025-09-22 15:06:31'),
-(87, 27, '76474', 'Papers Received', 'Papers received by client', 9, '2025-09-22 15:40:47'),
-(88, 27, '76474', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:01:18'),
-(89, 26, '52061', 'Updated', 'Transaction updated', 9, '2025-09-22 16:04:39'),
-(90, 26, '52061', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:08:25'),
-(91, 34, '43012', 'Created', 'Transaction created', 9, '2025-09-22 16:08:54'),
-(92, 35, '57158', 'Created', 'Transaction created', 9, '2025-09-22 16:09:07'),
-(93, 26, '52061', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:12:46'),
-(94, 35, '57158', 'Updated', 'Transaction updated', 9, '2025-09-22 16:15:32'),
-(95, 35, '57158', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:15:35'),
-(96, 34, '43012', 'Updated', 'Transaction updated', 9, '2025-09-22 16:17:18'),
-(97, 34, '43012', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:17:24'),
-(98, 36, '97303', 'Created', 'Transaction created', 9, '2025-09-22 16:18:17'),
-(99, 37, '26437', 'Created', 'Transaction created', 9, '2025-09-22 16:18:28'),
-(100, 37, '26437', 'Updated', 'Transaction updated', 9, '2025-09-22 16:18:34'),
-(101, 37, '26437', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:18:56'),
-(102, 36, '97303', 'Updated', 'Transaction updated', 9, '2025-09-22 16:19:24'),
-(103, 36, '97303', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:19:27'),
-(104, 38, '22474', 'Created', 'Transaction created', 9, '2025-09-22 16:21:00'),
-(105, 38, '22474', 'Updated', 'Transaction updated', 9, '2025-09-22 16:21:04'),
-(106, 38, '22474', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:21:08'),
-(107, 39, '76224', 'Created', 'Transaction created', 9, '2025-09-22 16:22:22'),
-(108, 40, '86054', 'Created', 'Transaction created', 9, '2025-09-22 16:22:36'),
-(109, 40, '86054', 'Updated', 'Transaction updated', 9, '2025-09-22 16:22:43'),
-(110, 40, '86054', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:23:02'),
-(111, 39, '76224', 'Updated', 'Transaction updated', 9, '2025-09-22 16:24:05'),
-(112, 39, '76224', 'Papers Received', 'Papers received by client', 9, '2025-09-22 16:24:08');
+(114, 42, '12084', 'Document Uploaded', 'uploads/transaction_42/tx_68d34d6e2b15f_business-document-template_1435-229.jpg', 9, '2025-09-24 01:46:22'),
+(115, 42, '12084', 'Created', 'Transaction created', 9, '2025-09-24 01:46:22');
 
 -- --------------------------------------------------------
 
@@ -1224,7 +1183,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `brgy`
@@ -1278,19 +1237,19 @@ ALTER TABLE `municipality`
 -- AUTO_INCREMENT for table `owners_tb`
 --
 ALTER TABLE `owners_tb`
-  MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `own_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `owner_audit_log`
 --
 ALTER TABLE `owner_audit_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `propertyowner`
 --
 ALTER TABLE `propertyowner`
-  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
+  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
 
 --
 -- AUTO_INCREMENT for table `province`
@@ -1320,7 +1279,7 @@ ALTER TABLE `region`
 -- AUTO_INCREMENT for table `rpu_dec`
 --
 ALTER TABLE `rpu_dec`
-  MODIFY `dec_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `dec_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `rpu_idnum`
@@ -1338,19 +1297,19 @@ ALTER TABLE `subclass`
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
-  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `transaction_files`
 --
 ALTER TABLE `transaction_files`
-  MODIFY `file_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `file_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT for table `transaction_logs`
 --
 ALTER TABLE `transaction_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=113;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
 
 --
 -- AUTO_INCREMENT for table `users`

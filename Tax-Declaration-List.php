@@ -22,8 +22,7 @@ if ($conn->connect_error) {
 }
 
 // Main query to join rpu_dec with faas
-$sql = "
-  SELECT 
+$sql = "SELECT 
     r.dec_id,
     r.arp_no,
     r.total_property_value,
@@ -33,7 +32,9 @@ $sql = "
     GROUP_CONCAT(DISTINCT CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname) SEPARATOR ', ') AS owner_names
   FROM rpu_dec r
   LEFT JOIN faas f ON r.faas_id = f.faas_id
-  LEFT JOIN propertyowner po ON po.property_id = f.pro_id
+  LEFT JOIN propertyowner po  
+    ON po.property_id = f.pro_id 
+   AND po.is_retained = 1
   LEFT JOIN owners_tb o ON o.own_id = po.owner_id
   GROUP BY r.dec_id, f.faas_id, f.pro_id
   ORDER BY r.dec_id DESC
@@ -101,72 +102,72 @@ $result = $conn->query($sql);
         <tbody class="text-center">
           <?php
           if ($result && $result->num_rows > 0) {
-              while ($row = $result->fetch_assoc()) {
-                  $dec_id = $row['dec_id'];
-                  $faas_id = $row['faas_id'];
-                  $p_id = $row['p_id'];
-                  $owner_names = $row['owner_names'] ?? '';
+            while ($row = $result->fetch_assoc()) {
+              $dec_id = $row['dec_id'];
+              $faas_id = $row['faas_id'];
+              $p_id = $row['p_id'];
+              $owner_names = $row['owner_names'] ?? '';
 
-                  echo "<tr>";
-                  echo "<td>" . htmlspecialchars($dec_id) . "</td>";
-                  echo "<td>" . htmlspecialchars($owner_names) . "</td>";
-                  echo "<td>" . htmlspecialchars($row['arp_no']) . "</td>";
-                  echo "<td>₱ " . htmlspecialchars($row['total_property_value']) . "</td>";
-                  echo "<td>" . htmlspecialchars($row['tax_year']) . "</td>";
-                  if (!empty($p_id)) {
-                      echo "<td class='text-center'><a href='FAAS.php?id={$p_id}' class='btn btn-success btn-sm'><i class='fas fa-edit'></i></a </td>";
-                  } else {
-                      echo "<td><span class='text-muted'>No Property</span></td>";
-                  }
-                  echo "</tr>";
+              echo "<tr>";
+              echo "<td>" . htmlspecialchars($dec_id) . "</td>";
+              echo "<td>" . htmlspecialchars($owner_names) . "</td>";
+              echo "<td>" . htmlspecialchars($row['arp_no']) . "</td>";
+              echo "<td>₱ " . htmlspecialchars($row['total_property_value']) . "</td>";
+              echo "<td>" . htmlspecialchars($row['tax_year']) . "</td>";
+              if (!empty($p_id)) {
+                echo "<td class='text-center'><a href='FAAS.php?id={$p_id}' class='btn btn-success btn-sm'><i class='fas fa-edit'></i></a </td>";
+              } else {
+                echo "<td><span class='text-muted'>No Property</span></td>";
               }
+              echo "</tr>";
+            }
           } else {
-              echo "<tr><td colspan='6' class='text-center'>No records found.</td></tr>";
+            echo "<tr><td colspan='6' class='text-center'>No records found.</td></tr>";
           }
           ?>
         </tbody>
-        </table>
-            <div class="d-flex justify-content-between mt-3">
-         <div class="d-flex justify-content-center align-items-center mt-3" id="paginationControls"></div>
+      </table>
+      <div class="d-flex justify-content-between mt-3">
+        <div class="d-flex justify-content-center align-items-center mt-3" id="paginationControls"></div>
         <button type="button" class="btn btn-success mb-2" data-bs-toggle="modal" data-bs-target="#viewAllModal">View All</button>
-    </div>
+      </div>
   </section>
 
- <!--View All Modal-->
+  <!--View All Modal-->
   <div class="modal fade" id="viewAllModal" tabindex="-1" aria-labelledby="viewAllModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="viewAllModalLabel">All Tax Declarations</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-       <div class="row mb-3">
-        <div class="col-12 col-md-4">
-          <input type="text" id="modalSearchInput" class="form-control form-control-sm" placeholder="Search...">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="viewAllModalLabel">All Tax Declarations</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-      </div>
-        <div class="table-responsive">
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col-12 col-md-4">
+              <input type="text" id="modalSearchInput" class="form-control form-control-sm" placeholder="Search...">
+            </div>
+          </div>
+          <div class="table-responsive">
             <table class="table table-hover table-striped modern-table" id="modalTable">
-            <thead class="table-dark">
-              <tr>
-                <th>TD ID</th>
-                <th>Owner</th>
-                <th>TD Number</th>
-                <th>Property Value</th>
-                <th>Year</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Rows will be here from the main table -->
-            </tbody>
-          </table>
+              <thead class="table-dark">
+                <tr>
+                  <th>TD ID</th>
+                  <th>Owner</th>
+                  <th>TD Number</th>
+                  <th>Property Value</th>
+                  <th>Year</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Rows will be here from the main table -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
 
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
@@ -176,7 +177,8 @@ $result = $conn->query($sql);
   </footer>
 
   <!-- Scripts -->
-   <script src="Tax-Declaration-List.js"></script>
+  <script src="Tax-Declaration-List.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
