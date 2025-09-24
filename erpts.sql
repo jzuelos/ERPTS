@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 24, 2025 at 03:53 AM
+-- Generation Time: Sep 24, 2025 at 04:44 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -772,32 +772,6 @@ INSERT INTO `p_info` (`p_id`, `house_no`, `block_no`, `province`, `city`, `distr
 -- --------------------------------------------------------
 
 --
--- Table structure for table `received_papers`
---
-
-CREATE TABLE `received_papers` (
-  `received_id` int(11) NOT NULL,
-  `transaction_id` int(11) NOT NULL,
-  `transaction_code` varchar(10) NOT NULL,
-  `client_name` varchar(255) NOT NULL,
-  `contact_number` varchar(20) DEFAULT NULL,
-  `transaction_type` varchar(100) DEFAULT NULL,
-  `received_by` int(11) DEFAULT NULL,
-  `received_date` datetime NOT NULL DEFAULT current_timestamp(),
-  `notes` text DEFAULT NULL,
-  `status` enum('received','processing','ready_for_pickup','completed') DEFAULT 'received'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `received_papers`
---
-
-INSERT INTO `received_papers` (`received_id`, `transaction_id`, `transaction_code`, `client_name`, `contact_number`, `transaction_type`, `received_by`, `received_date`, `notes`, `status`) VALUES
-(14, 39, '76224', 'Renz', '+635234523423', 'Simple Transfer of Ownership', 9, '2025-09-23 00:24:08', '', 'received');
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `region`
 --
 
@@ -1113,14 +1087,6 @@ ALTER TABLE `p_info`
   ADD PRIMARY KEY (`p_id`);
 
 --
--- Indexes for table `received_papers`
---
-ALTER TABLE `received_papers`
-  ADD PRIMARY KEY (`received_id`),
-  ADD UNIQUE KEY `unique_transaction` (`transaction_id`),
-  ADD KEY `received_by` (`received_by`);
-
---
 -- Indexes for table `region`
 --
 ALTER TABLE `region`
@@ -1264,12 +1230,6 @@ ALTER TABLE `p_info`
   MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
 
 --
--- AUTO_INCREMENT for table `received_papers`
---
-ALTER TABLE `received_papers`
-  MODIFY `received_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
-
---
 -- AUTO_INCREMENT for table `region`
 --
 ALTER TABLE `region`
@@ -1358,12 +1318,6 @@ ALTER TABLE `owner_audit_log`
 --
 ALTER TABLE `propertyowner`
   ADD CONSTRAINT `property_id` FOREIGN KEY (`property_id`) REFERENCES `p_info` (`p_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `received_papers`
---
-ALTER TABLE `received_papers`
-  ADD CONSTRAINT `received_papers_ibfk_2` FOREIGN KEY (`received_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `rpu_dec`
