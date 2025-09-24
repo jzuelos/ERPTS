@@ -14,6 +14,19 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
+// Fetch owners from the database
+$sql = "SELECT own_id, own_fname, own_mname, own_surname, tin_no, house_no, street, barangay, district, city, province, own_info 
+        FROM owners_tb";
+
+$owners = [];
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+  while ($row = $result->fetch_assoc()) {
+    $owners[] = $row;
+  }
+}
+
 // Fetch faas_id from GET parameter
 $property_id = $_GET['id'] ?? null;
 
@@ -159,7 +172,7 @@ function fetchOwnersByIds($conn, $owner_ids)
   return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 }
 
-// Fetch owner details by a list of IDs
+// Fetch owner details by a list of IDs - UPDATED to exclude non-retained owners
 function fetchOwnersWithDetails($conn, $property_id)
 {
   $sql = "
@@ -168,6 +181,10 @@ function fetchOwnersWithDetails($conn, $property_id)
             o.own_fname AS first_name,
             o.own_mname AS middle_name,
             o.own_surname AS last_name,
+            o.street AS street,
+            o.barangay AS barangay,
+            o.city AS city,
+            o.province AS province,
             COALESCE(o.owner_type, 'individual') as owner_type,
             o.company_name,
             CASE 
@@ -185,7 +202,7 @@ function fetchOwnersWithDetails($conn, $property_id)
             END AS display_name
         FROM propertyowner po
         JOIN owners_tb o ON po.owner_id = o.own_id
-        WHERE po.property_id = ?
+        WHERE po.property_id = ? AND po.is_retained = 1
         ORDER BY 
             o.owner_type DESC, 
             CASE WHEN o.owner_type = 'company' THEN o.company_name ELSE o.own_surname END,
@@ -205,10 +222,10 @@ function fetchOwnersWithDetails($conn, $property_id)
   return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 }
 
-//fetch property owner ids
+// Updated fetch property owner IDs to only get retained owners
 function fetchPropertyOwnerIDs($conn, $property_id)
 {
-  $stmt = $conn->prepare("SELECT owner_id FROM propertyowner WHERE property_id = ?");
+  $stmt = $conn->prepare("SELECT owner_id FROM propertyowner WHERE property_id = ? AND is_retained = 1");
   $stmt->bind_param("i", $property_id);
   $stmt->execute();
   $result = $stmt->get_result();
@@ -321,7 +338,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     // Fetch owner IDs
     $owner_ids = fetchPropertyOwnerIDs($conn, $property_id);
 
-    // Fetch owner details
+    // Fetch owner details for this property
     if (!empty($owner_ids)) {
       $owners_details = fetchOwnersWithDetails($conn, $property_id);
     }
@@ -333,6 +350,19 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 
   // Fetch RPU details
   $rpu_details = fetchRPUDetails($conn, $property_id);
+
+  // -----------------------------
+  // Fetch all owners in owners_tb
+  // -----------------------------
+  $all_owners = [];
+  $sql = "SELECT own_id, own_fname, own_mname, own_surname, tin_no, house_no, street, barangay, district, city, province, own_info 
+            FROM owners_tb";
+  $result = $conn->query($sql);
+  if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+      $all_owners[] = $row;
+    }
+  }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -557,97 +587,86 @@ $conn->close();
             </div>
           </div>
         <?php else: ?>
-          <!-- Display all owners properly -->
           <div class="col-md-12 mb-4">
-            <h6 class="mb-3">Property Owners (<?= count($owners_details) ?>)</h6>
-            <?php foreach ($owners_details as $index => $owner): ?>
-              <div class="owner-item mb-3 p-3 bg-light rounded"
-                data-owner-id="<?= (int)$owner['own_id'] ?>"
-                data-owner-type="<?= htmlspecialchars($owner['owner_type'] ?? 'individual', ENT_QUOTES) ?>"
-                data-company="<?= htmlspecialchars($owner['company_name'] ?? '', ENT_QUOTES) ?>"
-                data-first="<?= htmlspecialchars($owner['first_name'] ?? '', ENT_QUOTES) ?>"
-                data-middle="<?= htmlspecialchars($owner['middle_name'] ?? '', ENT_QUOTES) ?>"
-                data-last="<?= htmlspecialchars($owner['last_name'] ?? '', ENT_QUOTES) ?>">
-                <div class="d-flex justify-content-between align-items-start">
-                  <div class="owner-details flex-grow-1">
-                    <?php if (($owner['owner_type'] ?? 'individual') === 'company'): ?>
-                      <div class="mb-2">
-                        <span class="badge bg-primary me-2">Company</span>
-                        <strong><?= htmlspecialchars($owner['display_name']) ?></strong>
-                      </div>
-                      <?php if (!empty($owner['first_name']) || !empty($owner['last_name'])): ?>
-                        <div class="text-muted small">
-                          Contact:
-                          <?= htmlspecialchars(trim(($owner['first_name'] ?? '') . ' ' . ($owner['middle_name'] ?? '') . ' ' . ($owner['last_name'] ?? ''))) ?>
-                        </div>
-                      <?php endif; ?>
-                    <?php else: ?>
-                      <div class="mb-2">
-                        <span class="badge bg-info me-2">Individual</span>
-                        <strong><?= htmlspecialchars($owner['display_name']) ?></strong>
-                      </div>
-                      <div class="row text-muted small">
-                        <div class="col-md-4">First: <?= htmlspecialchars($owner['first_name'] ?? '') ?></div>
-                        <div class="col-md-4">Middle: <?= htmlspecialchars($owner['middle_name'] ?? '') ?></div>
-                        <div class="col-md-4">Last: <?= htmlspecialchars($owner['last_name'] ?? '') ?></div>
-                      </div>
-                    <?php endif; ?>
-                  </div>
-
-                  <div class="owner-actions">
-                    <!-- pass the element; editOwner will use .closest('.owner-item') -->
-                    <button type="button" class="btn btn-sm btn-outline-primary me-1"
-                      onclick="editOwner(this)" <?= $disableButton ?>>
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <?php if (count($owners_details) > 1): ?>
-                      <button type="button" class="btn btn-sm btn-outline-danger"
-                        onclick="removeOwner(<?= (int)$owner['own_id'] ?>)" <?= $disableButton ?>>
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    <?php endif; ?>
-                  </div>
+            <div class="d-flex align-items-center mb-3">
+              <h6 class="mb-0">Property Owners (<?= count($owners_details) ?>)</h6>
+              <div class="d-flex align-items-center ms-auto gap-2">
+                <?php
+                $hasRPUWithTax = !empty($rpu_declaration); // true if RPU exists for this FAAS
+                ?>
+                <div class="text-end"> <!-- align everything to the right -->
+                  <?php if (!$hasRPUWithTax): ?>
+                    <small class="text-muted d-block mb-1">
+                      No tax declaration; ownership change disabled.
+                    </small>
+                  <?php endif; ?>
+                  <button type="button" class="btn btn-dark btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#changeOwnershipModal"
+                    data-property-id="<?= htmlspecialchars($property_id) ?>"
+                    <?= $hasRPUWithTax ? '' : 'disabled' ?>>
+                    Change Ownership
+                  </button>
                 </div>
               </div>
-            <?php endforeach; ?>
+            </div>
+            <?php
+            // Ensure $property_id is defined before including modal
+            $property_id = $property_id ?? ($_GET['id'] ?? 0);
+            include __DIR__ . '/change_ownership_modal.php';
+            ?>
           </div>
-        <?php endif; ?>
+
+          <?php foreach ($owners_details as $index => $owner): ?>
+            <div class="owner-item mb-3 p-3 bg-light rounded"
+              data-owner-id="<?= (int)$owner['own_id'] ?>"
+              data-owner-type="<?= htmlspecialchars($owner['owner_type'] ?? 'individual', ENT_QUOTES) ?>"
+              data-company="<?= htmlspecialchars($owner['company_name'] ?? '', ENT_QUOTES) ?>"
+              data-first="<?= htmlspecialchars($owner['first_name'] ?? '', ENT_QUOTES) ?>"
+              data-middle="<?= htmlspecialchars($owner['middle_name'] ?? '', ENT_QUOTES) ?>"
+              data-last="<?= htmlspecialchars($owner['last_name'] ?? '', ENT_QUOTES) ?>">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="owner-details flex-grow-1">
+                  <?php if (($owner['owner_type'] ?? 'individual') === 'company'): ?>
+                    <div class="mb-2">
+                      <span class="badge bg-primary me-2">Company</span>
+                      <strong><?= htmlspecialchars($owner['display_name']) ?></strong>
+                    </div>
+                    <?php if (!empty($owner['first_name']) || !empty($owner['last_name'])): ?>
+                      <div class="text-muted small">
+                        Contact:
+                        <?= htmlspecialchars(trim(($owner['first_name'] ?? '') . ' ' . ($owner['middle_name'] ?? '') . ' ' . ($owner['last_name'] ?? ''))) ?>
+                      </div>
+                    <?php endif; ?>
+                  <?php else: ?>
+                    <div class="mb-2">
+                      <span class="badge bg-info me-2">Individual</span>
+                      <strong><?= htmlspecialchars($owner['display_name']) ?></strong>
+                    </div>
+                    <div class="row text-muted small">
+                      <div class="col-md-4">First: <?= htmlspecialchars($owner['first_name'] ?? '') ?></div>
+                      <div class="col-md-4">Middle: <?= htmlspecialchars($owner['middle_name'] ?? '') ?></div>
+                      <div class="col-md-4">Last: <?= htmlspecialchars($owner['last_name'] ?? '') ?></div>
+                    </div>
+                  <?php endif; ?>
+                </div>
+
+                <div class="owner-actions">
+                  <?php if (count($owners_details) > 1): ?>
+                    <button type="button" class="btn btn-sm btn-outline-danger"
+                      onclick="removeOwner(<?= (int)$owner['own_id'] ?>)" <?= $disableButton ?>>
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  <?php endif; ?>
+                </div>
+              </div>
+            </div>
+          <?php endforeach; ?>
       </div>
+    <?php endif; ?>
+    </div>
     </div>
   </section>
-
-  <!-- Modal for Editing Owner's Information -->
-  <div class="modal fade" id="editOwnerModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <form id="editOwnerForm" class="modal-content" method="POST" action="<?= htmlspecialchars($_SERVER['PHP_SELF'] . '?id=' . $property_id) ?>">
-        <input type="hidden" name="action" value="update">
-        <input type="hidden" name="id" class="ownerIdInput" value="">
-        <div class="modal-header">
-          <h5 class="modal-title">Edit Owner</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label">First Name</label>
-            <input name="first_name" type="text" class="form-control firstNameModal" maxlength="50">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Middle Name</label>
-            <input name="middle_name" type="text" class="form-control middleNameModal" maxlength="50">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Last Name</label>
-            <input name="last_name" type="text" class="form-control lastNameModal" maxlength="50">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <!-- normal submit posts back to same PHP file and you handle $_POST['action']=='update' -->
-          <button type="submit" class="btn btn-primary">Save changes</button>
-        </div>
-      </form>
-    </div>
-  </div>
 
   <!-- Property Information Section -->
   <section class="container my-5" id="property-info-section">
@@ -956,10 +975,12 @@ $conn->close();
           // Get the property ID from the current URL (e.g., FAAS.php?id=140)
           $p_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
           ?>
-          <a href="DRP.php?p_id=<?= urlencode($p_id); ?>" class="btn btn-sm btn-secondary ml-3" title="print"
-            target="_blank">
+          <button type="button"
+            class="btn btn-outline-primary btn-sm ml-3"
+            onclick="window.open('DRP.php?p_id=<?= urlencode($p_id); ?>', '_blank')"
+            <?= $disableButton ?>>
             <i class="bi bi-printer"></i>
-          </a>
+          </button>
         </div>
       </form>
     </div>
