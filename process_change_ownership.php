@@ -213,7 +213,7 @@ try {
 
     $conn->commit();
 
-    header("Location: property_view.php?id=$property_id&status=success");
+    header("Location: FAAS.php?id=$property_id&status=success");
     exit;
 } catch (Exception $e) {
     $conn->rollback();
