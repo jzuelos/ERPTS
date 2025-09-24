@@ -46,7 +46,7 @@ if ($result && $result->num_rows > 0) {
 
     $transactionRows .= "
 <tr>
-  <td>{$row['transaction_id']}</td>
+  <td>{$row['transaction_code']}</td>
   <td>{$row['name']}</td>
   <td>{$row['contact_number']}</td>
   <td>{$row['description']}</td>
@@ -145,7 +145,7 @@ if ($result && $result->num_rows > 0) {
 <table class="table table-borderless table-striped align-middle">
   <thead class="table-light">
     <tr>
-      <th>Transaction ID</th>
+      <th>Transaction Code</th>
       <th>Name</th>
       <th>Contact Number</th>
       <th>Description</th>

@@ -618,7 +618,7 @@ echo "<script>
                 <label for="adjustedMarketValue" class="form-label">Adjusted Market Value</label>
                 <input type="text" id="adjustedMarketValue" name="adjusted_market_value" class="form-control"
                   placeholder="Enter adjusted market value" readonly
-                  value="<?php echo htmlspecialchars($land_data['adjust_mv']); ?>">
+                  value="₱<?php echo htmlspecialchars($land_data['adjust_mv']); ?>">
               </div>
             </div>
 
