@@ -62,16 +62,16 @@ function openModal(id = null) {
       document.getElementById('nameInput').value = tx.name || '';
       document.getElementById('contactInput').value = tx.contact || '';
       document.getElementById('transactionInput').value = tx.transaction || '';
-      document.getElementById('transactionInput').disabled = false; // Enable for edit
+      document.getElementById('transactionInput').disabled = false;
       document.getElementById('transactionType').value = tx.transaction_type || '';
 
-      // For edit mode: only show "In Progress" and "Completed" options
       const statusSelect = document.getElementById('statusInput');
+      statusSelect.disabled = false; // ✅ Re-enable dropdown in edit mode
       statusSelect.innerHTML = `
-        <option value="" disabled selected hidden>Select Status</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Completed">Completed</option>
-      `;
+      <option value="" disabled selected>Select Status</option>
+      <option value="In Progress">In Progress</option>
+      <option value="Completed">Completed</option>
+    `;
       statusSelect.value = tx.status || '';
 
       editId = id;
@@ -95,13 +95,12 @@ function openModal(id = null) {
     document.getElementById('transactionInput').disabled = true; // Disable initially for add mode
     document.getElementById('transactionType').selectedIndex = 0;
 
-    // For add mode: only show "Pending" option
     const statusSelect = document.getElementById('statusInput');
     statusSelect.innerHTML = `
-      <option value="" disabled selected hidden>Select Status</option>
-      <option value="Pending">Pending</option>
-    `;
+  <option value="Pending" selected>Pending</option>
+`;
     statusSelect.selectedIndex = 0;
+    statusSelect.disabled = true; // ✅ keep this
 
     editId = null;
   }
