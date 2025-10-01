@@ -94,16 +94,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['email'])) {
 
       if ($result && $result->num_rows > 0) {
         $user = $result->fetch_assoc();
-        $_SESSION['reset_email'] = $user['email'];
 
-        // generate random code 
-        $code = random_int(100000, 999999);
-        $_SESSION['verification_code'] = $code;
-        $_SESSION['verification_expires'] = time() + (3 * 60); // 3 minutes
+        if (isset($user['user_type']) && strtolower($user['user_type']) === 'admin') {
+          $_SESSION['admin_reset_blocked'] = true;
+        } else {
+          $_SESSION['reset_email'] = $user['email'];
 
-        sendVerificationCode($user['email'], $code);
+          // generate random code 
+          $code = random_int(100000, 999999);
+          $_SESSION['verification_code'] = $code;
+          $_SESSION['verification_expires'] = time() + (3 * 60); // 3 minutes
 
-        $_SESSION['step'] = 2;
+          sendVerificationCode($user['email'], $code);
+
+          $_SESSION['step'] = 2;
+        }
       } else {
         $_SESSION['invalid_email'] = true;
       }
@@ -258,6 +263,11 @@ $conn->close();
               class="form-control rounded-pill <?php echo !empty($_SESSION['invalid_email']) ? 'is-invalid' : ''; ?>"
               value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
             <div class="invalid-feedback">Please enter a valid active email.</div>
+            <?php if (!empty($_SESSION['admin_reset_blocked'])): ?>
+              <div class="alert alert-warning mt-2 fade-message text-center">
+                Password reset is not allowed for admin accounts.
+              </div>
+            <?php endif; ?>
           </div>
           <button type="submit" class="btn btn-dark w-100 mt-3">Send Code</button>
         </form>
@@ -421,4 +431,5 @@ unset($_SESSION['invalid_email']);
 unset($_SESSION['code_error']);
 unset($_SESSION['password_error']);
 unset($_SESSION['resent']);
+unset($_SESSION['admin_reset_blocked']);
 ?>
