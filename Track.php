@@ -127,124 +127,124 @@ if ($result && $result->num_rows > 0) {
       </div>
     </div>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <!-- Add Transaction Button -->
-  <button class="btn btn-add" onclick="openModal()">
-    <i class="fas fa-plus"></i> Add Transaction
-  </button>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <!-- Add Transaction Button -->
+      <button class="btn btn-add" onclick="openModal()">
+        <i class="fas fa-plus"></i> Add Transaction
+      </button>
 
-<!-- Toggle Button -->
-<button id="toggleBtn" class="btn btn-primary" onclick="toggleTables()">
-  <i class="fas fa-exchange-alt"></i> Show Received Table
-</button>
-</div>
+      <!-- Toggle Button -->
+      <button id="toggleBtn" class="btn btn-primary" onclick="toggleTables()">
+        <i class="fas fa-exchange-alt"></i> Show Received Table
+      </button>
+    </div>
 
 
-<!-- Transaction Table -->
-<div id="transactionSection">
-<table class="table table-borderless table-striped align-middle">
-  <thead class="table-light">
-    <tr>
-      <th>Transaction Code</th>
-      <th>Name</th>
-      <th>Contact Number</th>
-      <th>Description</th>
-      <th>Transaction Type</th>
-      <th>Status</th>
-      <th>Actions</th>
-      <th>Confirm</th>
-    </tr>
-  </thead>
-  <tbody>
-    <?= $transactionRows ?>
-  </tbody>
-</table>
-<div class="d-flex justify-content-center mt-3 mb-5">
-  <ul class="pagination justify-content-center my-3">
+    <!-- Transaction Table -->
+    <div id="transactionSection">
+      <table class="table table-borderless table-striped align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Transaction Code</th>
+            <th>Name</th>
+            <th>Contact Number</th>
+            <th>Description</th>
+            <th>Transaction Type</th>
+            <th>Status</th>
+            <th>Actions</th>
+            <th>Confirm</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?= $transactionRows ?>
+        </tbody>
+      </table>
+      <div class="d-flex justify-content-center mt-3 mb-5">
+        <ul class="pagination justify-content-center my-3">
 
-    <!-- Previous Button -->
-    <?php if ($page > 1): ?>
-      <li class="page-item">
-        <a class="page-link" href="?page=<?= $page - 1 ?>">&lt;</a>
-      </li>
-    <?php else: ?>
-      <li class="page-item disabled">
-        <span class="page-link">&lt;</span>
-      </li>
-    <?php endif; ?>
+          <!-- Previous Button -->
+          <?php if ($page > 1): ?>
+            <li class="page-item">
+              <a class="page-link" href="?page=<?= $page - 1 ?>">&lt;</a>
+            </li>
+          <?php else: ?>
+            <li class="page-item disabled">
+              <span class="page-link">&lt;</span>
+            </li>
+          <?php endif; ?>
 
-    <!-- Page Info -->
-    <li class="page-item disabled">
-      <span class="page-link">
-        Page <?= $page ?> of <?= $totalPages ?>
-      </span>
-    </li>
+          <!-- Page Info -->
+          <li class="page-item disabled">
+            <span class="page-link">
+              Page <?= $page ?> of <?= $totalPages ?>
+            </span>
+          </li>
 
-    <!-- Next Button -->
-    <?php if ($page < $totalPages): ?>
-      <li class="page-item">
-        <a class="page-link" href="?page=<?= $page + 1 ?>">&gt;</a>
-      </li>
-    <?php else: ?>
-      <li class="page-item disabled">
-        <span class="page-link">&gt;</span>
-      </li>
-    <?php endif; ?>
+          <!-- Next Button -->
+          <?php if ($page < $totalPages): ?>
+            <li class="page-item">
+              <a class="page-link" href="?page=<?= $page + 1 ?>">&gt;</a>
+            </li>
+          <?php else: ?>
+            <li class="page-item disabled">
+              <span class="page-link">&gt;</span>
+            </li>
+          <?php endif; ?>
 
-  </ul>
-</div>
-</div>
+        </ul>
+      </div>
+    </div>
 
-<!-- Received Table -->
-<div id="receivedSection" class="d-none">
-  <table class="table table-borderless table-striped align-middle">
-    <thead class="table-light">
-      <tr>
-        <th>Transaction Code</th>
-        <th>Client Name</th>
-        <th>Contact Number</th>
-        <th>Transaction Type</th>
-        <th>Received Date</th>
-        <th>Notes</th>
-        <th>User</th>
-      </tr>
-    </thead>
-    <tbody id="receivedTable">
-      <tr>
-        <td>RCV-001</td>
-        <td>Juan Dela Cruz</td>
-        <td>09171234567</td>
-        <td>Application</td>
-        <td>2025-09-20</td>
-        <td>First submission</td>
-        <td>Admin</td>
-      </tr>
-      <tr>
-        <td>RCV-002</td>
-        <td>Maria Santos</td>
-        <td>09283456789</td>
-        <td>Renewal</td>
-        <td>2025-09-21</td>
-        <td>Needs verification</td>
-        <td>Clerk01</td>
-      </tr>
-      <tr>
-        <td>RCV-003</td>
-        <td>Pedro Ramirez</td>
-        <td>09981234567</td>
-        <td>Request</td>
-        <td>2025-09-22</td>
-        <td>Supporting docs attached</td>
-        <td>Staff02</td>
-      </tr>
-    </tbody>
-  </table>
+    <!-- Received Table -->
+    <div id="receivedSection" class="d-none">
+      <table class="table table-borderless table-striped align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Transaction Code</th>
+            <th>Client Name</th>
+            <th>Contact Number</th>
+            <th>Transaction Type</th>
+            <th>Received Date</th>
+            <th>Notes</th>
+            <th>User</th>
+          </tr>
+        </thead>
+        <tbody id="receivedTable">
+          <tr>
+            <td>RCV-001</td>
+            <td>Juan Dela Cruz</td>
+            <td>09171234567</td>
+            <td>Application</td>
+            <td>2025-09-20</td>
+            <td>First submission</td>
+            <td>Admin</td>
+          </tr>
+          <tr>
+            <td>RCV-002</td>
+            <td>Maria Santos</td>
+            <td>09283456789</td>
+            <td>Renewal</td>
+            <td>2025-09-21</td>
+            <td>Needs verification</td>
+            <td>Clerk01</td>
+          </tr>
+          <tr>
+            <td>RCV-003</td>
+            <td>Pedro Ramirez</td>
+            <td>09981234567</td>
+            <td>Request</td>
+            <td>2025-09-22</td>
+            <td>Supporting docs attached</td>
+            <td>Staff02</td>
+          </tr>
+        </tbody>
+      </table>
 
-  <!-- Received Pagination -->
-  <div class="d-flex justify-content-center mt-3 mb-5">
-    <ul id="receivedPagination" class="pagination justify-content-center my-3"></ul>
-  </div>
-</div>
+      <!-- Received Pagination -->
+      <div class="d-flex justify-content-center mt-3 mb-5">
+        <ul id="receivedPagination" class="pagination justify-content-center my-3"></ul>
+      </div>
+    </div>
 
     <!-- Recent Activity Section -->
     <div class="recent-activity">
@@ -287,7 +287,7 @@ if ($result && $result->num_rows > 0) {
       </div>
 
       <!-- Pagination container -->
-<div id="pagination" class="d-flex justify-content-center align-items-center my-3"></div>
+      <div id="pagination" class="d-flex justify-content-center align-items-center my-3"></div>
     </div>
   </div>
 
@@ -337,10 +337,10 @@ if ($result && $result->num_rows > 0) {
             <option value="Completed">Completed</option>
           </select>
 
-          <!-- Upload File Input -->
+          <!-- Upload Image Input -->
           <div class="mb-2">
-            <label for="fileUpload" class="form-label">Upload File</label>
-            <input type="file" id="fileUpload" name="t_file[]" multiple>
+            <label for="fileUpload" class="form-label">Upload Image</label>
+            <input type="file" id="fileUpload" name="t_file[]" accept="image/*" multiple>
           </div>
         </div>
 
@@ -410,94 +410,94 @@ if ($result && $result->num_rows > 0) {
   <script src="track.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Script for Transaction Table Pagination -->
-   <script>
-  function initReceivedPagination() {
-  const rowsPerPage = 10; 
-  const table = document.getElementById("receivedTable");
-  const rows = table.querySelectorAll("tr");
-  const totalRows = rows.length;
-  const totalPages = Math.ceil(totalRows / rowsPerPage);
-  const pagination = document.getElementById("receivedPagination");
+  <!-- Script for Transaction Table Pagination -->
+  <script>
+    function initReceivedPagination() {
+      const rowsPerPage = 10;
+      const table = document.getElementById("receivedTable");
+      const rows = table.querySelectorAll("tr");
+      const totalRows = rows.length;
+      const totalPages = Math.ceil(totalRows / rowsPerPage);
+      const pagination = document.getElementById("receivedPagination");
 
-  let currentPage = 1;
+      let currentPage = 1;
 
-  function renderTable() {
-    rows.forEach((row, index) => {
-      row.style.display =
-        index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage
-          ? ""
-          : "none";
-    });
-  }
-
-  function renderPagination() {
-    pagination.innerHTML = "";
-
-    // Prev Button
-    const prev = document.createElement("li");
-    prev.className = "page-item " + (currentPage === 1 ? "disabled" : "");
-    prev.innerHTML = `<a class="page-link" href="#">&lt;</a>`;
-    prev.addEventListener("click", (e) => {
-      e.preventDefault();
-      if (currentPage > 1) {
-        currentPage--;
-        update();
+      function renderTable() {
+        rows.forEach((row, index) => {
+          row.style.display =
+            index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage
+              ? ""
+              : "none";
+        });
       }
-    });
-    pagination.appendChild(prev);
 
-    // Page Info
-    const info = document.createElement("li");
-    info.className = "page-item disabled";
-    info.innerHTML = `<span class="page-link">Page ${currentPage} of ${totalPages}</span>`;
-    pagination.appendChild(info);
+      function renderPagination() {
+        pagination.innerHTML = "";
 
-    // Next Button
-    const next = document.createElement("li");
-    next.className = "page-item " + (currentPage === totalPages ? "disabled" : "");
-    next.innerHTML = `<a class="page-link" href="#">&gt;</a>`;
-    next.addEventListener("click", (e) => {
-      e.preventDefault();
-      if (currentPage < totalPages) {
-        currentPage++;
-        update();
+        // Prev Button
+        const prev = document.createElement("li");
+        prev.className = "page-item " + (currentPage === 1 ? "disabled" : "");
+        prev.innerHTML = `<a class="page-link" href="#">&lt;</a>`;
+        prev.addEventListener("click", (e) => {
+          e.preventDefault();
+          if (currentPage > 1) {
+            currentPage--;
+            update();
+          }
+        });
+        pagination.appendChild(prev);
+
+        // Page Info
+        const info = document.createElement("li");
+        info.className = "page-item disabled";
+        info.innerHTML = `<span class="page-link">Page ${currentPage} of ${totalPages}</span>`;
+        pagination.appendChild(info);
+
+        // Next Button
+        const next = document.createElement("li");
+        next.className = "page-item " + (currentPage === totalPages ? "disabled" : "");
+        next.innerHTML = `<a class="page-link" href="#">&gt;</a>`;
+        next.addEventListener("click", (e) => {
+          e.preventDefault();
+          if (currentPage < totalPages) {
+            currentPage++;
+            update();
+          }
+        });
+        pagination.appendChild(next);
       }
-    });
-    pagination.appendChild(next);
-  }
 
-  function update() {
-    renderTable();
-    renderPagination();
-  }
+      function update() {
+        renderTable();
+        renderPagination();
+      }
 
-  update();
-}
+      update();
+    }
 
-// Initialize pagination when page loads
-document.addEventListener("DOMContentLoaded", initReceivedPagination);
-</script>
+    // Initialize pagination when page loads
+    document.addEventListener("DOMContentLoaded", initReceivedPagination);
+  </script>
 
   <script>
-// Toggle between Transaction and Received tables
-  function toggleTables() {
-    const transactionSection = document.getElementById("transactionSection");
-    const receivedSection = document.getElementById("receivedSection");
-    const toggleBtn = document.getElementById("toggleBtn");
+    // Toggle between Transaction and Received tables
+    function toggleTables() {
+      const transactionSection = document.getElementById("transactionSection");
+      const receivedSection = document.getElementById("receivedSection");
+      const toggleBtn = document.getElementById("toggleBtn");
 
-    // Toggle visibility
-    transactionSection.classList.toggle("d-none");
-    receivedSection.classList.toggle("d-none");
+      // Toggle visibility
+      transactionSection.classList.toggle("d-none");
+      receivedSection.classList.toggle("d-none");
 
-    // Update button text
-    if (receivedSection.classList.contains("d-none")) {
-      toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> Show Received Table';
-    } else {
-      toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> Show Transaction Table';
+      // Update button text
+      if (receivedSection.classList.contains("d-none")) {
+        toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> Show Received Table';
+      } else {
+        toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> Show Transaction Table';
+      }
     }
-  }
-</script>
+  </script>
 </body>
 
 </html>
