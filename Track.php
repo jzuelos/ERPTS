@@ -76,8 +76,40 @@ if ($result && $result->num_rows > 0) {
 } else {
   $transactionRows = "<tr><td colspan='8' class='text-center'>No transactions found</td></tr>";
 }
-?>
 
+// Fetch received papers
+$sql = "SELECT 
+            transaction_code,
+            client_name,
+            contact_number,
+            transaction_type,
+            DATE(received_date) AS received_date,
+            notes,
+            received_by
+        FROM received_papers
+        ORDER BY received_date DESC";
+
+$result = $conn->query($sql);
+
+// Build table rows
+$receivedRows = "";
+if ($result && $result->num_rows > 0) {
+  while ($row = $result->fetch_assoc()) {
+    $receivedRows .= "
+      <tr>
+        <td>" . htmlspecialchars($row['transaction_code']) . "</td>
+        <td>" . htmlspecialchars($row['client_name']) . "</td>
+        <td>" . htmlspecialchars($row['contact_number']) . "</td>
+        <td>" . htmlspecialchars($row['transaction_type']) . "</td>
+        <td>" . htmlspecialchars($row['received_date']) . "</td>
+        <td>" . htmlspecialchars($row['notes']) . "</td>
+        <td>" . htmlspecialchars($row['received_by']) . "</td>
+      </tr>";
+  }
+} else {
+  $receivedRows = "<tr><td colspan='7' class='text-center'>No received papers found</td></tr>";
+}
+?>
 
 <!doctype html>
 <html lang="en">
@@ -210,33 +242,7 @@ if ($result && $result->num_rows > 0) {
           </tr>
         </thead>
         <tbody id="receivedTable">
-          <tr>
-            <td>RCV-001</td>
-            <td>Juan Dela Cruz</td>
-            <td>09171234567</td>
-            <td>Application</td>
-            <td>2025-09-20</td>
-            <td>First submission</td>
-            <td>Admin</td>
-          </tr>
-          <tr>
-            <td>RCV-002</td>
-            <td>Maria Santos</td>
-            <td>09283456789</td>
-            <td>Renewal</td>
-            <td>2025-09-21</td>
-            <td>Needs verification</td>
-            <td>Clerk01</td>
-          </tr>
-          <tr>
-            <td>RCV-003</td>
-            <td>Pedro Ramirez</td>
-            <td>09981234567</td>
-            <td>Request</td>
-            <td>2025-09-22</td>
-            <td>Supporting docs attached</td>
-            <td>Staff02</td>
-          </tr>
+          <?php echo $receivedRows; ?>
         </tbody>
       </table>
 
@@ -415,10 +421,28 @@ if ($result && $result->num_rows > 0) {
     function initReceivedPagination() {
       const rowsPerPage = 10;
       const table = document.getElementById("receivedTable");
-      const rows = table.querySelectorAll("tr");
-      const totalRows = rows.length;
-      const totalPages = Math.ceil(totalRows / rowsPerPage);
       const pagination = document.getElementById("receivedPagination");
+
+      if (!table || !pagination) {
+        console.error("Received table or pagination element not found");
+        return;
+      }
+
+      // Get all tr elements, but exclude any with colspan (like "no data" rows)
+      const rows = Array.from(table.querySelectorAll("tr")).filter(row => {
+        const firstCell = row.querySelector("td");
+        return firstCell && !firstCell.hasAttribute("colspan");
+      });
+
+      const totalRows = rows.length;
+      
+      // If no rows or only one page, hide pagination
+      if (totalRows === 0) {
+        pagination.innerHTML = "";
+        return;
+      }
+
+      const totalPages = Math.ceil(totalRows / rowsPerPage);
 
       let currentPage = 1;
 
@@ -434,7 +458,7 @@ if ($result && $result->num_rows > 0) {
       function renderPagination() {
         pagination.innerHTML = "";
 
-        // Prev Button
+        // Previous Button
         const prev = document.createElement("li");
         prev.className = "page-item " + (currentPage === 1 ? "disabled" : "");
         prev.innerHTML = `<a class="page-link" href="#">&lt;</a>`;
@@ -474,9 +498,6 @@ if ($result && $result->num_rows > 0) {
 
       update();
     }
-
-    // Initialize pagination when page loads
-    document.addEventListener("DOMContentLoaded", initReceivedPagination);
   </script>
 
   <script>
@@ -495,6 +516,8 @@ if ($result && $result->num_rows > 0) {
         toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> Show Received Table';
       } else {
         toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> Show Transaction Table';
+        // Initialize pagination when table becomes visible
+        initReceivedPagination();
       }
     }
   </script>

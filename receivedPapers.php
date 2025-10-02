@@ -129,15 +129,38 @@ try {
         (transaction_id, transaction_code, client_name, contact_number, transaction_type, received_by, notes, status, received_date)
         VALUES (?, ?, ?, ?, ?, ?, ?, 'received', NOW())
     ");
-    $user_id = $_SESSION['user_id'];
+    $user_id = intval($_SESSION['user_id']);
+
+    // Get user full name
+    $stmtUser = $conn->prepare("SELECT first_name, middle_name, last_name FROM users WHERE user_id = ? LIMIT 1");
+    $stmtUser->bind_param("i", $user_id);
+    $stmtUser->execute();
+    $userRow = $stmtUser->get_result()->fetch_assoc();
+    $stmtUser->close();
+
+    if (!$userRow) {
+        throw new Exception("User not found");
+    }
+
+    // Concatenate name: First M. Last
+    $received_by = trim($userRow['first_name'] .
+        ' ' . ($userRow['middle_name'] ? substr($userRow['middle_name'], 0, 1) . '. ' : '') .
+        $userRow['last_name']);
+
+    // Insert into received_papers with name instead of ID
+    $insertStmt = $conn->prepare("
+    INSERT INTO received_papers 
+    (transaction_id, transaction_code, client_name, contact_number, transaction_type, received_by, notes, status, received_date)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 'received', NOW())
+");
     $insertStmt->bind_param(
-        "issssis",
+        "issssss",
         $transaction_id,
         $transaction['transaction_code'],
         $transaction['name'],
         $transaction['contact_number'],
         $transaction['transaction_type'],
-        $user_id,
+        $received_by,
         $notes
     );
     if (!$insertStmt->execute()) {

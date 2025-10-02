@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 02, 2025 at 11:13 AM
+-- Generation Time: Oct 02, 2025 at 12:35 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -58,7 +58,10 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (17, 9, 'Logged in to the system', '2025-10-01 13:01:12'),
 (18, 9, 'Logged out of the system', '2025-10-01 13:09:16'),
 (19, 9, 'Logged in to the system', '2025-10-01 13:27:00'),
-(20, 9, 'Logged in to the system', '2025-10-02 08:52:13');
+(20, 9, 'Logged in to the system', '2025-10-02 08:52:13'),
+(21, 9, 'Logged in to the system', '2025-10-02 09:24:29'),
+(22, 9, 'Logged in to the system', '2025-10-02 10:15:40'),
+(23, 9, 'Logged in to the system', '2025-10-02 10:24:32');
 
 -- --------------------------------------------------------
 
@@ -786,7 +789,7 @@ CREATE TABLE `received_papers` (
   `client_name` varchar(255) NOT NULL,
   `contact_number` varchar(20) DEFAULT NULL,
   `transaction_type` varchar(100) DEFAULT NULL,
-  `received_by` int(11) DEFAULT NULL,
+  `received_by` varchar(150) DEFAULT NULL,
   `received_date` datetime NOT NULL DEFAULT current_timestamp(),
   `notes` text DEFAULT NULL,
   `status` enum('received','processing','ready_for_pickup','completed') DEFAULT 'received',
@@ -798,7 +801,18 @@ CREATE TABLE `received_papers` (
 --
 
 INSERT INTO `received_papers` (`received_id`, `transaction_id`, `transaction_code`, `client_name`, `contact_number`, `transaction_type`, `received_by`, `received_date`, `notes`, `status`, `created_at`) VALUES
-(14, 39, '76224', 'Renz', '+635234523423', 'Simple Transfer of Ownership', 9, '2025-09-23 00:24:08', '', 'received', '2025-09-24 02:09:32');
+(16, 43, '38162', 'Jonard Canaria', '+639563453242', 'Consolidation', 'Admin A. Admin', '2025-10-02 18:00:29', '', 'received', '2025-10-02 10:00:29'),
+(17, 44, 'RCV-1001', 'Maria Santos', '+639171112222', 'Application', 'Admin A. Admin', '2025-10-02 18:11:44', 'Verified papers', 'received', '2025-10-02 10:11:44'),
+(18, 45, 'RCV-1002', 'Pedro Ramirez', '+639182223333', 'Renewal', 'Clerk01 B. Clerk', '2025-10-02 18:11:44', 'Late submission', 'received', '2025-10-02 10:11:44'),
+(19, 46, 'RCV-1003', 'Ana Dela Cruz', '+639193334444', 'Request', 'Staff02 C. Staff', '2025-10-02 18:11:44', 'With attachments', 'received', '2025-10-02 10:11:44'),
+(20, 47, 'RCV-1004', 'Renz Bautista', '+639204445555', 'Simple Transfer of Ownership', 'Admin A. Admin', '2025-10-02 18:11:44', 'Initial review passed', 'received', '2025-10-02 10:11:44'),
+(21, 48, 'RCV-1005', 'Leo Villanueva', '+639215556666', 'Mortgage', 'Clerk01 B. Clerk', '2025-10-02 18:11:44', 'For legal team review', 'received', '2025-10-02 10:11:44'),
+(22, 49, 'RCV-1006', 'Grace Mendoza', '+639226667777', 'Lease', 'Staff02 C. Staff', '2025-10-02 18:11:44', 'Completed forms', 'received', '2025-10-02 10:11:44'),
+(23, 50, 'RCV-1007', 'Mark Reyes', '+639237778888', 'Donation', 'Admin A. Admin', '2025-10-02 18:11:44', 'Missing ID copy', 'received', '2025-10-02 10:11:44'),
+(24, 51, 'RCV-1008', 'Josefina Cruz', '+639248889999', 'Partition', 'Clerk01 B. Clerk', '2025-10-02 18:11:44', 'Needs barangay clearance', 'received', '2025-10-02 10:11:44'),
+(25, 52, 'RCV-1009', 'Cynthia Navarro', '+639259990000', 'Exchange', 'Staff02 C. Staff', '2025-10-02 18:11:44', 'Verified and complete', 'received', '2025-10-02 10:11:44'),
+(26, 53, 'RCV-1010', 'Michael Tan', '+639260001111', 'Inheritance', 'Admin A. Admin', '2025-10-02 18:11:44', 'Heirs approved', 'received', '2025-10-02 10:11:44'),
+(27, 54, 'RCV-1011', 'Liza Sarmiento', '+639271112222', 'Transfer Certificate of Title', 'Clerk01 B. Clerk', '2025-10-02 18:11:44', 'Pending notarization', 'received', '2025-10-02 10:11:44');
 
 -- --------------------------------------------------------
 
@@ -936,7 +950,21 @@ CREATE TABLE `transactions` (
 
 INSERT INTO `transactions` (`transaction_id`, `transaction_code`, `name`, `contact_number`, `description`, `status`, `created_at`, `updated_at`, `transaction_type`) VALUES
 (41, '95289', 'Jonard Canaria', '+639432441231', 'Property Revision request #37123 received 09/24/2025. Your application is now pending review. For more info. visit https://erptstrack.erpts.online', 'Pending', '2025-09-24 01:42:33', '2025-09-24 01:42:33', 'Revision/Correction'),
-(42, '12084', 'Rommel James Gacho', '+639645624523', 'Property Consolidation request #71641 received 09/24/2025. Your application is now pending review. For more info. visit https://erptstrack.erpts.online', 'Pending', '2025-09-24 01:46:22', '2025-09-24 01:46:22', 'Consolidation');
+(44, 'TX-1001', 'Juan Dela Cruz', '+639171111111', 'Simple Transfer request #1001 received', 'Pending', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Simple Transfer of Ownership'),
+(45, 'TX-1002', 'Maria Santos', '+639181111111', 'New Property Declaration request #1002 received', 'In Progress', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'New Declaration of Real Property'),
+(46, 'TX-1003', 'Pedro Ramirez', '+639191111111', 'Property Revision request #1003 received', 'Completed', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Revision/Correction'),
+(47, 'TX-1004', 'Josefa Manalo', '+639201111111', 'Property Consolidation request #1004 received', 'Pending', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Consolidation'),
+(48, 'TX-1005', 'Carlos Cruz', '+639211111111', 'Simple Transfer request #1005 received', 'In Progress', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Simple Transfer of Ownership'),
+(49, 'TX-1006', 'Ana Villanueva', '+639221111111', 'New Property Declaration request #1006 received', 'Completed', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'New Declaration of Real Property'),
+(50, 'TX-1007', 'Miguel Reyes', '+639231111111', 'Property Revision request #1007 received', 'Pending', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Revision/Correction'),
+(51, 'TX-1008', 'Elena Bautista', '+639241111111', 'Consolidation request #1008 received', 'In Progress', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Consolidation'),
+(52, 'TX-1009', 'Roberto Flores', '+639251111111', 'Simple Transfer request #1009 received', 'Completed', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Simple Transfer of Ownership'),
+(53, 'TX-1010', 'Andrea Pascual', '+639261111111', 'New Property Declaration request #1010 received', 'Pending', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'New Declaration of Real Property'),
+(54, 'TX-1011', 'Lorenzo Aquino', '+639271111111', 'Property Revision request #1011 received', 'In Progress', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Revision/Correction'),
+(55, 'TX-1012', 'Cecilia Navarro', '+639281111111', 'Consolidation request #1012 received', 'Completed', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Consolidation'),
+(56, 'TX-1013', 'Daniel Gomez', '+639291111111', 'Simple Transfer request #1013 received', 'Pending', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Simple Transfer of Ownership'),
+(57, 'TX-1014', 'Patricia Ramos', '+639301111111', 'New Property Declaration request #1014 received', 'In Progress', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'New Declaration of Real Property'),
+(58, 'TX-1015', 'Fernando Torres', '+639311111111', 'Property Revision request #1015 received', 'Completed', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Revision/Correction');
 
 -- --------------------------------------------------------
 
@@ -980,7 +1008,12 @@ CREATE TABLE `transaction_logs` (
 
 INSERT INTO `transaction_logs` (`log_id`, `transaction_id`, `transaction_code`, `action`, `details`, `user_id`, `created_at`) VALUES
 (114, 42, '12084', 'Document Uploaded', 'uploads/transaction_42/tx_68d34d6e2b15f_business-document-template_1435-229.jpg', 9, '2025-09-24 01:46:22'),
-(115, 42, '12084', 'Created', 'Transaction created', 9, '2025-09-24 01:46:22');
+(115, 42, '12084', 'Created', 'Transaction created', 9, '2025-09-24 01:46:22'),
+(116, 42, '12084', 'Updated', 'Transaction updated', 9, '2025-10-02 09:48:35'),
+(117, 42, '12084', 'Papers Received', 'Papers received by client', 9, '2025-10-02 09:48:44'),
+(118, 43, '38162', 'Created', 'Transaction created', 9, '2025-10-02 09:49:11'),
+(119, 43, '38162', 'Updated', 'Transaction updated', 9, '2025-10-02 09:49:48'),
+(120, 43, '38162', 'Papers Received', 'Papers received by client', 9, '2025-10-02 10:00:29');
 
 -- --------------------------------------------------------
 
@@ -1188,7 +1221,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `brgy`
@@ -1272,7 +1305,7 @@ ALTER TABLE `p_info`
 -- AUTO_INCREMENT for table `received_papers`
 --
 ALTER TABLE `received_papers`
-  MODIFY `received_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `received_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `region`
@@ -1302,7 +1335,7 @@ ALTER TABLE `subclass`
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
-  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT for table `transaction_files`
@@ -1314,7 +1347,7 @@ ALTER TABLE `transaction_files`
 -- AUTO_INCREMENT for table `transaction_logs`
 --
 ALTER TABLE `transaction_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=121;
 
 --
 -- AUTO_INCREMENT for table `users`
