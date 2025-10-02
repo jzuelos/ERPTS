@@ -112,7 +112,7 @@ $result = $conn->query($sql);
               echo "<td>" . htmlspecialchars($dec_id) . "</td>";
               echo "<td>" . htmlspecialchars($owner_names) . "</td>";
               echo "<td>" . htmlspecialchars($row['arp_no']) . "</td>";
-              echo "<td>₱ " . htmlspecialchars($row['total_property_value']) . "</td>";
+              echo "<td>₱ " . number_format($row['total_property_value'], 2) . "</td>";
               echo "<td>" . htmlspecialchars($row['tax_year']) . "</td>";
               if (!empty($p_id)) {
                 echo "<td class='text-center'><a href='FAAS.php?id={$p_id}' class='btn btn-success btn-sm'><i class='fas fa-edit'></i></a </td>";

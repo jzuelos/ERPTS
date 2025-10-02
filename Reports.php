@@ -95,25 +95,27 @@
 
        <!-- Filters -->
 <form class="d-flex flex-column justify-content-center" style="height: 500px;">
-  <div class="row g-5">
-    <!-- LEFT: Location -->
-    <div class="col-md-6">
-      <div class="mb-3">
-        <label for="provinceSelect" class="form-label fw-bold">Province</label>
-        <select class="form-select" id="provinceSelect">
-          <option value="" disabled selected>Select Province</option>
-          <?php
-          if ($provinces_result->num_rows > 0) {
-            while ($row = $provinces_result->fetch_assoc()) {
-              echo "<option value='" . htmlspecialchars($row['province_id'], ENT_QUOTES) . "'>"
-                . htmlspecialchars($row['province_name'], ENT_QUOTES) . "</option>";
+      <div class="row g-5">
+      <!-- LEFT: Location -->
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label for="provinceSelect" class="form-label fw-bold">Province</label>
+          <select class="form-select" id="provinceSelect" name="province" disabled>
+            <?php
+            if ($provinces_result->num_rows > 0) {
+              while ($row = $provinces_result->fetch_assoc()) {
+                $selected = ($row['province_id'] == 1) ? 'selected' : '';
+                echo "<option value='" . htmlspecialchars($row['province_id'], ENT_QUOTES) . "' $selected>"
+                  . htmlspecialchars($row['province_name'], ENT_QUOTES) . "</option>";
+              }
+            } else {
+              echo "<option disabled>No provinces found</option>";
             }
-          } else {
-            echo "<option disabled>No provinces found</option>";
-          }
-          ?>
-        </select>
-      </div>
+            ?>
+          </select>
+        </div>
+
+
 
       <div class="mb-3">
         <label for="citySelect" class="form-label fw-bold">Municipality</label>

@@ -27,10 +27,25 @@
       text-align: center;
     }
 
-    @media print {
-      @page {{
+    @media print{
+    @page {
         size: landscape;
-      }}
+      }
+      
+     body::before {
+    content: "";
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: url('images/Seal.png') no-repeat center;
+    background-size: 500px; /* 🔹 Increase this value (try 400px–600px) */
+    opacity: 0.08; /* 🔹 Adjust transparency if needed */
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+  }  
     }
 
   </style>

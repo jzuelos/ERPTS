@@ -291,8 +291,8 @@ $conn->close();
                                                             </div>
                                                         </div>
 
-                                                        <!-- Right Column -->
-                                                        <div class="col-md-6">
+                                                      <!-- Right Column -->
+                                                            <div class="col-md-6">
                                                             <h5 class="text-primary">Additional Details</h5>
                                                             <hr>
                                                             <div class="form-group">
@@ -302,8 +302,7 @@ $conn->close();
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="marital_status">Marital Status</label>
-                                                                <input type="text" class="form-control"
-                                                                    name="marital_status"
+                                                                <input type="text" class="form-control" name="marital_status"
                                                                     value="<?php echo htmlspecialchars($user['marital_status'] ?? ''); ?>">
                                                             </div>
                                                             <div class="form-group">
@@ -316,8 +315,7 @@ $conn->close();
                                                             <hr>
                                                             <div class="form-group">
                                                                 <label for="contact_number">Contact Number</label>
-                                                                <input type="text" class="form-control"
-                                                                    name="contact_number"
+                                                                <input type="text" class="form-control" name="contact_number"
                                                                     value="<?php echo htmlspecialchars($user['contact_number'] ?? ''); ?>"
                                                                     required>
                                                             </div>
@@ -327,10 +325,35 @@ $conn->close();
                                                                     value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>"
                                                                     required>
                                                             </div>
-                                                        </div>
-                                                    </div> <!-- End Row -->
-                                                </div> <!-- End Container -->
-                                            </div>
+
+                                                            <h5 class="text-primary mt-4">Location</h5>
+                                                            <hr>
+
+                                                            <div class="form-group mb-2">
+                                                            <label for="municipality">Municipality</label>
+                                                            <select class="form-control" name="municipality" id="municipality">
+                                                                <option value="" selected disabled>Select municipality</option>
+                                                                <option value="Municipality 1">Municipality 1</option>
+                                                            </select>
+                                                            </div>
+
+                                                            <div class="form-group mb-2">
+                                                            <label for="district">District</label>
+                                                            <select class="form-control" name="district" id="district">
+                                                                <option value="" selected disabled>Select district</option>
+                                                                <option value="District 1">District 1</option>
+                                                                <option value="District 2">District 2</option>
+                                                            </select>
+                                                            </div>
+
+                                                            <div class="form-group mb-2">
+                                                            <label for="barangay">Barangay</label>
+                                                            <select class="form-control" name="barangay" id="barangay">
+                                                                <option value="" selected disabled>Select barangay</option>
+                                                                <option value="Barangay 1">Barangay 1</option>
+                                                            </select>
+                                                            </div>
+                                                         </div>
 
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary"
