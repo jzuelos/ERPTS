@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 24, 2025 at 04:44 AM
+-- Generation Time: Oct 02, 2025 at 11:13 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -54,7 +54,11 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (13, 9, 'Logged in to the system', '2025-09-22 16:20:38'),
 (14, 9, 'Logged out of the system', '2025-09-23 15:02:53'),
 (15, 9, 'Logged in to the system', '2025-09-23 15:03:25'),
-(16, 9, 'Logged in to the system', '2025-09-24 00:50:10');
+(16, 9, 'Logged in to the system', '2025-09-24 00:50:10'),
+(17, 9, 'Logged in to the system', '2025-10-01 13:01:12'),
+(18, 9, 'Logged out of the system', '2025-10-01 13:09:16'),
+(19, 9, 'Logged in to the system', '2025-10-01 13:27:00'),
+(20, 9, 'Logged in to the system', '2025-10-02 08:52:13');
 
 -- --------------------------------------------------------
 
@@ -772,6 +776,33 @@ INSERT INTO `p_info` (`p_id`, `house_no`, `block_no`, `province`, `city`, `distr
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `received_papers`
+--
+
+CREATE TABLE `received_papers` (
+  `received_id` int(11) NOT NULL,
+  `transaction_id` int(11) NOT NULL,
+  `transaction_code` varchar(10) NOT NULL,
+  `client_name` varchar(255) NOT NULL,
+  `contact_number` varchar(20) DEFAULT NULL,
+  `transaction_type` varchar(100) DEFAULT NULL,
+  `received_by` int(11) DEFAULT NULL,
+  `received_date` datetime NOT NULL DEFAULT current_timestamp(),
+  `notes` text DEFAULT NULL,
+  `status` enum('received','processing','ready_for_pickup','completed') DEFAULT 'received',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `received_papers`
+--
+
+INSERT INTO `received_papers` (`received_id`, `transaction_id`, `transaction_code`, `client_name`, `contact_number`, `transaction_type`, `received_by`, `received_date`, `notes`, `status`, `created_at`) VALUES
+(14, 39, '76224', 'Renz', '+635234523423', 'Simple Transfer of Ownership', 9, '2025-09-23 00:24:08', '', 'received', '2025-09-24 02:09:32');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `region`
 --
 
@@ -840,7 +871,7 @@ CREATE TABLE `rpu_idnum` (
 
 INSERT INTO `rpu_idnum` (`rpu_id`, `arp`, `pin`, `taxability`, `effectivity`, `faas_id`) VALUES
 (46, 123456786, '110-34564234-', 'taxable', '2025', 33),
-(62, 42342, '110-123456789', 'exempt', '2025', 36),
+(62, 42342, '110123456789', 'exempt', '2025', 36),
 (63, 423234, '110-42342342-', 'taxable', '2025', 42);
 
 -- --------------------------------------------------------
@@ -1087,6 +1118,14 @@ ALTER TABLE `p_info`
   ADD PRIMARY KEY (`p_id`);
 
 --
+-- Indexes for table `received_papers`
+--
+ALTER TABLE `received_papers`
+  ADD PRIMARY KEY (`received_id`),
+  ADD UNIQUE KEY `unique_transaction` (`transaction_id`),
+  ADD KEY `received_by` (`received_by`);
+
+--
 -- Indexes for table `region`
 --
 ALTER TABLE `region`
@@ -1149,7 +1188,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `brgy`
@@ -1230,6 +1269,12 @@ ALTER TABLE `p_info`
   MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
 
 --
+-- AUTO_INCREMENT for table `received_papers`
+--
+ALTER TABLE `received_papers`
+  MODIFY `received_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
 -- AUTO_INCREMENT for table `region`
 --
 ALTER TABLE `region`
@@ -1304,38 +1349,6 @@ ALTER TABLE `land`
 --
 ALTER TABLE `municipality`
   ADD CONSTRAINT `municipality_ibfk_1` FOREIGN KEY (`r_id`) REFERENCES `region` (`r_id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `owner_audit_log`
---
-ALTER TABLE `owner_audit_log`
-  ADD CONSTRAINT `fk_audit_owner` FOREIGN KEY (`owner_id`) REFERENCES `owners_tb` (`own_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_audit_property` FOREIGN KEY (`property_id`) REFERENCES `p_info` (`p_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_audit_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `propertyowner`
---
-ALTER TABLE `propertyowner`
-  ADD CONSTRAINT `property_id` FOREIGN KEY (`property_id`) REFERENCES `p_info` (`p_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `rpu_dec`
---
-ALTER TABLE `rpu_dec`
-  ADD CONSTRAINT `faas_idrpudec` FOREIGN KEY (`faas_id`) REFERENCES `faas` (`faas_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `rpu_idnum`
---
-ALTER TABLE `rpu_idnum`
-  ADD CONSTRAINT `faas_idrpu` FOREIGN KEY (`faas_id`) REFERENCES `faas` (`faas_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `transaction_files`
---
-ALTER TABLE `transaction_files`
-  ADD CONSTRAINT `transaction_files_ibfk_1` FOREIGN KEY (`transaction_id`) REFERENCES `transactions` (`transaction_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
