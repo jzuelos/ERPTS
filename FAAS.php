@@ -548,7 +548,7 @@ $conn->close();
     <?php
     if (!empty($property_id)) {
       $no_declaration = empty($rpu_declaration); // true if no rpu_dec present
-
+    
       if ($is_active == 0): ?>
         <!-- Property already disabled -->
         <span class="btn btn-outline-secondary disabled" title="This property is already inactive.">
@@ -572,7 +572,7 @@ $conn->close();
         <span class="btn btn-secondary disabled" title="Cannot disable: tax declaration exists for this property">
           <i class="fas fa-ban"></i> Cannot cancel RPU with TD encoded
         </span>
-    <?php endif;
+      <?php endif;
     }
     ?>
 
@@ -600,10 +600,8 @@ $conn->close();
                       No tax declaration; ownership change disabled.
                     </small>
                   <?php endif; ?>
-                  <button type="button" class="btn btn-dark btn-sm"
-                    data-bs-toggle="modal"
-                    data-bs-target="#changeOwnershipModal"
-                    data-property-id="<?= htmlspecialchars($property_id) ?>"
+                  <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#changeOwnershipModal" data-property-id="<?= htmlspecialchars($property_id) ?>"
                     <?= $hasRPUWithTax ? '' : 'disabled' ?>>
                     Change Ownership
                   </button>
@@ -618,8 +616,7 @@ $conn->close();
           </div>
 
           <?php foreach ($owners_details as $index => $owner): ?>
-            <div class="owner-item mb-3 p-3 bg-light rounded"
-              data-owner-id="<?= (int)$owner['own_id'] ?>"
+            <div class="owner-item mb-3 p-3 bg-light rounded" data-owner-id="<?= (int) $owner['own_id'] ?>"
               data-owner-type="<?= htmlspecialchars($owner['owner_type'] ?? 'individual', ENT_QUOTES) ?>"
               data-company="<?= htmlspecialchars($owner['company_name'] ?? '', ENT_QUOTES) ?>"
               data-first="<?= htmlspecialchars($owner['first_name'] ?? '', ENT_QUOTES) ?>"
@@ -650,20 +647,11 @@ $conn->close();
                     </div>
                   <?php endif; ?>
                 </div>
-
-                <div class="owner-actions">
-                  <?php if (count($owners_details) > 1): ?>
-                    <button type="button" class="btn btn-sm btn-outline-danger"
-                      onclick="removeOwner(<?= (int)$owner['own_id'] ?>)" <?= $disableButton ?>>
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  <?php endif; ?>
-                </div>
               </div>
             </div>
           <?php endforeach; ?>
-      </div>
-    <?php endif; ?>
+        </div>
+      <?php endif; ?>
     </div>
     </div>
   </section>
@@ -813,7 +801,7 @@ $conn->close();
           </div>
 
           <script>
-            (function() {
+            (function () {
               const input = document.getElementById('propertyNumber');
               const MAX = 13; // digits only
 
@@ -844,7 +832,7 @@ $conn->close();
               });
 
               // helper for enabling/disabling
-              window.togglePropertyNumberInput = function(enable) {
+              window.togglePropertyNumberInput = function (enable) {
                 input.disabled = !enable;
                 if (enable) {
                   input.focus();
@@ -853,7 +841,7 @@ $conn->close();
               };
 
               // helper for saving: always returns digits-only
-              window.getPropertyNumberDigits = function() {
+              window.getPropertyNumberDigits = function () {
                 return digitsOnly(input.value);
               };
             })();
@@ -975,10 +963,8 @@ $conn->close();
           // Get the property ID from the current URL (e.g., FAAS.php?id=140)
           $p_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
           ?>
-          <button type="button"
-            class="btn btn-outline-primary btn-sm ml-3"
-            onclick="window.open('DRP.php?p_id=<?= urlencode($p_id); ?>', '_blank')"
-            <?= $disableButton ?>>
+          <button type="button" class="btn btn-outline-primary btn-sm ml-3"
+            onclick="window.open('DRP.php?p_id=<?= urlencode($p_id); ?>', '_blank')" <?= $disableButton ?>>
             <i class="bi bi-printer"></i>
           </button>
         </div>
@@ -1152,9 +1138,10 @@ $conn->close();
                           <i class="bi bi-pencil"></i>
                         </a>
                         <a href="<?= ($is_active == 1)
-                                    ? 'print-layout.php?p_id=' . urlencode($p_id) . '&land_id=' . urlencode($record['land_id'])
-                                    : '#' ?>" class="btn btn-sm btn-secondary ml-3 <?= ($is_active == 0) ? 'disabled' : '' ?>"
-                          title="View" target="_blank" style="pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
+                          ? 'print-layout.php?p_id=' . urlencode($p_id) . '&land_id=' . urlencode($record['land_id'])
+                          : '#' ?>"
+                          class="btn btn-sm btn-secondary ml-3 <?= ($is_active == 0) ? 'disabled' : '' ?>" title="View"
+                          target="_blank" style="pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
                           <i class="bi bi-printer"></i>
                         </a>
                         <a href="ViewAll.php?p_id=<?= urlencode($p_id); ?>" class="btn btn-sm btn-info ml-3"

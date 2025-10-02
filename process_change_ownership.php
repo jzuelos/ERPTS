@@ -4,10 +4,10 @@ require_once 'database.php';
 
 $conn = Database::getInstance();
 
-$user_id     = $_SESSION['user_id'] ?? 0;
-$property_id = (int)($_POST['property_id'] ?? 0);
-$remove_ids  = $_POST['owners_to_remove'] ?? [];
-$add_ids     = $_POST['owners_to_add'] ?? [];
+$user_id = $_SESSION['user_id'] ?? 0;
+$property_id = (int) ($_POST['property_id'] ?? 0);
+$remove_ids = $_POST['owners_to_remove'] ?? [];
+$add_ids = $_POST['owners_to_add'] ?? [];
 
 // ----------------------
 // Lookup tax declaration via FAAS
@@ -22,7 +22,7 @@ $stmt->bind_param("i", $property_id);
 $stmt->execute();
 $taxdec = $stmt->get_result()->fetch_assoc();
 $tax_dec_id = $taxdec['dec_id'] ?? 0;
-$faas_id    = $taxdec['faas_id'] ?? 0;
+$faas_id = $taxdec['faas_id'] ?? 0;
 
 if (!$tax_dec_id) {
     die("No tax declaration found for property ID $property_id");
@@ -38,7 +38,8 @@ function getOwnerDetails($conn, $oid)
     $stmt->bind_param("i", $oid);
     $stmt->execute();
     $owner = $stmt->get_result()->fetch_assoc();
-    if (!$owner) return "Owner ID $oid (not found)";
+    if (!$owner)
+        return "Owner ID $oid (not found)";
     $fullname = trim(($owner['own_fname'] ?? '') . ' ' . ($owner['own_mname'] ?? '') . ' ' . ($owner['own_surname'] ?? ''));
     $addressParts = array_filter([$owner['street'] ?? '', $owner['barangay'] ?? '', $owner['city'] ?? '', $owner['province'] ?? ''], fn($p) => trim($p) !== '');
     $address = implode(', ', $addressParts);
@@ -50,8 +51,8 @@ function getOwnerDetails($conn, $oid)
 // ----------------------
 if (!isset($_POST['confirm'])) {
     $removeDetails = array_map(fn($id) => getOwnerDetails($conn, $id), $remove_ids);
-    $addDetails    = array_map(fn($id) => getOwnerDetails($conn, $id), $add_ids);
-?>
+    $addDetails = array_map(fn($id) => getOwnerDetails($conn, $id), $add_ids);
+    ?>
     <!DOCTYPE html>
     <html lang="en">
 
@@ -136,7 +137,7 @@ if (!isset($_POST['confirm'])) {
                             <a href="FAAS.php?id=<?= $property_id ?>" class="btn btn-outline-secondary btn-sm">
                                 Cancel
                             </a>
-                        </div>  
+                        </div>
                     </form>
 
                     <p class="text-muted small mt-3">
@@ -148,7 +149,7 @@ if (!isset($_POST['confirm'])) {
     </body>
 
     </html>
-<?php
+    <?php
     exit;
 }
 
@@ -158,7 +159,7 @@ if (!isset($_POST['confirm'])) {
 $conn->begin_transaction();
 
 try {
-    // --- 1. Handle Removed Owners ---
+    // --- 1. Handle Removed Owners (with audit log) ---
     foreach ($remove_ids as $oid) {
         $stmt = $conn->prepare("UPDATE propertyowner 
                                 SET is_retained = 0 
@@ -166,6 +167,7 @@ try {
         $stmt->bind_param("ii", $property_id, $oid);
         $stmt->execute();
 
+        // log only removals
         $ownerDetails = getOwnerDetails($conn, $oid);
         $details = "Removed: $ownerDetails from property $property_id";
         $stmt2 = $conn->prepare("INSERT INTO owner_audit_log 
@@ -175,41 +177,17 @@ try {
         $stmt2->execute();
     }
 
-    // --- 2. Handle Added Owners ---
+    // --- 2. Handle Added Owners (no audit log) ---
     foreach ($add_ids as $oid) {
         $stmt = $conn->prepare("INSERT INTO propertyowner 
             (property_id, owner_id, is_retained, created_by) 
             VALUES (?, ?, 1, ?)");
         $stmt->bind_param("iii", $property_id, $oid, $user_id);
         $stmt->execute();
-
-        $ownerDetails = getOwnerDetails($conn, $oid);
-        $details = "Added: $ownerDetails to property $property_id";
-        $stmt2 = $conn->prepare("INSERT INTO owner_audit_log 
-            (action, owner_id, property_id, user_id, `tax-dec_id`, details) 
-            VALUES ('Added', ?, ?, ?, ?, ?)");
-        $stmt2->bind_param("iiiis", $oid, $property_id, $user_id, $tax_dec_id, $details);
-        $stmt2->execute();
+        // no log here
     }
 
-    // --- 3. Snapshot of rpu_dec ---
-    $sql = "SELECT * FROM rpu_dec WHERE faas_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $faas_id);
-    $stmt->execute();
-    $snapshot = $stmt->get_result()->fetch_assoc();
-
-    if ($snapshot) {
-        $json = json_encode($snapshot);
-        $allOwners = array_merge($remove_ids, $add_ids);
-        foreach ($allOwners as $oid) {
-            $stmt2 = $conn->prepare("INSERT INTO owner_audit_log 
-                (action, owner_id, property_id, user_id, `tax-dec_id`, details) 
-                VALUES ('Snapshot', ?, ?, ?, ?, ?)");
-            $stmt2->bind_param("iiiis", $oid, $property_id, $user_id, $tax_dec_id, $json);
-            $stmt2->execute();
-        }
-    }
+    // --- 3. Skip snapshot logging entirely ---
 
     $conn->commit();
 
@@ -219,3 +197,4 @@ try {
     $conn->rollback();
     die("Ownership transfer failed: " . $e->getMessage());
 }
+
