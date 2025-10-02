@@ -101,10 +101,10 @@ if ($conn->connect_error) {
             <button class="btn btn-sm btn-outline-primary me-1 edit-btn" title="Edit" data-bs-toggle="modal" data-bs-target="#editModal">
                 <i class="fas fa-edit"></i>
             </button>
-        <button class="btn btn-sm btn-outline-danger delete-btn" 
-                data-id="001" title="Delete">
-          <i class="fas fa-trash-alt"></i>
-        </button>
+      <button class="btn btn-sm btn-outline-danger delete-row-btn" 
+              data-id="001" title="Delete">
+        <i class="fas fa-trash-alt"></i>
+      </button>
             </td>
         </tr>
           </tbody>
@@ -287,7 +287,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // On Click
   document.addEventListener("click", (e) => {
-    const btn = e.target.closest(".delete-btn");
+    const btn = e.target.closest(".delete-row-btn");
     if (!btn) return;
     activeRow = btn.closest("tr");
     modal.show();

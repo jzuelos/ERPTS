@@ -965,8 +965,9 @@ $conn->close();
           <div class="col-md-6 mb-3">
             <label for="previousAssessedValue" class="form-label">Previous Assessed Value</label>
             <input type="text" class="form-control" id="previousAssessedValue" placeholder="Enter Assessed Value"
-              value="₱<?= htmlspecialchars($rpu_declaration['prev_assess'] ?? '') ?>" disabled>
+              value="₱<?= isset($rpu_declaration['prev_assess']) ? number_format($rpu_declaration['prev_assess'], 2) : '' ?>" disabled>
           </div>
+
         </div>
 
         <!-- Print Button at the Bottom Right -->
@@ -1141,7 +1142,9 @@ $conn->close();
                   <tr class="border-bottom border-3">
                     <td><?= htmlspecialchars($record['oct_no']) ?></td>
                     <td><?= htmlspecialchars($record['area']) ?></td>
-                    <td>₱<?= number_format($record['market_value'], 2) ?></td>
+                    <td>
+                      ₱<?= isset($record['market_value']) ? number_format($record['market_value'], 2) : '0.00' ?>
+                    </td>
                     <td>
                       ₱<?= isset($record['assess_value']) ? number_format($record['assess_value'], 2) : '0.00' ?>
                     </td>

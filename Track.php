@@ -53,20 +53,20 @@ if ($result && $result->num_rows > 0) {
   <td>{$transaction_type}</td>
   <td><span class='status-badge status-{$statusClass}'>{$row['status']}</span></td>
 <td>
-  <button class='btn btn-sm btn-primary me-1 mb-1' onclick='openModal(" . $row['transaction_id'] . ")'>
+  <button class='btn btn-sm btn-primary me-1 mb-1'style='padding:8px 12px; font-size:12px;'onclick='openModal(" . $row['transaction_id'] . ")'>
     <i class='fas fa-edit'></i> Edit
   </button>
 
-  <button class='btn btn-sm btn-danger me-1 mb-1' onclick='deleteTransaction(" . $row['transaction_id'] . ")'>
+  <button class='btn btn-sm btn-danger me-1 mb-1' style='padding:8px 12px; font-size:12px; onclick='deleteTransaction(" . $row['transaction_id'] . ")'>
     <i class='fas fa-trash'></i> Delete
   </button>
 
-  <button class='btn btn-sm btn-dark me-1 mb-1' onclick='showDocuments(" . $row['transaction_id'] . ")'>
+  <button class='btn btn-sm btn-dark me-1 mb-1'style='padding:8px 12px; font-size:12px; onclick='showDocuments(" . $row['transaction_id'] . ")'>
     <i class='fas fa-file-alt'></i> Documents
   </button>
 </td>
 <td>
-  <button class='btn btn-sm btn-secondary mb-1' onclick='confirmTransaction(" . $row['transaction_id'] . ")'>
+  <button class='btn btn-sm btn-secondary mb-1' style='padding:8px 12px; font-size:12px;  onclick='confirmTransaction(" . $row['transaction_id'] . ")'>
     <i class='fas fa-check'></i>
   </button>
 </td>

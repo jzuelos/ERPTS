@@ -100,61 +100,115 @@ $result = $stmt->get_result();
         <div class="col-auto">
           <button type="submit" class="btn btn-success">Filter</button>
         </div>
+
+      <div class="col-auto ms-auto">
+        <button type="button" id="toggleLogsBtn" class="btn btn-primary">
+          <i class="fas fa-sign-in-alt me-1"></i> Show Log In Logs
+        </button>
+      </div>
       </form>
 
-      <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle text-start">
-          <thead class="table-dark">
-            <tr>
-              <th style="width: 10%">No.</th>
-              <th style="width: 40%">Activity</th>
-              <th style="width: 25%">Date and Time</th>
-              <th style="width: 25%">User</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php
-            if ($result->num_rows > 0) {
-              $no = 1;
-              while ($row = $result->fetch_assoc()) {
-                echo "<tr>
-                        <td>{$no}</td>
-                        <td>{$row['action']}</td>
-                        <td>{$row['log_time']}</td>
-                        <td>{$row['username']}</td>
-                      </tr>";
-                $no++;
-              }
-            } else {
-              echo "<tr><td colspan='4' class='text-center text-muted'>No activity logs found.</td></tr>";
-            }
-            ?>
-          </tbody>
-        </table>
-      </div>
-      <nav aria-label="Page navigation">
-  <ul class="pagination justify-content-center">
+<div id="activitylogs" class="table-responsive">
+  <table class="table table-striped table-hover align-middle text-start">
+    <thead class="table-dark">
+      <tr>
+        <th style="width: 10%">No.</th>
+        <th style="width: 40%">Activity</th>
+        <th style="width: 25%">Date and Time</th>
+        <th style="width: 25%">User</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php
+      if ($result->num_rows > 0) {
+        $no = 1;
+        while ($row = $result->fetch_assoc()) {
+          echo "<tr>
+                  <td>{$no}</td>
+                  <td>{$row['action']}</td>
+                  <td>{$row['log_time']}</td>
+                  <td>{$row['username']}</td>
+                </tr>";
+          $no++;
+        }
+      } else {
+        echo "<tr><td colspan='4' class='text-center text-muted'>No activity logs found.</td></tr>";
+      }
+      ?>
+    </tbody>
+  </table>
+<nav aria-label="Page navigation" class="mt-2">
+  <div class="d-flex justify-content-center align-items-center gap-2">
+    
+    <!-- Previous Button -->
     <?php if($page > 1): ?>
-      <li class="page-item">
-        <a class="page-link" href="?page=<?= $page-1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Previous</a>
-      </li>
+      <a class="btn btn-outline-primary btn-sm px-3 py-1" href="?page=<?= $page-1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">
+        <i class="fas fa-chevron-left me-1"></i> Prev
+      </a>
+    <?php else: ?>
+      <button class="btn btn-outline-secondary btn-sm px-3 py-1" disabled>
+        <i class="fas fa-chevron-left me-1"></i> Prev
+      </button>
     <?php endif; ?>
 
-    <?php for($p=1; $p<=$total_pages; $p++): ?>
-      <li class="page-item <?= $p==$page?'active':'' ?>">
-        <a class="page-link" href="?page=<?= $p ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>"><?= $p ?></a>
-      </li>
-    <?php endfor; ?>
+    <!-- Page Indicator -->
+    <span class="small text-muted">Page <?= $page ?> of <?= $total_pages ?></span>
 
+    <!-- Next Button -->
     <?php if($page < $total_pages): ?>
-      <li class="page-item">
-        <a class="page-link" href="?page=<?= $page+1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Next</a>
-      </li>
+      <a class="btn btn-outline-primary btn-sm px-3 py-1" href="?page=<?= $page+1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">
+        Next <i class="fas fa-chevron-right ms-1"></i>
+      </a>
+    <?php else: ?>
+      <button class="btn btn-outline-secondary btn-sm px-3 py-1" disabled>
+        Next <i class="fas fa-chevron-right ms-1"></i>
+      </button>
     <?php endif; ?>
-  </ul>
+
+  </div>
 </nav>
 
+
+</div>
+
+
+<!-- Log In Logs --> 
+<div id="loginlogs" class="table-responsive d-none">
+  <table class="table table-striped table-hover align-middle text-start">
+    <thead class="table-dark">
+      <tr>
+        <th style="width: 10%">No.</th>
+        <th style="width: 40%">Activity</th>
+        <th style="width: 25%">Date and Time</th>
+        <th style="width: 25%">User</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>User logged in</td>
+        <td>2025-10-02 08:00:00</td>
+        <td>Admin</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>User logged in</td>
+        <td>2025-10-02 09:10:00</td>
+        <td>Staff1</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>User logged in</td>
+        <td>2025-10-02 10:20:00</td>
+        <td>Staff2</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
     </div>
+      <!--Put Navigation after PHP applied --> 
+
+
   </main>
 
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
@@ -164,6 +218,7 @@ $result = $stmt->get_result();
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="activitylog.js"></script>
 </body>
 
 </html>

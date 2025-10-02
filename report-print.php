@@ -27,10 +27,10 @@
       text-align: center;
     }
 
-    @media print {
-      @page {{
+    @media print{
+    @page {
         size: landscape;
-      }}
+      }
     }
 
   </style>
