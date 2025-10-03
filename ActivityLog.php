@@ -18,24 +18,27 @@ $start_date = $_GET['start_date'] ?? '';
 $end_date = $_GET['end_date'] ?? '';
 
 // Pagination setup
-$limit = 10; // logs per page
+$limit = 10;
+
+// --- MAIN LOGS (excluding login/logout) ---
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-// Build WHERE clause for date filter
+// Build WHERE clause
 $where = [];
 $params = [];
 if ($start_date) {
-    $where[] = "DATE(a.log_time) >= ?";
-    $params[] = $start_date;
+  $where[] = "DATE(a.log_time) >= ?";
+  $params[] = $start_date;
 }
 if ($end_date) {
-    $where[] = "DATE(a.log_time) <= ?";
-    $params[] = $end_date;
+  $where[] = "DATE(a.log_time) <= ?";
+  $params[] = $end_date;
 }
+$where[] = "a.action NOT IN ('Logged in to the system', 'Logged out of the system')"; // exclude login/logout
 $where_sql = $where ? "WHERE " . implode(" AND ", $where) : "";
 
-// Count total rows for pagination
+// Count total rows
 $stmt_count = $conn->prepare("SELECT COUNT(*) as total 
                               FROM activity_log a
                               JOIN users u ON a.user_id = u.user_id
@@ -45,20 +48,64 @@ $stmt_count->execute();
 $total_rows = $stmt_count->get_result()->fetch_assoc()['total'];
 $total_pages = ceil($total_rows / $limit);
 
-// Fetch logs with pagination
-$stmt = $conn->prepare("SELECT a.log_id, a.action, a.log_time, u.username
+// Fetch logs
+$stmt = $conn->prepare("SELECT a.log_id, a.action, a.log_time, 
+                               CONCAT(u.first_name, ' ', u.last_name) AS fullname
                         FROM activity_log a
                         JOIN users u ON a.user_id = u.user_id
                         $where_sql
                         ORDER BY a.log_time DESC
                         LIMIT ? OFFSET ?");
-$params[] = $limit;
-$params[] = $offset;
-
-$types = str_repeat("s", count($params)-2)."ii"; // last two are integers
-$stmt->bind_param($types, ...$params);
+$params_main = $params;
+$params_main[] = $limit;
+$params_main[] = $offset;
+$types_main = str_repeat("s", count($params)) . "ii";
+$stmt->bind_param($types_main, ...$params_main);
 $stmt->execute();
 $result = $stmt->get_result();
+
+// --- LOGIN/LOGOUT LOGS ---
+$page_login = isset($_GET['page_login']) && is_numeric($_GET['page_login']) ? (int)$_GET['page_login'] : 1;
+$offset_login = ($page_login - 1) * $limit;
+
+$where_login = [];
+$params_login = [];
+if ($start_date) {
+  $where_login[] = "DATE(a.log_time) >= ?";
+  $params_login[] = $start_date;
+}
+if ($end_date) {
+  $where_login[] = "DATE(a.log_time) <= ?";
+  $params_login[] = $end_date;
+}
+$where_login[] = "a.action IN ('Logged in to the system', 'Logged out of the system')";
+$where_sql_login = $where_login ? "WHERE " . implode(" AND ", $where_login) : "";
+
+// Count login logs
+$stmt_count_login = $conn->prepare("SELECT COUNT(*) as total 
+                                    FROM activity_log a
+                                    JOIN users u ON a.user_id = u.user_id
+                                    $where_sql_login");
+if ($params_login) $stmt_count_login->bind_param(str_repeat("s", count($params_login)), ...$params_login);
+$stmt_count_login->execute();
+$total_rows_login = $stmt_count_login->get_result()->fetch_assoc()['total'];
+$total_pages_login = ceil($total_rows_login / $limit);
+
+// Fetch login logs
+$stmt_login = $conn->prepare("SELECT a.log_id, a.action, a.log_time, 
+                                     CONCAT(u.first_name, ' ', u.last_name) AS fullname
+                              FROM activity_log a
+                              JOIN users u ON a.user_id = u.user_id
+                              $where_sql_login
+                              ORDER BY a.log_time DESC
+                              LIMIT ? OFFSET ?");
+$params_login2 = $params_login;
+$params_login2[] = $limit;
+$params_login2[] = $offset_login;
+$types_login = str_repeat("s", count($params_login)) . "ii";
+$stmt_login->bind_param($types_login, ...$params_login2);
+$stmt_login->execute();
+$result_login = $stmt_login->get_result();
 ?>
 
 <!doctype html>
@@ -101,114 +148,115 @@ $result = $stmt->get_result();
           <button type="submit" class="btn btn-success">Filter</button>
         </div>
 
-      <div class="col-auto ms-auto">
-        <button type="button" id="toggleLogsBtn" class="btn btn-primary">
-          <i class="fas fa-sign-in-alt me-1"></i> Show Log In Logs
-        </button>
-      </div>
+        <div class="col-auto ms-auto">
+          <button type="button" id="toggleLogsBtn" class="btn btn-primary">
+            <i class="fas fa-sign-in-alt me-1"></i> Show Log In Logs
+          </button>
+        </div>
       </form>
 
-<div id="activitylogs" class="table-responsive">
-  <table class="table table-striped table-hover align-middle text-start">
-    <thead class="table-dark">
-      <tr>
-        <th style="width: 10%">No.</th>
-        <th style="width: 40%">Activity</th>
-        <th style="width: 25%">Date and Time</th>
-        <th style="width: 25%">User</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php
-      if ($result->num_rows > 0) {
-        $no = 1;
-        while ($row = $result->fetch_assoc()) {
-          echo "<tr>
+      <!-- Main Activity Logs -->
+      <div id="activitylogs" class="table-responsive">
+        <table class="table table-striped table-hover align-middle text-start">
+          <thead class="table-dark">
+            <tr>
+              <th style="width: 10%">No.</th>
+              <th style="width: 40%">Activity</th>
+              <th style="width: 25%">Date and Time</th>
+              <th style="width: 25%">User</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            if ($result->num_rows > 0) {
+              $no = $offset + 1;
+              while ($row = $result->fetch_assoc()) {
+                echo "<tr>
                   <td>{$no}</td>
                   <td>{$row['action']}</td>
                   <td>{$row['log_time']}</td>
-                  <td>{$row['username']}</td>
+                  <td>{$row['fullname']}</td>
                 </tr>";
-          $no++;
-        }
-      } else {
-        echo "<tr><td colspan='4' class='text-center text-muted'>No activity logs found.</td></tr>";
-      }
-      ?>
-    </tbody>
-  </table>
-<nav aria-label="Page navigation" class="mt-2">
-  <div class="d-flex justify-content-center align-items-center gap-2">
-    
-    <!-- Previous Button -->
-    <?php if($page > 1): ?>
-      <a class="btn btn-outline-primary btn-sm px-3 py-1" href="?page=<?= $page-1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">
-        <i class="fas fa-chevron-left me-1"></i> Prev
-      </a>
-    <?php else: ?>
-      <button class="btn btn-outline-secondary btn-sm px-3 py-1" disabled>
-        <i class="fas fa-chevron-left me-1"></i> Prev
-      </button>
-    <?php endif; ?>
+                $no++;
+              }
+            } else {
+              echo "<tr><td colspan='4' class='text-center text-muted'>No activity logs found.</td></tr>";
+            }
+            ?>
+          </tbody>
+        </table>
 
-    <!-- Page Indicator -->
-    <span class="small text-muted">Page <?= $page ?> of <?= $total_pages ?></span>
+        <!-- Pagination -->
+        <nav aria-label="Page navigation" class="mt-2">
+          <div class="d-flex justify-content-center align-items-center gap-2">
+            <?php if ($page > 1): ?>
+              <a class="btn btn-outline-primary btn-sm" href="?page=<?= $page - 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Prev</a>
+            <?php else: ?>
+              <button class="btn btn-outline-secondary btn-sm" disabled>Prev</button>
+            <?php endif; ?>
 
-    <!-- Next Button -->
-    <?php if($page < $total_pages): ?>
-      <a class="btn btn-outline-primary btn-sm px-3 py-1" href="?page=<?= $page+1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">
-        Next <i class="fas fa-chevron-right ms-1"></i>
-      </a>
-    <?php else: ?>
-      <button class="btn btn-outline-secondary btn-sm px-3 py-1" disabled>
-        Next <i class="fas fa-chevron-right ms-1"></i>
-      </button>
-    <?php endif; ?>
+            <span class="small text-muted">Page <?= $page ?> of <?= $total_pages ?></span>
 
-  </div>
-</nav>
+            <?php if ($page < $total_pages): ?>
+              <a class="btn btn-outline-primary btn-sm" href="?page=<?= $page + 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Next</a>
+            <?php else: ?>
+              <button class="btn btn-outline-secondary btn-sm" disabled>Next</button>
+            <?php endif; ?>
+          </div>
+        </nav>
+      </div>
 
+      <!-- Login/Logout Logs -->
+      <div id="loginlogs" class="table-responsive d-none">
+        <table class="table table-striped table-hover align-middle text-start">
+          <thead class="table-dark">
+            <tr>
+              <th style="width: 10%">No.</th>
+              <th style="width: 40%">Activity</th>
+              <th style="width: 25%">Date and Time</th>
+              <th style="width: 25%">User</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            if ($result_login->num_rows > 0) {
+              $no = $offset_login + 1;
+              while ($row = $result_login->fetch_assoc()) {
+                echo "<tr>
+                        <td>{$no}</td>
+                        <td>{$row['action']}</td>
+                        <td>{$row['log_time']}</td>
+                        <td>{$row['fullname']}</td>
+                      </tr>";
+                $no++;
+              }
+            } else {
+              echo "<tr><td colspan='4' class='text-center text-muted'>No login/logout logs found.</td></tr>";
+            }
+            ?>
+          </tbody>
+        </table>
 
-</div>
+        <!-- Pagination -->
+        <nav aria-label="Page navigation" class="mt-2">
+          <div class="d-flex justify-content-center align-items-center gap-2">
+            <?php if ($page_login > 1): ?>
+              <a class="btn btn-outline-primary btn-sm" href="?page_login=<?= $page_login - 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Prev</a>
+            <?php else: ?>
+              <button class="btn btn-outline-secondary btn-sm" disabled>Prev</button>
+            <?php endif; ?>
 
+            <span class="small text-muted">Page <?= $page_login ?> of <?= $total_pages_login ?></span>
 
-<!-- Log In Logs --> 
-<div id="loginlogs" class="table-responsive d-none">
-  <table class="table table-striped table-hover align-middle text-start">
-    <thead class="table-dark">
-      <tr>
-        <th style="width: 10%">No.</th>
-        <th style="width: 40%">Activity</th>
-        <th style="width: 25%">Date and Time</th>
-        <th style="width: 25%">User</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td>
-        <td>User logged in</td>
-        <td>2025-10-02 08:00:00</td>
-        <td>Admin</td>
-      </tr>
-      <tr>
-        <td>2</td>
-        <td>User logged in</td>
-        <td>2025-10-02 09:10:00</td>
-        <td>Staff1</td>
-      </tr>
-      <tr>
-        <td>3</td>
-        <td>User logged in</td>
-        <td>2025-10-02 10:20:00</td>
-        <td>Staff2</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+            <?php if ($page_login < $total_pages_login): ?>
+              <a class="btn btn-outline-primary btn-sm" href="?page_login=<?= $page_login + 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Next</a>
+            <?php else: ?>
+              <button class="btn btn-outline-secondary btn-sm" disabled>Next</button>
+            <?php endif; ?>
+          </div>
+        </nav>
+      </div>
     </div>
-      <!--Put Navigation after PHP applied --> 
-
-
   </main>
 
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
@@ -220,5 +268,4 @@ $result = $stmt->get_result();
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="activitylog.js"></script>
 </body>
-
 </html>

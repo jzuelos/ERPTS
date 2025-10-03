@@ -96,7 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
     if ($stmt->execute()) {
         // Log the action
         $adminId = $_SESSION['user_id'] ?? null; // who performed the update
-        $actionMsg = "Updated user ID: " . $userId;
+        $actionMsg = "Updated user: " . $first_name . " " . $last_name;
         if ($adminId) {
             logActivity($conn, $adminId, $actionMsg);
         }
@@ -291,8 +291,8 @@ $conn->close();
                                                             </div>
                                                         </div>
 
-                                                      <!-- Right Column -->
-                                                            <div class="col-md-6">
+                                                        <!-- Right Column -->
+                                                        <div class="col-md-6">
                                                             <h5 class="text-primary">Additional Details</h5>
                                                             <hr>
                                                             <div class="form-group">
@@ -330,37 +330,37 @@ $conn->close();
                                                             <hr>
 
                                                             <div class="form-group mb-2">
-                                                            <label for="municipality">Municipality</label>
-                                                            <select class="form-control" name="municipality" id="municipality">
-                                                                <option value="" selected disabled>Select municipality</option>
-                                                                <option value="Municipality 1">Municipality 1</option>
-                                                            </select>
+                                                                <label for="municipality">Municipality</label>
+                                                                <select class="form-control" name="municipality" id="municipality">
+                                                                    <option value="" selected disabled>Select municipality</option>
+                                                                    <option value="Municipality 1">Municipality 1</option>
+                                                                </select>
                                                             </div>
 
                                                             <div class="form-group mb-2">
-                                                            <label for="district">District</label>
-                                                            <select class="form-control" name="district" id="district">
-                                                                <option value="" selected disabled>Select district</option>
-                                                                <option value="District 1">District 1</option>
-                                                                <option value="District 2">District 2</option>
-                                                            </select>
+                                                                <label for="district">District</label>
+                                                                <select class="form-control" name="district" id="district">
+                                                                    <option value="" selected disabled>Select district</option>
+                                                                    <option value="District 1">District 1</option>
+                                                                    <option value="District 2">District 2</option>
+                                                                </select>
                                                             </div>
 
                                                             <div class="form-group mb-2">
-                                                            <label for="barangay">Barangay</label>
-                                                            <select class="form-control" name="barangay" id="barangay">
-                                                                <option value="" selected disabled>Select barangay</option>
-                                                                <option value="Barangay 1">Barangay 1</option>
-                                                            </select>
+                                                                <label for="barangay">Barangay</label>
+                                                                <select class="form-control" name="barangay" id="barangay">
+                                                                    <option value="" selected disabled>Select barangay</option>
+                                                                    <option value="Barangay 1">Barangay 1</option>
+                                                                </select>
                                                             </div>
-                                                         </div>
+                                                        </div>
 
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-dismiss="modal">Close</button>
-                                                <button type="reset" class="btn btn-warning">Reset</button>
-                                                <button type="submit" class="btn btn-primary">Save changes</button>
-                                            </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-dismiss="modal">Close</button>
+                                                            <button type="reset" class="btn btn-warning">Reset</button>
+                                                            <button type="submit" class="btn btn-primary">Save changes</button>
+                                                        </div>
                                         </form>
                                     </div>
                                 </div>
