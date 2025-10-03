@@ -92,14 +92,14 @@ if ($p_id > 0) {
             o.own_info
         FROM owners_tb o
         INNER JOIN propertyowner po ON o.own_id = po.owner_id
-        WHERE po.property_id = ?
+        WHERE po.property_id = ? AND po.is_retained = 1
     ")
     ) {
         $stmt->bind_param("i", $p_id);
         $stmt->execute();
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
-            $owners[] = $row; // $row now contains only the selected fields
+            $owners[] = $row;
         }
         $stmt->close();
     }
@@ -564,7 +564,8 @@ if ($p_id > 0) {
 <script>
     //Automatically print after populating the fields
     setTimeout(() => {
-         window.print();
-     }, 500); // Adjust delay if needed
+        window.print();
+    }, 500); // Adjust delay if needed
 </script>
+
 </html>
