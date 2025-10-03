@@ -90,50 +90,112 @@ if ($conn->connect_error) {
           </select>
         </div>
 
-        <!-- Right Column (Table) -->
-        <div class="col-md-8">
-          <div class="table-responsive rounded">
-            <table class="table table-hover align-middle mb-0" id="classificationTable">
-              <thead class="table-light">
-                <tr>
-                  <th style="width: 15%">ID</th>
-                  <th style="width: 40%">Name</th>
-                  <th style="width: 15%">Position</th>
-                  <th style="width: 15%">Status</th>
-                  <th style="width: 15%">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="id">001</td>
-                  <td class="name">Description Sample No. 1 Test</td>
-                  <td class="position">Position?</td>
-                  <td class="status">
-                    <span class="badge bg-success-subtle text-success">Active</span>
-                  </td>
-                  <td>
-                    <button class="btn btn-sm btn-outline-primary me-1 edit-btn" 
-                            title="Edit" 
-                            data-bs-toggle="modal" 
-                            data-bs-target="#editModal">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger delete-row-btn" 
-                            data-id="001" 
-                            title="Delete">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <div id="classificationPagination" class="mt-3 d-flex justify-content-start"></div> <!-- Lagyan ko nalang kapag may php na --> 
-          </div>
+<!-- Right Column (Table) -->
+<div class="col-md-8">
+  <div class="table-responsive rounded">
+
+    <!-- Top Bar: Add + Search -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Classification List</h5>
+      
+      <div class="d-flex gap-2">
+        <!-- Add Button -->
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+          <i class="fas fa-plus"></i> Add
+        </button>
+
+        <!-- Search Box -->
+        <div class="input-group" style="width: 280px;">
+          <input type="text" id="searchInput" class="form-control" placeholder="Search...">
+          <button class="btn btn-outline-primary" type="button" id="searchBtn">
+            <i class="fas fa-search"></i>
+          </button>
         </div>
       </div>
     </div>
+
+    <!-- Table -->
+    <table class="table table-hover align-middle mb-0" id="classificationTable">
+      <thead class="table-light">
+        <tr>
+          <th style="width: 15%">ID</th>
+          <th style="width: 40%">Name</th>
+          <th style="width: 15%">Position</th>
+          <th style="width: 15%">Status</th>
+          <th style="width: 15%">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="id">001</td>
+          <td class="name">Description Sample No. 1 Test</td>
+          <td class="position">Position?</td>
+          <td class="status">
+            <span class="badge bg-success-subtle text-success">Active</span>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary me-1 edit-btn" 
+                    title="Edit" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#editModal">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger delete-row-btn" 
+                    data-id="001" 
+                    title="Delete">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div id="classificationPagination" class="mt-3 d-flex justify-content-start"></div> <!-- Pagination Function --> 
   </div>
+</div>
+
 </main>
+
+
+<!-- Add Modal -->
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="addForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addModalLabel">Add New Record</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="addId" class="form-label">ID</label>
+            <input type="text" class="form-control" id="addId" required>
+          </div>
+          <div class="mb-3">
+            <label for="addName" class="form-label">Name</label>
+            <input type="text" class="form-control" id="addName" required>
+          </div>
+          <div class="mb-3">
+            <label for="addPosition" class="form-label">Position</label>
+            <input type="text" class="form-control" id="addPosition" required>
+          </div>
+          <div class="mb-3">
+            <label for="addStatus" class="form-label">Status</label>
+            <select class="form-select" id="addStatus" required>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 
 <!-- Edit Modal -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
