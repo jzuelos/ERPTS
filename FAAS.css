@@ -176,6 +176,9 @@
   transition: transform 0.1s ease-in-out;
 }
 
+/* Eye Hover CSS */
+
+
 /* Mobile adjustments */
 @media (max-width: 480px) {
   #propertyCarousel .carousel-control-prev,

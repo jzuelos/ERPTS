@@ -185,6 +185,7 @@ function fetchOwnersWithDetails($conn, $property_id)
             o.barangay AS barangay,
             o.city AS city,
             o.province AS province,
+            o.own_info,
             COALESCE(o.owner_type, 'individual') as owner_type,
             o.company_name,
             CASE 
@@ -569,7 +570,7 @@ $conn->close();
 
       <?php else: ?>
         <!-- Declaration exists, cannot disable -->
-        <span class="btn btn-secondary disabled" title="Cannot disable: tax declaration exists for this property">
+        <span class="btn btn-secondary disabled mb-" title="Cannot disable: tax declaration exists for this property">
           <i class="fas fa-ban"></i> Cannot cancel RPU with TD encoded
         </span>
       <?php endif;
@@ -588,73 +589,107 @@ $conn->close();
           </div>
         <?php else: ?>
           <div class="col-md-12 mb-4">
-            <div class="d-flex align-items-center mb-3">
-              <h6 class="mb-0">Property Owners (<?= count($owners_details) ?>)</h6>
-              <div class="d-flex align-items-center ms-auto gap-2">
-                <?php
-                $hasRPUWithTax = !empty($rpu_declaration); // true if RPU exists for this FAAS
-                ?>
-                <div class="text-end"> <!-- align everything to the right -->
-                  <?php if (!$hasRPUWithTax): ?>
-                    <small class="text-muted d-block mb-1">
-                      No tax declaration; ownership change disabled.
-                    </small>
-                  <?php endif; ?>
-                  <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal"
-                    data-bs-target="#changeOwnershipModal" data-property-id="<?= htmlspecialchars($property_id) ?>"
-                    <?= $hasRPUWithTax ? '' : 'disabled' ?>>
-                    Change Ownership
-                  </button>
+              <div class="d-flex align-items-center mb-3">
+                <h6 class="mb-0">Property Owners (<?= count($owners_details) ?>)</h6>
+                <div class="d-flex align-items-center ms-auto gap-2">
+                  <?php
+                  $hasRPUWithTax = !empty($rpu_declaration); // true if RPU exists for this FAAS
+                  ?>
+                  <div class="text-end"> <!-- align everything to the right -->
+                    <?php if (!$hasRPUWithTax): ?>
+                      <small class="text-muted d-block mb-1">
+                        No tax declaration; ownership change disabled.
+                      </small>
+                    <?php endif; ?>
+                    <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal"
+                      data-bs-target="#changeOwnershipModal" data-property-id="<?= htmlspecialchars($property_id) ?>"
+                      <?= $hasRPUWithTax ? '' : 'disabled' ?>>
+                      Change Ownership
+                    </button>
+                  </div>
                 </div>
               </div>
+              <?php
+              // Ensure $property_id is defined before including modal
+              $property_id = $property_id ?? ($_GET['id'] ?? 0);
+              include __DIR__ . '/change_ownership_modal.php';
+              ?>
             </div>
-            <?php
-            // Ensure $property_id is defined before including modal
-            $property_id = $property_id ?? ($_GET['id'] ?? 0);
-            include __DIR__ . '/change_ownership_modal.php';
-            ?>
-          </div>
+            <?php foreach ($owners_details as $index => $owner): ?>
+              <div class="owner-item mb-3 p-3 bg-light rounded" 
+                data-owner-id="<?= (int) $owner['own_id'] ?>"
+                data-owner-type="<?= htmlspecialchars($owner['owner_type'] ?? 'individual', ENT_QUOTES) ?>"
+                data-company="<?= htmlspecialchars($owner['company_name'] ?? '', ENT_QUOTES) ?>"
+                data-first="<?= htmlspecialchars($owner['first_name'] ?? '', ENT_QUOTES) ?>"
+                data-middle="<?= htmlspecialchars($owner['middle_name'] ?? '', ENT_QUOTES) ?>"
+                data-last="<?= htmlspecialchars($owner['last_name'] ?? '', ENT_QUOTES) ?>">
 
-          <?php foreach ($owners_details as $index => $owner): ?>
-            <div class="owner-item mb-3 p-3 bg-light rounded" data-owner-id="<?= (int) $owner['own_id'] ?>"
-              data-owner-type="<?= htmlspecialchars($owner['owner_type'] ?? 'individual', ENT_QUOTES) ?>"
-              data-company="<?= htmlspecialchars($owner['company_name'] ?? '', ENT_QUOTES) ?>"
-              data-first="<?= htmlspecialchars($owner['first_name'] ?? '', ENT_QUOTES) ?>"
-              data-middle="<?= htmlspecialchars($owner['middle_name'] ?? '', ENT_QUOTES) ?>"
-              data-last="<?= htmlspecialchars($owner['last_name'] ?? '', ENT_QUOTES) ?>">
-              <div class="d-flex justify-content-between align-items-start">
-                <div class="owner-details flex-grow-1">
-                  <?php if (($owner['owner_type'] ?? 'individual') === 'company'): ?>
-                    <div class="mb-2">
-                      <span class="badge bg-primary me-2">Company</span>
-                      <strong><?= htmlspecialchars($owner['display_name']) ?></strong>
-                    </div>
-                    <?php if (!empty($owner['first_name']) || !empty($owner['last_name'])): ?>
-                      <div class="text-muted small">
-                        Contact:
-                        <?= htmlspecialchars(trim(($owner['first_name'] ?? '') . ' ' . ($owner['middle_name'] ?? '') . ' ' . ($owner['last_name'] ?? ''))) ?>
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="owner-details flex-grow-1">
+                    <?php if (($owner['owner_type'] ?? 'individual') === 'company'): ?>
+                      <div class="mb-2">
+                        <span class="badge bg-primary me-2">Company</span>
+                        <strong><?= htmlspecialchars($owner['display_name']) ?></strong>
+                      </div>
+                      <?php if (!empty($owner['first_name']) || !empty($owner['last_name'])): ?>
+                        <div class="text-muted small">
+                          Contact:
+                          <?= htmlspecialchars(trim(($owner['first_name'] ?? '') . ' ' . ($owner['middle_name'] ?? '') . ' ' . ($owner['last_name'] ?? ''))) ?>
+                        </div>
+                      <?php endif; ?>
+                    <?php else: ?>
+                      <div class="mb-2">
+                        <span class="badge bg-info me-2">Individual</span>
+                        <strong><?= htmlspecialchars($owner['display_name']) ?></strong>
+                      </div>
+                      <div class="row text-muted small">
+                        <div class="col-md-4">First: <?= htmlspecialchars($owner['first_name'] ?? '') ?></div>
+                        <div class="col-md-4">Middle: <?= htmlspecialchars($owner['middle_name'] ?? '') ?></div>
+                        <div class="col-md-4">Last: <?= htmlspecialchars($owner['last_name'] ?? '') ?></div>
                       </div>
                     <?php endif; ?>
-                  <?php else: ?>
-                    <div class="mb-2">
-                      <span class="badge bg-info me-2">Individual</span>
-                      <strong><?= htmlspecialchars($owner['display_name']) ?></strong>
-                    </div>
-                    <div class="row text-muted small">
-                      <div class="col-md-4">First: <?= htmlspecialchars($owner['first_name'] ?? '') ?></div>
-                      <div class="col-md-4">Middle: <?= htmlspecialchars($owner['middle_name'] ?? '') ?></div>
-                      <div class="col-md-4">Last: <?= htmlspecialchars($owner['last_name'] ?? '') ?></div>
-                    </div>
-                  <?php endif; ?>
+                  </div>
+
+               <!-- Eye Hover -->
+              <div class="ms-3 position-relative" style="display:inline-block; position:relative;">
+                  <i class="bi bi-eye text-secondary"
+                    style="cursor: pointer; font-size: 1.3rem;"
+                    onmouseover="this.nextElementSibling.style.opacity='1'; this.nextElementSibling.style.visibility='visible';"
+                    onmouseout="this.nextElementSibling.style.opacity='0'; this.nextElementSibling.style.visibility='hidden';">
+                  </i>
+
+                  <div style="
+                    position: absolute;
+                    top: -10px;
+                    left: 130%;
+                    transform: translateY(-50%);
+                    background-color: #fff;
+                    border: 1px solid #ddd;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    padding: 10px 12px;
+                    border-radius: 8px;
+                    font-size: 0.85rem;
+                    color: #333;
+                    width: 220px;
+                    z-index: 10;
+                    opacity: 0;
+                    visibility: hidden;
+                    transition: opacity 0.2s ease-in-out, transform 0.2s;">
+                    <div><strong>Province:</strong> <?= htmlspecialchars($owner['province'] ?? 'N/A') ?></div>
+                    <div><strong>City:</strong> <?= htmlspecialchars($owner['city'] ?? 'N/A') ?></div>
+                    <div><strong>Barangay:</strong> <?= htmlspecialchars($owner['barangay'] ?? 'N/A') ?></div>
+                    <div><strong>Street:</strong> <?= htmlspecialchars($owner['street'] ?? 'N/A') ?></div>
+                    <div><strong>Info:</strong> <?= htmlspecialchars($owner['own_info'] ?? 'N/A') ?></div>
+                  </div>
                 </div>
               </div>
             </div>
           <?php endforeach; ?>
         </div>
-      <?php endif; ?>
-    </div>
-    </div>
-  </section>
+        <?php endif; ?>
+      </div>
+      </div>
+    </section>
 
   <!-- Property Information Section -->
   <section class="container my-5" id="property-info-section">
