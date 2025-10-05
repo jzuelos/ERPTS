@@ -34,6 +34,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
     $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
     $user_type = filter_input(INPUT_POST, 'user_type', FILTER_SANITIZE_STRING);
     $status = filter_input(INPUT_POST, 'status', FILTER_SANITIZE_NUMBER_INT);
+    $municipality = filter_input(INPUT_POST, 'municipality', FILTER_SANITIZE_NUMBER_INT);
+    $district = filter_input(INPUT_POST, 'district', FILTER_SANITIZE_NUMBER_INT);
+    $barangay = filter_input(INPUT_POST, 'barangay', FILTER_SANITIZE_NUMBER_INT);
 
     // Check for required valid email
     if (!$email) {
@@ -47,11 +50,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
         $query = "UPDATE users SET 
                         username = ?, password = ?, first_name = ?, middle_name = ?, last_name = ?, 
                         gender = ?, birthdate = ?, marital_status = ?, tin = ?, 
-                        contact_number = ?, email = ?, user_type = ?, status = ? 
+                        contact_number = ?, email = ?, user_type = ?, status = ?,
+                        m_id = ?, district_id = ?, brgy_id = ?
                       WHERE user_id = ?";
         $stmt = $conn->prepare($query);
         $stmt->bind_param(
-            "sssssssssssssi",
+            "ssssssssssssiiiii",
             $username,
             $password,
             $first_name,
@@ -65,6 +69,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
             $email,
             $user_type,
             $status,
+            $municipality,
+            $district,
+            $barangay,
             $userId
         );
     } else {
@@ -72,11 +79,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
         $query = "UPDATE users SET 
                         username = ?, first_name = ?, middle_name = ?, last_name = ?, 
                         gender = ?, birthdate = ?, marital_status = ?, tin = ?, 
-                        contact_number = ?, email = ?, user_type = ?, status = ? 
+                        contact_number = ?, email = ?, user_type = ?, status = ?,
+                        m_id = ?, district_id = ?, brgy_id = ?
                       WHERE user_id = ?";
         $stmt = $conn->prepare($query);
         $stmt->bind_param(
-            "sssssssssssii",
+            "sssssssssssiiii",
             $username,
             $first_name,
             $middle_name,
@@ -89,6 +97,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
             $email,
             $user_type,
             $status,
+            $municipality,
+            $district,
+            $barangay,
             $userId
         );
     }
@@ -106,6 +117,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
         echo "<script>alert('Error updating user: " . $stmt->error . "');</script>";
     }
     $stmt->close();
+}
+
+// Fetch all municipalities for dropdown
+$municipalities = [];
+$mun_query = "SELECT m_id, m_description FROM municipality WHERE m_status = 1 ORDER BY m_description";
+$mun_result = $conn->query($mun_query);
+if ($mun_result) {
+    while ($row = $mun_result->fetch_assoc()) {
+        $municipalities[] = $row;
+    }
+    $mun_result->free();
+}
+
+// Fetch all districts (will be filtered by JS)
+$districts = [];
+$dist_query = "SELECT district_id, district_code, description, m_id FROM district WHERE status = 1 ORDER BY description";
+$dist_result = $conn->query($dist_query);
+if ($dist_result) {
+    while ($row = $dist_result->fetch_assoc()) {
+        $districts[] = $row;
+    }
+    $dist_result->free();
+}
+
+// Fetch all barangays (will be filtered by JS)
+$barangays = [];
+$brgy_query = "SELECT brgy_id, brgy_name, m_id FROM brgy WHERE status = 1 ORDER BY brgy_name";
+$brgy_result = $conn->query($brgy_query);
+if ($brgy_result) {
+    while ($row = $brgy_result->fetch_assoc()) {
+        $barangays[] = $row;
+    }
+    $brgy_result->free();
 }
 
 $query = "SELECT * FROM users";
@@ -132,11 +176,6 @@ $conn->close();
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-KyZXEJr+8+6g5K4r53m5s3xmw1Is0J6wBd04YOeFvXOsZTgmYF9flT/qe6LZ9s+0" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
-        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="main_layout.css">
     <link rel="stylesheet" href="header.css">
@@ -145,6 +184,12 @@ $conn->close();
 
 <body>
     <?php include 'header.php'; ?>
+
+    <!-- Pass PHP data to JavaScript -->
+    <script>
+        const districtsData = <?php echo json_encode($districts); ?>;
+        const barangaysData = <?php echo json_encode($barangays); ?>;
+    </script>
 
     <!-- Main Content -->
     <section class="section-user-management">
@@ -331,36 +376,40 @@ $conn->close();
 
                                                             <div class="form-group mb-2">
                                                                 <label for="municipality">Municipality</label>
-                                                                <select class="form-control" name="municipality" id="municipality">
-                                                                    <option value="" selected disabled>Select municipality</option>
-                                                                    <option value="Municipality 1">Municipality 1</option>
+                                                                <select class="form-control municipality-select" name="municipality" data-user-id="<?php echo $user['user_id']; ?>">
+                                                                    <option value="">Select municipality</option>
+                                                                    <?php foreach ($municipalities as $mun): ?>
+                                                                        <option value="<?php echo $mun['m_id']; ?>" 
+                                                                            <?php echo (isset($user['m_id']) && $user['m_id'] == $mun['m_id']) ? 'selected' : ''; ?>>
+                                                                            <?php echo htmlspecialchars($mun['m_description']); ?>
+                                                                        </option>
+                                                                    <?php endforeach; ?>
                                                                 </select>
                                                             </div>
 
                                                             <div class="form-group mb-2">
                                                                 <label for="district">District</label>
-                                                                <select class="form-control" name="district" id="district">
-                                                                    <option value="" selected disabled>Select district</option>
-                                                                    <option value="District 1">District 1</option>
-                                                                    <option value="District 2">District 2</option>
+                                                                <select class="form-control district-select" name="district" data-user-id="<?php echo $user['user_id']; ?>" disabled>
+                                                                    <option value="">Select district</option>
                                                                 </select>
                                                             </div>
 
                                                             <div class="form-group mb-2">
                                                                 <label for="barangay">Barangay</label>
-                                                                <select class="form-control" name="barangay" id="barangay">
-                                                                    <option value="" selected disabled>Select barangay</option>
-                                                                    <option value="Barangay 1">Barangay 1</option>
+                                                                <select class="form-control barangay-select" name="barangay" data-user-id="<?php echo $user['user_id']; ?>" disabled>
+                                                                    <option value="">Select barangay</option>
                                                                 </select>
                                                             </div>
                                                         </div>
-
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary"
-                                                                data-dismiss="modal">Close</button>
-                                                            <button type="reset" class="btn btn-warning">Reset</button>
-                                                            <button type="submit" class="btn btn-primary">Save changes</button>
-                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-dismiss="modal">Close</button>
+                                                <button type="reset" class="btn btn-warning">Reset</button>
+                                                <button type="submit" class="btn btn-primary">Save changes</button>
+                                            </div>
                                         </form>
                                     </div>
                                 </div>
@@ -382,8 +431,13 @@ $conn->close();
 
     <!-- Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+
     <script>
         $(document).ready(function() {
+            // User status filter
             $("input[name='userStatusFilter']").change(function() {
                 var showDisabled = $("#showDisabled").is(":checked");
                 $("tbody tr").each(function() {
@@ -393,16 +447,80 @@ $conn->close();
                     }
                 });
             });
+
+            // Function to populate districts based on municipality (auto-filled, always disabled)
+            function populateDistricts(municipalityId, districtSelect, selectedDistrictId = null) {
+                districtSelect.empty();
+                districtSelect.append('<option value="">Select district</option>');
+                
+                if (municipalityId) {
+                    const filteredDistricts = districtsData.filter(d => d.m_id == municipalityId);
+                    filteredDistricts.forEach(district => {
+                        const selected = selectedDistrictId && district.district_id == selectedDistrictId ? 'selected' : '';
+                        districtSelect.append(`<option value="${district.district_id}" ${selected}>${district.description}</option>`);
+                    });
+                    // Auto-select if only one district exists
+                    if (filteredDistricts.length === 1) {
+                        districtSelect.val(filteredDistricts[0].district_id);
+                    }
+                }
+                // Always keep district disabled
+                districtSelect.prop('disabled', true);
+            }
+
+            // Function to populate barangays based on municipality
+            function populateBarangays(municipalityId, barangaySelect, selectedBarangayId = null) {
+                barangaySelect.empty();
+                barangaySelect.append('<option value="">Select barangay</option>');
+                
+                if (municipalityId) {
+                    const filteredBarangays = barangaysData.filter(b => b.m_id == municipalityId);
+                    filteredBarangays.forEach(barangay => {
+                        const selected = selectedBarangayId && barangay.brgy_id == selectedBarangayId ? 'selected' : '';
+                        barangaySelect.append(`<option value="${barangay.brgy_id}" ${selected}>${barangay.brgy_name}</option>`);
+                    });
+                    barangaySelect.prop('disabled', false);
+                } else {
+                    barangaySelect.prop('disabled', true);
+                }
+            }
+
+            // Initialize dropdowns on modal show
+            $('.modal').on('shown.bs.modal', function() {
+                const modal = $(this);
+                const municipalitySelect = modal.find('.municipality-select');
+                const districtSelect = modal.find('.district-select');
+                const barangaySelect = modal.find('.barangay-select');
+                
+                const selectedMunicipalityId = municipalitySelect.val();
+                
+                if (selectedMunicipalityId) {
+                    // Get the pre-selected values from the form (if editing existing user)
+                    const selectedDistrictId = districtSelect.data('selected-id');
+                    const selectedBarangayId = barangaySelect.data('selected-id');
+                    
+                    populateDistricts(selectedMunicipalityId, districtSelect, selectedDistrictId);
+                    populateBarangays(selectedMunicipalityId, barangaySelect, selectedBarangayId);
+                }
+            });
+
+            // Municipality change event
+            $('.municipality-select').on('change', function() {
+                const municipalityId = $(this).val();
+                const userId = $(this).data('user-id');
+                const districtSelect = $(`.district-select[data-user-id="${userId}"]`);
+                const barangaySelect = $(`.barangay-select[data-user-id="${userId}"]`);
+                
+                populateDistricts(municipalityId, districtSelect);
+                populateBarangays(municipalityId, barangaySelect);
+            });
+
+            // District change event (optional - in case you want to filter barangays by district in the future)
+            $('.district-select').on('change', function() {
+                // Currently district doesn't filter barangay, but you can add logic here if needed
+            });
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
-        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
