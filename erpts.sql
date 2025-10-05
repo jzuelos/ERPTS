@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 02, 2025 at 12:35 PM
+-- Generation Time: Oct 05, 2025 at 08:29 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -61,7 +61,32 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (20, 9, 'Logged in to the system', '2025-10-02 08:52:13'),
 (21, 9, 'Logged in to the system', '2025-10-02 09:24:29'),
 (22, 9, 'Logged in to the system', '2025-10-02 10:15:40'),
-(23, 9, 'Logged in to the system', '2025-10-02 10:24:32');
+(23, 9, 'Logged in to the system', '2025-10-02 10:24:32'),
+(24, 9, 'Logged in to the system', '2025-10-03 12:45:32'),
+(25, 9, 'Logged in to the system', '2025-10-05 14:01:05');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin_certification`
+--
+
+CREATE TABLE `admin_certification` (
+  `id` int(11) NOT NULL,
+  `name` varchar(150) NOT NULL,
+  `description` text DEFAULT NULL,
+  `position` varchar(150) DEFAULT NULL,
+  `status` enum('active','inactive') DEFAULT 'active',
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admin_certification`
+--
+
+INSERT INTO `admin_certification` (`id`, `name`, `description`, `position`, `status`, `created_at`, `updated_at`) VALUES
+(3, 'Ma. Salome Bertillo', NULL, 'Provincial Assessor', 'active', '2025-10-05 23:02:21', '2025-10-06 01:07:32');
 
 -- --------------------------------------------------------
 
@@ -666,29 +691,14 @@ CREATE TABLE `owner_audit_log` (
 
 INSERT INTO `owner_audit_log` (`log_id`, `action`, `owner_id`, `property_id`, `user_id`, `tax-dec_id`, `details`, `created_at`) VALUES
 (1, 'Removed', 9, 144, 9, 2, 'Removed: Renz Balce Dioneda (Purok, 95, 5, Camarines Norte) from property 144', '2025-09-23 22:34:55'),
-(2, 'Added', 14, 144, 9, 2, 'Added: Maria Luisa Santos (Quezon Avenue, Lag-on, Daet, Camarines Norte) to property 144', '2025-09-23 22:34:55'),
-(3, 'Snapshot', 9, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 22:34:55'),
-(4, 'Snapshot', 14, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 22:34:55'),
 (5, 'Removed', 14, 144, 9, 2, 'Removed: Maria Luisa Santos (Quezon Avenue, Lag-on, Daet, Camarines Norte) from property 144', '2025-09-23 22:35:46'),
-(6, 'Added', 8, 144, 9, 2, 'Added: Renz Balce Dioneda (Purok, 201, 8, Camarines Norte) to property 144', '2025-09-23 22:35:46'),
-(7, 'Snapshot', 14, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 22:35:46'),
-(8, 'Snapshot', 8, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 22:35:46'),
 (9, 'Removed', 12, 144, 9, 2, 'Removed: Mark Odi Bertillo (Purok 1, Pasig, Daet, Camarines norte) from property 144', '2025-09-23 23:10:56'),
-(10, 'Added', 11, 144, 9, 2, 'Added: John Lloyd Balce Zuelos (Purok 2, Kalamunding, Labo, Camarines Norte) to property 144', '2025-09-23 23:10:56'),
-(11, 'Snapshot', 12, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 23:10:56'),
-(12, 'Snapshot', 11, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 23:10:56'),
 (13, 'Removed', 8, 144, 9, 2, 'Removed: Renz Balce Dioneda (Purok, 201, 8, Camarines Norte) from property 144', '2025-09-23 23:33:55'),
-(14, 'Added', 12, 144, 9, 2, 'Added: Mark Odi Bertillo (Purok 1, Pasig, Daet, Camarines norte) to property 144', '2025-09-23 23:33:55'),
-(15, 'Snapshot', 8, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 23:33:55'),
 (16, 'Snapshot', 12, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-23 23:33:55'),
-(17, 'Removed', 12, 144, 9, 2, 'Removed: Mark Odi Bertillo (Purok 1, Pasig, Daet, Camarines norte) from property 144', '2025-09-24 00:51:05'),
 (18, 'Added', 10, 144, 9, 2, 'Added: Rommel James Balce Gacho (Purok 2, Bagacay, Labo, Camarines Norte) to property 144', '2025-09-24 00:51:05'),
-(19, 'Snapshot', 12, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-24 00:51:05'),
-(20, 'Snapshot', 10, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-24 00:51:05'),
 (21, 'Removed', 10, 144, 9, 2, 'Removed: Rommel James Balce Gacho (Purok 2, Bagacay, Labo, Camarines Norte) from property 144', '2025-09-24 00:53:05'),
-(22, 'Added', 22, 144, 9, 2, 'Added: Guillermo Torres Delos Santos (Libertad Street, Magang, Daet, Camarines Norte) to property 144', '2025-09-24 00:53:05'),
-(23, 'Snapshot', 10, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-24 00:53:05'),
-(24, 'Snapshot', 22, 144, 9, 2, '{\"dec_id\":2,\"arp_no\":0,\"pro_assess\":\"\",\"pro_date\":\"0000-00-00\",\"mun_assess\":\"\",\"mun_date\":\"0000-00-00\",\"td_cancel\":0,\"previous_pin\":0,\"tax_year\":\"0000-00-00\",\"entered_by\":0,\"entered_year\":\"0000-00-00\",\"prev_own\":\"\",\"prev_assess\":\"0.00\",\"faas_id\":33,\"total_property_value\":\"20157.00\"}', '2025-09-24 00:53:05');
+(25, 'Removed', 11, 144, 9, 1, 'Removed: Isabel Delos Ramos (Burgos St., Barangay 11, Labo, Camarines Norte) from property 144', '2025-10-02 15:18:15'),
+(26, 'Removed', 9, 144, 9, 1, 'Removed: Elena Mendoza Lopez (Purok 1, Barangay 9, Labo, Camarines Norte) from property 144', '2025-10-02 15:21:57');
 
 -- --------------------------------------------------------
 
@@ -710,16 +720,17 @@ CREATE TABLE `propertyowner` (
 --
 
 INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`, `created_at`, `created_by`) VALUES
-(62, 144, 12, 0, '2025-09-21 13:37:29', NULL),
+(62, 144, 12, 1, '2025-09-21 13:37:29', NULL),
 (63, 144, 9, 0, '2025-09-21 13:37:29', NULL),
 (66, 147, 12, 1, '2025-09-21 13:37:29', NULL),
 (72, 157, 12, 1, '2025-09-21 13:37:29', NULL),
 (74, 144, 14, 0, '2025-09-23 22:34:55', 9),
 (75, 144, 8, 0, '2025-09-23 22:35:46', 9),
-(76, 144, 11, 1, '2025-09-23 23:10:56', 9),
+(76, 144, 11, 0, '2025-09-23 23:10:56', 9),
 (77, 144, 12, 0, '2025-09-23 23:33:55', 9),
 (78, 144, 10, 0, '2025-09-24 00:51:05', 9),
-(79, 144, 22, 1, '2025-09-24 00:53:05', 9);
+(79, 144, 22, 1, '2025-09-24 00:53:05', 9),
+(80, 144, 4, 1, '2025-10-02 15:21:57', 9);
 
 -- --------------------------------------------------------
 
@@ -1034,9 +1045,9 @@ CREATE TABLE `users` (
   `tin` varchar(15) DEFAULT NULL,
   `house_number` varchar(10) DEFAULT NULL,
   `street` varchar(100) DEFAULT NULL,
-  `barangay` varchar(50) DEFAULT NULL,
-  `district` varchar(50) DEFAULT NULL,
-  `municipality` varchar(50) DEFAULT NULL,
+  `brgy_id` int(11) DEFAULT NULL,
+  `district_id` int(11) DEFAULT NULL,
+  `m_id` int(11) DEFAULT NULL,
   `province` varchar(50) DEFAULT NULL,
   `contact_number` varchar(15) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
@@ -1048,9 +1059,9 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `username`, `password`, `last_name`, `first_name`, `middle_name`, `gender`, `birthdate`, `marital_status`, `tin`, `house_number`, `street`, `barangay`, `district`, `municipality`, `province`, `contact_number`, `email`, `status`, `user_type`) VALUES
-(9, 'admin', '$2y$10$uJGu7hoKfqtqSLE2EyV2GetTumt1zHaZOnvIpBeGC5dcwWBr25fc.', 'Admin', 'Admin', 'Admin', 'Male', '2001-11-11', 'Single', '000-123-456-789', '5', 'Purok', '66', '18', '14', 'Camarines Norte', '09123456789', 'johnlloydzuelos@gmail.com', 1, 'admin'),
-(12, 'user', '$2y$10$gmDQWOOqOOy8uUra8gGPQOA.FUDHTpucmbrNQ7mk..FbM/3ndQNt2', 'Cruz', 'Juan', 'Dela', 'Male', '2000-01-01', 'Single', 'NA', '1', 'Purok 1', '4', NULL, '1', 'Camarines Norte', '09123456789', 'user@email.com', 1, 'user');
+INSERT INTO `users` (`user_id`, `username`, `password`, `last_name`, `first_name`, `middle_name`, `gender`, `birthdate`, `marital_status`, `tin`, `house_number`, `street`, `brgy_id`, `district_id`, `m_id`, `province`, `contact_number`, `email`, `status`, `user_type`) VALUES
+(9, 'admin', '$2y$10$uJGu7hoKfqtqSLE2EyV2GetTumt1zHaZOnvIpBeGC5dcwWBr25fc.', 'Zuelos', 'John Lloyd', 'Cruz', 'Male', '2001-11-11', 'Single', '000-123-456-789', '5', 'Purok', 66, 18, 14, 'Camarines Norte', '09123456789', 'johnlloydzuelos@gmail.com', 1, 'admin'),
+(12, 'user', '$2y$10$gmDQWOOqOOy8uUra8gGPQOA.FUDHTpucmbrNQ7mk..FbM/3ndQNt2', 'Cruz', 'Juan', 'Dela', 'Male', '2000-01-01', 'Single', 'NA', '1', 'Purok 1', 4, NULL, 1, 'Camarines Norte', '09123456789', 'user@email.com', 1, 'user');
 
 --
 -- Indexes for dumped tables
@@ -1062,6 +1073,12 @@ INSERT INTO `users` (`user_id`, `username`, `password`, `last_name`, `first_name
 ALTER TABLE `activity_log`
   ADD PRIMARY KEY (`log_id`),
   ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `admin_certification`
+--
+ALTER TABLE `admin_certification`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `brgy`
@@ -1211,7 +1228,8 @@ ALTER TABLE `transaction_logs`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`user_id`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD UNIQUE KEY `email` (`email`),
+  ADD KEY `fk_users_brgy` (`brgy_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -1221,7 +1239,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+
+--
+-- AUTO_INCREMENT for table `admin_certification`
+--
+ALTER TABLE `admin_certification`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `brgy`
@@ -1281,13 +1305,13 @@ ALTER TABLE `owners_tb`
 -- AUTO_INCREMENT for table `owner_audit_log`
 --
 ALTER TABLE `owner_audit_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `propertyowner`
 --
 ALTER TABLE `propertyowner`
-  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
+  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
 
 --
 -- AUTO_INCREMENT for table `province`
@@ -1353,7 +1377,7 @@ ALTER TABLE `transaction_logs`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- Constraints for dumped tables
