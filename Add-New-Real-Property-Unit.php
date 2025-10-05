@@ -24,7 +24,7 @@
   <div id="selectedOwnerDisplay"></div> <!-- Display area for selected owner IDs -->
   <?php
   session_start(); // Start session at the top
-  
+
   // Prevent the browser from caching this page
   header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
   header("Cache-Control: post-check=0, pre-check=0", false);
@@ -88,7 +88,7 @@
           if ($stmt->execute()) {
             $property_id = $stmt->insert_id; // Get last inserted ID
             $_SESSION['last_property_id'] = $property_id; // Store it in session
-  
+
             // Insert owners into propertyowner table and collect propertyowner_ids
             $propertyowner_ids = [];
             if (!empty($selected_owner_ids)) {
@@ -346,16 +346,28 @@
             ?>
             <!-- Province Dropdown -->
             <div class="row mb-3">
+              <!-- Province Dropdown (Auto-set to Camarines Norte) -->
               <div class="col-md-3">
                 <label for="province" class="form-label">Province</label>
-                <select class="form-control" id="province" name="province" required>
-                  <option value="" disabled selected>Select Province</option>
+                <select class="form-control" id="province" name="province_display" disabled>
                   <?php
                   while ($row = $regions_result->fetch_assoc()) {
-                    echo "<option value='" . htmlspecialchars($row['province_id'], ENT_QUOTES) . "'>" . htmlspecialchars($row['province_name'], ENT_QUOTES) . "</option>";
+                    $province_id = htmlspecialchars($row['province_id'], ENT_QUOTES);
+                    $province_name = htmlspecialchars($row['province_name'], ENT_QUOTES);
+
+                    if (strtolower($province_name) === 'camarines norte') {
+                      echo "<option value='$province_id' selected>$province_name</option>";
+                      // Store province_id for hidden input
+                      $selected_province_id = $province_id;
+                    }
                   }
                   ?>
                 </select>
+
+                <!-- Hidden input to still include province in form submission -->
+                <?php if (isset($selected_province_id)): ?>
+                  <input type="hidden" name="province" value="<?php echo $selected_province_id; ?>">
+                <?php endif; ?>
               </div>
 
               <!-- Municipality Dropdown -->
