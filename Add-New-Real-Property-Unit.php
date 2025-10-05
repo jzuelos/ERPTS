@@ -390,7 +390,7 @@
               <div class="col-md-3">
                 <label for="district" class="form-label">District</label>
                 <input type="text" class="form-control" id="district" name="district" readonly
-                  placeholder="Auto-filled from Municipality">
+                  placeholder="District">
               </div>
 
               <!-- Barangay Dropdown -->
