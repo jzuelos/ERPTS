@@ -84,7 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
                       WHERE user_id = ?";
         $stmt = $conn->prepare($query);
         $stmt->bind_param(
-            "sssssssssssiiii",
+            "sssssssssssiiiii",
             $username,
             $first_name,
             $middle_name,
@@ -379,7 +379,7 @@ $conn->close();
                                                                 <select class="form-control municipality-select" name="municipality" data-user-id="<?php echo $user['user_id']; ?>">
                                                                     <option value="">Select municipality</option>
                                                                     <?php foreach ($municipalities as $mun): ?>
-                                                                        <option value="<?php echo $mun['m_id']; ?>" 
+                                                                        <option value="<?php echo $mun['m_id']; ?>"
                                                                             <?php echo (isset($user['m_id']) && $user['m_id'] == $mun['m_id']) ? 'selected' : ''; ?>>
                                                                             <?php echo htmlspecialchars($mun['m_description']); ?>
                                                                         </option>
@@ -389,17 +389,28 @@ $conn->close();
 
                                                             <div class="form-group mb-2">
                                                                 <label for="district">District</label>
-                                                                <select class="form-control district-select" name="district" data-user-id="<?php echo $user['user_id']; ?>" disabled>
+                                                                <select
+                                                                    class="form-control district-select"
+                                                                    name="district"
+                                                                    data-user-id="<?php echo $user['user_id']; ?>"
+                                                                    data-selected-id="<?php echo isset($user['district_id']) ? $user['district_id'] : ''; ?>"
+                                                                    disabled>
                                                                     <option value="">Select district</option>
                                                                 </select>
                                                             </div>
 
                                                             <div class="form-group mb-2">
                                                                 <label for="barangay">Barangay</label>
-                                                                <select class="form-control barangay-select" name="barangay" data-user-id="<?php echo $user['user_id']; ?>" disabled>
+                                                                <select
+                                                                    class="form-control barangay-select"
+                                                                    name="barangay"
+                                                                    data-user-id="<?php echo $user['user_id']; ?>"
+                                                                    data-selected-id="<?php echo isset($user['brgy_id']) ? $user['brgy_id'] : ''; ?>"
+                                                                    disabled>
                                                                     <option value="">Select barangay</option>
                                                                 </select>
                                                             </div>
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -450,77 +461,74 @@ $conn->close();
 
             // Function to populate districts based on municipality (auto-filled, always disabled)
             function populateDistricts(municipalityId, districtSelect, selectedDistrictId = null) {
-                districtSelect.empty();
-                districtSelect.append('<option value="">Select district</option>');
-                
+                districtSelect.empty().append('<option value="">Select district</option>');
+
                 if (municipalityId) {
                     const filteredDistricts = districtsData.filter(d => d.m_id == municipalityId);
                     filteredDistricts.forEach(district => {
-                        const selected = selectedDistrictId && district.district_id == selectedDistrictId ? 'selected' : '';
-                        districtSelect.append(`<option value="${district.district_id}" ${selected}>${district.description}</option>`);
+                        const selected = selectedDistrictId && district.d_id == selectedDistrictId ? 'selected' : '';
+                        districtSelect.append(`<option value="${district.d_id}" ${selected}>${district.d_description}</option>`);
                     });
+
                     // Auto-select if only one district exists
                     if (filteredDistricts.length === 1) {
-                        districtSelect.val(filteredDistricts[0].district_id);
+                        districtSelect.val(filteredDistricts[0].d_id);
                     }
                 }
+
                 // Always keep district disabled
                 districtSelect.prop('disabled', true);
             }
 
             // Function to populate barangays based on municipality
             function populateBarangays(municipalityId, barangaySelect, selectedBarangayId = null) {
-                barangaySelect.empty();
-                barangaySelect.append('<option value="">Select barangay</option>');
-                
+                barangaySelect.empty().append('<option value="">Select barangay</option>');
+
                 if (municipalityId) {
                     const filteredBarangays = barangaysData.filter(b => b.m_id == municipalityId);
                     filteredBarangays.forEach(barangay => {
                         const selected = selectedBarangayId && barangay.brgy_id == selectedBarangayId ? 'selected' : '';
                         barangaySelect.append(`<option value="${barangay.brgy_id}" ${selected}>${barangay.brgy_name}</option>`);
                     });
-                    barangaySelect.prop('disabled', false);
+
+                    // Enable barangay dropdown only if there are results
+                    barangaySelect.prop('disabled', filteredBarangays.length === 0);
                 } else {
                     barangaySelect.prop('disabled', true);
                 }
             }
 
-            // Initialize dropdowns on modal show
+            // Initialize dropdowns on modal show (auto-selects saved barangay)
             $('.modal').on('shown.bs.modal', function() {
                 const modal = $(this);
                 const municipalitySelect = modal.find('.municipality-select');
                 const districtSelect = modal.find('.district-select');
                 const barangaySelect = modal.find('.barangay-select');
-                
+
+                // Get saved values from PHP (set as data attributes)
                 const selectedMunicipalityId = municipalitySelect.val();
-                
+                const selectedDistrictId = districtSelect.data('selected-id');
+                const selectedBarangayId = barangaySelect.data('selected-id');
+
                 if (selectedMunicipalityId) {
-                    // Get the pre-selected values from the form (if editing existing user)
-                    const selectedDistrictId = districtSelect.data('selected-id');
-                    const selectedBarangayId = barangaySelect.data('selected-id');
-                    
                     populateDistricts(selectedMunicipalityId, districtSelect, selectedDistrictId);
                     populateBarangays(selectedMunicipalityId, barangaySelect, selectedBarangayId);
                 }
             });
 
-            // Municipality change event
+            // Municipality change event (refresh district & barangay)
             $('.municipality-select').on('change', function() {
                 const municipalityId = $(this).val();
                 const userId = $(this).data('user-id');
                 const districtSelect = $(`.district-select[data-user-id="${userId}"]`);
                 const barangaySelect = $(`.barangay-select[data-user-id="${userId}"]`);
-                
+
                 populateDistricts(municipalityId, districtSelect);
                 populateBarangays(municipalityId, barangaySelect);
             });
-
-            // District change event (optional - in case you want to filter barangays by district in the future)
-            $('.district-select').on('change', function() {
-                // Currently district doesn't filter barangay, but you can add logic here if needed
-            });
         });
     </script>
+
 </body>
 
 </html>
