@@ -1,4 +1,198 @@
 
+document.addEventListener("DOMContentLoaded", () => {
+  let rowToDelete = null;
+
+  // =========================
+  // ADD RECORD
+  // =========================
+  document.getElementById("addForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const name = document.getElementById("addName").value.trim();
+    const position = document.getElementById("addPosition").value.trim();
+    const status = document.querySelector('#addForm input[name="status"]:checked').value;
+
+    fetch("", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ action: "add", name, position, status })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert("✅ Record added successfully!");
+          location.reload();
+        } else {
+          alert("❌ Failed to add record.");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("❌ Error adding record.");
+      });
+  });
+
+  // =========================
+  // EDIT RECORD
+  // =========================
+  document.querySelectorAll(".edit-btn").forEach(button => {
+    button.addEventListener("click", function () {
+      const row = this.closest("tr");
+      const id = row.querySelector(".id").textContent.trim();
+      const name = row.querySelector(".name").textContent.trim();
+      const position = row.querySelector(".position").textContent.trim();
+      const statusText = row.querySelector(".status span").textContent.trim();
+
+      // Convert "Active" display text to "active" database value
+      const status = statusText.toLowerCase();
+
+      document.getElementById("editId").value = id;
+      document.getElementById("editName").value = name;
+      document.getElementById("editPosition").value = position;
+
+      // Check the correct radio button
+      const radioButton = document.querySelector(`#editForm input[value="${status}"]`);
+      if (radioButton) {
+        radioButton.checked = true;
+      }
+
+      // Show the modal
+      const editModal = new bootstrap.Modal(document.getElementById("editModal"));
+      editModal.show();
+    });
+  });
+
+  document.getElementById("editForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const id = document.getElementById("editId").value;
+    const name = document.getElementById("editName").value.trim();
+    const position = document.getElementById("editPosition").value.trim();
+    const status = document.querySelector('#editForm input[name="editStatus"]:checked').value;
+
+    fetch("", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ action: "edit", id, name, position, status })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert("✅ Record updated successfully!");
+          location.reload();
+        } else {
+          alert("❌ Update failed.");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("❌ Error updating record.");
+      });
+  });
+
+  // =========================
+  // DELETE RECORD
+  // =========================
+  document.querySelectorAll(".delete-row-btn").forEach(button => {
+    button.addEventListener("click", function () {
+      rowToDelete = this.closest("tr");
+      const id = this.dataset.id;
+      document.getElementById("deleteMessage").textContent =
+        `Are you sure you want to delete record ID ${id}?`;
+
+      const deleteModal = new bootstrap.Modal(document.getElementById("deleteModal"));
+      deleteModal.show();
+    });
+  });
+
+  document.getElementById("confirmDeleteBtn").addEventListener("click", function () {
+    if (!rowToDelete) return;
+    const id = rowToDelete.querySelector(".id").textContent.trim();
+
+    fetch("", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ action: "delete", id })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert("🗑️ Record deleted successfully!");
+          location.reload();
+        } else {
+          alert("❌ Delete failed.");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("❌ Error deleting record.");
+      })
+      .finally(() => {
+        const modal = bootstrap.Modal.getInstance(document.getElementById("deleteModal"));
+        if (modal) modal.hide();
+      });
+  });
+
+  // =========================
+  // SEARCH FUNCTIONALITY
+  // =========================
+  const searchInput = document.getElementById("searchInput");
+  const searchBtn = document.getElementById("searchBtn");
+
+  function performSearch() {
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    const rows = document.querySelectorAll("#classificationTable tbody tr");
+
+    rows.forEach(row => {
+      const id = row.querySelector(".id")?.textContent.toLowerCase() || "";
+      const name = row.querySelector(".name")?.textContent.toLowerCase() || "";
+      const position = row.querySelector(".position")?.textContent.toLowerCase() || "";
+      const status = row.querySelector(".status")?.textContent.toLowerCase() || "";
+
+      if (id.includes(searchTerm) || name.includes(searchTerm) ||
+        position.includes(searchTerm) || status.includes(searchTerm)) {
+        row.style.display = "";
+      } else {
+        row.style.display = "none";
+      }
+    });
+  }
+
+  if (searchBtn) {
+    searchBtn.addEventListener("click", performSearch);
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener("keyup", function (e) {
+      if (e.key === "Enter") {
+        performSearch();
+      }
+    });
+  }
+});
+
+document.getElementById("confirmDeleteBtn").addEventListener("click", function () {
+  if (!rowToDelete) return;
+  const id = rowToDelete.querySelector(".id").textContent.trim();
+
+  fetch("", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ action: "delete", id })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        rowToDelete.remove();
+        alert("🗑️ Record deleted successfully!");
+      } else {
+        alert("❌ Delete failed.");
+      }
+
+      const modal = bootstrap.Modal.getInstance(document.getElementById("deleteModal"));
+      modal.hide();
+    });
+});
+
+
 // Edit Button
 document.querySelectorAll(".edit-btn").forEach(button => {
   button.addEventListener("click", function () {
@@ -30,7 +224,7 @@ document.getElementById("editForm").addEventListener("submit", function (e) {
 
   // Find row with matching ID
   let row = [...document.querySelectorAll("#classificationTable tbody tr")]
-              .find(r => r.querySelector(".id").textContent.trim() === id);
+    .find(r => r.querySelector(".id").textContent.trim() === id);
 
   if (row) {
     // Update table row values
@@ -40,7 +234,7 @@ document.getElementById("editForm").addEventListener("submit", function (e) {
 
     // Update badge styling depending on status
     let badge = row.querySelector(".status span");
-    badge.className = status === "Active" 
+    badge.className = status === "Active"
       ? "badge bg-success-subtle text-success"
       : "badge bg-danger-subtle text-danger";
   }
@@ -80,4 +274,3 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", function (
   let modalInstance = bootstrap.Modal.getInstance(modalEl);
   modalInstance.hide();
 });
-
