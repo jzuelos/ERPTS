@@ -38,9 +38,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tin = filter_input(INPUT_POST, 'tin', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $house_number = filter_input(INPUT_POST, 'house_number', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $street = filter_input(INPUT_POST, 'street', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $barangay = filter_input(INPUT_POST, 'barangay', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $district = filter_input(INPUT_POST, 'district', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $municipality = filter_input(INPUT_POST, 'municipality', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $barangay = filter_input(INPUT_POST, 'barangay', FILTER_SANITIZE_NUMBER_INT);
+    $district = filter_input(INPUT_POST, 'district', FILTER_SANITIZE_NUMBER_INT);
+    $municipality = filter_input(INPUT_POST, 'municipality', FILTER_SANITIZE_NUMBER_INT);
     $province = filter_input(INPUT_POST, 'province', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $contact_number = filter_input(INPUT_POST, 'contact_number', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($stmt) {
         $stmt->bind_param(
-            "ssssssssssssssssss",
+            "sssssssssssiiissss",
             $username,
             $hashed_password,
             $lastname,
@@ -70,9 +70,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $tin,
             $house_number,
             $street,
-            $barangay,
-            $district,
-            $municipality,
+            $barangay,     // i
+            $district,     // i
+            $municipality, // i
             $province,
             $contact_number,
             $email,
@@ -260,10 +260,11 @@ if (isset($_SESSION['message'])) {
 
                     <div class="col-md-6 form-group mb-3">
                         <label for="district" class="form-label"><span style="color: #F3E407;">*</span> District:</label>
-                        <select id="district" name="district" class="form-control" required
-                            style="border-radius: 6px; border: 1px solid #379777;">
-                            <option value="" disabled selected>Select District</option>
+                        <select id="district" class="form-control" style="border-radius: 6px; border: 1px solid #379777;" disabled>
+                            <option value="" disabled selected>District</option>
                         </select>
+                        <!-- Hidden input to actually submit the value -->
+                        <input type="hidden" name="district" id="hidden_district">
                     </div>
                 </div>
 
