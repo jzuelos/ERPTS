@@ -150,7 +150,7 @@ $result_login = $stmt_login->get_result();
 
         <div class="col-auto ms-auto">
           <button type="button" id="toggleLogsBtn" class="btn btn-primary">
-            <i class="fas fa-sign-in-alt me-1"></i> Show Log In Logs
+            <i class="fas fa-sign-in-alt me-1"></i> Log In/Log Out Logs
           </button>
         </div>
       </form>

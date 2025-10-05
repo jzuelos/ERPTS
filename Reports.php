@@ -93,112 +93,121 @@
           <div style="width: 70px;"></div>
         </div>
 
-       <!-- Filters -->
-<form class="d-flex flex-column justify-content-center" style="height: 500px;">
-      <div class="row g-5">
-      <!-- LEFT: Location -->
-      <div class="col-md-6">
-        <div class="mb-3">
-          <label for="provinceSelect" class="form-label fw-bold">Province</label>
-          <select class="form-select" id="provinceSelect" name="province" disabled>
-            <?php
-            if ($provinces_result->num_rows > 0) {
-              while ($row = $provinces_result->fetch_assoc()) {
-                $selected = ($row['province_id'] == 1) ? 'selected' : '';
-                echo "<option value='" . htmlspecialchars($row['province_id'], ENT_QUOTES) . "' $selected>"
-                  . htmlspecialchars($row['province_name'], ENT_QUOTES) . "</option>";
-              }
-            } else {
-              echo "<option disabled>No provinces found</option>";
-            }
-            ?>
-          </select>
-        </div>
+        <!-- Filters -->
+        <form class="d-flex flex-column justify-content-center" style="height: 500px;">
+          <div class="row g-5">
+            <!-- LEFT: Location -->
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="provinceSelect" class="form-label fw-bold">Province</label>
+                <select class="form-select" id="provinceSelect" name="province" disabled>
+                  <?php
+                  if ($provinces_result->num_rows > 0) {
+                    while ($row = $provinces_result->fetch_assoc()) {
+                      // Automatically select "Camarines Norte"
+                      $selected = (strtolower($row['province_name']) === 'camarines norte') ? 'selected' : '';
+                      echo "<option value='" . htmlspecialchars($row['province_id'], ENT_QUOTES) . "' $selected>"
+                        . htmlspecialchars($row['province_name'], ENT_QUOTES) . "</option>";
+                    }
+                  } else {
+                    echo "<option disabled>No provinces found</option>";
+                  }
+                  ?>
+                </select>
+                <!-- Hidden field to still send province value in POST (disabled fields don't submit) -->
+                <input type="hidden" name="province" value="<?php
+                                                            $provinces_result->data_seek(0);
+                                                            while ($row = $provinces_result->fetch_assoc()) {
+                                                              if (strtolower($row['province_name']) === 'camarines norte') {
+                                                                echo htmlspecialchars($row['province_id'], ENT_QUOTES);
+                                                                break;
+                                                              }
+                                                            }
+                                                            ?>">
+              </div>
 
+              <div class="mb-3">
+                <label for="citySelect" class="form-label fw-bold">Municipality</label>
+                <select class="form-select" id="citySelect">
+                  <option value="" disabled selected>Select Municipality</option>
+                  <?php
+                  if ($municipalities_result->num_rows > 0) {
+                    while ($row = $municipalities_result->fetch_assoc()) {
+                      echo "<option value='" . htmlspecialchars($row['m_id'], ENT_QUOTES) . "'>"
+                        . htmlspecialchars($row['m_description'], ENT_QUOTES) . "</option>";
+                    }
+                  } else {
+                    echo "<option disabled>No municipalities found</option>";
+                  }
+                  ?>
+                </select>
+              </div>
 
+              <div class="mb-3">
+                <label for="districtSelect" class="form-label fw-bold">District</label>
+                <select class="form-select" id="districtSelect">
+                  <option value="" disabled selected>Select District</option>
+                </select>
+              </div>
 
-      <div class="mb-3">
-        <label for="citySelect" class="form-label fw-bold">Municipality</label>
-        <select class="form-select" id="citySelect">
-          <option value="" disabled selected>Select Municipality</option>
-          <?php
-          if ($municipalities_result->num_rows > 0) {
-            while ($row = $municipalities_result->fetch_assoc()) {
-              echo "<option value='" . htmlspecialchars($row['m_id'], ENT_QUOTES) . "'>"
-                . htmlspecialchars($row['m_description'], ENT_QUOTES) . "</option>";
-            }
-          } else {
-            echo "<option disabled>No municipalities found</option>";
-          }
-          ?>
-        </select>
-      </div>
+              <div class="mb-3">
+                <label for="barangaySelect" class="form-label fw-bold">Barangay</label>
+                <select class="form-select" id="barangaySelect" disabled>
+                  <option value="" disabled selected>Select Barangay</option>
+                </select>
+              </div>
+            </div>
 
-      <div class="mb-3">
-        <label for="districtSelect" class="form-label fw-bold">District</label>
-        <select class="form-select" id="districtSelect">
-          <option value="" disabled selected>Select District</option>
-        </select>
-      </div>
+            <!-- RIGHT: Classification + Date -->
+            <div class="col-md-6">
 
-      <div class="mb-3">
-        <label for="barangaySelect" class="form-label fw-bold">Barangay</label>
-        <select class="form-select" id="barangaySelect" disabled>
-          <option value="" disabled selected>Select Barangay</option>
-        </select>
-      </div>
-    </div>
+              <div class="mb-3">
+                <label for="classificationSelect" class="form-label fw-bold">Classification</label>
+                <select class="form-select w-75" id="classificationSelect">
+                  <option value="" disabled selected>Select Classification</option>
+                  <?php
+                  if ($classification_result->num_rows > 0) {
+                    while ($row = $classification_result->fetch_assoc()) {
+                      echo "<option value='" . htmlspecialchars($row['c_id'], ENT_QUOTES) . "'>"
+                        . htmlspecialchars($row['c_description'], ENT_QUOTES) . "</option>";
+                    }
+                  } else {
+                    echo "<option disabled>No classifications found</option>";
+                  }
+                  ?>
+                </select>
+              </div>
 
-    <!-- RIGHT: Classification + Date -->
-    <div class="col-md-6">
+              <hr>
 
-      <div class="mb-3">
-        <label for="classificationSelect" class="form-label fw-bold">Classification</label>
-        <select class="form-select w-75" id="classificationSelect">
-          <option value="" disabled selected>Select Classification</option>
-          <?php
-          if ($classification_result->num_rows > 0) {
-            while ($row = $classification_result->fetch_assoc()) {
-              echo "<option value='" . htmlspecialchars($row['c_id'], ENT_QUOTES) . "'>"
-                . htmlspecialchars($row['c_description'], ENT_QUOTES) . "</option>";
-            }
-          } else {
-            echo "<option disabled>No classifications found</option>";
-          }
-          ?>
-        </select>
-      </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="fromDate" class="form-label fw-bold">From:</label>
+                  <input type="date" class="form-control" id="fromDate" min="<?= $minDate ?>" max="<?= $maxDate ?>">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="toDate" class="form-label fw-bold">To:</label>
+                  <input type="date" class="form-control" id="toDate" min="<?= $minDate ?>" max="<?= $maxDate ?>">
+                </div>
+              </div>
 
-      <hr>
+              <hr>
 
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label for="fromDate" class="form-label fw-bold">From:</label>
-          <input type="date" class="form-control" id="fromDate" min="<?= $minDate ?>" max="<?= $maxDate ?>">
-        </div>
-        <div class="col-md-6 mb-3">
-          <label for="toDate" class="form-label fw-bold">To:</label>
-          <input type="date" class="form-control" id="toDate" min="<?= $minDate ?>" max="<?= $maxDate ?>">
-        </div>
-      </div>
+              <div class="form-check mb-3">
+                <input type="checkbox" class="form-check-input" id="printAllCheck">
+                <label class="form-check-label fw-bold" for="printAllCheck">Print ALL (No Filtering)</label>
+              </div>
 
-      <hr>
+              <div class="text-end d-flex justify-content-end gap-2">
+                <!-- Reset Button -->
+                <button type="button" id="resetBtn" class="btn btn-secondary px-4">RESET</button>
 
-      <div class="form-check mb-3">
-        <input type="checkbox" class="form-check-input" id="printAllCheck">
-        <label class="form-check-label fw-bold" for="printAllCheck">Print ALL (No Filtering)</label>
-      </div>
-
-      <div class="text-end d-flex justify-content-end gap-2">
-        <!-- Reset Button -->
-        <button type="button" id="resetBtn" class="btn btn-secondary px-4">RESET</button>
-        
-        <!-- Print Button -->
-        <a href="#" id="printBtn" class="btn btn-primary px-4" target="_blank">PRINT</a>
-      </div>
-    </div>
-  </div>
-</form>
+                <!-- Print Button -->
+                <a href="#" id="printBtn" class="btn btn-primary px-4" target="_blank">PRINT</a>
+              </div>
+            </div>
+          </div>
+        </form>
 
 
       </div>
@@ -211,199 +220,205 @@
 
   <!-- JS -->
   <script>
-const districts = <?= $districts_json ?>;
-const barangays = <?= $barangays_json ?>;
+    const districts = <?= $districts_json ?>;
+    const barangays = <?= $barangays_json ?>;
 
-document.addEventListener("DOMContentLoaded", () => {
-  const printAllCheck = document.getElementById("printAllCheck");
+    document.addEventListener("DOMContentLoaded", () => {
+      const printAllCheck = document.getElementById("printAllCheck");
+      const classificationSelect = document.getElementById("classificationSelect");
+      const provinceSelect = document.getElementById("provinceSelect");
+      const citySelect = document.getElementById("citySelect");
+      const districtSelect = document.getElementById("districtSelect");
+      const barangaySelect = document.getElementById("barangaySelect");
+      const fromDate = document.getElementById("fromDate");
+      const toDate = document.getElementById("toDate");
+      const printBtn = document.getElementById("printBtn");
+      const resetBtn = document.getElementById("resetBtn");
 
-  const classificationSelect = document.getElementById("classificationSelect");
-  const provinceSelect = document.getElementById("provinceSelect");
-  const citySelect = document.getElementById("citySelect");
-  const districtSelect = document.getElementById("districtSelect");
-  const barangaySelect = document.getElementById("barangaySelect");
-  
-  const fromDate = document.getElementById("fromDate");
-  const toDate = document.getElementById("toDate");
+      // Flag for district auto-lock
+      let districtLocked = true;
 
-  const printBtn = document.getElementById("printBtn");
+      const formElements = [
+        classificationSelect,
+        provinceSelect,
+        citySelect,
+        districtSelect,
+        barangaySelect,
+        fromDate,
+        toDate
+      ];
 
+      function toggleFilters() {
+        formElements.forEach(el => {
+          if (!el) return;
+          // Province always locked
+          if (el === provinceSelect) {
+            el.disabled = true;
+            return;
+          }
+          // District always locked (non-selectable)
+          if (el === districtSelect) {
+            el.disabled = true;
+            return;
+          }
+          // Barangay locked until municipality selected
+          if (el === barangaySelect && !citySelect.value) {
+            el.disabled = true;
+            return;
+          }
+          // Other fields follow Print All checkbox
+          el.disabled = printAllCheck.checked;
+        });
+      }
 
-  const resetBtn = document.getElementById("resetBtn");
+      function checkFilters() {
+        const hasValue = formElements.some(el => el && el.value && el.value !== "");
+        if (hasValue) {
+          printAllCheck.disabled = true;
+          printAllCheck.checked = false;
+        } else {
+          printAllCheck.disabled = false;
+        }
+      }
 
-  // Toggle filters when Print All is checked/unchecked
-  const formElements = [
-    classificationSelect,
-    provinceSelect,
-    citySelect,
-    districtSelect,
-    barangaySelect,
-    fromDate,
-    toDate
-  ];
-
-  function toggleFilters() {
-    formElements.forEach(el => {
-      el.disabled = printAllCheck.checked;
-    });
-  }
-
-  // Initial run
-  toggleFilters();
-  printAllCheck.addEventListener("change", toggleFilters);
-
-  //  NEW: Disable Print All if user changes anything
-  function checkFilters() {
-    const hasValue = formElements.some(el => el.value && el.value !== "");
-    if (hasValue) {
-      printAllCheck.disabled = true;
-      printAllCheck.checked = false;
-    } else {
-      printAllCheck.disabled = false;
-    }
-  }
-
-  formElements.forEach(el => {
-    el.addEventListener("change", checkFilters);
-    el.addEventListener("input", checkFilters);
-  });
-
-  //  Municipality change → auto-fill district + barangays
-  citySelect.addEventListener("change", () => {
-    const m_id = citySelect.value;
-
-    // Reset
-    districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
-    barangaySelect.innerHTML = '<option value="" disabled selected>Select Barangay</option>';
-    barangaySelect.disabled = true;
-
-    // District auto-fill (first match)
-    const d = districts.find(d => d.m_id == m_id);
-    if (d) {
-      const opt = document.createElement("option");
-      opt.value = d.district_id;
-      opt.textContent = d.description;
-      opt.selected = true;
-      districtSelect.appendChild(opt);
+      // Initial state
+      provinceSelect.disabled = true;
+      districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
       districtSelect.disabled = true;
-    }
+      barangaySelect.innerHTML = '<option value="" disabled selected>Select Barangay</option>';
+      barangaySelect.disabled = true;
+      toggleFilters();
 
-    // Barangays under this municipality
-    const filteredBarangays = barangays.filter(b => b.m_id == m_id);
-    if (filteredBarangays.length > 0) {
-      filteredBarangays.forEach(b => {
-        const opt = document.createElement("option");
-        opt.value = b.brgy_id;
-        opt.textContent = b.brgy_name;
-        barangaySelect.appendChild(opt);
+      printAllCheck.addEventListener("change", () => {
+        toggleFilters();
+        provinceSelect.disabled = true;
       });
-      barangaySelect.disabled = false;
-    }
 
-    checkFilters(); // also re-check printAll status
-  });
+      [classificationSelect, citySelect, districtSelect, barangaySelect, fromDate, toDate].forEach(el => {
+        if (!el) return;
+        el.addEventListener("change", checkFilters);
+        el.addEventListener("input", checkFilters);
+      });
 
-  //  Date validation
-  toDate.addEventListener("change", () => {
-    toDate.classList.remove("is-invalid");
-    if (fromDate.value && toDate.value < fromDate.value) {
-      toDate.classList.add("is-invalid");
-    }
-  });
-  fromDate.addEventListener("change", () => {
-    fromDate.classList.remove("is-invalid");
-    if (toDate.value && fromDate.value > toDate.value) {
-      fromDate.classList.add("is-invalid");
-    }
-  });
+      // Municipality change → auto-select district + populate barangays
+      citySelect.addEventListener("change", () => {
+        const m_id = citySelect.value;
 
-  //  Print button
-  printBtn.addEventListener("click", e => {
-    e.preventDefault();
+        // Always keep district disabled
+        districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
+        districtSelect.disabled = true;
 
-    if (fromDate.classList.contains("is-invalid") || toDate.classList.contains("is-invalid")) {
-      alert("Please fix the date range.");
-      return;
-    }
+        if (!m_id) {
+          barangaySelect.innerHTML = '<option value="" disabled selected>Select Barangay</option>';
+          barangaySelect.disabled = true;
+          toggleFilters();
+          checkFilters();
+          return;
+        }
 
-    let params = new URLSearchParams();
-    if (printAllCheck.checked) {
-      params.append("print_all", "1");
-    } else {
-      if (classificationSelect.value) params.append("classification", classificationSelect.value);
-      if (provinceSelect.value) params.append("province", provinceSelect.value);
-      if (citySelect.value) params.append("municipality", citySelect.value);
-      if (districtSelect.value) params.append("district", districtSelect.value);
-      if (barangaySelect.value) params.append("barangay", barangaySelect.value);
-      if (fromDate.value) params.append("from_date", fromDate.value);
-      if (toDate.value) params.append("to_date", toDate.value);
-    }
+        // Find first matching district
+        const matchedDistrict = districts.find(d => String(d.m_id) === String(m_id));
+        if (matchedDistrict) {
+          const option = document.createElement("option");
+          option.value = matchedDistrict.district_id;
+          option.textContent = matchedDistrict.description;
+          option.selected = true;
+          districtSelect.innerHTML = '';
+          districtSelect.appendChild(option);
+        } else {
+          districtSelect.innerHTML = '<option value="" disabled selected>No district found</option>';
+        }
+        districtSelect.disabled = true;
 
-    if (!printAllCheck.checked && !params.toString()) {
-      alert("Please select at least one filter or Print All.");
-      return;
-    }
+        // Populate barangays
+        const filteredBarangays = barangays.filter(b => String(b.m_id) === String(m_id));
+        barangaySelect.innerHTML = '<option value="" disabled selected>Select Barangay</option>';
+        if (filteredBarangays.length > 0) {
+          filteredBarangays.forEach(b => {
+            const opt = document.createElement("option");
+            opt.value = b.brgy_id;
+            opt.textContent = b.brgy_name;
+            barangaySelect.appendChild(opt);
+          });
+          barangaySelect.disabled = false;
+        } else {
+          barangaySelect.innerHTML = '<option value="" disabled selected>No barangays found</option>';
+          barangaySelect.disabled = true;
+        }
 
-    window.open("report-print.php?" + params.toString(), "_blank");
-  });
+        provinceSelect.disabled = true;
+        toggleFilters();
+        checkFilters();
+      });
 
-  //  Reset button logic
-  resetBtn.addEventListener("click", () => {
-    formElements.forEach(el => {
-      if (el.tagName === "SELECT") {
-        el.selectedIndex = 0;
-      } else {
-        el.value = "";
-      }
-      el.disabled = false;
-    });
+      // Date validation
+      toDate.addEventListener("change", () => {
+        toDate.classList.remove("is-invalid");
+        if (fromDate.value && toDate.value < fromDate.value) {
+          toDate.classList.add("is-invalid");
+        }
+      });
+      fromDate.addEventListener("change", () => {
+        fromDate.classList.remove("is-invalid");
+        if (toDate.value && fromDate.value > toDate.value) {
+          fromDate.classList.add("is-invalid");
+        }
+      });
 
-    // Reset checkbox
-    printAllCheck.disabled = false;
-    printAllCheck.checked = false;
+      // Print button
+      printBtn.addEventListener("click", e => {
+        e.preventDefault();
+        if (fromDate.classList.contains("is-invalid") || toDate.classList.contains("is-invalid")) {
+          alert("Please fix the date range.");
+          return;
+        }
 
-    // Reset district + barangay dropdowns
-    districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
-    barangaySelect.innerHTML = '<option value="" disabled selected>Select Barangay</option>';
-  });
-});
-</script>
+        let params = new URLSearchParams();
+        if (printAllCheck.checked) {
+          params.append("print_all", "1");
+        } else {
+          if (classificationSelect.value) params.append("classification", classificationSelect.value);
+          if (provinceSelect.value) params.append("province", provinceSelect.value);
+          if (citySelect.value) params.append("municipality", citySelect.value);
+          if (districtSelect.value) params.append("district", districtSelect.value);
+          if (barangaySelect.value) params.append("barangay", barangaySelect.value);
+          if (fromDate.value) params.append("from_date", fromDate.value);
+          if (toDate.value) params.append("to_date", toDate.value);
+        }
 
+        if (!printAllCheck.checked && !params.toString()) {
+          alert("Please select at least one filter or Print All.");
+          return;
+        }
 
-  <script>
-     document.addEventListener("DOMContentLoaded", function () {
-    const printAllCheck = document.getElementById("printAllCheck");
+        window.open("report-print.php?" + params.toString(), "_blank");
+      });
 
-    // All filter inputs (dropdowns + dates)
-    const filters = [
-      document.getElementById("provinceSelect"),
-      document.getElementById("citySelect"),
-      document.getElementById("districtSelect"),
-      document.getElementById("barangaySelect"),
-      document.getElementById("classificationSelect"),
-      document.getElementById("fromDate"),
-      document.getElementById("toDate"),
-    ];
+      // Reset
+      resetBtn.addEventListener("click", () => {
+        formElements.forEach(el => {
+          if (!el) return;
+          if (el.tagName === "SELECT") {
+            el.selectedIndex = 0;
+          } else {
+            el.value = "";
+          }
+        });
 
-    // Function to check filters
-    function checkFilters() {
-      const hasValue = filters.some(el => el && el.value && el.value !== "");
-      if (hasValue) {
-        printAllCheck.disabled = true;
-        printAllCheck.checked = false; // uncheck for safety
-      } else {
+        provinceSelect.disabled = true;
+        districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
+        districtSelect.disabled = true;
+        barangaySelect.innerHTML = '<option value="" disabled selected>Select Barangay</option>';
+        barangaySelect.disabled = true;
+
         printAllCheck.disabled = false;
-      }
-    }
-
-    // Attach event listeners
-    filters.forEach(el => {
-      if (!el) return;
-      el.addEventListener("change", checkFilters);
-      el.addEventListener("input", checkFilters); // for date fields
+        printAllCheck.checked = false;
+        toggleFilters();
+        checkFilters();
+      });
     });
-  });
   </script>
+
 </body>
 
 </html>
