@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
             populateSelect('classification', data.classifications, window.landData?.classification);
             populateSelect('subClass', data.subclasses, window.landData?.subClass);
             populateSelect('actualUse', data.land_uses, window.landData?.actualUse);
-            
+
             // Store the data globally for later use
             window.dropdownData = data;
         })
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const option = document.createElement('option');
             option.value = item.id;
             option.textContent = item.text;
-            
+
             // Store additional data as data attributes
             if (item.uv) option.setAttribute('data-uv', item.uv);
             if (item.al) option.setAttribute('data-al', item.al);
@@ -36,9 +36,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // === Populate recommended unit value when sub-class changes ===
     const subClassSelect = document.getElementById('subClass');
     const recommendedUnitValueInput = document.getElementById('recommendedUnitValue');
-    
+
     if (subClassSelect && recommendedUnitValueInput) {
-        subClassSelect.addEventListener('change', function() {
+        subClassSelect.addEventListener('change', function () {
             const selectedOption = this.options[this.selectedIndex];
             const unitValue = selectedOption.getAttribute('data-uv') || '';
             recommendedUnitValueInput.value = unitValue;
@@ -48,14 +48,23 @@ document.addEventListener('DOMContentLoaded', function () {
     // === Populate recommended assessment level when actual use changes ===
     const actualUseSelect = document.getElementById('actualUse');
     const recommendedAssessmentLevelInput = document.getElementById('recommendedAssessmentLevel');
-    
+
     if (actualUseSelect && recommendedAssessmentLevelInput) {
-        actualUseSelect.addEventListener('change', function() {
+        actualUseSelect.addEventListener('change', function () {
             const selectedOption = this.options[this.selectedIndex];
             const assessmentLevel = selectedOption.getAttribute('data-al') || '';
             recommendedAssessmentLevelInput.value = assessmentLevel;
         });
     }
+
+    // === Toggle: Auto Calculation ===
+    let autoCalcEnabled = true;
+    document.querySelectorAll('input[name="autoCalc"]').forEach(radio => {
+        radio.addEventListener('change', function () {
+            autoCalcEnabled = (this.value === 'on');
+            console.log("Auto calculation is", autoCalcEnabled ? "ENABLED" : "DISABLED");
+        });
+    });
 
     // === Auto-calculation elements ===
     const areaInput = document.getElementById("area");
@@ -80,6 +89,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // === sqm/hectare conversion ===
     function convertArea() {
+        if (!autoCalcEnabled) return; // 🚫 stop if disabled
+
         let value = parseFloat(areaInput.value) || 0;
         if (sqmRadio && sqmRadio.checked) {
             areaInput.value = value.toFixed(2);
@@ -91,6 +102,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // === Market value = area × unit value ===
     function calculateMarketValue() {
+        if (!autoCalcEnabled) return; // 🚫 stop if disabled
+
         const area = parseFloat(areaInput.value.replace(/,/g, "")) || 0;
         const unitValue = parseFloat(unitValueInput.value.replace(/,/g, "")) || 0;
         const areaSqm = hectareRadio && hectareRadio.checked ? area * 10000 : area;
@@ -107,23 +120,23 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // === Value adjustment ===
     function calculateValueAdjustment(marketValue) {
+        if (!autoCalcEnabled) return; // 🚫 stop if disabled
         const percentAdjustment = parseFloat(percentAdjustmentInput.value) || 0;
         const valueAdjustment = marketValue * (percentAdjustment / 100 - 1);
         valueAdjustmentInput.value = valueAdjustment.toFixed(2);
         calculateAdjustedMarketValue(marketValue, valueAdjustment);
     }
 
-    // === Adjusted market value ===
     function calculateAdjustedMarketValue(marketValue, valueAdjustment) {
+        if (!autoCalcEnabled) return; // 🚫 stop if disabled
         const adjustedMarketValue = marketValue + valueAdjustment;
         adjustedMarketValueInput.value = adjustedMarketValue.toFixed(2);
         calculateAssessedValue();
     }
 
-    // === Assessed value ===
     function calculateAssessedValue() {
+        if (!autoCalcEnabled) return; // 🚫 stop if disabled
         const adjustedMarketValue = parseFloat(adjustedMarketValueInput.value.replace(/,/g, "")) || 0;
         const assessmentLevel = parseFloat(assessmentLevelInput.value) || 0;
         if (adjustedMarketValue > 0 && assessmentLevel > 0) {

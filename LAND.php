@@ -343,6 +343,10 @@ $conn->close();
         </a>
         Land
       </h4>
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <label><input type="radio" name="autoCalc" value="on" checked> Enable Auto Calculation</label>
+        <label><input type="radio" name="autoCalc" value="off"> Disable Auto Calculation</label>
+      </div>
     </div>
 
     <div class="card border-0 shadow p-4 rounded-3">
@@ -642,7 +646,6 @@ $conn->close();
             </div>
           </div>
         </div>
-
 
         <!-- Miscellaneous Section -->
         <h5 class="section-title mt-5">Miscellaneous</h5>
