@@ -138,6 +138,8 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
             </tbody>
           </table>
         </div>
+        <!-- Pagination container -->
+  <div id="classificationPagination" class="mt-3 text-center"></div>
       </div>
     </div>
   </main>
@@ -281,6 +283,71 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
     });
 
   </script>
+
+<script>
+function paginateTable(tableId, paginationId, rowsPerPage = 10) {
+  const table = document.getElementById(tableId);
+  const tbody = table.querySelector("tbody");
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+  const pagination = document.getElementById(paginationId);
+
+  let currentPage = 1;
+  const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+  function renderTable() {
+    rows.forEach((row, index) => {
+      row.style.display =
+        index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage
+          ? ""
+          : "none";
+    });
+  }
+
+  function renderPagination() {
+    pagination.innerHTML = "";
+
+    const prevBtn = document.createElement("button");
+    prevBtn.className = "btn btn-sm btn-outline-success me-2";
+    prevBtn.innerHTML = "&laquo; Prev";
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.onclick = () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+        renderPagination();
+      }
+    };
+
+    const pageIndicator = document.createElement("span");
+    pageIndicator.className = "mx-2";
+    pageIndicator.innerText = `Page ${currentPage} of ${totalPages}`;
+
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "btn btn-sm btn-outline-success ms-2";
+    nextBtn.innerHTML = "Next &raquo;";
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.onclick = () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderTable();
+        renderPagination();
+      }
+    };
+
+    pagination.appendChild(prevBtn);
+    pagination.appendChild(pageIndicator);
+    pagination.appendChild(nextBtn);
+  }
+
+  renderTable();
+  renderPagination();
+}
+
+// Initialize after DOM is ready
+document.addEventListener("DOMContentLoaded", function () {
+  paginateTable("classificationTable", "classificationPagination", 5);
+});
+</script>
 
 </body>
 
