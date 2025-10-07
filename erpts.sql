@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 05, 2025 at 08:29 PM
+-- Generation Time: Oct 07, 2025 at 11:39 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -63,7 +63,8 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (22, 9, 'Logged in to the system', '2025-10-02 10:15:40'),
 (23, 9, 'Logged in to the system', '2025-10-02 10:24:32'),
 (24, 9, 'Logged in to the system', '2025-10-03 12:45:32'),
-(25, 9, 'Logged in to the system', '2025-10-05 14:01:05');
+(25, 9, 'Logged in to the system', '2025-10-05 14:01:05'),
+(26, 9, 'Logged in to the system', '2025-10-07 07:12:48');
 
 -- --------------------------------------------------------
 
@@ -77,6 +78,7 @@ CREATE TABLE `admin_certification` (
   `description` text DEFAULT NULL,
   `position` varchar(150) DEFAULT NULL,
   `status` enum('active','inactive') DEFAULT 'active',
+  `role` enum('none','provincial_assessor','verifier') NOT NULL DEFAULT 'none',
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -85,8 +87,10 @@ CREATE TABLE `admin_certification` (
 -- Dumping data for table `admin_certification`
 --
 
-INSERT INTO `admin_certification` (`id`, `name`, `description`, `position`, `status`, `created_at`, `updated_at`) VALUES
-(3, 'Ma. Salome Bertillo', NULL, 'Provincial Assessor', 'active', '2025-10-05 23:02:21', '2025-10-06 01:07:32');
+INSERT INTO `admin_certification` (`id`, `name`, `description`, `position`, `status`, `role`, `created_at`, `updated_at`) VALUES
+(6, 'Mark Bertillo', NULL, 'Provincial Assessor', 'active', 'provincial_assessor', '2025-10-07 15:39:00', '2025-10-07 17:28:27'),
+(8, 'Jonard Canaria', NULL, 'Janitor', 'active', 'verifier', '2025-10-07 16:38:54', '2025-10-07 17:28:27'),
+(9, 'Ma. Salome Bertillo', NULL, 'Assistant Assessor', 'active', 'none', '2025-10-07 16:42:41', '2025-10-07 16:42:41');
 
 -- --------------------------------------------------------
 
@@ -1239,13 +1243,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `admin_certification`
 --
 ALTER TABLE `admin_certification`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `brgy`
