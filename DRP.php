@@ -305,20 +305,39 @@ function formatPin($value)
             </p>
         </div>
 
+        <?php
+        // Fetch current Provincial Assessor and Verifier
+        $currentAssessor = $conn->query("SELECT name FROM admin_certification WHERE role = 'provincial_assessor' LIMIT 1")->fetch_assoc()['name'] ?? '';
+        $currentVerifier = $conn->query("SELECT name FROM admin_certification WHERE role = 'verifier' LIMIT 1")->fetch_assoc()['name'] ?? '';
+        ?>
+
         <div class="section">
-            <p><span class="bold">Area:</span> <u>____<?= htmlspecialchars($p_info['land_area'] ?? 'N/A') ?>____</u></p>
-            <p style="display: flex; justify-content: space-between; margin: 0; ">
-                <span class="bold">Verified By: MA. SALOME A. BERTILLO</span>
+            <p>
+                <span class="bold">Area:</span>
+                <u>____<?= htmlspecialchars($p_info['land_area'] ?? 'N/A') ?>____</u>
+            </p>
+
+            <p style="display: flex; justify-content: space-between; margin: 0;">
+                <span class="bold">
+                    Verified By:
+                    <u style="<?= empty($currentVerifier) ? 'color:red;' : '' ?>">
+                        <?= htmlspecialchars($currentVerifier ?: 'Not Assigned') ?>
+                    </u>
+                </span>
+
                 <span class="bold" style="text-align: right; margin-right: 20%;">Approved By:</span>
             </p>
+
             <div style="text-align: right; margin-top: 5px; margin-right: 10px;">
-                <u>MAXIMO P. MAGANA, JR., REA</u><br>
+                <u style="<?= empty($currentAssessor) ? 'color:red;' : '' ?>">
+                    <?= htmlspecialchars($currentAssessor ?: 'Not Assigned') ?>
+                </u><br>
                 <div style="margin-top: 2px; text-align: right; margin-right: 30px;">
                     <span class="bold">Provincial Assessor</span>
                 </div>
             </div>
-
         </div>
+
 
         <div class="section">
             <p style="display: flex; justify-content: space-between; margin: 0;">

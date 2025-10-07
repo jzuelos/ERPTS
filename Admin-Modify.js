@@ -124,12 +124,12 @@ document.addEventListener("DOMContentLoaded", () => {
           alert("🗑️ Record deleted successfully!");
           location.reload();
         } else {
-          alert("❌ Delete failed.");
+          alert("Delete failed.");
         }
       })
       .catch(err => {
         console.error(err);
-        alert("❌ Error deleting record.");
+        alert("Error deleting record.");
       })
       .finally(() => {
         const modal = bootstrap.Modal.getInstance(document.getElementById("deleteModal"));
@@ -188,9 +188,9 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", function (
     .then(data => {
       if (data.success) {
         rowToDelete.remove();
-        alert("🗑️ Record deleted successfully!");
+        alert("Record deleted successfully!");
       } else {
-        alert("❌ Delete failed.");
+        alert("Delete failed.");
       }
 
       const modal = bootstrap.Modal.getInstance(document.getElementById("deleteModal"));

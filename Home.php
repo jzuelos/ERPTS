@@ -183,14 +183,20 @@ $result = $conn->query($sql);
     r.tax_year,
     f.faas_id,
     f.pro_id AS p_id,
-    GROUP_CONCAT(DISTINCT CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname) SEPARATOR ', ') AS owner_names
+    GROUP_CONCAT(
+      DISTINCT CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname)
+      SEPARATOR ', '
+    ) AS owner_names
   FROM rpu_dec r
   LEFT JOIN faas f ON r.faas_id = f.faas_id
-  LEFT JOIN propertyowner po ON po.property_id = f.pro_id
+  LEFT JOIN propertyowner po 
+    ON po.property_id = f.pro_id 
+    AND po.is_retained = 1  -- ✅ only include retained owners
   LEFT JOIN owners_tb o ON o.own_id = po.owner_id
   GROUP BY r.dec_id, f.faas_id, f.pro_id
   ORDER BY r.dec_id DESC
 ";
+
 
                 $result = $conn->query($sql);
                 ?>
@@ -229,7 +235,8 @@ $result = $conn->query($sql);
             <h5 class="text-secondary mb-4 custom-text-color">Capitol, Daet, Camarines Norte</h5>
             <p class="lead custom-text-color">The Office of the Provincial Assessor is a key entity in the Provincial
               Government, operating under Republic Act No. 7160, also known as the Local Government Code of 1991.</p>
-            <p class="custom-text-color">Its primary goal is to perform duties related to real property taxation, adhering
+            <p class="custom-text-color">Its primary goal is to perform duties related to real property taxation,
+              adhering
               to fundamental principles such as:</p>
             <ul class="list-group list-group-flush">
               <li class="list-group-item custom-text-color"><i class="fas fa-check-circle text-primary"></i> Appraising
@@ -247,7 +254,8 @@ $result = $conn->query($sql);
               responsibilities:</p>
             <ol class="ml-3">
               <li class="custom-text-color">Enforcing laws and policies regarding property appraisal and taxation.</li>
-              <li class="custom-text-color">Reviewing and recommending improvements to policies and practices in property
+              <li class="custom-text-color">Reviewing and recommending improvements to policies and practices in
+                property
                 valuation and assessment.</li>
               <li class="custom-text-color">Establishing efficient property assessment systems and maintaining accurate
                 property records.</li>

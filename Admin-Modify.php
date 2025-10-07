@@ -12,6 +12,36 @@ if ($conn->connect_error) {
 }
 
 // ================================
+// FETCH CURRENT ACTIVE ASSIGNMENTS
+// ================================
+$currentAssessor = null;
+$currentVerifier = null;
+
+// Fetch current Provincial Assessor
+$assessorQuery = $conn->query("
+  SELECT name 
+  FROM admin_certification 
+  WHERE role = 'provincial_assessor' AND status = 'active'
+  LIMIT 1
+");
+if ($assessorQuery && $assessorQuery->num_rows > 0) {
+  $currentAssessor = $assessorQuery->fetch_assoc()['name'];
+  $assessorQuery->free();
+}
+
+// Fetch current Verifier
+$verifierQuery = $conn->query("
+  SELECT name 
+  FROM admin_certification 
+  WHERE role = 'verifier' AND status = 'active'
+  LIMIT 1
+");
+if ($verifierQuery && $verifierQuery->num_rows > 0) {
+  $currentVerifier = $verifierQuery->fetch_assoc()['name'];
+  $verifierQuery->free();
+}
+
+// ================================
 // BACKEND ACTION HANDLERS (CRUD)
 // ================================
 
@@ -88,9 +118,18 @@ if (isset($_POST['action']) && $_POST['action'] === 'edit') {
   $id = (int) $_POST['id'];
   $name = trim($_POST['name'] ?? '');
   $position = trim($_POST['position'] ?? '');
-  $status = strtolower(trim($_POST['status'] ?? 'active')); // Convert to lowercase
+  $status = strtolower(trim($_POST['status'] ?? 'active'));
 
-  // 🛑 Prevent changing to "Provincial Assessor" if one already exists
+  // Get current position
+  $currentStmt = $conn->prepare("SELECT position FROM admin_certification WHERE id = ?");
+  $currentStmt->bind_param("i", $id);
+  $currentStmt->execute();
+  $currentRecord = $currentStmt->get_result()->fetch_assoc();
+  $currentStmt->close();
+
+  $currentPosition = $currentRecord['position'] ?? '';
+
+  // 🛑 Prevent adding another Provincial Assessor
   if (strcasecmp($position, 'Provincial Assessor') === 0) {
     $check = $conn->prepare("SELECT COUNT(*) AS total FROM admin_certification WHERE position = 'Provincial Assessor' AND id != ?");
     $check->bind_param("i", $id);
@@ -104,14 +143,22 @@ if (isset($_POST['action']) && $_POST['action'] === 'edit') {
     }
   }
 
-  $stmt = $conn->prepare("UPDATE admin_certification SET name=?, position=?, status=? WHERE id=?");
-  $stmt->bind_param("sssi", $name, $position, $status, $id);
+  // ✅ Clear role if changing FROM Provincial Assessor to another position
+  if (strcasecmp($currentPosition, 'Provincial Assessor') === 0 && strcasecmp($position, 'Provincial Assessor') !== 0) {
+    // Clear the role to 'none'
+    $stmt = $conn->prepare("UPDATE admin_certification SET name=?, position=?, status=?, role='none' WHERE id=?");
+    $stmt->bind_param("sssi", $name, $position, $status, $id);
+  } else {
+    // Normal update without changing role
+    $stmt = $conn->prepare("UPDATE admin_certification SET name=?, position=?, status=? WHERE id=?");
+    $stmt->bind_param("sssi", $name, $position, $status, $id);
+  }
+
   $success = $stmt->execute();
   $stmt->close();
   echo json_encode(['success' => $success]);
   exit;
 }
-
 
 // DELETE certification
 if (isset($_POST['action']) && $_POST['action'] === 'delete') {
@@ -125,13 +172,12 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete') {
   exit;
 }
 
-
 // APPLY Provincial Assessor and Verifier selection
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
   header('Content-Type: application/json');
 
-  $provincial_assessor = (int)($_POST['provincial_assessor'] ?? 0);
-  $verified_by = (int)($_POST['verified_by'] ?? 0);
+  $provincial_assessor = (int) ($_POST['provincial_assessor'] ?? 0);
+  $verified_by = (int) ($_POST['verified_by'] ?? 0);
 
   $success = false;
 
@@ -235,13 +281,25 @@ if ($verifierQuery) {
           <!-- Verified By (Left Side) -->
           <div>
             <span style="font-weight:bold;">Verified By:</span>
-            <span style="font-weight:bold;"><u>MA. SALOME A. BERTILLO</u></span>
+            <span style="font-weight:bold;">
+              <?php
+              $isNotAssigned = empty($currentVerifier);
+              ?>
+              <u style="<?= $isNotAssigned ? 'color: red;' : '' ?>">
+                <?= htmlspecialchars($currentVerifier ?? 'Not Assigned') ?>
+              </u>
+            </span>
           </div>
 
           <!-- Approved By (Right Side) -->
           <div style="text-align: center;">
             <div style="text-align: left; font-weight:bold;">Approved By:</div>
-            <u>MAXIMO P. MAGANA, JR., REA</u><br>
+            <?php
+            $isNotAssigned = empty($currentAssessor);
+            ?>
+            <u style="<?= $isNotAssigned ? 'color: red;' : '' ?>">
+              <?= htmlspecialchars($currentAssessor ?? 'Not Assigned') ?>
+            </u>
             <div style="margin-top: 2px; text-align: center;">
               Provincial Assessor
             </div>
