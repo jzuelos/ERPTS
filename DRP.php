@@ -329,7 +329,8 @@ function formatPin($value)
             </p>
 
             <div style="text-align: right; margin-top: 5px; margin-right: 10px;">
-                <u style="<?= empty($currentAssessor) ? 'color:red;' : '' ?>">
+                <u
+                    style="<?= empty($currentAssessor) ? 'color:red;' : '' ?>; display: inline-block; margin-right: 60px;">
                     <?= htmlspecialchars($currentAssessor ?: 'Not Assigned') ?>
                 </u><br>
                 <div style="margin-top: 2px; text-align: right; margin-right: 30px;">
