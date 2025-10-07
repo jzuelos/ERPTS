@@ -11,10 +11,37 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-
 // ================================
 // BACKEND ACTION HANDLERS (CRUD)
 // ================================
+
+// 🟢 APPLY (Update selected Provincial Assessor and Verifier)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST['action'])) {
+  $provincial_assessor = isset($_POST['provincial_assessor']) ? (int) $_POST['provincial_assessor'] : 0;
+  $verified_by = isset($_POST['verified_by']) ? (int) $_POST['verified_by'] : 0;
+
+  // Optional: Reset previous roles before setting new ones
+  $conn->query("UPDATE admin_certification SET role = 'none' WHERE role IN ('provincial_assessor', 'verifier')");
+
+  // Update selected Provincial Assessor
+  if ($provincial_assessor > 0) {
+    $stmt = $conn->prepare("UPDATE admin_certification SET role = 'provincial_assessor' WHERE id = ?");
+    $stmt->bind_param("i", $provincial_assessor);
+    $stmt->execute();
+    $stmt->close();
+  }
+
+  // Update selected Verifier
+  if ($verified_by > 0) {
+    $stmt = $conn->prepare("UPDATE admin_certification SET role = 'verifier' WHERE id = ?");
+    $stmt->bind_param("i", $verified_by);
+    $stmt->execute();
+    $stmt->close();
+  }
+
+  echo "<script>alert('Roles updated successfully!'); window.location.href = window.location.href;</script>";
+  exit;
+}
 
 // ADD new certification
 if (isset($_POST['action']) && $_POST['action'] === 'add') {
@@ -23,13 +50,37 @@ if (isset($_POST['action']) && $_POST['action'] === 'add') {
   $position = trim($_POST['position'] ?? '');
   $status = strtolower(trim($_POST['status'] ?? 'active')); // Convert to lowercase
 
+  // 🛑 Prevent duplicate names
+  $checkName = $conn->prepare("SELECT COUNT(*) AS total FROM admin_certification WHERE LOWER(name) = LOWER(?)");
+  $checkName->bind_param("s", $name);
+  $checkName->execute();
+  $nameResult = $checkName->get_result()->fetch_assoc();
+  $checkName->close();
+
+  if ($nameResult['total'] > 0) {
+    echo json_encode(['success' => false, 'error' => 'This name already exists in the list.']);
+    exit;
+  }
+
+  // 🛑 Prevent adding another Provincial Assessor
+  if (strcasecmp($position, 'Provincial Assessor') === 0) {
+    $check = $conn->query("SELECT COUNT(*) AS total FROM admin_certification WHERE position = 'Provincial Assessor'");
+    $row = $check->fetch_assoc();
+    if ($row['total'] > 0) {
+      echo json_encode(['success' => false, 'error' => 'A Provincial Assessor already exists.']);
+      exit;
+    }
+  }
+
   $stmt = $conn->prepare("INSERT INTO admin_certification (name, position, status) VALUES (?, ?, ?)");
   $stmt->bind_param("sss", $name, $position, $status);
   $success = $stmt->execute();
   $stmt->close();
+
   echo json_encode(['success' => $success]);
   exit;
 }
+
 
 // UPDATE existing certification
 if (isset($_POST['action']) && $_POST['action'] === 'edit') {
@@ -39,6 +90,20 @@ if (isset($_POST['action']) && $_POST['action'] === 'edit') {
   $position = trim($_POST['position'] ?? '');
   $status = strtolower(trim($_POST['status'] ?? 'active')); // Convert to lowercase
 
+  // 🛑 Prevent changing to "Provincial Assessor" if one already exists
+  if (strcasecmp($position, 'Provincial Assessor') === 0) {
+    $check = $conn->prepare("SELECT COUNT(*) AS total FROM admin_certification WHERE position = 'Provincial Assessor' AND id != ?");
+    $check->bind_param("i", $id);
+    $check->execute();
+    $result = $check->get_result()->fetch_assoc();
+    $check->close();
+
+    if ($result['total'] > 0) {
+      echo json_encode(['success' => false, 'error' => 'Cannot assign another Provincial Assessor. One already exists.']);
+      exit;
+    }
+  }
+
   $stmt = $conn->prepare("UPDATE admin_certification SET name=?, position=?, status=? WHERE id=?");
   $stmt->bind_param("sssi", $name, $position, $status, $id);
   $success = $stmt->execute();
@@ -46,6 +111,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'edit') {
   echo json_encode(['success' => $success]);
   exit;
 }
+
 
 // DELETE certification
 if (isset($_POST['action']) && $_POST['action'] === 'delete') {
@@ -59,9 +125,44 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete') {
   exit;
 }
 
+
+// APPLY Provincial Assessor and Verifier selection
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
+  header('Content-Type: application/json');
+
+  $provincial_assessor = (int)($_POST['provincial_assessor'] ?? 0);
+  $verified_by = (int)($_POST['verified_by'] ?? 0);
+
+  $success = false;
+
+  // Reset current roles (ensure only one of each)
+  $conn->query("UPDATE admin_certification SET role = 'none' WHERE role IN ('provincial_assessor', 'verifier')");
+
+  // Assign new Provincial Assessor
+  if ($provincial_assessor > 0) {
+    $stmt = $conn->prepare("UPDATE admin_certification SET role = 'provincial_assessor' WHERE id = ?");
+    $stmt->bind_param("i", $provincial_assessor);
+    $stmt->execute();
+    $stmt->close();
+  }
+
+  // Assign new Verifier
+  if ($verified_by > 0) {
+    $stmt = $conn->prepare("UPDATE admin_certification SET role = 'verifier' WHERE id = ?");
+    $stmt->bind_param("i", $verified_by);
+    $stmt->execute();
+    $stmt->close();
+  }
+
+  $success = true;
+  echo json_encode(['success' => $success]);
+  exit;
+}
+
+
 // FETCH all certifications
 $certifications = [];
-$result = $conn->query("SELECT id, name, position, status FROM admin_certification ORDER BY id ASC");
+$result = $conn->query("SELECT id, name, position, status, role FROM admin_certification ORDER BY id ASC");
 if ($result) {
   $certifications = $result->fetch_all(MYSQLI_ASSOC);
   $result->free();
@@ -69,7 +170,11 @@ if ($result) {
 
 // FETCH Provincial Assessor (Active only)
 $assessors = [];
-$assessorQuery = $conn->query("SELECT id, name FROM admin_certification WHERE position = 'Provincial Assessor' AND status = 'Active'");
+$assessorQuery = $conn->query("
+  SELECT id, name 
+  FROM admin_certification 
+  WHERE status = 'active' AND (role = 'provincial_assessor' OR position = 'Provincial Assessor')
+");
 if ($assessorQuery) {
   $assessors = $assessorQuery->fetch_all(MYSQLI_ASSOC);
   $assessorQuery->free();
@@ -80,15 +185,13 @@ $verifiers = [];
 $verifierQuery = $conn->query("
   SELECT id, name 
   FROM admin_certification 
-  WHERE status = 'Active' 
-  AND position != 'Provincial Assessor'
+  WHERE status = 'active' AND (role = 'verifier' OR position != 'Provincial Assessor')
 ");
 if ($verifierQuery) {
   $verifiers = $verifierQuery->fetch_all(MYSQLI_ASSOC);
   $verifierQuery->free();
 }
 ?>
-
 
 <!doctype html>
 <html lang="en">
@@ -152,15 +255,16 @@ if ($verifierQuery) {
           <!-- Left Column -->
           <div class="col-md-4 border-end">
 
+            <!-- Form for Assessor and Verifier -->
             <?php
             // Fetch only Active Provincial Assessors
             $assessors = [];
             $assessorQuery = $conn->query("
-        SELECT id, name 
-        FROM admin_certification 
-        WHERE position = 'Provincial Assessor' 
-        AND status = 'Active'
-      ");
+  SELECT id, name 
+  FROM admin_certification 
+  WHERE position = 'Provincial Assessor' 
+  AND status = 'Active'
+");
             if ($assessorQuery) {
               $assessors = $assessorQuery->fetch_all(MYSQLI_ASSOC);
               $assessorQuery->free();
@@ -169,24 +273,39 @@ if ($verifierQuery) {
             // Fetch all Active verifiers EXCEPT Provincial Assessors
             $verifiers = [];
             $verifierQuery = $conn->query("
-        SELECT id, name 
-        FROM admin_certification 
-        WHERE status = 'Active' 
-        AND position != 'Provincial Assessor'
-      ");
+  SELECT id, name 
+  FROM admin_certification 
+  WHERE status = 'Active' 
+  AND position != 'Provincial Assessor'
+");
             if ($verifierQuery) {
               $verifiers = $verifierQuery->fetch_all(MYSQLI_ASSOC);
               $verifierQuery->free();
             }
+
+            // 🟢 Get currently assigned roles
+            $currentAssessorId = 0;
+            $currentVerifierId = 0;
+
+            $roleResult = $conn->query("SELECT id, role FROM admin_certification WHERE role IN ('provincial_assessor', 'verifier')");
+            if ($roleResult) {
+              while ($r = $roleResult->fetch_assoc()) {
+                if ($r['role'] === 'provincial_assessor') {
+                  $currentAssessorId = (int) $r['id'];
+                } elseif ($r['role'] === 'verifier') {
+                  $currentVerifierId = (int) $r['id'];
+                }
+              }
+              $roleResult->free();
+            }
             ?>
 
-            <!-- Form for Assessor and Verifier -->
             <form id="assessorForm" method="POST" action="">
               <p><strong>Provincial Assessor:</strong></p>
               <select class="form-control mb-3" name="provincial_assessor" id="provincial_assessor" required>
                 <option value="">Select Assessor</option>
                 <?php foreach ($assessors as $a): ?>
-                  <option value="<?= htmlspecialchars($a['id']); ?>">
+                  <option value="<?= htmlspecialchars($a['id']); ?>" <?= ($a['id'] == $currentAssessorId ? 'selected' : '') ?>>
                     <?= htmlspecialchars($a['name']); ?>
                   </option>
                 <?php endforeach; ?>
@@ -196,7 +315,7 @@ if ($verifierQuery) {
               <select class="form-control mb-4" name="verified_by" id="verified_by" required>
                 <option value="">Select Verifier</option>
                 <?php foreach ($verifiers as $v): ?>
-                  <option value="<?= htmlspecialchars($v['id']); ?>">
+                  <option value="<?= htmlspecialchars($v['id']); ?>" <?= ($v['id'] == $currentVerifierId ? 'selected' : '') ?>>
                     <?= htmlspecialchars($v['name']); ?>
                   </option>
                 <?php endforeach; ?>

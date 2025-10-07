@@ -18,16 +18,19 @@ document.addEventListener("DOMContentLoaded", () => {
     })
       .then(res => res.json())
       .then(data => {
-        if (data.success) {
-          alert("✅ Record added successfully!");
+        //AJAX success callback for Add/Edit
+        if (response.success) {
+          alert('Saved successfully!');
           location.reload();
+        } else if (response.error) {
+          alert(response.error);
         } else {
-          alert("❌ Failed to add record.");
+          alert('An error occurred.');
         }
       })
       .catch(err => {
         console.error(err);
-        alert("❌ Error adding record.");
+        alert("Error adding record.");
       });
   });
 
@@ -75,16 +78,19 @@ document.addEventListener("DOMContentLoaded", () => {
     })
       .then(res => res.json())
       .then(data => {
-        if (data.success) {
-          alert("✅ Record updated successfully!");
+        //AJAX success callback for Add/Edit
+        if (response.success) {
+          alert('Saved successfully!');
           location.reload();
+        } else if (response.error) {
+          alert(response.error);
         } else {
-          alert("❌ Update failed.");
+          alert('An error occurred.');
         }
       })
       .catch(err => {
         console.error(err);
-        alert("❌ Error updating record.");
+        alert("Error updating record.");
       });
   });
 
