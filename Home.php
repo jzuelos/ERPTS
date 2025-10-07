@@ -189,7 +189,7 @@ $result = $conn->query($sql);
     ) AS owner_names
   FROM rpu_dec r
   LEFT JOIN faas f ON r.faas_id = f.faas_id
-  LEFT JOIN propertyowner po 
+  LEFT JOIN propertyowner po  
     ON po.property_id = f.pro_id 
     AND po.is_retained = 1  -- ✅ only include retained owners
   LEFT JOIN owners_tb o ON o.own_id = po.owner_id
@@ -214,7 +214,9 @@ $result = $conn->query($sql);
                       echo "<td>" . htmlspecialchars($dec_id ?? '') . "</td>";
                       echo "<td>" . htmlspecialchars($owner_names) . "</td>";
                       echo "<td>" . htmlspecialchars($row['arp_no'] ?? '') . "</td>";
-                      echo "<td>₱ " . htmlspecialchars($row['total_property_value'] ?? '') . "</td>";
+                      $property_value = isset($row['total_property_value']) ? number_format((float)$row['total_property_value'], 2) : '0.00';
+                      echo "<td>₱ {$property_value}</td>";
+
                       echo "<td>" . (!empty($row['tax_year']) ? htmlspecialchars(date('Y', strtotime($row['tax_year']))) : '') . "</td>";
                       echo "</tr>";
                     }

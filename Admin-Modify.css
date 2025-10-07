@@ -1,0 +1,8 @@
+#classificationPagination {
+  min-height: 40px; /* keeps space even if buttons shrink */
+  position: sticky;
+  bottom: 0;
+  background-color: #fff; /* optional – matches background */
+  padding: 10px 0;
+  z-index: 2;
+}

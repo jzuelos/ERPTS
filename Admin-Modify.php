@@ -92,7 +92,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'add') {
     exit;
   }
 
-  // 🛑 Prevent adding another Provincial Assessor
+  //  Prevent adding another Provincial Assessor
   if (strcasecmp($position, 'Provincial Assessor') === 0) {
     $check = $conn->query("SELECT COUNT(*) AS total FROM admin_certification WHERE position = 'Provincial Assessor'");
     $row = $check->fetch_assoc();
@@ -129,7 +129,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'edit') {
 
   $currentPosition = $currentRecord['position'] ?? '';
 
-  // 🛑 Prevent adding another Provincial Assessor
+  // Prevent adding another Provincial Assessor
   if (strcasecmp($position, 'Provincial Assessor') === 0) {
     $check = $conn->prepare("SELECT COUNT(*) AS total FROM admin_certification WHERE position = 'Provincial Assessor' AND id != ?");
     $check->bind_param("i", $id);
@@ -143,7 +143,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'edit') {
     }
   }
 
-  // ✅ Clear role if changing FROM Provincial Assessor to another position
+  // Clear role if changing FROM Provincial Assessor to another position
   if (strcasecmp($currentPosition, 'Provincial Assessor') === 0 && strcasecmp($position, 'Provincial Assessor') !== 0) {
     // Clear the role to 'none'
     $stmt = $conn->prepare("UPDATE admin_certification SET name=?, position=?, status=?, role='none' WHERE id=?");
@@ -251,7 +251,7 @@ if ($verifierQuery) {
 
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="header.css">
-
+  <link rel="stylesheet" href="Admin-Modify.css">
   <title>Sheet Modification</title>
 </head>
 
@@ -341,7 +341,7 @@ if ($verifierQuery) {
               $verifierQuery->free();
             }
 
-            // 🟢 Get currently assigned roles
+            // Get currently assigned roles
             $currentAssessorId = 0;
             $currentVerifierId = 0;
 
@@ -457,7 +457,7 @@ if ($verifierQuery) {
                   <?php endif; ?>
                 </tbody>
               </table>
-
+            
               <div id="classificationPagination" class="mt-3 d-flex justify-content-start"></div>
             </div>
           </div>
@@ -578,5 +578,77 @@ if ($verifierQuery) {
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="Admin-Modify.js"></script>
 </body>
+<!-- Pagination Script -->
+<script>
+function paginateTable(tableId, paginationId, rowsPerPage = 10) {
+  const table = document.getElementById(tableId);
+  const tbody = table.querySelector("tbody");
+  const rows = Array.from(tbody.querySelectorAll("tr")).filter(
+    row => !row.querySelector(".text-center.text-muted") // skip 'no records' row
+  );
+  const pagination = document.getElementById(paginationId);
+
+  if (rows.length === 0) {
+    pagination.innerHTML = "";
+    return;
+  }
+
+  let currentPage = 1;
+  const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+  function renderTable() {
+    rows.forEach((row, index) => {
+      row.style.display =
+        index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage
+          ? ""
+          : "none";
+    });
+  }
+
+  function renderPagination() {
+    pagination.innerHTML = "";
+
+    const prevBtn = document.createElement("button");
+    prevBtn.className = "btn btn-sm btn-outline-success me-2";
+    prevBtn.innerHTML = "&laquo; Prev";
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.onclick = () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+        renderPagination();
+      }
+    };
+
+    const pageIndicator = document.createElement("span");
+    pageIndicator.className = "mx-2 align-self-center fw-semibold";
+    pageIndicator.innerText = `Page ${currentPage} of ${totalPages}`;
+
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "btn btn-sm btn-outline-success ms-2";
+    nextBtn.innerHTML = "Next &raquo;";
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.onclick = () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderTable();
+        renderPagination();
+      }
+    };
+
+    pagination.appendChild(prevBtn);
+    pagination.appendChild(pageIndicator);
+    pagination.appendChild(nextBtn);
+  }
+
+  renderTable();
+  renderPagination();
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  paginateTable("classificationTable", "classificationPagination", 5);
+});
+</script>
+
 
 </html>

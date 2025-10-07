@@ -280,3 +280,4 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", function (
   let modalInstance = bootstrap.Modal.getInstance(modalEl);
   modalInstance.hide();
 });
+

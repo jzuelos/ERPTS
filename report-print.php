@@ -54,14 +54,25 @@
 <body>
 
   <?php
+  session_start();
   require_once "database.php";
   $conn = Database::getInstance();
-
   date_default_timezone_set('Asia/Manila');
 
 
+  // Fetch username of the logged-in user
+$username = 'Guest';
+if (isset($_SESSION['user_id'])) {
+    $user_id = intval($_SESSION['user_id']);
+    $query = "SELECT username FROM users WHERE user_id = $user_id LIMIT 1";
+    $result = $conn->query($query);
+    if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $username = $row['username'];
+    }
+}
 
-  // Capture filters
+  // Capture filters     
   $classification = $_GET['classification'] ?? '';
   $province = $_GET['province'] ?? '';
   $municipality = $_GET['municipality'] ?? '';
@@ -182,7 +193,7 @@ WHERE 1=1
   </table>
 
   <div style="position:fixed; bottom:20px; right:20px; font-size:14px; text-align:right;">
-    <b>ASSESSED BY:</b> <?= htmlspecialchars($_SESSION['username'] ?? 'Guest') ?><br>
+    <b>PROCESSED BY:</b> <?= htmlspecialchars($username) ?><br>
     <b>Date & Time:</b> <?= date("F d, Y h:i A") ?>
   </div>
 

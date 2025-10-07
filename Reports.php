@@ -24,6 +24,7 @@
   <?php
   include 'database.php';
   $conn = Database::getInstance();
+  
 
   // Fetch classifications
   $classification_stmt = $conn->prepare("SELECT c_id, c_description FROM classification");
