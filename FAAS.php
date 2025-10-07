@@ -973,10 +973,56 @@ $conn->close();
       <form>
         <div class="row">
           <div class="col-md-6 mb-3">
-            <label for="taxDeclarationNumber" class="form-label">Identification Numbers (Tax Declaration Number)</label>
+            <label for="taxDeclarationNumber" class="form-label">
+              Identification Numbers (Tax Declaration Number)
+            </label>
             <input type="text" class="form-control" id="taxDeclarationNumber" placeholder="Enter Tax Declaration Number"
-              value="<?= htmlspecialchars($rpu_declaration['arp_no'] ?? '') ?>" disabled>
+              value="<?= htmlspecialchars($rpu_declaration['arp_no'] ?? '') ?>" maxlength="25" disabled>
           </div>
+
+          <script>
+            document.addEventListener("DOMContentLoaded", function () {
+              const input = document.getElementById('taxDeclarationNumber');
+              if (!input) return;
+
+              // Desired format: GR-2023-II-03-015-03799
+              const PATTERN = [2, 4, 2, 2, 3, 5]; // group sizes
+              const MAX_LEN = PATTERN.reduce((a, b) => a + b, 0);
+
+              function cleanValue(v) {
+                return v.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, MAX_LEN);
+              }
+
+              function formatTD(v) {
+                const clean = cleanValue(v);
+                const parts = [];
+                let i = 0;
+                for (const len of PATTERN) {
+                  if (i >= clean.length) break;
+                  parts.push(clean.substr(i, len));
+                  i += len;
+                }
+                return parts.join('-');
+              }
+
+              // Format initial value (from PHP)
+              input.value = formatTD(input.value);
+
+              // Auto-format as user types
+              input.addEventListener('input', () => {
+                const cursor = input.selectionStart;
+                input.value = formatTD(input.value);
+                input.selectionStart = input.selectionEnd = cursor;
+              });
+
+              // Handle paste
+              input.addEventListener('paste', e => {
+                e.preventDefault();
+                const text = (e.clipboardData || window.clipboardData).getData('text');
+                input.value = formatTD(text);
+              });
+            });
+          </script>
 
           <div class="col-12 mb-3">
             <h6 class="mt-4 mb-3">Approval</h6>
@@ -1075,12 +1121,68 @@ $conn->close();
           <form method="POST" action="" id="declarationForm">
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label for="taxDeclarationNumberModal" class="form-label">Identification Numbers (Tax Declaration
-                  Number)</label>
+                <label for="taxDeclarationNumberModal" class="form-label">
+                  Identification Numbers (Tax Declaration Number)
+                </label>
                 <input type="text" class="form-control" id="taxDeclarationNumberModal" name="arp_no"
                   value="<?= htmlspecialchars($rpu_declaration['arp_no'] ?? '') ?>"
-                  placeholder="Enter Tax Declaration Number" maxlength="15">
+                  placeholder="Enter Tax Declaration Number" maxlength="25">
               </div>
+
+              <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                  const input = document.getElementById('taxDeclarationNumberModal');
+                  if (!input) return;
+
+                  const PATTERN = [2, 4, 2, 2, 3, 5]; // GR-2023-II-03-015-03799
+                  const MAX_LEN = PATTERN.reduce((a, b) => a + b, 0);
+
+                  function cleanValue(v) {
+                    return v.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, MAX_LEN);
+                  }
+
+                  function formatTD(v) {
+                    const clean = cleanValue(v);
+                    const parts = [];
+                    let i = 0;
+                    for (const len of PATTERN) {
+                      if (i >= clean.length) break;
+                      parts.push(clean.substr(i, len));
+                      i += len;
+                    }
+                    return parts.join('-');
+                  }
+
+                  // Handle input with proper cursor tracking
+                  input.addEventListener('input', function (e) {
+                    const oldValue = input.value;
+                    const oldPos = input.selectionStart;
+
+                    // Format and compare
+                    const formatted = formatTD(oldValue);
+                    if (formatted !== oldValue) {
+                      // Count non-alphanumeric characters before cursor
+                      const before = oldValue.slice(0, oldPos);
+                      const beforeClean = before.replace(/[^A-Za-z0-9]/g, '');
+                      const newPos = formatTD(beforeClean).length;
+
+                      input.value = formatted;
+                      input.setSelectionRange(newPos, newPos);
+                    }
+                  });
+
+                  // Handle paste
+                  input.addEventListener('paste', e => {
+                    e.preventDefault();
+                    const text = (e.clipboardData || window.clipboardData).getData('text');
+                    input.value = formatTD(text);
+                  });
+
+                  // Format any preexisting value
+                  input.value = formatTD(input.value);
+                });
+              </script>
+
 
               <div class="col-12 mb-3">
                 <h6 class="mt-4 mb-3">Approval</h6>

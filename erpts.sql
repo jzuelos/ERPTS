@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 07, 2025 at 11:39 AM
+-- Generation Time: Oct 07, 2025 at 06:50 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -64,7 +64,8 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (23, 9, 'Logged in to the system', '2025-10-02 10:24:32'),
 (24, 9, 'Logged in to the system', '2025-10-03 12:45:32'),
 (25, 9, 'Logged in to the system', '2025-10-05 14:01:05'),
-(26, 9, 'Logged in to the system', '2025-10-07 07:12:48');
+(26, 9, 'Logged in to the system', '2025-10-07 07:12:48'),
+(27, 9, 'Logged in to the system', '2025-10-07 13:52:04');
 
 -- --------------------------------------------------------
 
@@ -88,8 +89,8 @@ CREATE TABLE `admin_certification` (
 --
 
 INSERT INTO `admin_certification` (`id`, `name`, `description`, `position`, `status`, `role`, `created_at`, `updated_at`) VALUES
-(6, 'Mark Bertillo', NULL, 'Provincial Assessor', 'active', 'provincial_assessor', '2025-10-07 15:39:00', '2025-10-07 17:28:27'),
-(8, 'Jonard Canaria', NULL, 'Janitor', 'active', 'verifier', '2025-10-07 16:38:54', '2025-10-07 17:28:27'),
+(6, 'Mark Bertillo', NULL, 'Provincial Assessor', 'active', 'provincial_assessor', '2025-10-07 15:39:00', '2025-10-07 23:30:18'),
+(8, 'Jonard Canaria', NULL, 'Janitor', 'active', 'verifier', '2025-10-07 16:38:54', '2025-10-07 23:30:18'),
 (9, 'Ma. Salome Bertillo', NULL, 'Assistant Assessor', 'active', 'none', '2025-10-07 16:42:41', '2025-10-07 16:42:41');
 
 -- --------------------------------------------------------
@@ -855,7 +856,7 @@ INSERT INTO `region` (`r_id`, `r_no`) VALUES
 
 CREATE TABLE `rpu_dec` (
   `dec_id` int(10) NOT NULL,
-  `arp_no` int(30) NOT NULL,
+  `arp_no` varchar(150) NOT NULL,
   `pro_assess` varchar(250) NOT NULL,
   `pro_date` date NOT NULL,
   `mun_assess` varchar(250) NOT NULL,
@@ -876,8 +877,8 @@ CREATE TABLE `rpu_dec` (
 --
 
 INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `pro_assess`, `pro_date`, `mun_assess`, `mun_date`, `td_cancel`, `previous_pin`, `tax_year`, `entered_by`, `entered_year`, `prev_own`, `prev_assess`, `faas_id`, `total_property_value`) VALUES
-(1, 1484394354, 'Provincial Assessor Maria Santos', '2025-08-05', 'Municipal Assessor Luis Cruz', '2025-08-06', 0, 110, '2025-08-07', 1, '2025-08-07', 'Ricardo Delos Reyes', 7000.00, 33, 280000.00),
-(3, 42342, 'Juan Dela Cruz', '2025-09-10', 'Maria Reyes', '2025-09-11', 0, 110, '2025-09-27', 2, '2025-09-23', 'None', 5000.00, 36, 264000.00);
+(1, '1484394354', 'Provincial Assessor Maria Santos', '2025-08-05', 'Municipal Assessor Luis Cruz', '2025-08-06', 0, 110, '2025-08-07', 1, '2025-08-07', 'Ricardo Delos Reyes', 7000.00, 33, 20157.00),
+(3, '42342', 'Juan Dela Cruz', '2025-09-10', 'Maria Reyes', '2025-09-11', 0, 110, '2025-09-27', 2, '2025-09-23', 'None', 5000.00, 36, 264000.00);
 
 -- --------------------------------------------------------
 
@@ -887,7 +888,7 @@ INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `pro_assess`, `pro_date`, `mun_assess
 
 CREATE TABLE `rpu_idnum` (
   `rpu_id` int(50) NOT NULL,
-  `arp` int(50) NOT NULL,
+  `arp` varchar(150) NOT NULL,
   `pin` varchar(13) DEFAULT NULL,
   `taxability` varchar(20) NOT NULL,
   `effectivity` varchar(255) NOT NULL,
@@ -899,9 +900,9 @@ CREATE TABLE `rpu_idnum` (
 --
 
 INSERT INTO `rpu_idnum` (`rpu_id`, `arp`, `pin`, `taxability`, `effectivity`, `faas_id`) VALUES
-(46, 123456786, '110-34564234-', 'taxable', '2025', 33),
-(62, 42342, '110123456789', 'exempt', '2025', 36),
-(63, 423234, '110-42342342-', 'taxable', '2025', 42);
+(46, '42342-42342-243423', '1103456423442', 'taxable', '2025', 33),
+(62, '42342', '110123456789', 'exempt', '2025', 36),
+(63, '423234', '110-42342342-', 'taxable', '2025', 42);
 
 -- --------------------------------------------------------
 
@@ -1243,7 +1244,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `admin_certification`
