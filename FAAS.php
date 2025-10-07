@@ -589,71 +589,69 @@ $conn->close();
           </div>
         <?php else: ?>
           <div class="col-md-12 mb-4">
-              <div class="d-flex align-items-center mb-3">
-                <h6 class="mb-0">Property Owners (<?= count($owners_details) ?>)</h6>
-                <div class="d-flex align-items-center ms-auto gap-2">
-                  <?php
-                  $hasRPUWithTax = !empty($rpu_declaration); // true if RPU exists for this FAAS
-                  ?>
-                  <div class="text-end"> <!-- align everything to the right -->
-                    <?php if (!$hasRPUWithTax): ?>
-                      <small class="text-muted d-block mb-1">
-                        No tax declaration; ownership change disabled.
-                      </small>
-                    <?php endif; ?>
-                    <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal"
-                      data-bs-target="#changeOwnershipModal" data-property-id="<?= htmlspecialchars($property_id) ?>"
-                      <?= $hasRPUWithTax ? '' : 'disabled' ?>>
-                      Change Ownership
-                    </button>
-                  </div>
+            <div class="d-flex align-items-center mb-3">
+              <h6 class="mb-0">Property Owners (<?= count($owners_details) ?>)</h6>
+              <div class="d-flex align-items-center ms-auto gap-2">
+                <?php
+                $hasRPUWithTax = !empty($rpu_declaration); // true if RPU exists for this FAAS
+                ?>
+                <div class="text-end"> <!-- align everything to the right -->
+                  <?php if (!$hasRPUWithTax): ?>
+                    <small class="text-muted d-block mb-1">
+                      No tax declaration; ownership change disabled.
+                    </small>
+                  <?php endif; ?>
+                  <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#changeOwnershipModal" data-property-id="<?= htmlspecialchars($property_id) ?>"
+                    <?= $hasRPUWithTax ? '' : 'disabled' ?>>
+                    Change Ownership
+                  </button>
                 </div>
               </div>
-              <?php
-              // Ensure $property_id is defined before including modal
-              $property_id = $property_id ?? ($_GET['id'] ?? 0);
-              include __DIR__ . '/change_ownership_modal.php';
-              ?>
             </div>
-            <?php foreach ($owners_details as $index => $owner): ?>
-              <div class="owner-item mb-3 p-3 bg-light rounded" 
-                data-owner-id="<?= (int) $owner['own_id'] ?>"
-                data-owner-type="<?= htmlspecialchars($owner['owner_type'] ?? 'individual', ENT_QUOTES) ?>"
-                data-company="<?= htmlspecialchars($owner['company_name'] ?? '', ENT_QUOTES) ?>"
-                data-first="<?= htmlspecialchars($owner['first_name'] ?? '', ENT_QUOTES) ?>"
-                data-middle="<?= htmlspecialchars($owner['middle_name'] ?? '', ENT_QUOTES) ?>"
-                data-last="<?= htmlspecialchars($owner['last_name'] ?? '', ENT_QUOTES) ?>">
+            <?php
+            // Ensure $property_id is defined before including modal
+            $property_id = $property_id ?? ($_GET['id'] ?? 0);
+            include __DIR__ . '/change_ownership_modal.php';
+            ?>
+          </div>
+          <?php foreach ($owners_details as $index => $owner): ?>
+            <div class="owner-item mb-3 p-3 bg-light rounded" data-owner-id="<?= (int) $owner['own_id'] ?>"
+              data-owner-type="<?= htmlspecialchars($owner['owner_type'] ?? 'individual', ENT_QUOTES) ?>"
+              data-company="<?= htmlspecialchars($owner['company_name'] ?? '', ENT_QUOTES) ?>"
+              data-first="<?= htmlspecialchars($owner['first_name'] ?? '', ENT_QUOTES) ?>"
+              data-middle="<?= htmlspecialchars($owner['middle_name'] ?? '', ENT_QUOTES) ?>"
+              data-last="<?= htmlspecialchars($owner['last_name'] ?? '', ENT_QUOTES) ?>">
 
-                <div class="d-flex justify-content-between align-items-start">
-                  <div class="owner-details flex-grow-1">
-                    <?php if (($owner['owner_type'] ?? 'individual') === 'company'): ?>
-                      <div class="mb-2">
-                        <span class="badge bg-primary me-2">Company</span>
-                        <strong><?= htmlspecialchars($owner['display_name']) ?></strong>
-                      </div>
-                      <?php if (!empty($owner['first_name']) || !empty($owner['last_name'])): ?>
-                        <div class="text-muted small">
-                          Contact:
-                          <?= htmlspecialchars(trim(($owner['first_name'] ?? '') . ' ' . ($owner['middle_name'] ?? '') . ' ' . ($owner['last_name'] ?? ''))) ?>
-                        </div>
-                      <?php endif; ?>
-                    <?php else: ?>
-                      <div class="mb-2">
-                        <span class="badge bg-info me-2">Individual</span>
-                        <strong><?= htmlspecialchars($owner['display_name']) ?></strong>
-                      </div>
-                      <div class="row text-muted small">
-                        <div class="col-md-4">First: <?= htmlspecialchars($owner['first_name'] ?? '') ?></div>
-                        <div class="col-md-4">Middle: <?= htmlspecialchars($owner['middle_name'] ?? '') ?></div>
-                        <div class="col-md-4">Last: <?= htmlspecialchars($owner['last_name'] ?? '') ?></div>
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="owner-details flex-grow-1">
+                  <?php if (($owner['owner_type'] ?? 'individual') === 'company'): ?>
+                    <div class="mb-2">
+                      <span class="badge bg-primary me-2">Company</span>
+                      <strong><?= htmlspecialchars($owner['display_name']) ?></strong>
+                    </div>
+                    <?php if (!empty($owner['first_name']) || !empty($owner['last_name'])): ?>
+                      <div class="text-muted small">
+                        Contact:
+                        <?= htmlspecialchars(trim(($owner['first_name'] ?? '') . ' ' . ($owner['middle_name'] ?? '') . ' ' . ($owner['last_name'] ?? ''))) ?>
                       </div>
                     <?php endif; ?>
-                  </div>
+                  <?php else: ?>
+                    <div class="mb-2">
+                      <span class="badge bg-info me-2">Individual</span>
+                      <strong><?= htmlspecialchars($owner['display_name']) ?></strong>
+                    </div>
+                    <div class="row text-muted small">
+                      <div class="col-md-4">First: <?= htmlspecialchars($owner['first_name'] ?? '') ?></div>
+                      <div class="col-md-4">Middle: <?= htmlspecialchars($owner['middle_name'] ?? '') ?></div>
+                      <div class="col-md-4">Last: <?= htmlspecialchars($owner['last_name'] ?? '') ?></div>
+                    </div>
+                  <?php endif; ?>
+                </div>
 
-               <!-- Eye Hover -->
-              <div class="ms-3 position-relative" style="display:inline-block; position:relative;">
-                  <i class="bi bi-eye text-secondary"
-                    style="cursor: pointer; font-size: 1.3rem;"
+                <!-- Eye Hover -->
+                <div class="ms-3 position-relative" style="display:inline-block; position:relative;">
+                  <i class="bi bi-eye text-secondary" style="cursor: pointer; font-size: 1.3rem;"
                     onmouseover="this.nextElementSibling.style.opacity='1'; this.nextElementSibling.style.visibility='visible';"
                     onmouseout="this.nextElementSibling.style.opacity='0'; this.nextElementSibling.style.visibility='hidden';">
                   </i>
@@ -686,10 +684,10 @@ $conn->close();
             </div>
           <?php endforeach; ?>
         </div>
-        <?php endif; ?>
-      </div>
-      </div>
-    </section>
+      <?php endif; ?>
+    </div>
+    </div>
+  </section>
 
   <!-- Property Information Section -->
   <section class="container my-5" id="property-info-section">
@@ -819,13 +817,69 @@ $conn->close();
     <div class="card border-0 shadow p-4 rounded-3">
       <form>
         <div class="row">
-          <!-- ARP Number Input (Number only) -->
+          <!-- ARP Number Input -->
           <div class="col-md-6 mb-3">
             <label for="arpNumber" class="form-label">ARP Number</label>
-            <input type="number" class="form-control" id="arpNumber" placeholder="Enter ARP Number"
+            <input type="text" class="form-control" id="arpNumber" placeholder="Enter ARP Number"
               value="<?= isset($rpu_details['arp']) ? htmlspecialchars($rpu_details['arp']) : ''; ?>" maxlength="20"
               disabled>
           </div>
+
+          <script>
+            (function () {
+              const input = document.getElementById('arpNumber');
+              if (!input) return;
+
+              const MAX = 15; // 15 digits total
+              const PATTERN = [4, 4, 4, 3]; // 1997-1004-1795-101
+
+              function digitsOnly(s) {
+                return (s || '').replace(/\D/g, '').slice(0, MAX);
+              }
+
+              function formatArp(digits) {
+                let parts = [];
+                let index = 0;
+                for (let len of PATTERN) {
+                  const part = digits.slice(index, index + len);
+                  if (!part) break;
+                  parts.push(part);
+                  index += len;
+                }
+                return parts.join('-');
+              }
+
+              // Initialize (format any existing value)
+              input.value = formatArp(digitsOnly(input.value));
+
+              input.addEventListener('input', () => {
+                const digits = digitsOnly(input.value);
+                input.value = formatArp(digits);
+                input.selectionStart = input.selectionEnd = input.value.length; // keep cursor at end
+              });
+
+              input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pasted = (e.clipboardData || window.clipboardData).getData('text') || '';
+                const digits = digitsOnly(pasted);
+                input.value = formatArp(digits);
+              });
+
+              // Optional helper to enable/disable field dynamically
+              window.toggleArpInput = function (enable) {
+                input.disabled = !enable;
+                if (enable) {
+                  input.focus();
+                  input.selectionStart = input.selectionEnd = input.value.length;
+                }
+              };
+
+              // Optional helper to get digits-only ARP (e.g., for saving)
+              window.getArpDigits = function () {
+                return digitsOnly(input.value);
+              };
+            })();
+          </script>
 
           <!-- Property Number Input -->
           <div class="col-md-6 mb-3">
@@ -988,7 +1042,8 @@ $conn->close();
           <div class="col-md-6 mb-3">
             <label for="previousAssessedValue" class="form-label">Previous Assessed Value</label>
             <input type="text" class="form-control" id="previousAssessedValue" placeholder="Enter Assessed Value"
-              value="₱<?= isset($rpu_declaration['prev_assess']) ? number_format($rpu_declaration['prev_assess'], 2) : '' ?>" disabled>
+              value="₱<?= isset($rpu_declaration['prev_assess']) ? number_format($rpu_declaration['prev_assess'], 2) : '' ?>"
+              disabled>
           </div>
 
         </div>
@@ -1177,9 +1232,8 @@ $conn->close();
                         </a>
                         <a href="<?= ($is_active == 1)
                           ? 'print-layout.php?p_id=' . urlencode($p_id) . '&land_id=' . urlencode($record['land_id'])
-                          : '#' ?>"
-                          class="btn btn-sm btn-secondary ml-3 <?= ($is_active == 0) ? 'disabled' : '' ?>" title="View"
-                          target="_blank" style="pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
+                          : '#' ?>" class="btn btn-sm btn-secondary ml-3 <?= ($is_active == 0) ? 'disabled' : '' ?>"
+                          title="View" target="_blank" style="pointer-events: <?= ($is_active == 0) ? 'none' : 'auto' ?>;">
                           <i class="bi bi-printer"></i>
                         </a>
                         <a href="ViewAll.php?p_id=<?= urlencode($p_id); ?>" class="btn btn-sm btn-info ml-3"
