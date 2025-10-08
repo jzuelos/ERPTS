@@ -91,10 +91,9 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-KyZXEJr+8+6g5K4r53m5s3xmw1Is0J6wBd04YOeFvXOsZTgmYF9flT/qe6LZ9s+0" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="header.css">
   <link rel="stylesheet" href="Real-Property-Unit-List.css">
@@ -117,17 +116,17 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
       <div class="form-row mb-4">
         <div class="row mb-4 align-items-center">
           <!-- search input: medium width on md+, full width on xs -->
-          <div class="col-12 col-md-6 col-lg-5 mb-2 mb-md-0">
+          <div class="col-12 col-md-6 col-lg-3 mb-2 mb-md-0">
             <input type="text" class="form-control" id="searchInput" placeholder="Search" onkeyup="filterTable()">
           </div>
 
-          <div class="col-8 col-sm-6 col-md-3 col-lg-2 mb-2 mb-md-0">
+          <div class="col-10 col-sm-6 col-md-4 col-lg-4 mb-2 mb-md-0">
             <div class="d-flex">
               <!-- Dropdown -->
-              <select class="form-select me-2" id="barangayDropdown" name="barangay">
-                <option selected value="">All Barangay</option>
-                <?php echo $barangayOptions; ?>
-              </select>
+        <select class="form-select me-3 w-50" id="barangayDropdown" name="barangay">
+          <option value="" disabled selected hidden>Select Barangay</option>
+          <?php echo $barangayOptions; ?>
+        </select>
 
               <!-- Button -->
               <button type="button" class="btn btn-success" onclick="filterTable()">Search</button>
@@ -341,15 +340,24 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
       });
     }
   </script>
-  <script src="http://localhost/ERPTS/Real-Property-Unit-List.js"></script>
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-    crossorigin="anonymous"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- Initialize -->
+<script>
+$(document).ready(function() {
+  $('#barangayDropdown').select2({
+    placeholder: "Select Barangay",
+    width: '50%'
+  });
+});
+</script>
+
+
+  <script src="http://localhost/ERPTS/Real-Property-Unit-List.js"></script>  
+</body> 
 
 </html>

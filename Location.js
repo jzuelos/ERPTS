@@ -443,3 +443,18 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+ // Universal search function for currently visible table
+  document.getElementById('tableSearch').addEventListener('keyup', function () {
+    const query = this.value.toLowerCase().trim();
+
+    // Detect which table is currently visible
+    const visibleTable = document.querySelector('table:not(.d-none)');
+    if (!visibleTable) return;
+
+    const rows = visibleTable.querySelectorAll('tbody tr');
+
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(query) ? '' : 'none';
+    });
+  });

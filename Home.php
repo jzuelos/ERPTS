@@ -176,26 +176,26 @@ $result = $conn->query($sql);
                 </thead>
                 <?php
                 $sql = "
-  SELECT 
-    r.dec_id,
-    r.arp_no,
-    r.total_property_value,
-    r.tax_year,
-    f.faas_id,
-    f.pro_id AS p_id,
-    GROUP_CONCAT(
-      DISTINCT CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname)
-      SEPARATOR ', '
-    ) AS owner_names
-  FROM rpu_dec r
-  LEFT JOIN faas f ON r.faas_id = f.faas_id
-  LEFT JOIN propertyowner po  
-    ON po.property_id = f.pro_id 
-    AND po.is_retained = 1  -- ✅ only include retained owners
-  LEFT JOIN owners_tb o ON o.own_id = po.owner_id
-  GROUP BY r.dec_id, f.faas_id, f.pro_id
-  ORDER BY r.dec_id DESC
-";
+                SELECT 
+                  r.dec_id,
+                  r.arp_no,
+                  r.total_property_value,
+                  r.tax_year,
+                  f.faas_id,
+                  f.pro_id AS p_id,
+                  GROUP_CONCAT(
+                    DISTINCT CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname)
+                    SEPARATOR ', '
+                  ) AS owner_names
+                FROM rpu_dec r
+                LEFT JOIN faas f ON r.faas_id = f.faas_id
+                LEFT JOIN propertyowner po  
+                  ON po.property_id = f.pro_id 
+                  AND po.is_retained = 1  -- ✅ only include retained owners
+                LEFT JOIN owners_tb o ON o.own_id = po.owner_id
+                GROUP BY r.dec_id, f.faas_id, f.pro_id
+                ORDER BY r.dec_id DESC
+              ";
 
 
                 $result = $conn->query($sql);
@@ -231,7 +231,7 @@ $result = $conn->query($sql);
         </div>
 
         <!-- Right Section: Main Content -->
-        <div class="col-lg-4">
+        <div class="col-lg-4 mb-4">
           <div class="modern-card shadow-lg p-4 rounded-lg" style="height: 100%;">
             <h3 class="font-weight-bold custom-text-color">CITIZEN'S CHARTER OFFICE OF THE PROVINCIAL ASSESSOR</h3>
             <h5 class="text-secondary mb-4 custom-text-color">Capitol, Daet, Camarines Norte</h5>
