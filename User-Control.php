@@ -119,6 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
     $stmt->close();
 }
 
+$username = $_SESSION['username'] ?? 'Admin';
 // Fetch all municipalities for dropdown
 $municipalities = [];
 $mun_query = "SELECT m_id, m_description FROM municipality WHERE m_status = 1 ORDER BY m_description";
@@ -191,241 +192,288 @@ $conn->close();
         const barangaysData = <?php echo json_encode($barangays); ?>;
     </script>
 
-    <!-- Main Content -->
-    <section class="section-user-management">
-        <div class="container py-4">
-            <h4 class="text-success">Server Status: Online</h4>
-            <div class="alert alert-info text-center" role="alert">
-                Logged in as Admin
-            </div>
-
-            <div class="mb-4 d-flex justify-content-start">
-                <a href="Admin-Page-2.php" class="btn btn-outline-secondary btn-sm">
-                    <i class="fas fa-arrow-left"></i> Back
-                </a>
-            </div>
-            <h3 class="mb-4">Users</h3>
-            <div class="button-group mb-4">
-                <a href="ADD_User.php" class="btn btn-outline-primary">Add User</a>
-
-                <div class="form-check form-check-inline ml-3">
-                    <input class="form-check-input" type="radio" name="userStatusFilter" id="showDisabled" value="show"
-                        checked>
-                    <label class="form-check-label" for="showDisabled">Show Disabled User</label>
-                </div>
-
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="userStatusFilter" id="hideDisabled" value="hide">
-                    <label class="form-check-label" for="hideDisabled">Hide Disabled User</label>
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead class="table-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>Username</th>
-                            <th>Full Name</th>
-                            <th>User Type</th>
-                            <th>Status</th>
-                            <th>Edit</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($users as $user): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($user['user_id'] ?? ''); ?></td>
-                                <td><a href="#"><?php echo htmlspecialchars($user['username'] ?? ''); ?></a></td>
-                                <td><?php echo htmlspecialchars(trim("{$user['first_name']} {$user['middle_name']} {$user['last_name']}")); ?>
-                                </td>
-                                <td><?php echo htmlspecialchars($user['user_type'] ?? ''); ?></td>
-                                <td><?php echo ($user['status'] == 1) ? 'Enabled' : 'Disabled'; ?></td>
-                                <td class="text-center">
-                                    <a href="#" data-toggle="modal"
-                                        data-target="#editUserModal-<?php echo $user['user_id']; ?>">
-                                        <i class="bi bi-pencil-square edit-icon"></i>
-                                    </a>
-                                </td>
-                            </tr>
-
-                            <!-- User Edit Modal -->
-                            <div class="modal fade" id="editUserModal-<?php echo $user['user_id']; ?>" tabindex="-1"
-                                aria-labelledby="editUserModalLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-lg">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Edit User</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <!-- Submitting to the same file -->
-                                        <form action="" method="POST">
-                                            <!-- Hidden field to trigger update -->
-                                            <input type="hidden" name="update_user" value="1">
-                                            <div class="modal-body">
-                                                <div class="container">
-                                                    <div class="row">
-                                                        <!-- Left Column -->
-                                                        <div class="col-md-6">
-                                                            <h5 class="text-primary">User Credentials</h5>
-                                                            <hr>
-                                                            <div class="form-group">
-                                                                <label for="userId">User ID</label>
-                                                                <input type="text" class="form-control" name="userId"
-                                                                    value="<?php echo htmlspecialchars($user['user_id'] ?? ''); ?>"
-                                                                    readonly>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label for="username">Username</label>
-                                                                <input type="text" class="form-control" name="username"
-                                                                    value="<?php echo htmlspecialchars($user['username'] ?? ''); ?>"
-                                                                    required>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label for="password">Password</label>
-                                                                <input type="password" class="form-control" name="password"
-                                                                    placeholder="Enter new password (leave blank to keep current)">
-                                                            </div>
-
-                                                            <h5 class="text-primary mt-4">Personal Information</h5>
-                                                            <hr>
-                                                            <div class="form-group">
-                                                                <label for="last_name">Last Name</label>
-                                                                <input type="text" class="form-control" name="last_name"
-                                                                    value="<?php echo htmlspecialchars($user['last_name'] ?? ''); ?>"
-                                                                    required>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label for="first_name">First Name</label>
-                                                                <input type="text" class="form-control" name="first_name"
-                                                                    value="<?php echo htmlspecialchars($user['first_name'] ?? ''); ?>"
-                                                                    required>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label for="middle_name">Middle Name</label>
-                                                                <input type="text" class="form-control" name="middle_name"
-                                                                    value="<?php echo htmlspecialchars($user['middle_name'] ?? ''); ?>">
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label for="gender">Gender</label>
-                                                                <select class="form-control" name="gender">
-                                                                    <option value="Male" <?php echo ($user['gender'] ?? '') == 'Male' ? 'selected' : ''; ?>>Male</option>
-                                                                    <option value="Female" <?php echo ($user['gender'] ?? '') == 'Female' ? 'selected' : ''; ?>>Female</option>
-                                                                </select>
-                                                            </div>
-
-                                                            <h5 class="text-primary mt-4">User Settings</h5>
-                                                            <hr>
-                                                            <div class="form-group">
-                                                                <label for="user_type">User Type</label>
-                                                                <select class="form-control" name="user_type">
-                                                                    <option value="Admin" <?php echo ($user['user_type'] == 'Admin') ? 'selected' : ''; ?>>
-                                                                        Admin</option>
-                                                                    <option value="User" <?php echo ($user['user_type'] == 'User') ? 'selected' : ''; ?>>
-                                                                        User</option>
-                                                                </select>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label for="status">Status</label>
-                                                                <select class="form-control" name="status">
-                                                                    <option value="1" <?php echo ($user['status'] == 1) ? 'selected' : ''; ?>>Enabled</option>
-                                                                    <option value="0" <?php echo ($user['status'] == 0) ? 'selected' : ''; ?>>Disabled</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Right Column -->
-                                                        <div class="col-md-6">
-                                                            <h5 class="text-primary">Additional Details</h5>
-                                                            <hr>
-                                                            <div class="form-group">
-                                                                <label for="birthdate">Birthdate</label>
-                                                                <input type="date" class="form-control" name="birthdate"
-                                                                    value="<?php echo htmlspecialchars($user['birthdate'] ?? ''); ?>">
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label for="marital_status">Marital Status</label>
-                                                                <input type="text" class="form-control" name="marital_status"
-                                                                    value="<?php echo htmlspecialchars($user['marital_status'] ?? ''); ?>">
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label for="tin">TIN</label>
-                                                                <input type="text" class="form-control" name="tin"
-                                                                    value="<?php echo htmlspecialchars($user['tin'] ?? ''); ?>">
-                                                            </div>
-
-                                                            <h5 class="text-primary mt-4">Contact Information</h5>
-                                                            <hr>
-                                                            <div class="form-group">
-                                                                <label for="contact_number">Contact Number</label>
-                                                                <input type="text" class="form-control" name="contact_number"
-                                                                    value="<?php echo htmlspecialchars($user['contact_number'] ?? ''); ?>"
-                                                                    required>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label for="email">Email</label>
-                                                                <input type="email" class="form-control" name="email"
-                                                                    value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>"
-                                                                    required>
-                                                            </div>
-
-                                                            <h5 class="text-primary mt-4">Location</h5>
-                                                            <hr>
-
-                                                            <div class="form-group mb-2">
-                                                                <label for="municipality">Municipality</label>
-                                                                <select class="form-control municipality-select" name="municipality" data-user-id="<?php echo $user['user_id']; ?>">
-                                                                    <option value="">Select municipality</option>
-                                                                    <?php foreach ($municipalities as $mun): ?>
-                                                                        <option value="<?php echo $mun['m_id']; ?>"
-                                                                            <?php echo (isset($user['m_id']) && $user['m_id'] == $mun['m_id']) ? 'selected' : ''; ?>>
-                                                                            <?php echo htmlspecialchars($mun['m_description']); ?>
-                                                                        </option>
-                                                                    <?php endforeach; ?>
-                                                                </select>
-                                                            </div>
-
-                                                            <div class="form-group mb-2">
-                                                                <label for="district">District</label>
-                                                                <select class="form-control district-select" name="district" data-user-id="<?php echo $user['user_id']; ?>" disabled>
-                                                                    <option value="">Select district</option>
-                                                                </select>
-                                                            </div>
-
-                                                            <div class="form-group mb-2">
-                                                                <label for="barangay">Barangay</label>
-                                                                <select
-                                                                    class="form-control barangay-select"
-                                                                    name="barangay"
-                                                                    data-user-id="<?php echo $user['user_id']; ?>"
-                                                                    data-selected-id="<?php echo isset($user['brgy_id']) ? $user['brgy_id'] : ''; ?>"
-                                                                    disabled>
-                                                                    <option value="">Select barangay</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-dismiss="modal">Close</button>
-                                                <button type="reset" class="btn btn-warning">Reset</button>
-                                                <button type="submit" class="btn btn-primary">Save changes</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-
-                    </tbody>
-                </table>
-            </div>
+  <div class="container py-4">
+  <!-- SERVER STATUS + LOGGED IN INFO -->
+  <div class="row mb-4 align-items-center">
+    <div class="col-md-4 mb-3 mb-md-0">
+      <div class="card border-success shadow-sm">
+        <div class="card-body text-center text-success fw-bold">
+          <i class="bi bi-server me-2"></i> Server Status: Online
         </div>
-    </section>
+      </div>
+    </div>
+
+    <div class="col-md-6 offset-md-1">
+      <div class="alert alert-info text-center shadow-sm mb-0">
+        <i class="bi bi-person-circle me-2"></i>
+        Logged in as <strong><?= htmlspecialchars($username); ?></strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- BACK BUTTON -->
+  <div class="mb-4">
+    <a href="Admin-Page-2.php" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
+
+  <!-- USERS SECTION -->
+  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+    <h3 class="fw-bold text-primary mb-3 mb-md-0">
+      <i class="bi bi-people-fill me-2"></i> Users
+    </h3>
+
+    <div class="d-flex align-items-center flex-wrap gap-3">
+      <a href="ADD_User.php" class="btn btn-outline-primary">
+        <i class="bi bi-person-plus"></i> Add User
+      </a>
+
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="userStatusFilter" id="showDisabled" value="show" checked>
+        <label class="form-check-label" for="showDisabled">
+          Show Disabled User
+        </label>
+      </div>
+
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="userStatusFilter" id="hideDisabled" value="hide">
+        <label class="form-check-label" for="hideDisabled">
+          Hide Disabled User
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- USERS TABLE  -->
+  <div class="table-responsive mx-auto" style="width: 85%;">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="bg-dark text-white text-center">
+        <tr>
+          <th scope="col" style="width: 8%">ID</th>
+          <th scope="col" style="width: 18%">Username</th>
+          <th scope="col" style="width: 25%">Full Name</th>
+          <th scope="col" style="width: 15%">User Type</th>
+          <th scope="col" style="width: 15%">Status</th>
+          <th scope="col" style="width: 10%">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="text-start">
+        <?php foreach ($users as $user): ?>
+          <tr class="border-bottom">
+            <td><?= htmlspecialchars($user['user_id'] ?? '') ?></td>
+            <td class="fw-semibold"><?= htmlspecialchars($user['username'] ?? '') ?></td>
+            <td><?= htmlspecialchars(trim("{$user['first_name']} {$user['middle_name']} {$user['last_name']}")) ?></td>
+            <td><?= htmlspecialchars($user['user_type'] ?? '') ?></td>
+            <td>
+              <?php if ($user['status'] == 1): ?>
+                <span class="badge bg-success px-3 py-2">Enabled</span>
+              <?php else: ?>
+                <span class="badge bg-secondary px-3 py-2">Disabled</span>
+              <?php endif; ?>
+            </td>
+            <td class="text-center">
+              <a href="#"
+                 data-toggle="modal"
+                 data-target="#editUserModal-<?= $user['user_id'] ?>"
+                 class="btn btn-outline-primary btn-sm rounded-circle">
+                <i class="bi bi-pencil-square"></i>
+              </a>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+
+<?php foreach ($users as $user): ?>
+<div class="modal fade" id="editUserModal-<?= $user['user_id'] ?>" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+
+      <!-- Modal Header -->
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-pencil-square me-2"></i> Edit User
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Modal Form -->
+      <form action="" method="POST" class="needs-validation" novalidate>
+        <input type="hidden" name="update_user" value="1">
+
+        <div class="modal-body">
+          <div class="row g-4">
+
+            <!-- LEFT COLUMN -->
+            <div class="col-md-6">
+              <h6 class="fw-bold text-success">User Credentials</h6>
+              <hr class="mt-1 mb-3">
+
+              <div class="mb-3">
+                <label class="form-label">User ID</label>
+                <input type="text" class="form-control" name="userId"
+                       value="<?= htmlspecialchars($user['user_id'] ?? '') ?>" readonly>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-control" name="username"
+                       value="<?= htmlspecialchars($user['username'] ?? '') ?>" required>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" name="password"
+                       placeholder="Enter new password (leave blank to keep current)">
+              </div>
+
+              <h6 class="fw-bold text-success mt-4">Personal Information</h6>
+              <hr class="mt-1 mb-3">
+
+              <div class="mb-3">
+                <label class="form-label">Last Name</label>
+                <input type="text" class="form-control" name="last_name"
+                       value="<?= htmlspecialchars($user['last_name'] ?? '') ?>" required>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">First Name</label>
+                <input type="text" class="form-control" name="first_name"
+                       value="<?= htmlspecialchars($user['first_name'] ?? '') ?>" required>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Middle Name</label>
+                <input type="text" class="form-control" name="middle_name"
+                       value="<?= htmlspecialchars($user['middle_name'] ?? '') ?>">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Gender</label>
+                <select class="form-select" name="gender">
+                  <option value="Male" <?= ($user['gender'] ?? '') == 'Male' ? 'selected' : '' ?>>Male</option>
+                  <option value="Female" <?= ($user['gender'] ?? '') == 'Female' ? 'selected' : '' ?>>Female</option>
+                </select>
+              </div>
+
+              <h6 class="fw-bold text-success mt-4">User Settings</h6>
+              <hr class="mt-1 mb-3">
+
+              <div class="mb-3">
+                <label class="form-label">User Type</label>
+                <select class="form-select" name="user_type">
+                  <option value="Admin" <?= ($user['user_type'] == 'Admin') ? 'selected' : '' ?>>Admin</option>
+                  <option value="User" <?= ($user['user_type'] == 'User') ? 'selected' : '' ?>>User</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Status</label>
+                <select class="form-select" name="status">
+                  <option value="1" <?= ($user['status'] == 1) ? 'selected' : '' ?>>Enabled</option>
+                  <option value="0" <?= ($user['status'] == 0) ? 'selected' : '' ?>>Disabled</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="col-md-6">
+              <h6 class="fw-bold text-success">Additional Details</h6>
+              <hr class="mt-1 mb-3">
+
+              <div class="mb-3">
+                <label class="form-label">Birthdate</label>
+                <input type="date" class="form-control" name="birthdate"
+                       value="<?= htmlspecialchars($user['birthdate'] ?? '') ?>">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Marital Status</label>
+                <input type="text" class="form-control" name="marital_status"
+                       value="<?= htmlspecialchars($user['marital_status'] ?? '') ?>">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">TIN</label>
+                <input type="text" class="form-control" name="tin"
+                       value="<?= htmlspecialchars($user['tin'] ?? '') ?>">
+              </div>
+
+              <h6 class="fw-bold text-success mt-4">Contact Information</h6>
+              <hr class="mt-1 mb-3">
+
+              <div class="mb-3">
+                <label class="form-label">Contact Number</label>
+                <input type="text" class="form-control" name="contact_number"
+                       value="<?= htmlspecialchars($user['contact_number'] ?? '') ?>" required>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email"
+                       value="<?= htmlspecialchars($user['email'] ?? '') ?>" required>
+              </div>
+
+              <h6 class="fw-bold text-success mt-4">Location</h6>
+              <hr class="mt-1 mb-3">
+
+              <div class="mb-3">
+                <label class="form-label">Municipality</label>
+                <select class="form-select municipality-select" name="municipality" data-user-id="<?= $user['user_id'] ?>">
+                  <option value="">Select municipality</option>
+                  <?php foreach ($municipalities as $mun): ?>
+                    <option value="<?= $mun['m_id'] ?>" <?= (isset($user['m_id']) && $user['m_id'] == $mun['m_id']) ? 'selected' : '' ?>>
+                      <?= htmlspecialchars($mun['m_description']) ?>
+                    </option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">District</label>
+                <select class="form-select district-select" name="district" data-user-id="<?= $user['user_id'] ?>" disabled>
+                  <option value="">Select district</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Barangay</label>
+                <select class="form-select barangay-select" name="barangay" data-user-id="<?= $user['user_id'] ?>" data-selected-id="<?= $user['brgy_id'] ?? '' ?>" disabled>
+                  <option value="">Select barangay</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Footer Buttons -->
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle"></i> Close
+          </button>
+          <button type="reset" class="btn btn-primary">
+            <i class="bi bi-arrow-counterclockwise"></i> Reset
+          </button>
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-save"></i> Save changes
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+<?php endforeach; ?>
+
+
+
 
     <!-- Footer -->
     <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
