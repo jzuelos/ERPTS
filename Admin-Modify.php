@@ -359,9 +359,10 @@ if ($verifierQuery) {
             ?>
 
             <form id="assessorForm" method="POST" action="">
-              <p><strong>Provincial Assessor:</strong></p>
+              <small class="text-muted mb">Select the Provincial Assessor and Verifier to be assigned.</small>
+              <p class="mt-3"><strong>Provincial Assessor:</strong></p>
               <select class="form-control mb-3" name="provincial_assessor" id="provincial_assessor" required>
-                <option value="">Select Assessor</option>
+                <option value="" disabled>Select Assessor</option>
                 <?php foreach ($assessors as $a): ?>
                   <option value="<?= htmlspecialchars($a['id']); ?>" <?= ($a['id'] == $currentAssessorId ? 'selected' : '') ?>>
                     <?= htmlspecialchars($a['name']); ?>
@@ -371,7 +372,7 @@ if ($verifierQuery) {
 
               <p><strong>Verified By:</strong></p>
               <select class="form-control mb-4" name="verified_by" id="verified_by" required>
-                <option value="">Select Verifier</option>
+                <option value="" disabled>Select Verifier</option>
                 <?php foreach ($verifiers as $v): ?>
                   <option value="<?= htmlspecialchars($v['id']); ?>" <?= ($v['id'] == $currentVerifierId ? 'selected' : '') ?>>
                     <?= htmlspecialchars($v['name']); ?>
@@ -381,12 +382,107 @@ if ($verifierQuery) {
 
               <!-- Apply Button -->
               <div class="d-flex justify-content-end">
-                <button type="submit" class="btn btn-success px-4">
+                <button type="button" class="btn btn-success px-4" data-bs-toggle="modal"
+                  data-bs-target="#applyConfirmModal">
                   <i class="fas fa-check-circle me-1"></i> Apply
                 </button>
               </div>
             </form>
+
+            <!-- Confirmation Modal -->
+            <div class="modal fade" id="applyConfirmModal" tabindex="-1" aria-labelledby="applyConfirmModalLabel"
+              aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow rounded-3">
+                  <div class="modal-header bg-success text-white">
+                    <h6 class="modal-title" id="applyConfirmModalLabel">
+                      <i class="fas fa-exclamation-circle me-2"></i> Confirm Action
+                    </h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                      aria-label="Close"></button>
+                  </div>
+
+                  <div class="modal-body text-center">
+                    <p class="fs-6 mb-2">You are about to apply updates to the following record:</p>
+
+                    <!-- Verifier Display -->
+                    <p class="fw-bold text-success mb-0">
+                      Verifier: <span id="verifierNameDisplay">(Not Selected)</span>
+                    </p>
+
+                    <!-- Provincial Assessor Display -->
+                    <p class="fw-bold text-primary mb-0">
+                      Provincial Assessor: <span id="assessorNameDisplay">(Not Selected)</span>
+                    </p>
+
+                    <p class="text-muted small mb-0 mt-2">
+                      Please confirm to proceed with saving the changes.
+                    </p>
+                  </div>
+
+                  <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="confirmApplyBtn">Yes, Apply</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Apply Button Script -->
+            <script>
+              document.addEventListener("DOMContentLoaded", function () {
+                const applyBtn = document.querySelector('[data-bs-target="#applyConfirmModal"]');
+                const confirmApplyBtn = document.getElementById("confirmApplyBtn");
+                const verifierField = document.getElementById("verified_by");
+                const assessorField = document.getElementById("provincial_assessor");
+
+                // Store initial values
+                const initialAssessor = assessorField.value;
+                const initialVerifier = verifierField.value;
+
+                // Function to check if values have changed
+                function checkForChanges() {
+                  const hasChanges =
+                    assessorField.value !== initialAssessor ||
+                    verifierField.value !== initialVerifier;
+
+                  applyBtn.disabled = !hasChanges;
+                }
+
+                // Check on page load
+                checkForChanges();
+
+                // Check whenever dropdown values change
+                assessorField.addEventListener("change", checkForChanges);
+                verifierField.addEventListener("change", checkForChanges);
+
+                // When Apply button is clicked → populate modal with selected names
+                if (applyBtn) {
+                  applyBtn.addEventListener("click", function () {
+                    const verifierDisplay = document.getElementById("verifierNameDisplay");
+                    const assessorDisplay = document.getElementById("assessorNameDisplay");
+
+                    const verifierName =
+                      verifierField?.options?.[verifierField.selectedIndex]?.text.trim() || "Not Selected";
+                    const assessorName =
+                      assessorField?.options?.[assessorField.selectedIndex]?.text.trim() || "Not Selected";
+
+                    verifierDisplay.textContent = verifierName;
+                    assessorDisplay.textContent = assessorName;
+                  });
+                }
+
+                // When "Yes, Apply" is clicked → submit form
+                if (confirmApplyBtn) {
+                  confirmApplyBtn.addEventListener("click", function () {
+                    const form = document.getElementById("assessorForm");
+                    if (form) form.submit();
+                  });
+                }
+              });
+            </script>
           </div>
+          <!-- END Left Column -->
 
           <!-- Right Column (Table) -->
           <div class="col-md-8">
@@ -394,7 +490,7 @@ if ($verifierQuery) {
 
               <!-- Top Bar: Add + Search -->
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">Classification List</h5>
+                <h5 class="mb-0">Positions</h5>
 
                 <div class="d-flex gap-2">
                   <!-- Add Button -->
@@ -457,7 +553,7 @@ if ($verifierQuery) {
                   <?php endif; ?>
                 </tbody>
               </table>
-            
+
               <div id="classificationPagination" class="mt-3 d-flex justify-content-start"></div>
             </div>
           </div>
@@ -580,74 +676,74 @@ if ($verifierQuery) {
 </body>
 <!-- Pagination Script -->
 <script>
-function paginateTable(tableId, paginationId, rowsPerPage = 10) {
-  const table = document.getElementById(tableId);
-  const tbody = table.querySelector("tbody");
-  const rows = Array.from(tbody.querySelectorAll("tr")).filter(
-    row => !row.querySelector(".text-center.text-muted") // skip 'no records' row
-  );
-  const pagination = document.getElementById(paginationId);
+  function paginateTable(tableId, paginationId, rowsPerPage = 10) {
+    const table = document.getElementById(tableId);
+    const tbody = table.querySelector("tbody");
+    const rows = Array.from(tbody.querySelectorAll("tr")).filter(
+      row => !row.querySelector(".text-center.text-muted") // skip 'no records' row
+    );
+    const pagination = document.getElementById(paginationId);
 
-  if (rows.length === 0) {
-    pagination.innerHTML = "";
-    return;
+    if (rows.length === 0) {
+      pagination.innerHTML = "";
+      return;
+    }
+
+    let currentPage = 1;
+    const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+    function renderTable() {
+      rows.forEach((row, index) => {
+        row.style.display =
+          index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage
+            ? ""
+            : "none";
+      });
+    }
+
+    function renderPagination() {
+      pagination.innerHTML = "";
+
+      const prevBtn = document.createElement("button");
+      prevBtn.className = "btn btn-sm btn-outline-success me-2";
+      prevBtn.innerHTML = "&laquo; Prev";
+      prevBtn.disabled = currentPage === 1;
+      prevBtn.onclick = () => {
+        if (currentPage > 1) {
+          currentPage--;
+          renderTable();
+          renderPagination();
+        }
+      };
+
+      const pageIndicator = document.createElement("span");
+      pageIndicator.className = "mx-2 align-self-center fw-semibold";
+      pageIndicator.innerText = `Page ${currentPage} of ${totalPages}`;
+
+      const nextBtn = document.createElement("button");
+      nextBtn.className = "btn btn-sm btn-outline-success ms-2";
+      nextBtn.innerHTML = "Next &raquo;";
+      nextBtn.disabled = currentPage === totalPages;
+      nextBtn.onclick = () => {
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderTable();
+          renderPagination();
+        }
+      };
+
+      pagination.appendChild(prevBtn);
+      pagination.appendChild(pageIndicator);
+      pagination.appendChild(nextBtn);
+    }
+
+    renderTable();
+    renderPagination();
   }
 
-  let currentPage = 1;
-  const totalPages = Math.ceil(rows.length / rowsPerPage);
-
-  function renderTable() {
-    rows.forEach((row, index) => {
-      row.style.display =
-        index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage
-          ? ""
-          : "none";
-    });
-  }
-
-  function renderPagination() {
-    pagination.innerHTML = "";
-
-    const prevBtn = document.createElement("button");
-    prevBtn.className = "btn btn-sm btn-outline-success me-2";
-    prevBtn.innerHTML = "&laquo; Prev";
-    prevBtn.disabled = currentPage === 1;
-    prevBtn.onclick = () => {
-      if (currentPage > 1) {
-        currentPage--;
-        renderTable();
-        renderPagination();
-      }
-    };
-
-    const pageIndicator = document.createElement("span");
-    pageIndicator.className = "mx-2 align-self-center fw-semibold";
-    pageIndicator.innerText = `Page ${currentPage} of ${totalPages}`;
-
-    const nextBtn = document.createElement("button");
-    nextBtn.className = "btn btn-sm btn-outline-success ms-2";
-    nextBtn.innerHTML = "Next &raquo;";
-    nextBtn.disabled = currentPage === totalPages;
-    nextBtn.onclick = () => {
-      if (currentPage < totalPages) {
-        currentPage++;
-        renderTable();
-        renderPagination();
-      }
-    };
-
-    pagination.appendChild(prevBtn);
-    pagination.appendChild(pageIndicator);
-    pagination.appendChild(nextBtn);
-  }
-
-  renderTable();
-  renderPagination();
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-  paginateTable("classificationTable", "classificationPagination", 5);
-});
+  document.addEventListener("DOMContentLoaded", function () {
+    paginateTable("classificationTable", "classificationPagination", 5);
+  });
 </script>
 
 
