@@ -155,36 +155,40 @@ $result_login = $stmt_login->get_result();
         </div>
       </form>
 
-      <!-- Main Activity Logs -->
-      <div id="activitylogs" class="table-responsive">
-        <table class="table table-striped table-hover align-middle text-start">
-          <thead class="table-dark">
-            <tr>
-              <th style="width: 10%">No.</th>
-              <th style="width: 40%">Activity</th>
-              <th style="width: 25%">Date and Time</th>
-              <th style="width: 25%">User</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php
-            if ($result->num_rows > 0) {
-              $no = $offset + 1;
-              while ($row = $result->fetch_assoc()) {
-                echo "<tr>
-                  <td>{$no}</td>
-                  <td>{$row['action']}</td>
-                  <td>{$row['log_time']}</td>
-                  <td>{$row['fullname']}</td>
-                </tr>";
-                $no++;
-              }
-            } else {
-              echo "<tr><td colspan='4' class='text-center text-muted'>No activity logs found.</td></tr>";
-            }
-            ?>
-          </tbody>
-        </table>
+              <!-- Main Activity Logs -->
+          <div id="activitylogs" class="table-responsive">
+            <table class="table table-striped table-hover align-middle text-start w-100">
+              <thead class="table-dark">
+                <tr>
+                  <th style="width: 8%">No.</th>
+                  <th style="width: 32%">Activity</th>
+                  <th style="width: 20%">Date and Time</th>
+                  <th style="width: 20%">Log Details</th>
+                  <th style="width: 20%">User</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php
+                if ($result->num_rows > 0) {
+                  $no = $offset + 1;
+                  while ($row = $result->fetch_assoc()) {
+                    echo "<tr>
+                      <td>{$no}</td>
+                      <td>{$row['action']}</td>
+                      <td>{$row['log_time']}</td>
+                      <td>" . (!empty($row['log_details']) ? htmlspecialchars($row['log_details']) : '<span class=\"text-muted\">Details not Available.</span>') . "</td>
+                      <td>{$row['fullname']}</td>
+                    </tr>";
+                    $no++;
+                  }
+                } else {
+                  echo "<tr><td colspan='5' class='text-center text-muted'>No activity logs found.</td></tr>";
+                }
+                ?>
+              </tbody>
+            </table>
+          </div>
+
 
         <!-- Pagination -->
         <nav aria-label="Page navigation" class="mt-2">
