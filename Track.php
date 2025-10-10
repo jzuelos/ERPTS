@@ -502,24 +502,30 @@ if ($result && $result->num_rows > 0) {
 
   <script>
     // Toggle between Transaction and Received tables
-    function toggleTables() {
-      const transactionSection = document.getElementById("transactionSection");
-      const receivedSection = document.getElementById("receivedSection");
-      const toggleBtn = document.getElementById("toggleBtn");
+function toggleTables() {
+  const transactionSection = document.getElementById("transactionSection");
+  const receivedSection = document.getElementById("receivedSection");
+  const toggleBtn = document.getElementById("toggleBtn");
+  const addBtn = document.querySelector(".btn-add");
 
-      // Toggle visibility
-      transactionSection.classList.toggle("d-none");
-      receivedSection.classList.toggle("d-none");
+  // Toggle table visibility
+  transactionSection.classList.toggle("d-none");
+  receivedSection.classList.toggle("d-none");
 
-      // Update button text
-      if (receivedSection.classList.contains("d-none")) {
-        toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> Show Received Table';
-      } else {
-        toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> Show Transaction Table';
-        // Initialize pagination when table becomes visible
-        initReceivedPagination();
-      }
-    }
+  // Update button visibility and state
+  if (receivedSection.classList.contains("d-none")) {
+    toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> Show Received Table';
+    addBtn.classList.remove("invisible-btn"); // make visible again
+    addBtn.disabled = false; // re-enable
+  } else {
+    toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> Show Transaction Table';
+    addBtn.classList.add("invisible-btn"); // hide visually but keep space
+    addBtn.disabled = true; // disable click
+    initReceivedPagination();
+  }
+}
+
+
   </script>
 </body>
 

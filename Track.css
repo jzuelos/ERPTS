@@ -214,6 +214,7 @@
 }
 
 
+
 .modal-backdrop {
   z-index: 1990 !important;
 }
@@ -318,4 +319,10 @@
   }
 
   
-  
+.invisible-btn {
+  visibility: hidden !important;  /* hides entire button including text */
+  opacity: 0 !important;          /* makes it transparent */
+  pointer-events: none !important; /* disable interaction */
+  transition: opacity 0.3s ease;
+}
+
