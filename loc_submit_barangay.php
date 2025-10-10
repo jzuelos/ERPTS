@@ -17,10 +17,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($stmt->execute()) {
         echo "Barangay details added successfully!";
 
-        // ✅ Log activity
+        // ✅ Log activity with details
         if (isset($_SESSION['user_id'])) {
+            // Get municipality name
+            $m_stmt = $conn->prepare("SELECT m_description FROM municipality WHERE m_id = ?");
+            $m_stmt->bind_param("i", $m_id);
+            $m_stmt->execute();
+            $m_result = $m_stmt->get_result();
+            $municipality_name = $m_result->fetch_assoc()['m_description'] ?? 'Unknown';
+            $m_stmt->close();
+
             $log = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
-            $action = "Added Barangay: " . $brgy_name;
+            $action = "Added new Barangay \"$brgy_name\" under Municipality \"$municipality_name\"";
             $log->bind_param("is", $_SESSION['user_id'], $action);
             $log->execute();
             $log->close();

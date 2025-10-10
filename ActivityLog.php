@@ -49,7 +49,7 @@ $total_rows = $stmt_count->get_result()->fetch_assoc()['total'];
 $total_pages = ceil($total_rows / $limit);
 
 // Fetch logs
-$stmt = $conn->prepare("SELECT a.log_id, a.action, a.log_time, 
+$stmt = $conn->prepare("SELECT a.log_id, a.action, a.log_details, a.log_time, 
                                CONCAT(u.first_name, ' ', u.last_name) AS fullname
                         FROM activity_log a
                         JOIN users u ON a.user_id = u.user_id
@@ -92,7 +92,7 @@ $total_rows_login = $stmt_count_login->get_result()->fetch_assoc()['total'];
 $total_pages_login = ceil($total_rows_login / $limit);
 
 // Fetch login logs
-$stmt_login = $conn->prepare("SELECT a.log_id, a.action, a.log_time, 
+$stmt_login = $conn->prepare("SELECT a.log_id, a.action, a.log_details, a.log_time, 
                                      CONCAT(u.first_name, ' ', u.last_name) AS fullname
                               FROM activity_log a
                               JOIN users u ON a.user_id = u.user_id
@@ -155,60 +155,56 @@ $result_login = $stmt_login->get_result();
         </div>
       </form>
 
-              <!-- Main Activity Logs -->
-          <div id="activitylogs" class="table-responsive">
-            <table class="table table-striped table-hover align-middle text-start w-100">
-              <thead class="table-dark">
-                <tr>
-                  <th style="width: 8%">No.</th>
-                  <th style="width: 32%">Activity</th>
-                  <th style="width: 20%">Date and Time</th>
-                  <th style="width: 20%">Log Details</th>
-                  <th style="width: 20%">User</th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php
-                if ($result->num_rows > 0) {
-                  $no = $offset + 1;
-                  while ($row = $result->fetch_assoc()) {
-                    echo "<tr>
-                      <td>{$no}</td>
-                      <td>{$row['action']}</td>
-                      <td>{$row['log_time']}</td>
-                      <td>" . (!empty($row['log_details']) ? htmlspecialchars($row['log_details']) : '<span class=\"text-muted\">Details not Available.</span>') . "</td>
-                      <td>{$row['fullname']}</td>
-                    </tr>";
-                    $no++;
-                  }
-                } else {
-                  echo "<tr><td colspan='5' class='text-center text-muted'>No activity logs found.</td></tr>";
-                }
-                ?>
-              </tbody>
-            </table>
-          </div>
-
-
-        <!-- Pagination -->
-        <nav aria-label="Page navigation" class="mt-2">
-          <div class="d-flex justify-content-center align-items-center gap-2">
-            <?php if ($page > 1): ?>
-              <a class="btn btn-outline-primary btn-sm" href="?page=<?= $page - 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Prev</a>
-            <?php else: ?>
-              <button class="btn btn-outline-secondary btn-sm" disabled>Prev</button>
-            <?php endif; ?>
-
-            <span class="small text-muted">Page <?= $page ?> of <?= $total_pages ?></span>
-
-            <?php if ($page < $total_pages): ?>
-              <a class="btn btn-outline-primary btn-sm" href="?page=<?= $page + 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Next</a>
-            <?php else: ?>
-              <button class="btn btn-outline-secondary btn-sm" disabled>Next</button>
-            <?php endif; ?>
-          </div>
-        </nav>
+      <!-- Main Activity Logs -->
+      <div id="activitylogs" class="table-responsive">
+        <table class="table table-striped table-hover align-middle text-start w-100">
+          <thead class="table-dark">
+            <tr>
+              <th style="width: 8%">No.</th>
+              <th style="width: 32%">Activity</th>
+              <th style="width: 20%">User</th>
+              <th style="width: 20%">Date and Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            if ($result->num_rows > 0) {
+              $no = $offset + 1;
+              while ($row = $result->fetch_assoc()) {
+                echo "<tr>
+                  <td>{$no}</td>
+                  <td>{$row['action']}</td>
+                  <td>{$row['fullname']}</td>
+                  <td>{$row['log_time']}</td>
+                </tr>";
+                $no++;
+              }
+            } else {
+              echo "<tr><td colspan='5' class='text-center text-muted'>No activity logs found.</td></tr>";
+            }
+            ?>
+          </tbody>
+        </table>
       </div>
+
+      <!-- Pagination -->
+      <nav aria-label="Page navigation" class="mt-2">
+        <div class="d-flex justify-content-center align-items-center gap-2">
+          <?php if ($page > 1): ?>
+            <a class="btn btn-outline-primary btn-sm" href="?page=<?= $page - 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Prev</a>
+          <?php else: ?>
+            <button class="btn btn-outline-secondary btn-sm" disabled>Prev</button>
+          <?php endif; ?>
+
+          <span class="small text-muted">Page <?= $page ?> of <?= $total_pages ?></span>
+
+          <?php if ($page < $total_pages): ?>
+            <a class="btn btn-outline-primary btn-sm" href="?page=<?= $page + 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Next</a>
+          <?php else: ?>
+            <button class="btn btn-outline-secondary btn-sm" disabled>Next</button>
+          <?php endif; ?>
+        </div>
+      </nav>
 
       <!-- Login/Logout Logs -->
       <div id="loginlogs" class="table-responsive d-none">
