@@ -480,16 +480,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Handle land record deletion
-if (isset($_GET['land_id']) && isset($_GET['p_id'])) {
-    $land_id = $_GET['land_id'];
-    $p_id = $_GET['p_id'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_land_id'])) {
+    $land_id = $_POST['delete_land_id'];
+    $p_id = $_POST['p_id'];
 
     $stmt = $conn->prepare("DELETE FROM land WHERE land_id = ?");
     $stmt->execute([$land_id]);
 
+    // Redirect after delete
     header("Location: LAND_List.php?p_id=" . urlencode($p_id));
     exit();
 }
+
 
 
 // General owners list
@@ -1355,13 +1357,13 @@ $conn->close();
                           title="View All">
                           <i class="bi bi-eye"></i>
                         </a>
-                        <a href="#" 
-                          class="btn btn-sm btn-danger ml-3" 
-                          title="Delete" 
-                          data-bs-toggle="modal" 
-                          data-bs-target="#deleteModal-<?= $record['land_id'] ?>">
-                          <i class="bi bi-trash"></i>
-                        </a>
+                     <a href="#" 
+                        class="btn btn-sm btn-danger ml-3" 
+                        title="Delete" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#deleteModal-<?= $record['land_id'] ?>">
+                        <i class="bi bi-trash"></i>
+                    </a>
                       </div>
                     </td>
                   </tr>
@@ -1449,8 +1451,7 @@ $conn->close();
   </section>
 
 
-  <!-- Delete Confimation Modal -->
-   <!-- Delete Confirmation Modal -->
+<!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteModal-<?= $record['land_id'] ?>" tabindex="-1" aria-labelledby="deleteModalLabel-<?= $record['land_id'] ?>" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -1464,11 +1465,18 @@ $conn->close();
       </div>
       <div class="modal-footer justify-content-center">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <a href="LAND_Delete.php?land_id=<?= urlencode($record['land_id']); ?>&p_id=<?= urlencode($p_id); ?>" class="btn btn-danger">Delete</a>
+
+        <!-- PHP-only Delete Form -->
+        <form method="POST" style="display:inline;">
+          <input type="hidden" name="delete_land_id" value="<?= htmlspecialchars($record['land_id']); ?>">
+          <input type="hidden" name="p_id" value="<?= htmlspecialchars($p_id); ?>">
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
       </div>
     </div>
   </div>
 </div>
+
 
 
 
