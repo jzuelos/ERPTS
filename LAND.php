@@ -360,12 +360,12 @@ $conn->close();
         <div class="row">
           <div class="col-md-6 mb-4">
             <label for="octTctNumber" class="form-label">OCT/TCT Number</label>
-            <input type="text" id="octTctNumber" name="oct_no" class="form-control" placeholder="Enter OCT/TCT Number">
+            <input type="text" id="octTctNumber" name="oct_no" class="form-control" placeholder="Enter OCT/TCT Number" required>
           </div>
           <div class="col-md-6 mb-4">
             <label for="surveyNumber" class="form-label">Survey Number</label>
             <input type="text" id="surveyNumber" name="survey_no" class="form-control"
-              placeholder="Enter Survey Number">
+              placeholder="Enter Survey Number" required>
           </div>
         </div>
 
@@ -466,19 +466,19 @@ $conn->close();
           </div>
           <div class="col-md-6 mb-4">
             <label for="classification" class="form-label">Classification</label>
-            <select id="classification" name="classification" class="form-select">
+            <select id="classification" name="classification" class="form-select" required>
               <option value="">Select classification</option>
             </select>
           </div>
           <div class="col-md-6 mb-4">
             <label for="subClass" class="form-label">Sub-Class</label>
-            <select id="subClass" name="sub_class" class="form-select">
+            <select id="subClass" name="sub_class" class="form-select" required>
               <option value="">Select sub-class</option>
             </select>
           </div>
           <div class="col-md-6 mb-4">
             <label for="actualUse" class="form-label">Actual Use</label>
-            <select id="actualUse" name="actual_use" class="form-select">
+            <select id="actualUse" name="actual_use" class="form-select" required>
               <option value="">Select actual use</option>
             </select>
           </div>
@@ -488,7 +488,7 @@ $conn->close();
           <div class="col-md-4 mb-4">
             <label for="area" class="form-label">Area</label>
             <div class="input-group">
-              <input type="text" id="area" name="area" class="form-control" placeholder="Enter area in sq m">
+              <input type="text" id="area" name="area" class="form-control" placeholder="Enter area in sq m" required>
               <div class="input-group-text">
                 <label><input type="radio" name="areaUnit" value="sqm" checked> Sq m</label>
                 <label class="ms-2"><input type="radio" name="areaUnit" value="hectare"> Ha</label>
@@ -500,7 +500,7 @@ $conn->close();
         <div class="row">
           <div class="col-md-4 mb-4">
             <label for="unitValue" class="form-label">Unit Value</label>
-            <input type="text" id="unitValue" name="unit_value" class="form-control" placeholder="Enter unit value">
+            <input type="text" id="unitValue" name="unit_value" class="form-control" placeholder="Enter unit value" required>
           </div>
           <div class="col-md-4 mb-4">
             <label for="recommendedUnitValue" class="form-label">Recommended Unit Value</label>
@@ -512,7 +512,7 @@ $conn->close();
           <div class="col-md-4 mb-4">
             <label for="marketValue" class="form-label">Market Value</label>
             <input type="text" id="marketValue" name="market_value" class="form-control"
-              placeholder="Enter market value">
+              placeholder="Enter market value" required>
           </div>
         </div>
 
@@ -550,7 +550,7 @@ $conn->close();
           <div class="col-md-6 mb-4">
             <label for="assessmentLevel" class="form-label">Assessment Level</label>
             <input type="text" id="assessmentLevel" name="assess_lvl" class="form-control"
-              placeholder="Enter assessment level">
+              placeholder="Enter assessment level" required>
           </div>
           <div class="col-md-6 mb-4">
             <label for="recommendedAssessmentLevel" class="form-label">% Recommended Assessment Level</label>
@@ -560,7 +560,7 @@ $conn->close();
           <div class="col-md-6 mb-4">
             <label for="assessedValue" class="form-label">Assessed Value</label>
             <input type="text" id="assessedValue" name="assess_value" class="form-control"
-              placeholder="Enter assessed value" value="<?= htmlspecialchars($land_data['assess_value'] ?? '') ?>">
+              placeholder="Enter assessed value" value="<?= htmlspecialchars($land_data['assess_value'] ?? '') ?>" required>
           </div>
         </div>
 
@@ -574,7 +574,7 @@ $conn->close();
               <div class="row mb-3 align-items-center">
                 <label class="col-md-2 col-form-label">Verified By</label>
                 <div class="col-md-4">
-                  <select id="verifiedBy" name="verified_by" class="form-select">
+                  <select id="verifiedBy" name="verified_by" class="form-select" required>
                     <option value="">Select verifier</option>
                   </select>
                 </div>
@@ -584,7 +584,7 @@ $conn->close();
               <div class="row mb-3 align-items-center">
                 <label class="col-md-2 col-form-label">Plotted By</label>
                 <div class="col-md-4">
-                  <select id="plottedBy" name="plotted_by" class="form-select">
+                  <select id="plottedBy" name="plotted_by" class="form-select" required>
                     <option value="">Select plotter</option>
                   </select>
                 </div>
@@ -594,7 +594,7 @@ $conn->close();
               <div class="row mb-3 align-items-center">
                 <label class="col-md-2 col-form-label">Noted By</label>
                 <div class="col-md-4">
-                  <select id="notedBy" name="noted_by" class="form-select">
+                  <select id="notedBy" name="noted_by" class="form-select" required>
                     <option value="">Select noter</option>
                   </select>
                 </div>
@@ -604,14 +604,14 @@ $conn->close();
               <div class="row mb-3 align-items-center">
                 <label class="col-md-2 col-form-label">Appraised By</label>
                 <div class="col-md-4">
-                  <select id="appraisedBy" name="appraised_by" class="form-select">
+                  <select id="appraisedBy" name="appraised_by" class="form-select" required>
                     <option value="">Select appraiser</option>
                   </select>
                 </div>
                 <label class="col-md-1 col-form-label text-end">Date</label>
                 <div class="col-md-3">
                   <input type="date" name="appraisal_date" class="form-control"
-                    value="<?= htmlspecialchars($cert_data['appraised_date'] ?? '') ?>">
+                    value="<?= htmlspecialchars($cert_data['appraised_date'] ?? '') ?>" required>
                 </div>
               </div>
 
@@ -620,12 +620,12 @@ $conn->close();
                 <label class="col-md-2 col-form-label">Recommending Approval</label>
                 <div class="col-md-4">
                   <input type="text" name="recommending_approval" class="form-control" placeholder="Enter Recommender"
-                    value="<?= htmlspecialchars($cert_data['recom_approval'] ?? '') ?>">
+                    value="<?= htmlspecialchars($cert_data['recom_approval'] ?? '') ?>" required>
                 </div>
                 <label class="col-md-1 col-form-label text-end">Date</label>
                 <div class="col-md-3">
                   <input type="date" name="recommendation_date" class="form-control"
-                    value="<?= htmlspecialchars($cert_data['recom_date'] ?? '') ?>">
+                    value="<?= htmlspecialchars($cert_data['recom_date'] ?? '') ?>" required>
                 </div>
               </div>
 
@@ -634,7 +634,7 @@ $conn->close();
                 <label class="col-md-2 col-form-label">Approved By</label>
                 <div class="col-md-4">
                   <input type="text" name="approved_by" class="form-control" placeholder="Enter Approver"
-                    value="<?= htmlspecialchars($cert_data['approved'] ?? '') ?>">
+                    value="<?= htmlspecialchars($cert_data['approved'] ?? '') ?>" required>
                 </div>
                 <label class="col-md-1 col-form-label text-end">Date</label>
                 <div class="col-md-3">
@@ -642,7 +642,6 @@ $conn->close();
                     value="<?= htmlspecialchars($cert_data['approved_date'] ?? '') ?>">
                 </div>
               </div>
-
             </div>
           </div>
         </div>
@@ -655,12 +654,12 @@ $conn->close();
               <label class="form-label d-block">Idle</label>
               <div class="form-check form-check-inline">
                 <input class="form-check-input" type="radio" name="idleStatus" id="idleYes" value="yes"
-                  <?= (isset($cert_data['idle']) && $cert_data['idle'] == 1) ? 'checked' : '' ?>>
+                  <?= (isset($cert_data['idle']) && $cert_data['idle'] == 1) ? 'checked' : '' ?> required>
                 <label class="form-check-label" for="idleYes">Yes</label>
               </div>
               <div class="form-check form-check-inline">
                 <input class="form-check-input" type="radio" name="idleStatus" id="idleNo" value="no"
-                  <?= (isset($cert_data['idle']) && $cert_data['idle'] == 0) ? 'checked' : '' ?>>
+                  <?= (isset($cert_data['idle']) && $cert_data['idle'] == 0) ? 'checked' : '' ?> required>
                 <label class="form-check-label" for="idleNo">No</label>
               </div>
             </div>
@@ -670,7 +669,7 @@ $conn->close();
               <label class="form-label d-block">Contested</label>
               <div class="form-check form-check-inline">
                 <input class="form-check-input" type="radio" name="contestedStatus" id="contestedYes" value="yes"
-                  <?= (isset($cert_data['contested']) && $cert_data['contested'] == 1) ? 'checked' : '' ?>>
+                  <?= (isset($cert_data['contested']) && $cert_data['contested'] == 1) ? 'checked' : '' ?> required>
                 <label class="form-check-label" for="contestedYes">Yes</label>
               </div>
               <div class="form-check form-check-inline">
