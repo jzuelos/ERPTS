@@ -240,15 +240,15 @@ function handleDisableProperty($conn, $user_role, $current_user_id)
 function handleRPUDeclaration($conn, $faas_id)
 {
   $data = [
-    'arp_no' => $_POST['arp_no'] ?? 0,
+    'arp_no' => $_POST['arp_no'] ?? '',  // Changed from 0 to ''
     'pro_assess' => $_POST['pro_assess'] ?? '',
     'pro_date' => $_POST['pro_date'] ?? '',
     'mun_assess' => $_POST['mun_assess'] ?? '',
     'mun_date' => $_POST['mun_date'] ?? '',
-    'td_cancel' => $_POST['td_cancel'] ?? 0,
-    'previous_pin' => $_POST['previous_pin'] ?? 0,
+    'td_cancel' => $_POST['td_cancel'] ?? '',  // Changed from 0 to ''
+    'previous_pin' => $_POST['previous_pin'] ?? '',  // Changed from 0 to ''
     'tax_year' => $_POST['tax_year'] ?? '',
-    'entered_by' => $_POST['entered_by'] ?? 0,
+    'entered_by' => $_POST['entered_by'] ?? '',  // Changed from 0 to ''
     'entered_year' => $_POST['entered_year'] ?? '',
     'prev_own' => $_POST['prev_own'] ?? '',
     'prev_assess' => $_POST['prev_assess'] ?? 0.00
@@ -273,8 +273,9 @@ function handleRPUDeclaration($conn, $faas_id)
             prev_own = ?, prev_assess = ?, total_property_value = ?
             WHERE faas_id = ?");
 
+    // Changed first 'i' to 's' for arp_no (string instead of integer)
     $stmt->bind_param(
-      "issssiissssdid",
+      "sssssssssssddi",  // Changed from "issssiissssdid"
       $data['arp_no'],
       $data['pro_assess'],
       $data['pro_date'],
@@ -299,8 +300,9 @@ function handleRPUDeclaration($conn, $faas_id)
             tax_year, entered_by, entered_year, prev_own, prev_assess, faas_id, total_property_value
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
+    // Changed first 'i' to 's' for arp_no (string instead of integer)
     $stmt->bind_param(
-      "issssiissssdid",
+      "sssssssssssddi",  // Changed from "issssiissssdid"
       $data['arp_no'],
       $data['pro_assess'],
       $data['pro_date'],
