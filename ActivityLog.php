@@ -49,7 +49,7 @@ $total_rows = $stmt_count->get_result()->fetch_assoc()['total'];
 $total_pages = ceil($total_rows / $limit);
 
 // Fetch logs
-$stmt = $conn->prepare("SELECT a.log_id, a.action, a.log_details, a.log_time, 
+$stmt = $conn->prepare("SELECT a.log_id, a.action, a.log_time, 
                                CONCAT(u.first_name, ' ', u.last_name) AS fullname
                         FROM activity_log a
                         JOIN users u ON a.user_id = u.user_id
@@ -92,7 +92,7 @@ $total_rows_login = $stmt_count_login->get_result()->fetch_assoc()['total'];
 $total_pages_login = ceil($total_rows_login / $limit);
 
 // Fetch login logs
-$stmt_login = $conn->prepare("SELECT a.log_id, a.action, a.log_details, a.log_time, 
+$stmt_login = $conn->prepare("SELECT a.log_id, a.action, a.log_time, 
                                      CONCAT(u.first_name, ' ', u.last_name) AS fullname
                               FROM activity_log a
                               JOIN users u ON a.user_id = u.user_id
@@ -180,7 +180,7 @@ $result_login = $stmt_login->get_result();
                 $no++;
               }
             } else {
-              echo "<tr><td colspan='5' class='text-center text-muted'>No activity logs found.</td></tr>";
+              echo "<tr><td colspan='4' class='text-center text-muted'>No activity logs found.</td></tr>";
             }
             ?>
           </tbody>

@@ -46,15 +46,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
     $user_type = filter_input(INPUT_POST, 'user_type', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?? 'User'; // Default to 'User'
 
-    // Validate and process passwords
+    // Validate passwords
     if ($password !== $confirm_password) {
         echo "<p style='color: red;'>Passwords do not match.</p>";
         exit();
     }
+
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     // Prepare insert statement
-    $stmt = $conn->prepare("INSERT INTO users (username, password, last_name, first_name, middle_name, gender, birthdate, marital_status, tin, house_number, street, brgy_id, district_id, m_id, province, contact_number, email, user_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("
+        INSERT INTO users 
+        (username, password, last_name, first_name, middle_name, gender, birthdate, marital_status, tin, house_number, street, brgy_id, district_id, m_id, province, contact_number, email, user_type) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ");
 
     if ($stmt) {
         $stmt->bind_param(
@@ -70,9 +75,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $tin,
             $house_number,
             $street,
-            $barangay,     // i
-            $district,     // i
-            $municipality, // i
+            $barangay,
+            $district,
+            $municipality,
             $province,
             $contact_number,
             $email,
@@ -82,7 +87,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->execute()) {
             // ✅ Log admin activity instead of the new user
             if (isset($_SESSION['user_id'])) {
-                logActivity($conn, $_SESSION['user_id'], "Created new user: $username");
+                $userId = $_SESSION['user_id']; // current logged-in admin
+                $fullname = trim("$firstname $middlename $lastname");
+                $role = htmlspecialchars($user_type);
+
+                logActivity($conn, $userId, "Created new user account. Username: $username, Full Name: $fullname, Role: $role.");
             }
 
             $_SESSION['message'] = "New user created successfully!";
