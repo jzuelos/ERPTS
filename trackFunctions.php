@@ -428,3 +428,51 @@ if (isset($_GET['action']) && $_GET['action'] === 'getActivity') {
 }
 
 echo json_encode(["success" => false, "message" => "Invalid request"]);
+
+// ---------- SAVE QR UPLOAD (from mobile_upload.php) ----------
+if ($_POST['action'] === 'saveQrUpload') {
+    $t_code = $_POST['t_code'] ?? '';
+    if (!$t_code) {
+        echo json_encode(['success' => false, 'message' => 'Missing transaction code.']);
+        exit;
+    }
+
+    // Find the transaction ID by its code
+    $stmt = $conn->prepare("SELECT transaction_id FROM transactions WHERE transaction_code = ?");
+    $stmt->bind_param("s", $t_code);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $tx = $result->fetch_assoc();
+
+    if (!$tx) {
+        echo json_encode(['success' => false, 'message' => 'Transaction not found.']);
+        exit;
+    }
+
+    $transaction_id = $tx['transaction_id'];
+    $uploadDir = "uploads/";
+    if (!file_exists($uploadDir)) mkdir($uploadDir, 0777, true);
+
+    $successCount = 0;
+
+    foreach ($_FILES['t_file']['tmp_name'] as $index => $tmpName) {
+        if (is_uploaded_file($tmpName)) {
+            $fileName = basename($_FILES['t_file']['name'][$index]);
+            $targetPath = $uploadDir . time() . "_" . $fileName;
+
+            if (move_uploaded_file($tmpName, $targetPath)) {
+                // Save to your existing transaction_files table
+                $stmt = $conn->prepare("INSERT INTO transaction_files (transaction_id, file_path, uploaded_at) VALUES (?, ?, NOW())");
+                $stmt->bind_param("is", $transaction_id, $targetPath);
+                $stmt->execute();
+                $successCount++;
+            }
+        }
+    }
+
+    echo json_encode([
+        'success' => $successCount > 0,
+        'message' => $successCount > 0 ? "Uploaded $successCount file(s)." : "No files uploaded."
+    ]);
+    exit;
+}

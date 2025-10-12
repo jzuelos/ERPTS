@@ -865,3 +865,72 @@ function initActivityTable() {
   showPage(currentPage);
   renderPagination();
 }
+
+function generateQrFromModal() {
+  const t_code = document.getElementById("transactionID").value.trim();
+  if (!t_code) {
+    alert("Please save the transaction first.");
+    return;
+  }
+
+  const domain = "https://responsively-interfulgent-thad.ngrok-free.dev/erpts";// Replace with your actual domain
+  const uploadUrl = `${domain}/mobile_upload.php?t_code=${encodeURIComponent(t_code)}`;
+
+  //Using api.qrserver.com (stable public QR generator)
+  const qrImage = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(uploadUrl)}`;
+
+  //Calculate centered popup position
+  const popupWidth = 400;
+  const popupHeight = 450;
+  const left = (window.screen.width / 2) - (popupWidth / 2);
+  const top = (window.screen.height / 2) - (popupHeight / 2);
+
+  //Open a centered popup window
+  const qrWindow = window.open(
+    '',
+    'QR Upload',
+    `width=${popupWidth},height=${popupHeight},left=${left},top=${top},resizable=no,scrollbars=no,status=no`
+  );
+
+  // ✅ Build HTML content safely (no document.write)
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <title>QR Upload</title>
+        <style>
+          body { 
+            text-align:center; 
+            font-family:Arial, sans-serif; 
+            padding:20px; 
+          }
+          img { 
+            width:250px; 
+            height:250px; 
+            margin:10px 0; 
+            border:1px solid #ccc; 
+          }
+          h3 { margin-bottom:8px; }
+          p { font-size:14px; }
+        </style>
+      </head>
+      <body>
+        <h3>Scan to Upload</h3>
+        <img src="${qrImage}" alt="QR Code">
+        <p>Scan this QR to upload documents for <b>${t_code}</b></p>
+      </body>
+    </html>
+  `;
+
+  // ✅ Write the content using DOM methods
+  qrWindow.document.open();
+  qrWindow.document.write(htmlContent);
+  qrWindow.document.close();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const qrBtn = document.getElementById('generateQrBtn');
+  if (qrBtn) qrBtn.addEventListener('click', generateQrFromModal);
+});
+
