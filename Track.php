@@ -66,7 +66,7 @@ if ($result && $result->num_rows > 0) {
   </button>
 </td>
 <td>
-  <button class='btn btn-sm btn-secondary mb-1' style='padding:8px 12px; font-size:12px;  onclick='confirmTransaction(" . $row['transaction_id'] . ")'>
+  <button class='btn btn-sm " . ($row['status'] === 'Completed' ? 'btn-success' : 'btn-secondary') . " mb-1' style='padding:8px 12px; font-size:12px;' onclick='confirmTransaction(" . $row['transaction_id'] . ")' " . ($row['status'] !== 'Completed' ? 'disabled' : '') . ">
     <i class='fas fa-check'></i>
   </button>
 </td>
