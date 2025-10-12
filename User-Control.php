@@ -117,12 +117,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
   }
 
   if ($stmt->execute()) {
-    // ✅ Log admin activity with proper line breaks
+    // ✅ Log admin activity with proper formatting
     if (isset($_SESSION['user_id'])) {
       $adminId = $_SESSION['user_id'];
       $fullname = trim("$first_name $middle_name $last_name");
 
-      // Compare changes
+      // Helper function to get municipality name
+      function getMunicipalityName($conn, $m_id)
+      {
+        if (empty($m_id)) return 'None';
+        $stmt = $conn->prepare("SELECT m_description FROM municipality WHERE m_id = ?");
+        $stmt->bind_param("i", $m_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $stmt->close();
+        return $row ? $row['m_description'] : "ID: $m_id";
+      }
+
+      // Helper function to get district name
+      function getDistrictName($conn, $district_id)
+      {
+        if (empty($district_id)) return 'None';
+        $stmt = $conn->prepare("SELECT description FROM district WHERE district_id = ?");
+        $stmt->bind_param("i", $district_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $stmt->close();
+        return $row ? $row['description'] : "ID: $district_id";
+      }
+
+      // Helper function to get barangay name
+      function getBarangayName($conn, $brgy_id)
+      {
+        if (empty($brgy_id)) return 'None';
+        $stmt = $conn->prepare("SELECT brgy_name FROM brgy WHERE brgy_id = ?");
+        $stmt->bind_param("i", $brgy_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $stmt->close();
+        return $row ? $row['brgy_name'] : "ID: $brgy_id";
+      }
+
+      // Compare changes with readable formats
       $changes = [];
 
       if ($oldData['username'] !== $username) {
@@ -158,17 +197,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
       if ($oldData['user_type'] !== $user_type) {
         $changes[] = "• Role changed from '{$oldData['user_type']}' to '$user_type'";
       }
-      if ($oldData['status'] !== $status) {
-        $changes[] = "• Status changed from '{$oldData['status']}' to '$status'";
+
+      // ✅ Format status as Enabled/Disabled
+      if ($oldData['status'] != $status) {
+        $oldStatus = ($oldData['status'] == 1) ? 'Enabled' : 'Disabled';
+        $newStatus = ($status == 1) ? 'Enabled' : 'Disabled';
+        $changes[] = "• Status changed from '$oldStatus' to '$newStatus'";
       }
-      if ($oldData['m_id'] !== $municipality) {
-        $changes[] = "• Municipality changed from '{$oldData['m_id']}' to '$municipality'";
+
+      // ✅ Show municipality name instead of ID
+      if ($oldData['m_id'] != $municipality) {
+        $oldMunName = getMunicipalityName($conn, $oldData['m_id']);
+        $newMunName = getMunicipalityName($conn, $municipality);
+        $changes[] = "• Municipality changed from '$oldMunName' to '$newMunName'";
       }
-      if ($oldData['district_id'] !== $district) {
-        $changes[] = "• District changed from '{$oldData['district_id']}' to '$district'";
+
+      // ✅ Show district name instead of ID
+      if ($oldData['district_id'] != $district) {
+        $oldDistName = getDistrictName($conn, $oldData['district_id']);
+        $newDistName = getDistrictName($conn, $district);
+        $changes[] = "• District changed from '$oldDistName' to '$newDistName'";
       }
-      if ($oldData['brgy_id'] !== $barangay) {
-        $changes[] = "• Barangay changed from '{$oldData['brgy_id']}' to '$barangay'";
+
+      // ✅ Show barangay name instead of ID
+      if ($oldData['brgy_id'] != $barangay) {
+        $oldBrgyName = getBarangayName($conn, $oldData['brgy_id']);
+        $newBrgyName = getBarangayName($conn, $barangay);
+        $changes[] = "• Barangay changed from '$oldBrgyName' to '$newBrgyName'";
+      }
+
+      // Check if password was changed
+      if (!empty($_POST["password"])) {
+        $changes[] = "• Password was updated";
       }
 
       // 🧾 Create readable multiline log text
@@ -183,7 +243,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
         $logMessage .= "No changes detected.";
       }
 
-      // ✅ Save clean message (no HTML tags)
+      // ✅ Save clean message
       logActivity($conn, $adminId, $logMessage);
     }
 
