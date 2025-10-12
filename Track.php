@@ -337,7 +337,7 @@ if ($result && $result->num_rows > 0) {
           <div id="requirementsText" class="alert alert-info mt-2" style="display:none; white-space:pre-line;"></div>
 
           <!-- Status Input - Add the onchange event -->
-          <select id="statusInput" name="t_status" class="form-select mb-2" required onchange="handleStatusChange()">
+          <select id="statusInput" name="t_status" class="form-select mb-4" required onchange="handleStatusChange()">
             <option value="" disabled selected hidden>Select Status</option>
             <option value="Pending">Pending</option>
             <option value="In Progress">In Progress</option>
@@ -345,9 +345,10 @@ if ($result && $result->num_rows > 0) {
           </select>
 
           <!-- Upload Image Input -->
-          <div class="mb-2 d-flex align-items-center">
+          <div class="mb-1 d-flex align-items-center">
             <div class="flex-grow-1">
-              <label for="fileUpload" class="form-label">Upload Image</label>
+              <label for="fileUpload" class="form-label">Upload Image</label><br>
+              <small>Accepts JPG, PNG, and PDF format only</small>
               <input type="file" class="form-control" id="fileUpload" name="t_file[]" multiple>
             </div>
             <button type="button" class="btn btn-info ms-2 mt-4" id="generateQrBtn"
