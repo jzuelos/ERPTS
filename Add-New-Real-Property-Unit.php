@@ -40,6 +40,73 @@
     die("Connection failed: " . $conn->connect_error);
   }
 
+  /**
+   * Function to log activity
+   */
+  function logActivity($conn, $userId, $action)
+  {
+    $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action) VALUES (?, ?)");
+    $stmt->bind_param("is", $userId, $action);
+    $stmt->execute();
+    $stmt->close();
+  }
+
+  /**
+   * Helper function to get owner name by ID
+   */
+  function getOwnerName($conn, $owner_id)
+  {
+    $stmt = $conn->prepare("SELECT own_fname, own_surname FROM owners_tb WHERE own_id = ?");
+    $stmt->bind_param("i", $owner_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+
+    if ($row) {
+      return trim($row['own_fname'] . ' ' . $row['own_surname']);
+    }
+    return "Unknown Owner (ID: $owner_id)";
+  }
+
+  /**
+   * Helper function to get municipality name
+   */
+  function getMunicipalityName($conn, $m_id)
+  {
+    if (empty($m_id)) return 'None';
+    $stmt = $conn->prepare("SELECT m_description FROM municipality WHERE m_id = ?");
+    $stmt->bind_param("i", $m_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+    return $row ? $row['m_description'] : "ID: $m_id";
+  }
+
+  /**
+   * Helper function to get barangay name
+   */
+  function getBarangayName($conn, $brgy_id)
+  {
+    if (empty($brgy_id)) return 'None';
+    $stmt = $conn->prepare("SELECT brgy_name FROM brgy WHERE brgy_id = ?");
+    $stmt->bind_param("i", $brgy_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+    return $row ? $row['brgy_name'] : "ID: $brgy_id";
+  }
+
+  /**
+   * Helper function to get district name
+   */
+  function getDistrictName($conn, $district_name)
+  {
+    return !empty($district_name) ? $district_name : 'None';
+  }
+
   // Check if form is submitted via POST
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Sanitize inputs
@@ -91,6 +158,8 @@
 
             // Insert owners into propertyowner table and collect propertyowner_ids
             $propertyowner_ids = [];
+            $owner_names = []; // Store owner names for logging
+
             if (!empty($selected_owner_ids)) {
               foreach ($selected_owner_ids as $owner_id) {
                 // Ensure the owner exists
@@ -100,6 +169,9 @@
                 $check_owner_stmt->store_result();
 
                 if ($check_owner_stmt->num_rows > 0) {
+                  // Get owner name for logging
+                  $owner_names[] = getOwnerName($conn, $owner_id);
+
                   // Insert into propertyowner table and get the propertyowner_id
                   $owner_stmt = $conn->prepare("INSERT INTO propertyowner (property_id, owner_id) VALUES (?, ?)");
                   if ($owner_stmt) {
@@ -135,6 +207,57 @@
               throw new Exception("Error preparing FAAS statement: " . $conn->error);
             }
 
+            // ✅ LOG ACTIVITY - Property Added
+            if (isset($_SESSION['user_id'])) {
+              $userId = $_SESSION['user_id'];
+
+              // Get readable names for location
+              $municipalityName = getMunicipalityName($conn, $city);
+              $barangayName = getBarangayName($conn, $barangay);
+              $districtName = getDistrictName($conn, $district);
+
+              // Build detailed log message
+              $logMessage = "Added new property\n";
+              $logMessage .= "Property ID: $property_id\n\n";
+
+              $logMessage .= "Location Details:\n";
+              $logMessage .= "• House Number: $house_number\n";
+              if (!empty($block_number)) {
+                $logMessage .= "• Block Number: $block_number\n";
+              }
+              $logMessage .= "• Municipality: $municipalityName\n";
+              $logMessage .= "• District: $districtName\n";
+              $logMessage .= "• Barangay: $barangayName\n";
+
+              if (!empty($house_tag)) {
+                $logMessage .= "• House Tag Number: $house_tag\n";
+              }
+
+              $logMessage .= "\nProperty Details:\n";
+              $logMessage .= "• Land Area: $land_area sq.m\n";
+
+              if (!empty(trim($desc_land))) {
+                $logMessage .= "• Land Description: " . trim($desc_land) . "\n";
+              }
+
+              if (!empty($documents)) {
+                $logMessage .= "• Documents: $documents\n";
+              }
+
+              // Add owner information
+              if (!empty($owner_names)) {
+                $logMessage .= "\nAssociated Owners (" . count($owner_names) . "):\n";
+                foreach ($owner_names as $index => $name) {
+                  $logMessage .= "• $name (ID: {$selected_owner_ids[$index]})\n";
+                }
+              }
+
+              $logMessage .= "\nFAAS record created for this property.";
+
+              // Save to activity log
+              logActivity($conn, $userId, $logMessage);
+            }
+
             // Commit the transaction
             $conn->commit();
             $_SESSION['message'] = "Property Added with owner ID(s): " . htmlspecialchars(implode(", ", $selected_owner_ids));
@@ -151,6 +274,17 @@
       } catch (Exception $e) {
         // Rollback the transaction in case of error
         $conn->rollback();
+
+        // ✅ LOG FAILED ATTEMPT
+        if (isset($_SESSION['user_id'])) {
+          $userId = $_SESSION['user_id'];
+          $logMessage = "Failed to add property\n";
+          $logMessage .= "Error: " . $e->getMessage() . "\n";
+          $logMessage .= "Attempted location: House #$house_number, Municipality ID: $city";
+
+          logActivity($conn, $userId, $logMessage);
+        }
+
         echo "<p>Transaction failed: " . $e->getMessage() . "</p>";
       }
     } else {
