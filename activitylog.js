@@ -2,27 +2,42 @@ document.addEventListener("DOMContentLoaded", function () {
   const toggleBtn = document.getElementById("toggleLogsBtn");
   const activityLogs = document.getElementById("activitylogs");
   const loginLogs = document.getElementById("loginlogs");
+  const urlParams = new URLSearchParams(window.location.search);
+  let logType = urlParams.get("log_type") || "activity";
 
-  toggleBtn.addEventListener("click", function () {
-    const isActivityVisible = !activityLogs.classList.contains("d-none");
-
-    if (isActivityVisible) {
-      // Hide Activity Logs, Show Login Logs
+  // Function to update button and table visibility
+  function showTable(type) {
+    if (type === "login") {
       activityLogs.classList.add("d-none");
       loginLogs.classList.remove("d-none");
       toggleBtn.innerHTML = '<i class="fas fa-list me-1"></i> Show Activity Logs';
       toggleBtn.classList.remove("btn-primary");
       toggleBtn.classList.add("btn-secondary");
     } else {
-      // Show Activity Logs, Hide Login Logs
       loginLogs.classList.add("d-none");
       activityLogs.classList.remove("d-none");
       toggleBtn.innerHTML = '<i class="fas fa-sign-in-alt me-1"></i> Show Log In Logs';
       toggleBtn.classList.remove("btn-secondary");
       toggleBtn.classList.add("btn-primary");
     }
+  }
+
+  // Initialize the correct table on page load
+  showTable(logType);
+
+  // When toggle button is clicked
+  toggleBtn.addEventListener("click", function () {
+    logType = logType === "activity" ? "login" : "activity";
+
+    // Update the URL parameter without reloading
+    urlParams.set("log_type", logType);
+    const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+    window.history.replaceState({}, "", newUrl);
+
+    showTable(logType);
   });
 });
+
 
 // Toggle full/truncated activity text
 document.addEventListener('DOMContentLoaded', function() {
