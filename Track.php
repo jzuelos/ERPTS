@@ -345,9 +345,15 @@ if ($result && $result->num_rows > 0) {
           </select>
 
           <!-- Upload Image Input -->
-          <div class="mb-2">
-            <label for="fileUpload" class="form-label">Upload Image</label>
-            <input type="file" id="fileUpload" name="t_file[]" accept="image/*" multiple>
+          <div class="mb-2 d-flex align-items-center">
+            <div class="flex-grow-1">
+              <label for="fileUpload" class="form-label">Upload Image</label>
+              <input type="file" class="form-control" id="fileUpload" name="t_file[]" multiple>
+            </div>
+            <button type="button" class="btn btn-info ms-2 mt-4" id="generateQrBtn"
+              title="Generate QR for phone upload">
+              <i class="fas fa-qrcode"></i>
+            </button>
           </div>
         </div>
 
