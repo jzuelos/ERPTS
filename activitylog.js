@@ -24,12 +24,26 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-// Toggle icon on collapse/expand
-document.addEventListener("DOMContentLoaded", function() {
-  document.querySelectorAll("[data-bs-toggle='collapse']").forEach(row => {
-    row.addEventListener("click", () => {
-      const icon = row.querySelector("i");
-      if (icon) icon.classList.toggle("bi-caret-up-fill");
+// Toggle full/truncated activity text
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation(); // Prevent row click conflict
+      const id = this.getAttribute('data-id');
+      const textDiv = document.getElementById('activity' + id);
+      const isTruncated = textDiv.classList.contains('text-truncate');
+
+      if (isTruncated) {
+        textDiv.classList.remove('text-truncate');
+        textDiv.style.whiteSpace = 'normal';
+        this.classList.remove('bi-caret-down-fill');
+        this.classList.add('bi-caret-up-fill');
+      } else {
+        textDiv.classList.add('text-truncate');
+        textDiv.style.whiteSpace = 'nowrap';
+        this.classList.remove('bi-caret-up-fill');
+        this.classList.add('bi-caret-down-fill');
+      }
     });
   });
 });

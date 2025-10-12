@@ -120,8 +120,6 @@
 
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="header.css">
-  <link rel="stylesheet" href="activitylog.css">
-
   <title>Activity Log</title>
 </head>
 
@@ -157,83 +155,73 @@
       </form>
 
 <!-- Main Activity Logs -->
-<div id="activitylogs" class="table-responsive" style="max-width: 100%;">
+<div id="activitylogs" class="table-responsive">
   <table class="table table-striped table-hover align-middle text-start w-100 mb-0">
     <thead class="table-dark">
       <tr>
-        <th style="width: 6%">#</th>
-        <th style="width: 36%">Activity</th>
-        <th style="width: 18%">User</th>
+        <th style="width: 8%">No.</th>
+        <th style="width: 32%">Activity</th>
+        <th style="width: 20%">User</th>
         <th style="width: 20%">Date and Time</th>
-        <th style="width: 5%"></th>
       </tr>
     </thead>
     <tbody>
-      <?php
+       <?php 
       if ($result->num_rows > 0) {
-        $no = $offset + 1;
-        while ($row = $result->fetch_assoc()) {
-          $log_id = htmlspecialchars($row['log_id']);
+        $no = $offset + 1; 
+        while ($row = $result->fetch_assoc()) { 
+          $activity = htmlspecialchars($row['action']);
+          $fullname = htmlspecialchars($row['fullname']);
+          $log_time = htmlspecialchars($row['log_time']);
+          
           echo "
-            <!-- Main Row -->
-            <tr data-bs-toggle='collapse' data-bs-target='#details{$log_id}' aria-expanded='false' style='cursor: pointer;'>
-              <td>{$no}</td>
-              <td>{$row['action']}</td>
-              <td>{$row['fullname']}</td>
-              <td>{$row['log_time']}</td>
-              <td class='text-center'>
-                <i class='bi bi-caret-down-fill text-secondary'></i>
-              </td>
-            </tr>
-
-            <!-- Expandable Details Row -->
-            <tr class='collapse' id='details{$log_id}' style='transition: none !important;'>
-              <td colspan='5'>
-                <div class='border rounded bg-white p-3 shadow-sm'>
-                  <div class='d-flex justify-content-between align-items-center mb-2'>
-                    <h6 class='mb-0 text-success'>Activity Details</h6>
-                    <span class='badge bg-secondary text-light'>Log ID: {$log_id}</span>
-                  </div>
-                  <p class='mb-1'><strong>Action:</strong> " . htmlspecialchars($row['action']) . "</p>
-                  <p class='mb-1'><strong>User:</strong> " . htmlspecialchars($row['fullname']) . "</p>
-                  <p class='mb-1'><strong>Date:</strong> " . htmlspecialchars($row['log_time']) . "</p>
-                  <p class='mb-0'><strong>Details:</strong><br>" . nl2br(htmlspecialchars($row['details'] ?? 'No additional information.')) . "</p>
-                </div>
-              </td>
-            </tr>
-          ";
+          <tr>
+            <td>{$no}</td>
+            <td style='max-width: 350px; vertical-align: middle;'>
+              <div id='activity{$no}' 
+                   class='activity-text text-truncate' 
+                   style='cursor: pointer; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;'>
+                {$activity}
+              </div>
+            </td>
+            <td style='vertical-align: middle;'>{$fullname}</td>
+            <td style='white-space: nowrap; vertical-align: middle; position: relative;'>
+              <span>{$log_time}</span>
+              <i class='bi bi-caret-down-fill text-secondary toggle-btn' 
+                 data-id='{$no}' 
+                 style='cursor: pointer; margin-left: 8px;'></i>
+            </td>
+          </tr>";
           $no++;
         }
       } else {
-        echo "<tr><td colspan='5' class='text-center text-muted py-4'>No activity logs found.</td></tr>";
+        echo "<tr><td colspan='4' class='text-center text-muted'>No activity logs found.</td></tr>"; 
       }
       ?>
     </tbody>
   </table>
 
+  <!-- Pagination -->
+  <nav aria-label="Page navigation" class="mt-2">
+    <div class="d-flex justify-content-center align-items-center gap-2">
+      <?php if ($page > 1): ?>
+        <a class="btn btn-outline-primary btn-sm" href="?page=<?= $page - 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Prev</a>
+      <?php else: ?>
+        <button class="btn btn-outline-secondary btn-sm" disabled>Prev</button>
+      <?php endif; ?>
+
+      <span class="small text-muted">Page <?= $page ?> of <?= $total_pages ?></span>
+
+      <?php if ($page < $total_pages): ?>
+        <a class="btn btn-outline-primary btn-sm" href="?page=<?= $page + 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Next</a>
+      <?php else: ?>
+        <button class="btn btn-outline-secondary btn-sm" disabled>Next</button>
+      <?php endif; ?>
+    </div>
+  </nav>
+</div>          
 
 
-      <!-- Pagination -->
-      <nav aria-label="Page navigation" class="mt-2">
-        <div class="d-flex justify-content-center align-items-center gap-2">
-          <?php if ($page > 1): ?>
-            <a class="btn btn-outline-primary btn-sm" href="?page=<?= $page - 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Prev</a>
-          <?php else: ?>
-            <button class="btn btn-outline-secondary btn-sm" disabled>Prev</button>
-          <?php endif; ?>
-
-          <span class="small text-muted">Page <?= $page ?> of <?= $total_pages ?></span>
-
-          <?php if ($page < $total_pages): ?>
-            <a class="btn btn-outline-primary btn-sm" href="?page=<?= $page + 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Next</a>
-          <?php else: ?>
-            <button class="btn btn-outline-secondary btn-sm" disabled>Next</button>
-          <?php endif; ?>
-        </div>
-      </nav>
-          </div>
-
-          
       <!-- Login/Logout Logs -->
       <div id="loginlogs" class="table-responsive d-none">
         <table class="table table-striped table-hover align-middle text-start">
