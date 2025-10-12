@@ -388,6 +388,21 @@ if ($result && $result->num_rows > 0) {
     </div>
   </div>
 
+  <!-- Document Viewer Modal -->
+  <div class="modal fade" id="documentPreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 id="documentPreviewModalLabel" class="modal-title">Preview</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center">
+          <!-- Preview content inserted dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Confirm Modal -->
   <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">

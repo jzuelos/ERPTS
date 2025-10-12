@@ -690,7 +690,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-//Show Documents
+// Show Documents
 function showDocuments(transactionId) {
   fetch(`trackFunctions.php?action=getDocuments&transaction_id=${transactionId}`)
     .then(res => res.json())
@@ -705,35 +705,48 @@ function showDocuments(transactionId) {
           const wrapper = document.createElement("div");
           wrapper.className = "doc-item mb-3 d-flex align-items-center justify-content-between";
 
-          // Extract the file name from the path
-          const fileName = file.original_name || file.file_path.split("/").pop();
+          const filePath = file.file_path;
+          const fileName = file.original_name || filePath.split("/").pop();
+          const isPdf = filePath.toLowerCase().endsWith(".pdf");
 
-          // Truncate file name (max 70 chars)
+          // Truncate file name for display
           let displayName = fileName.length > 70
             ? fileName.substring(0, 22) + "..."
             : fileName;
 
+          // Create thumbnail preview (image or pdf icon)
+          let previewHtml = "";
+          if (isPdf) {
+            previewHtml = `
+              <div class="pdf-thumb bg-light border rounded d-flex align-items-center justify-content-center" 
+                   style="width:100px; height:100px; cursor:pointer;"
+                   onclick="viewDocument('${filePath}', '${fileName}', true)">
+                <i class="bi bi-file-earmark-pdf text-danger" style="font-size:2rem;"></i>
+              </div>
+            `;
+          } else {
+            previewHtml = `
+              <img src="${filePath}" class="img-fluid border rounded"
+                   style="max-height:100px; width:auto; cursor:pointer;"
+                   onclick="viewDocument('${filePath}', '${fileName}', false)">
+            `;
+          }
+
           wrapper.innerHTML = `
-  <div class="d-flex align-items-center justify-content-between w-100">
-    <!-- Left: Image -->
-    <img src="${file.file_path}" class="img-fluid" style="max-height:100px; width:auto;">
+            <div class="d-flex align-items-center justify-content-between w-100">
+              ${previewHtml}
+              <div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 mx-3" style="max-width: 300px; overflow: hidden;">
+                <span class="doc-name text-truncate text-center w-100" title="${fileName}">
+                  ${displayName}
+                </span>
+                <small class="text-muted text-center">${file.uploaded_at}</small>
+              </div>
+              <button class="btn btn-sm btn-danger" onclick="deleteDocument(${file.file_id}, ${transactionId})">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
+          `;
 
-    <!-- Middle: File name + date -->
-    <div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 mx-3" style="max-width: 300px; overflow: hidden;">
-      <span class="doc-name text-truncate text-center w-100" title="${fileName}">
-        ${displayName}
-      </span>
-      <small class="text-muted text-center">
-        ${file.uploaded_at}
-      </small>
-    </div>
-
-    <!-- Right: Delete button -->
-    <button class="btn btn-sm btn-danger" onclick="deleteDocument(${file.file_id}, ${transactionId})">
-      <i class="fas fa-trash"></i> Delete
-    </button>
-  </div>
-`;
           container.appendChild(wrapper);
         });
       }
@@ -742,6 +755,27 @@ function showDocuments(transactionId) {
     })
     .catch(err => console.error("Error loading documents:", err));
 }
+
+//Viewer Modal Logic
+function viewDocument(filePath, fileName, isPdf = false) {
+  const modalBody = document.querySelector("#documentPreviewModal .modal-body");
+  const title = document.querySelector("#documentPreviewModalLabel");
+  title.textContent = fileName;
+
+  if (isPdf) {
+    modalBody.innerHTML = `
+      <iframe src="${filePath}" style="width:100%;height:50vh;border:none;" allowfullscreen></iframe>
+    `;
+  } else {
+    modalBody.innerHTML = `
+      <img src="${filePath}" alt="${fileName}" class="img-fluid rounded shadow-sm" style="max-height:80vh; object-fit:contain;">
+    `;
+  }
+
+  const modal = new bootstrap.Modal(document.getElementById("documentPreviewModal"));
+  modal.show();
+}
+
 
 // Delete Document
 function deleteDocument(fileId, transactionId) {
@@ -892,7 +926,7 @@ function generateQrFromModal() {
     `width=${popupWidth},height=${popupHeight},left=${left},top=${top},resizable=no,scrollbars=no,status=no`
   );
 
-  // ✅ Build HTML content safely (no document.write)
+  //Build HTML content safely (no document.write)
   const htmlContent = `
     <!DOCTYPE html>
     <html lang="en">
