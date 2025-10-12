@@ -202,23 +202,26 @@
   </table>
 
   <!-- Pagination -->
-  <nav aria-label="Page navigation" class="mt-2">
-    <div class="d-flex justify-content-center align-items-center gap-2">
-      <?php if ($page > 1): ?>
-        <a class="btn btn-outline-primary btn-sm" href="?page=<?= $page - 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Prev</a>
-      <?php else: ?>
-        <button class="btn btn-outline-secondary btn-sm" disabled>Prev</button>
-      <?php endif; ?>
+<nav aria-label="Page navigation" class="mt-2">
+  <div class="d-flex justify-content-center align-items-center gap-2">
+    <?php if ($page > 1): ?>
+      <a class="btn btn-outline-primary btn-sm" 
+         href="?log_type=activity&page=<?= $page - 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Prev</a>
+    <?php else: ?>
+      <button class="btn btn-outline-secondary btn-sm" disabled>Prev</button>
+    <?php endif; ?>
 
-      <span class="small text-muted">Page <?= $page ?> of <?= $total_pages ?></span>
+    <span class="small text-muted">Page <?= $page ?> of <?= $total_pages ?></span>
 
-      <?php if ($page < $total_pages): ?>
-        <a class="btn btn-outline-primary btn-sm" href="?page=<?= $page + 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Next</a>
-      <?php else: ?>
-        <button class="btn btn-outline-secondary btn-sm" disabled>Next</button>
-      <?php endif; ?>
-    </div>
-  </nav>
+    <?php if ($page < $total_pages): ?>
+      <a class="btn btn-outline-primary btn-sm" 
+         href="?log_type=activity&page=<?= $page + 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Next</a>
+    <?php else: ?>
+      <button class="btn btn-outline-secondary btn-sm" disabled>Next</button>
+    <?php endif; ?>
+  </div>
+</nav>
+
 </div>          
 
 
@@ -254,10 +257,11 @@
         </table>
 
         <!-- Pagination -->
-        <nav aria-label="Page navigation" class="mt-2">
+       <nav aria-label="Page navigation" class="mt-2">
           <div class="d-flex justify-content-center align-items-center gap-2">
             <?php if ($page_login > 1): ?>
-              <a class="btn btn-outline-primary btn-sm" href="?page_login=<?= $page_login - 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Prev</a>
+              <a class="btn btn-outline-primary btn-sm" 
+                href="?log_type=login&page_login=<?= $page_login - 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Prev</a>
             <?php else: ?>
               <button class="btn btn-outline-secondary btn-sm" disabled>Prev</button>
             <?php endif; ?>
@@ -265,11 +269,13 @@
             <span class="small text-muted">Page <?= $page_login ?> of <?= $total_pages_login ?></span>
 
             <?php if ($page_login < $total_pages_login): ?>
-              <a class="btn btn-outline-primary btn-sm" href="?page_login=<?= $page_login + 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Next</a>
+              <a class="btn btn-outline-primary btn-sm" 
+                href="?log_type=login&page_login=<?= $page_login + 1 ?>&start_date=<?= $start_date ?>&end_date=<?= $end_date ?>">Next</a>
             <?php else: ?>
               <button class="btn btn-outline-secondary btn-sm" disabled>Next</button>
             <?php endif; ?>
           </div>
+        </nav>
         </nav>
       </div>
     </div>

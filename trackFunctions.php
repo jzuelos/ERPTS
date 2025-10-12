@@ -74,6 +74,43 @@ function logActivity($transaction_id, $action, $details = null, $user_id = null,
     return $ok;
 }
 
+
+/**
+ * Clean up empty transaction folder
+ * @param int $transaction_id
+ */
+function cleanupEmptyFolder($transaction_id)
+{
+    global $conn;
+
+    // Check if there are any files left in the database for this transaction
+    $stmt = $conn->prepare("SELECT COUNT(*) as file_count FROM transaction_files WHERE transaction_id = ?");
+    $stmt->bind_param("i", $transaction_id);
+    $stmt->execute();
+    $result = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    // If no files in database, delete the folder
+    if ($result['file_count'] == 0) {
+        $uploadDir = __DIR__ . "/uploads/transaction_" . $transaction_id . "/";
+
+        if (is_dir($uploadDir)) {
+            // Delete all remaining files in folder
+            $files = array_diff(scandir($uploadDir), ['.', '..']);
+            foreach ($files as $file) {
+                $filePath = $uploadDir . $file;
+                if (is_file($filePath)) {
+                    unlink($filePath);
+                }
+            }
+
+            // Remove the empty directory
+            rmdir($uploadDir);
+            error_log("Cleaned up empty folder: transaction_{$transaction_id}");
+        }
+    }
+}
+
 // ---------- GET ALL ---------- 
 if (isset($_GET['action']) && $_GET['action'] === 'getTransactions') {
     $sql = "SELECT transaction_id, transaction_code, name, contact_number, description, 
@@ -113,6 +150,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'getDocuments') {
     $result = $stmt->get_result();
     $files = [];
     while ($row = $result->fetch_assoc()) {
+        // Add original_name from file_path if not in database
+        $row['original_name'] = basename($row['file_path']);
         $files[] = $row;
     }
     echo json_encode($files);
@@ -229,7 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 if (!empty($contact) && !empty($description)) {
                     sendSMS($contact, $description);
                 }*/
-                
+
                 echo json_encode(["success" => true, "message" => "Transaction saved successfully!", "transaction_id" => $transaction_id]);
             } else {
                 echo json_encode(["success" => false, "message" => $stmt->error]);
@@ -274,6 +313,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
 
         // ------------------ DELETE DOCUMENT ------------------
+        // ------------------ DELETE DOCUMENT ------------------
         elseif ($action === 'deleteDocument') {
             $file_id = intval($_POST['file_id'] ?? 0);
 
@@ -293,6 +333,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 if ($stmt->execute()) {
                     $details = "Deleted document: " . $file['file_path'];
                     logActivity(intval($file['transaction_id']), "Document Deleted", $details, $_SESSION['user_id']);
+
+                    // ✅ Clean up empty folder after deleting file
+                    cleanupEmptyFolder(intval($file['transaction_id']));
+
                     echo json_encode(["success" => true, "message" => "Document deleted successfully!"]);
                 } else {
                     echo json_encode(["success" => false, "message" => $stmt->error]);
@@ -310,13 +354,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $stmtFiles->bind_param("i", $transaction_id);
                 $stmtFiles->execute();
                 $resultFiles = $stmtFiles->get_result();
-                $folderPath = __DIR__ . "/uploads/transaction_" . $transaction_id . "/";
 
                 while ($file = $resultFiles->fetch_assoc()) {
                     $filePath = __DIR__ . "/" . $file['file_path'];
                     if (file_exists($filePath))
                         unlink($filePath);
                 }
+                $stmtFiles->close();
 
                 // Delete file records
                 $stmtDelFiles = $conn->prepare("DELETE FROM transaction_files WHERE transaction_id=?");
@@ -331,13 +375,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 if ($stmt->affected_rows > 0) {
                     logActivity($transaction_id, "Deleted", "Transaction deleted", $_SESSION['user_id']);
 
-                    // Delete folder if empty
-                    if (is_dir($folderPath)) {
-                        $filesInFolder = array_diff(scandir($folderPath), ['.', '..']);
-                        if (empty($filesInFolder)) {
-                            rmdir($folderPath); // remove folder if empty
-                        }
-                    }
+                    // ✅ Use the cleanup function instead
+                    cleanupEmptyFolder($transaction_id);
 
                     echo json_encode(["success" => true, "message" => "Transaction deleted successfully"]);
                 } else {
@@ -389,3 +428,51 @@ if (isset($_GET['action']) && $_GET['action'] === 'getActivity') {
 }
 
 echo json_encode(["success" => false, "message" => "Invalid request"]);
+
+// ---------- SAVE QR UPLOAD (from mobile_upload.php) ----------
+if ($_POST['action'] === 'saveQrUpload') {
+    $t_code = $_POST['t_code'] ?? '';
+    if (!$t_code) {
+        echo json_encode(['success' => false, 'message' => 'Missing transaction code.']);
+        exit;
+    }
+
+    // Find the transaction ID by its code
+    $stmt = $conn->prepare("SELECT transaction_id FROM transactions WHERE transaction_code = ?");
+    $stmt->bind_param("s", $t_code);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $tx = $result->fetch_assoc();
+
+    if (!$tx) {
+        echo json_encode(['success' => false, 'message' => 'Transaction not found.']);
+        exit;
+    }
+
+    $transaction_id = $tx['transaction_id'];
+    $uploadDir = "uploads/";
+    if (!file_exists($uploadDir)) mkdir($uploadDir, 0777, true);
+
+    $successCount = 0;
+
+    foreach ($_FILES['t_file']['tmp_name'] as $index => $tmpName) {
+        if (is_uploaded_file($tmpName)) {
+            $fileName = basename($_FILES['t_file']['name'][$index]);
+            $targetPath = $uploadDir . time() . "_" . $fileName;
+
+            if (move_uploaded_file($tmpName, $targetPath)) {
+                // Save to your existing transaction_files table
+                $stmt = $conn->prepare("INSERT INTO transaction_files (transaction_id, file_path, uploaded_at) VALUES (?, ?, NOW())");
+                $stmt->bind_param("is", $transaction_id, $targetPath);
+                $stmt->execute();
+                $successCount++;
+            }
+        }
+    }
+
+    echo json_encode([
+        'success' => $successCount > 0,
+        'message' => $successCount > 0 ? "Uploaded $successCount file(s)." : "No files uploaded."
+    ]);
+    exit;
+}
