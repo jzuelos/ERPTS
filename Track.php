@@ -53,15 +53,15 @@ if ($result && $result->num_rows > 0) {
   <td>{$transaction_type}</td>
   <td><span class='status-badge status-{$statusClass}'>{$row['status']}</span></td>
 <td>
-  <button class='btn btn-sm btn-primary me-1 mb-1'style='padding:8px 12px; font-size:12px;'onclick='openModal(" . $row['transaction_id'] . ")'>
+  <button class='btn btn-sm btn-primary me-1 mb-1' style='padding:8px 12px; font-size:12px;' onclick='openModal(" . $row['transaction_id'] . ")'>
     <i class='fas fa-edit'></i> Edit
   </button>
 
-  <button class='btn btn-sm btn-danger me-1 mb-1' style='padding:8px 12px; font-size:12px; onclick='deleteTransaction(" . $row['transaction_id'] . ")'>
+  <button class='btn btn-sm btn-danger me-1 mb-1' style='padding:8px 12px; font-size:12px;' onclick='deleteTransaction(" . $row['transaction_id'] . ")'>
     <i class='fas fa-trash'></i> Delete
   </button>
 
-  <button class='btn btn-sm btn-dark me-1 mb-1'style='padding:8px 12px; font-size:12px; onclick='showDocuments(" . $row['transaction_id'] . ")'>
+  <button class='btn btn-sm btn-dark me-1 mb-1' style='padding:8px 12px; font-size:12px;' onclick='showDocuments(" . $row['transaction_id'] . ")'>
     <i class='fas fa-file-alt'></i> Documents
   </button>
 </td>
@@ -70,6 +70,7 @@ if ($result && $result->num_rows > 0) {
     <i class='fas fa-check'></i>
   </button>
 </td>
+
 
 </tr>";
   }
@@ -435,7 +436,7 @@ if ($result && $result->num_rows > 0) {
       });
 
       const totalRows = rows.length;
-      
+
       // If no rows or only one page, hide pagination
       if (totalRows === 0) {
         pagination.innerHTML = "";
@@ -502,28 +503,28 @@ if ($result && $result->num_rows > 0) {
 
   <script>
     // Toggle between Transaction and Received tables
-function toggleTables() {
-  const transactionSection = document.getElementById("transactionSection");
-  const receivedSection = document.getElementById("receivedSection");
-  const toggleBtn = document.getElementById("toggleBtn");
-  const addBtn = document.querySelector(".btn-add");
+    function toggleTables() {
+      const transactionSection = document.getElementById("transactionSection");
+      const receivedSection = document.getElementById("receivedSection");
+      const toggleBtn = document.getElementById("toggleBtn");
+      const addBtn = document.querySelector(".btn-add");
 
-  // Toggle table visibility
-  transactionSection.classList.toggle("d-none");
-  receivedSection.classList.toggle("d-none");
+      // Toggle table visibility
+      transactionSection.classList.toggle("d-none");
+      receivedSection.classList.toggle("d-none");
 
-  // Update button visibility and state
-  if (receivedSection.classList.contains("d-none")) {
-    toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> Show Received Table';
-    addBtn.classList.remove("invisible-btn"); // make visible again
-    addBtn.disabled = false; // re-enable
-  } else {
-    toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> Show Transaction Table';
-    addBtn.classList.add("invisible-btn"); // hide visually but keep space
-    addBtn.disabled = true; // disable click
-    initReceivedPagination();
-  }
-}
+      // Update button visibility and state
+      if (receivedSection.classList.contains("d-none")) {
+        toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> Show Received Table';
+        addBtn.classList.remove("invisible-btn"); // make visible again
+        addBtn.disabled = false; // re-enable
+      } else {
+        toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> Show Transaction Table';
+        addBtn.classList.add("invisible-btn"); // hide visually but keep space
+        addBtn.disabled = true; // disable click
+        initReceivedPagination();
+      }
+    }
 
 
   </script>

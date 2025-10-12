@@ -706,7 +706,7 @@ function showDocuments(transactionId) {
           wrapper.className = "doc-item mb-3 d-flex align-items-center justify-content-between";
 
           // Extract the file name from the path
-          const fileName = file.file_path.split("/").pop();
+          const fileName = file.original_name || file.file_path.split("/").pop();
 
           // Truncate file name (max 70 chars)
           let displayName = fileName.length > 70

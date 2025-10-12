@@ -113,6 +113,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'getDocuments') {
     $result = $stmt->get_result();
     $files = [];
     while ($row = $result->fetch_assoc()) {
+        // Add original_name from file_path if not in database
+        $row['original_name'] = basename($row['file_path']);
         $files[] = $row;
     }
     echo json_encode($files);
@@ -229,7 +231,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 if (!empty($contact) && !empty($description)) {
                     sendSMS($contact, $description);
                 }*/
-                
+
                 echo json_encode(["success" => true, "message" => "Transaction saved successfully!", "transaction_id" => $transaction_id]);
             } else {
                 echo json_encode(["success" => false, "message" => $stmt->error]);
