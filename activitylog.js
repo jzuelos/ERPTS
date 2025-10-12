@@ -23,3 +23,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+// Toggle icon on collapse/expand
+document.addEventListener("DOMContentLoaded", function() {
+  document.querySelectorAll("[data-bs-toggle='collapse']").forEach(row => {
+    row.addEventListener("click", () => {
+      const icon = row.querySelector("i");
+      if (icon) icon.classList.toggle("bi-caret-up-fill");
+    });
+  });
+});

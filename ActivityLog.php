@@ -1,112 +1,112 @@
-<?php
-session_start();
-if (!isset($_SESSION['user_id'])) {
-  header("Location: index.php");
-  exit;
-}
+  <?php
+  session_start();
+  if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit;
+  }
 
-// prevent caching
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
+  // prevent caching
+  header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+  header("Cache-Control: post-check=0, pre-check=0", false);
+  header("Pragma: no-cache");
 
-include 'database.php';
-$conn = Database::getInstance();
+  include 'database.php';
+  $conn = Database::getInstance();
 
-// Get filter inputs
-$start_date = $_GET['start_date'] ?? '';
-$end_date = $_GET['end_date'] ?? '';
+  // Get filter inputs
+  $start_date = $_GET['start_date'] ?? '';
+  $end_date = $_GET['end_date'] ?? '';
 
-// Pagination setup
-$limit = 10;
+  // Pagination setup
+  $limit = 10;
 
-// --- MAIN LOGS (excluding login/logout) ---
-$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-$offset = ($page - 1) * $limit;
+  // --- MAIN LOGS (excluding login/logout) ---
+  $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+  $offset = ($page - 1) * $limit;
 
-// Build WHERE clause
-$where = [];
-$params = [];
-if ($start_date) {
-  $where[] = "DATE(a.log_time) >= ?";
-  $params[] = $start_date;
-}
-if ($end_date) {
-  $where[] = "DATE(a.log_time) <= ?";
-  $params[] = $end_date;
-}
-$where[] = "a.action NOT IN ('Logged in to the system', 'Logged out of the system')"; // exclude login/logout
-$where_sql = $where ? "WHERE " . implode(" AND ", $where) : "";
+  // Build WHERE clause
+  $where = [];
+  $params = [];
+  if ($start_date) {
+    $where[] = "DATE(a.log_time) >= ?";
+    $params[] = $start_date;
+  }
+  if ($end_date) {
+    $where[] = "DATE(a.log_time) <= ?";
+    $params[] = $end_date;
+  }
+  $where[] = "a.action NOT IN ('Logged in to the system', 'Logged out of the system')"; // exclude login/logout
+  $where_sql = $where ? "WHERE " . implode(" AND ", $where) : "";
 
-// Count total rows
-$stmt_count = $conn->prepare("SELECT COUNT(*) as total 
-                              FROM activity_log a
-                              JOIN users u ON a.user_id = u.user_id
-                              $where_sql");
-if ($params) $stmt_count->bind_param(str_repeat("s", count($params)), ...$params);
-$stmt_count->execute();
-$total_rows = $stmt_count->get_result()->fetch_assoc()['total'];
-$total_pages = ceil($total_rows / $limit);
+  // Count total rows
+  $stmt_count = $conn->prepare("SELECT COUNT(*) as total 
+                                FROM activity_log a
+                                JOIN users u ON a.user_id = u.user_id
+                                $where_sql");
+  if ($params) $stmt_count->bind_param(str_repeat("s", count($params)), ...$params);
+  $stmt_count->execute();
+  $total_rows = $stmt_count->get_result()->fetch_assoc()['total'];
+  $total_pages = ceil($total_rows / $limit);
 
-// Fetch logs
-$stmt = $conn->prepare("SELECT a.log_id, a.action, a.log_time, 
-                               CONCAT(u.first_name, ' ', u.last_name) AS fullname
-                        FROM activity_log a
-                        JOIN users u ON a.user_id = u.user_id
-                        $where_sql
-                        ORDER BY a.log_time DESC
-                        LIMIT ? OFFSET ?");
-$params_main = $params;
-$params_main[] = $limit;
-$params_main[] = $offset;
-$types_main = str_repeat("s", count($params)) . "ii";
-$stmt->bind_param($types_main, ...$params_main);
-$stmt->execute();
-$result = $stmt->get_result();
+  // Fetch logs
+  $stmt = $conn->prepare("SELECT a.log_id, a.action, a.log_time, 
+                                CONCAT(u.first_name, ' ', u.last_name) AS fullname
+                          FROM activity_log a
+                          JOIN users u ON a.user_id = u.user_id
+                          $where_sql
+                          ORDER BY a.log_time DESC
+                          LIMIT ? OFFSET ?");
+  $params_main = $params;
+  $params_main[] = $limit;
+  $params_main[] = $offset;
+  $types_main = str_repeat("s", count($params)) . "ii";
+  $stmt->bind_param($types_main, ...$params_main);
+  $stmt->execute();
+  $result = $stmt->get_result();
 
-// --- LOGIN/LOGOUT LOGS ---
-$page_login = isset($_GET['page_login']) && is_numeric($_GET['page_login']) ? (int)$_GET['page_login'] : 1;
-$offset_login = ($page_login - 1) * $limit;
+  // --- LOGIN/LOGOUT LOGS ---
+  $page_login = isset($_GET['page_login']) && is_numeric($_GET['page_login']) ? (int)$_GET['page_login'] : 1;
+  $offset_login = ($page_login - 1) * $limit;
 
-$where_login = [];
-$params_login = [];
-if ($start_date) {
-  $where_login[] = "DATE(a.log_time) >= ?";
-  $params_login[] = $start_date;
-}
-if ($end_date) {
-  $where_login[] = "DATE(a.log_time) <= ?";
-  $params_login[] = $end_date;
-}
-$where_login[] = "a.action IN ('Logged in to the system', 'Logged out of the system')";
-$where_sql_login = $where_login ? "WHERE " . implode(" AND ", $where_login) : "";
+  $where_login = [];
+  $params_login = [];
+  if ($start_date) {
+    $where_login[] = "DATE(a.log_time) >= ?";
+    $params_login[] = $start_date;
+  }
+  if ($end_date) {
+    $where_login[] = "DATE(a.log_time) <= ?";
+    $params_login[] = $end_date;
+  }
+  $where_login[] = "a.action IN ('Logged in to the system', 'Logged out of the system')";
+  $where_sql_login = $where_login ? "WHERE " . implode(" AND ", $where_login) : "";
 
-// Count login logs
-$stmt_count_login = $conn->prepare("SELECT COUNT(*) as total 
-                                    FROM activity_log a
-                                    JOIN users u ON a.user_id = u.user_id
-                                    $where_sql_login");
-if ($params_login) $stmt_count_login->bind_param(str_repeat("s", count($params_login)), ...$params_login);
-$stmt_count_login->execute();
-$total_rows_login = $stmt_count_login->get_result()->fetch_assoc()['total'];
-$total_pages_login = ceil($total_rows_login / $limit);
+  // Count login logs
+  $stmt_count_login = $conn->prepare("SELECT COUNT(*) as total 
+                                      FROM activity_log a
+                                      JOIN users u ON a.user_id = u.user_id
+                                      $where_sql_login");
+  if ($params_login) $stmt_count_login->bind_param(str_repeat("s", count($params_login)), ...$params_login);
+  $stmt_count_login->execute();
+  $total_rows_login = $stmt_count_login->get_result()->fetch_assoc()['total'];
+  $total_pages_login = ceil($total_rows_login / $limit);
 
-// Fetch login logs
-$stmt_login = $conn->prepare("SELECT a.log_id, a.action, a.log_time, 
-                                     CONCAT(u.first_name, ' ', u.last_name) AS fullname
-                              FROM activity_log a
-                              JOIN users u ON a.user_id = u.user_id
-                              $where_sql_login
-                              ORDER BY a.log_time DESC
-                              LIMIT ? OFFSET ?");
-$params_login2 = $params_login;
-$params_login2[] = $limit;
-$params_login2[] = $offset_login;
-$types_login = str_repeat("s", count($params_login)) . "ii";
-$stmt_login->bind_param($types_login, ...$params_login2);
-$stmt_login->execute();
-$result_login = $stmt_login->get_result();
-?>
+  // Fetch login logs
+  $stmt_login = $conn->prepare("SELECT a.log_id, a.action, a.log_time, 
+                                      CONCAT(u.first_name, ' ', u.last_name) AS fullname
+                                FROM activity_log a
+                                JOIN users u ON a.user_id = u.user_id
+                                $where_sql_login
+                                ORDER BY a.log_time DESC
+                                LIMIT ? OFFSET ?");
+  $params_login2 = $params_login;
+  $params_login2[] = $limit;
+  $params_login2[] = $offset_login;
+  $types_login = str_repeat("s", count($params_login)) . "ii";
+  $stmt_login->bind_param($types_login, ...$params_login2);
+  $stmt_login->execute();
+  $result_login = $stmt_login->get_result();
+  ?>
 
 <!doctype html>
 <html lang="en">
@@ -114,12 +114,13 @@ $result_login = $stmt_login->get_result();
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="header.css">
+  <link rel="stylesheet" href="activitylog.css">
 
   <title>Activity Log</title>
 </head>
@@ -127,8 +128,8 @@ $result_login = $stmt_login->get_result();
 <body class="d-flex flex-column min-vh-100">
   <?php include 'header.php'; ?>
 
-  <main class="container my-5 flex-grow-1 d-flex justify-content-center">
-    <div class="col-lg-8 col-md-10 col-sm-12">
+  <main class="container my-5 flex-grow-1 justify-content-center">
+    <div class="col-12 px-4">
       <div class="mb-3">
         <a href="Admin-Page-2.php" class="btn btn-outline-secondary btn-sm">
           <i class="fas fa-arrow-left"></i> Back
@@ -155,37 +156,62 @@ $result_login = $stmt_login->get_result();
         </div>
       </form>
 
-      <!-- Main Activity Logs -->
-      <div id="activitylogs" class="table-responsive">
-        <table class="table table-striped table-hover align-middle text-start w-100">
-          <thead class="table-dark">
-            <tr>
-              <th style="width: 8%">No.</th>
-              <th style="width: 32%">Activity</th>
-              <th style="width: 20%">User</th>
-              <th style="width: 20%">Date and Time</th>
+<!-- Main Activity Logs -->
+<div id="activitylogs" class="table-responsive" style="max-width: 100%;">
+  <table class="table table-striped table-hover align-middle text-start w-100 mb-0">
+    <thead class="table-dark">
+      <tr>
+        <th style="width: 6%">#</th>
+        <th style="width: 36%">Activity</th>
+        <th style="width: 18%">User</th>
+        <th style="width: 20%">Date and Time</th>
+        <th style="width: 5%"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php
+      if ($result->num_rows > 0) {
+        $no = $offset + 1;
+        while ($row = $result->fetch_assoc()) {
+          $log_id = htmlspecialchars($row['log_id']);
+          echo "
+            <!-- Main Row -->
+            <tr data-bs-toggle='collapse' data-bs-target='#details{$log_id}' aria-expanded='false' style='cursor: pointer;'>
+              <td>{$no}</td>
+              <td>{$row['action']}</td>
+              <td>{$row['fullname']}</td>
+              <td>{$row['log_time']}</td>
+              <td class='text-center'>
+                <i class='bi bi-caret-down-fill text-secondary'></i>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            <?php
-            if ($result->num_rows > 0) {
-              $no = $offset + 1;
-              while ($row = $result->fetch_assoc()) {
-                echo "<tr>
-                  <td>{$no}</td>
-                  <td>{$row['action']}</td>
-                  <td>{$row['fullname']}</td>
-                  <td>{$row['log_time']}</td>
-                </tr>";
-                $no++;
-              }
-            } else {
-              echo "<tr><td colspan='4' class='text-center text-muted'>No activity logs found.</td></tr>";
-            }
-            ?>
-          </tbody>
-        </table>
-      </div>
+
+            <!-- Expandable Details Row -->
+            <tr class='collapse' id='details{$log_id}' style='transition: none !important;'>
+              <td colspan='5'>
+                <div class='border rounded bg-white p-3 shadow-sm'>
+                  <div class='d-flex justify-content-between align-items-center mb-2'>
+                    <h6 class='mb-0 text-success'>Activity Details</h6>
+                    <span class='badge bg-secondary text-light'>Log ID: {$log_id}</span>
+                  </div>
+                  <p class='mb-1'><strong>Action:</strong> " . htmlspecialchars($row['action']) . "</p>
+                  <p class='mb-1'><strong>User:</strong> " . htmlspecialchars($row['fullname']) . "</p>
+                  <p class='mb-1'><strong>Date:</strong> " . htmlspecialchars($row['log_time']) . "</p>
+                  <p class='mb-0'><strong>Details:</strong><br>" . nl2br(htmlspecialchars($row['details'] ?? 'No additional information.')) . "</p>
+                </div>
+              </td>
+            </tr>
+          ";
+          $no++;
+        }
+      } else {
+        echo "<tr><td colspan='5' class='text-center text-muted py-4'>No activity logs found.</td></tr>";
+      }
+      ?>
+    </tbody>
+  </table>
+
+
 
       <!-- Pagination -->
       <nav aria-label="Page navigation" class="mt-2">
@@ -205,7 +231,9 @@ $result_login = $stmt_login->get_result();
           <?php endif; ?>
         </div>
       </nav>
+          </div>
 
+          
       <!-- Login/Logout Logs -->
       <div id="loginlogs" class="table-responsive d-none">
         <table class="table table-striped table-hover align-middle text-start">
