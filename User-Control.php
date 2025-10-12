@@ -183,8 +183,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
         $logMessage .= "No changes detected.";
       }
 
-      // Save with real line breaks in DB
-      logActivity($conn, $adminId, nl2br($logMessage));
+      // ✅ Save clean message (no HTML tags)
+      logActivity($conn, $adminId, $logMessage);
     }
 
     echo "<script>alert('User updated successfully!'); window.location.href='User-Control.php';</script>";
