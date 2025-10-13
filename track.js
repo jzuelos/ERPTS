@@ -714,23 +714,13 @@ function showDocuments(transactionId) {
             ? fileName.substring(0, 22) + "..."
             : fileName;
 
-          // Create thumbnail preview (image or pdf icon)
-          let previewHtml = "";
-          if (isPdf) {
-            previewHtml = `
-              <div class="pdf-thumb bg-light border rounded d-flex align-items-center justify-content-center" 
-                   style="width:100px; height:100px; cursor:pointer;"
-                   onclick="viewDocument('${filePath}', '${fileName}', true)">
-                <i class="bi bi-file-earmark-pdf text-danger" style="font-size:2rem;"></i>
-              </div>
-            `;
-          } else {
-            previewHtml = `
-              <img src="${filePath}" class="img-fluid border rounded"
-                   style="max-height:100px; width:auto; cursor:pointer;"
-                   onclick="viewDocument('${filePath}', '${fileName}', false)">
-            `;
-          }
+          // Always show a PDF-style thumbnail, clickable
+          let previewHtml = `
+          <div class="pdf-thumb bg-light border rounded d-flex align-items-center justify-content-center" 
+              style="width:80px; height:100px; cursor:pointer;"
+              onclick="viewDocument('${filePath}', '${fileName}', ${isPdf})">
+            <i class="bi bi-file-earmark-pdf text-danger" style="font-size:2rem;"></i>
+          </div>`;
 
           wrapper.innerHTML = `
             <div class="d-flex align-items-center justify-content-between w-100">
