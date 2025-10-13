@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 07, 2025 at 06:50 PM
+-- Generation Time: Oct 13, 2025 at 08:27 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -30,7 +30,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `activity_log` (
   `log_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `action` varchar(255) NOT NULL,
+  `action` mediumtext DEFAULT NULL,
   `log_time` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -65,7 +65,21 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (24, 9, 'Logged in to the system', '2025-10-03 12:45:32'),
 (25, 9, 'Logged in to the system', '2025-10-05 14:01:05'),
 (26, 9, 'Logged in to the system', '2025-10-07 07:12:48'),
-(27, 9, 'Logged in to the system', '2025-10-07 13:52:04');
+(27, 9, 'Logged in to the system', '2025-10-07 13:52:04'),
+(28, 9, 'Logged in to the system', '2025-10-08 12:22:00'),
+(29, 9, 'Logged out of the system', '2025-10-08 15:27:04'),
+(30, 9, 'Logged in to the system', '2025-10-10 06:44:12'),
+(31, 9, 'Logged in to the system', '2025-10-10 14:39:36'),
+(32, 9, 'Logged out of the system', '2025-10-10 14:39:40'),
+(33, 9, 'Logged in to the system', '2025-10-10 14:40:00'),
+(34, 9, 'Logged in to the system', '2025-10-11 10:18:03'),
+(35, 9, 'Logged in to the system', '2025-10-11 10:38:33'),
+(36, 9, 'Logged in to the system', '2025-10-12 09:41:57'),
+(37, 9, 'Logged in to the system', '2025-10-13 09:09:50'),
+(38, 9, 'Logged in to the system', '2025-10-13 14:36:24'),
+(39, 9, 'Logged in to the system', '2025-10-13 15:15:13'),
+(40, 9, 'Logged out of the system', '2025-10-13 15:25:47'),
+(41, 9, 'Logged out of the system', '2025-10-13 18:27:18');
 
 -- --------------------------------------------------------
 
@@ -89,9 +103,9 @@ CREATE TABLE `admin_certification` (
 --
 
 INSERT INTO `admin_certification` (`id`, `name`, `description`, `position`, `status`, `role`, `created_at`, `updated_at`) VALUES
-(6, 'Mark Bertillo', NULL, 'Provincial Assessor', 'active', 'provincial_assessor', '2025-10-07 15:39:00', '2025-10-07 23:30:18'),
-(8, 'Jonard Canaria', NULL, 'Janitor', 'active', 'verifier', '2025-10-07 16:38:54', '2025-10-07 23:30:18'),
-(9, 'Ma. Salome Bertillo', NULL, 'Assistant Assessor', 'active', 'none', '2025-10-07 16:42:41', '2025-10-07 16:42:41');
+(6, 'Mark Bertillo', NULL, 'Provincial Assessor', 'active', 'provincial_assessor', '2025-10-07 15:39:00', '2025-10-08 21:54:51'),
+(8, 'Jonard Canaria', NULL, 'Janitor', 'active', 'none', '2025-10-07 16:38:54', '2025-10-08 21:54:51'),
+(9, 'Ma. Salome Bertillo', NULL, 'Assistant Assessor', 'active', 'verifier', '2025-10-07 16:42:41', '2025-10-08 21:54:51');
 
 -- --------------------------------------------------------
 
@@ -423,8 +437,7 @@ CREATE TABLE `certification` (
 
 INSERT INTO `certification` (`cert_id`, `verified`, `noted`, `recom_approval`, `recom_date`, `plotted`, `appraised`, `appraised_date`, `approved`, `approved_date`, `idle`, `contested`, `land_id`) VALUES
 (1, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-09-20', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-09-20', 'Lingon, Nestor Jacolbia', '2025-09-20', 0, 0, 55),
-(2, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-28', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-28', 'Lingon, Nestor Jacolbia', '2025-04-28', 0, 0, 56),
-(3, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-08-27', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-08-27', 'Lingon, Nestor Jacolbia', '2025-08-27', 0, 0, 57);
+(2, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-28', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-28', 'Lingon, Nestor Jacolbia', '2025-04-28', 0, 0, 56);
 
 -- --------------------------------------------------------
 
@@ -557,7 +570,8 @@ CREATE TABLE `land` (
 INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `north`, `east`, `south`, `west`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`, `adjust_factor`, `adjust_percent`, `adjust_value`, `adjust_mv`, `assess_lvl`, `assess_value`, `faas_id`, `created_at`, `updated_at`) VALUES
 (55, '12345', '42322', 'Lot 15', 'Barangay Road', 'Rice Field', 'River', 'Bounded by residential and agricultural lands', 'Cruz', 'Juan', 'Dela', '09345678901', 'juan.cruz@example.com', 'Rizal Street', 'Kalamunding', 'District 1', 'Daet', 'Camarines Norte', 'Residential lot with improvements', 'Agricultural', '', 23, 'SC', 20.00, 460.00, 'Depreciation', 17.00, -381.80, 78.20, 20.00, 15.64, 33, '2025-08-27 16:41:18', '2025-09-20 08:44:08'),
 (56, '1234', '3412', 'Lot 22', 'Barangay Road', 'Vacant Lot', 'Riverbank', 'Commercial property near public market', 'Reyes', 'Maria', 'Lopez', '09181234567', 'maria.reyes@example.com', 'Mabini Street', 'Gahon', 'District 2', 'Daet', 'Camarines Norte', 'Commercial lot', 'Commercial', 'Business Establishment', 432, 'Commercial', 34.00, 14688.00, 'Standard', 0.00, 0.00, 14688.00, 34.00, 4993.92, 33, '2025-08-27 16:41:18', '2025-09-09 14:40:08'),
-(57, '3421', '4321', 'Highway', 'Residential Subdivision', 'Barangay Hall', 'Rice Field', 'Prime residential land near highway', 'Santos', 'Pedro', 'Gonzales', '09201234567', 'pedro.santos@example.com', 'Quezon Avenue', 'Bagasbas', 'District 3', 'Daet', 'Camarines Norte', 'Residential land', 'Residential', 'Vacant Lot', 800, 'Residential', 200.00, 160000.00, 'Standard', 0.00, 0.00, 160000.00, 65.00, 104000.00, 36, '2025-08-27 16:41:18', '2025-09-09 14:40:08');
+(61, '56789', '98765', 'Main Road', 'Creek', 'Farm Lot', 'River', 'Bounded by creek and residential area', 'Villanueva', 'Carlos', 'M.', '09171234567', 'carlos.villanueva@example.com', 'Purok 5, Rizal Street', 'Lag-on', 'District 4', 'Daet', 'Camarines Norte', 'Agricultural lot used for coconut plantation', 'Agricultural', 'Coconut Farm', 1200, 'Agricultural', 50.00, 60000.00, 'Depreciation', 10.00, -6000.00, 54000.00, 40.00, 21600.00, 43, '2025-10-10 16:04:03', '2025-10-10 16:04:03'),
+(62, '67890', '11223', 'Lot 7', 'Barangay Road', 'Vacant Lot', 'River', 'Bounded by commercial and residential properties', 'Dela Cruz', 'Ana', 'Ramos', '09193456789', 'ana.delacruz@example.com', 'Quezon Avenue', 'Magpakumbaba', 'District 3', 'Daet', 'Camarines Norte', 'Commercial lot beside the municipal hall', 'Commercial', 'Office Space', 350, 'Commercial', 45.00, 15750.00, 'Standard', 0.00, 0.00, 15750.00, 40.00, 6300.00, 36, '2025-10-11 10:30:00', '2025-10-11 10:30:00');
 
 -- --------------------------------------------------------
 
@@ -703,7 +717,8 @@ INSERT INTO `owner_audit_log` (`log_id`, `action`, `owner_id`, `property_id`, `u
 (18, 'Added', 10, 144, 9, 2, 'Added: Rommel James Balce Gacho (Purok 2, Bagacay, Labo, Camarines Norte) to property 144', '2025-09-24 00:51:05'),
 (21, 'Removed', 10, 144, 9, 2, 'Removed: Rommel James Balce Gacho (Purok 2, Bagacay, Labo, Camarines Norte) from property 144', '2025-09-24 00:53:05'),
 (25, 'Removed', 11, 144, 9, 1, 'Removed: Isabel Delos Ramos (Burgos St., Barangay 11, Labo, Camarines Norte) from property 144', '2025-10-02 15:18:15'),
-(26, 'Removed', 9, 144, 9, 1, 'Removed: Elena Mendoza Lopez (Purok 1, Barangay 9, Labo, Camarines Norte) from property 144', '2025-10-02 15:21:57');
+(26, 'Removed', 9, 144, 9, 1, 'Removed: Elena Mendoza Lopez (Purok 1, Barangay 9, Labo, Camarines Norte) from property 144', '2025-10-02 15:21:57'),
+(27, 'Removed', 12, 147, 9, 3, 'Removed: Ramon Torres Mendoza (San Isidro, Barangay 12, Daet, Camarines Norte) from property 147', '2025-10-11 10:43:15');
 
 -- --------------------------------------------------------
 
@@ -727,7 +742,7 @@ CREATE TABLE `propertyowner` (
 INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`, `created_at`, `created_by`) VALUES
 (62, 144, 12, 1, '2025-09-21 13:37:29', NULL),
 (63, 144, 9, 0, '2025-09-21 13:37:29', NULL),
-(66, 147, 12, 1, '2025-09-21 13:37:29', NULL),
+(66, 147, 12, 0, '2025-09-21 13:37:29', NULL),
 (72, 157, 12, 1, '2025-09-21 13:37:29', NULL),
 (74, 144, 14, 0, '2025-09-23 22:34:55', 9),
 (75, 144, 8, 0, '2025-09-23 22:35:46', 9),
@@ -735,7 +750,8 @@ INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`, 
 (77, 144, 12, 0, '2025-09-23 23:33:55', 9),
 (78, 144, 10, 0, '2025-09-24 00:51:05', 9),
 (79, 144, 22, 1, '2025-09-24 00:53:05', 9),
-(80, 144, 4, 1, '2025-10-02 15:21:57', 9);
+(80, 144, 4, 1, '2025-10-02 15:21:57', 9),
+(81, 147, 2, 1, '2025-10-11 10:43:15', 9);
 
 -- --------------------------------------------------------
 
@@ -788,7 +804,7 @@ CREATE TABLE `p_info` (
 
 INSERT INTO `p_info` (`p_id`, `house_no`, `block_no`, `province`, `city`, `district`, `barangay`, `street`, `house_tag_no`, `land_area`, `desc_land`, `documents`, `created_at`, `updated_at`, `is_active`, `disabled_at`, `disabled_by`) VALUES
 (144, 23, 1, 'Camarines Norte', 'Labo', 'District 1', 'Kalamunding', 'Calabasa Street', 0, 302, 'Residential lot with Affidavit and Barangay Cleara', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-09-21 18:03:49', 1, NULL, NULL),
-(147, 23, 3, 'Camarines Norte', 'Daet', 'District 2', 'Gahon', 'Mabini Street', 0, 453, 'Commercial lot with Affidavit and Barangay Clearan', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-09-20 13:22:18', 1, NULL, NULL),
+(147, 23, 3, 'Camarines Norte', 'Daet', 'District 2', 'Gahon', 'Mabini Street', 0, 453, 'Commercial lot with Affidavit and Barangay Clearan', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-10-11 10:24:47', 1, NULL, NULL),
 (156, 42134, 4, 'Camarines Norte', 'Daet', 'District 2', 'Bagasbas', 'Quezon Avenue', 1, 432, 'Agricultural lot with supporting affidavit', 'Affidavit', '2025-09-05 14:01:18', '2025-09-20 13:22:18', 0, '2025-09-13 14:29:21', 9),
 (157, 5345, 4, 'Camarines Norte', 'Daet', 'District 2', 'Camambugan', 'San Roque', 0, 5345, 'Residential lot with Barangay Clearance', 'Barangay Clearance', '2025-09-05 14:13:20', '2025-09-20 13:22:18', 1, NULL, NULL);
 
@@ -828,7 +844,8 @@ INSERT INTO `received_papers` (`received_id`, `transaction_id`, `transaction_cod
 (24, 51, 'RCV-1008', 'Josefina Cruz', '+639248889999', 'Partition', 'Clerk01 B. Clerk', '2025-10-02 18:11:44', 'Needs barangay clearance', 'received', '2025-10-02 10:11:44'),
 (25, 52, 'RCV-1009', 'Cynthia Navarro', '+639259990000', 'Exchange', 'Staff02 C. Staff', '2025-10-02 18:11:44', 'Verified and complete', 'received', '2025-10-02 10:11:44'),
 (26, 53, 'RCV-1010', 'Michael Tan', '+639260001111', 'Inheritance', 'Admin A. Admin', '2025-10-02 18:11:44', 'Heirs approved', 'received', '2025-10-02 10:11:44'),
-(27, 54, 'RCV-1011', 'Liza Sarmiento', '+639271112222', 'Transfer Certificate of Title', 'Clerk01 B. Clerk', '2025-10-02 18:11:44', 'Pending notarization', 'received', '2025-10-02 10:11:44');
+(27, 54, 'RCV-1011', 'Liza Sarmiento', '+639271112222', 'Transfer Certificate of Title', 'Clerk01 B. Clerk', '2025-10-02 18:11:44', 'Pending notarization', 'received', '2025-10-02 10:11:44'),
+(28, 58, 'TX-1015', 'Fernando Torres', '+639342342423', 'Revision/Correction', 'John Lloyd C. Zuelos', '2025-10-12 19:37:36', '', 'received', '2025-10-12 11:37:36');
 
 -- --------------------------------------------------------
 
@@ -877,8 +894,9 @@ CREATE TABLE `rpu_dec` (
 --
 
 INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `pro_assess`, `pro_date`, `mun_assess`, `mun_date`, `td_cancel`, `previous_pin`, `tax_year`, `entered_by`, `entered_year`, `prev_own`, `prev_assess`, `faas_id`, `total_property_value`) VALUES
-(1, '1484394354', 'Provincial Assessor Maria Santos', '2025-08-05', 'Municipal Assessor Luis Cruz', '2025-08-06', 0, 110, '2025-08-07', 1, '2025-08-07', 'Ricardo Delos Reyes', 7000.00, 33, 20157.00),
-(3, '42342', 'Juan Dela Cruz', '2025-09-10', 'Maria Reyes', '2025-09-11', 0, 110, '2025-09-27', 2, '2025-09-23', 'None', 5000.00, 36, 264000.00);
+(1, '31-2314-23-42-341-23123', 'Provincial Assessor Maria Santos', '2025-08-05', 'Municipal Assessor Luis Cruz', '2025-08-06', 0, 110, '2025-08-07', 1, '2025-08-07', 'Ricardo Delos Reyes', 7000.00, 33, 20157.56),
+(3, '42-5134-21-34-123-51345', 'Mark Bertillo', '2025-09-10', 'Maria Reyes', '2025-09-11', 0, 110, '2025-09-27', 2, '2025-09-23', 'None', 5000.00, 36, 22050.00),
+(4, '42-6345-63-45-634-52345', '', '0000-00-00', '', '0000-00-00', 0, 0, '0000-00-00', 0, '0000-00-00', '', 0.00, 43, 81600.00);
 
 -- --------------------------------------------------------
 
@@ -900,8 +918,8 @@ CREATE TABLE `rpu_idnum` (
 --
 
 INSERT INTO `rpu_idnum` (`rpu_id`, `arp`, `pin`, `taxability`, `effectivity`, `faas_id`) VALUES
-(46, '42342-42342-243423', '1103456423442', 'taxable', '2025', 33),
-(62, '42342', '110123456789', 'exempt', '2025', 36),
+(46, '4234-2423-4224-342', '1103456423442', 'taxable', '2025', 33),
+(62, '4234-2', '110123456789', 'taxable', '2025', 36),
 (63, '423234', '110-42342342-', 'taxable', '2025', 42);
 
 -- --------------------------------------------------------
@@ -977,10 +995,9 @@ INSERT INTO `transactions` (`transaction_id`, `transaction_code`, `name`, `conta
 (52, 'TX-1009', 'Roberto Flores', '+639251111111', 'Simple Transfer request #1009 received', 'Completed', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Simple Transfer of Ownership'),
 (53, 'TX-1010', 'Andrea Pascual', '+639261111111', 'New Property Declaration request #1010 received', 'Pending', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'New Declaration of Real Property'),
 (54, 'TX-1011', 'Lorenzo Aquino', '+639271111111', 'Property Revision request #1011 received', 'In Progress', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Revision/Correction'),
-(55, 'TX-1012', 'Cecilia Navarro', '+639281111111', 'Consolidation request #1012 received', 'Completed', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Consolidation'),
-(56, 'TX-1013', 'Daniel Gomez', '+639291111111', 'Simple Transfer request #1013 received', 'Pending', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Simple Transfer of Ownership'),
+(55, 'TX-1012', 'Cecilia Navarro', '+639281111111', 'Consolidation request #1012 received', 'Completed', '2025-10-02 10:19:56', '2025-10-12 11:58:21', 'Consolidation'),
 (57, 'TX-1014', 'Patricia Ramos', '+639301111111', 'New Property Declaration request #1014 received', 'In Progress', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'New Declaration of Real Property'),
-(58, 'TX-1015', 'Fernando Torres', '+639311111111', 'Property Revision request #1015 received', 'Completed', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Revision/Correction');
+(62, '02603', 'Jonard Canaria', '+635345352332', 'Property Consolidation #02603 is being processed. Documents under review as of 10/14/2025. For more info. visit https://erptstrack.erpts.online', 'In Progress', '2025-10-13 18:06:40', '2025-10-13 18:12:38', 'Consolidation');
 
 -- --------------------------------------------------------
 
@@ -1000,7 +1017,10 @@ CREATE TABLE `transaction_files` (
 --
 
 INSERT INTO `transaction_files` (`file_id`, `transaction_id`, `file_path`, `uploaded_at`) VALUES
-(50, 42, 'uploads/transaction_42/tx_68d34d6e2b15f_business-document-template_1435-229.jpg', '2025-09-24 01:46:22');
+(50, 42, 'uploads/transaction_42/tx_68d34d6e2b15f_business-document-template_1435-229.jpg', '2025-09-24 01:46:22'),
+(61, 57, 'uploads/transaction_57/1760286363_FB_IMG_1760254477732.pdf', '2025-10-12 16:26:03'),
+(62, 57, 'uploads/transaction_57/1760286363_FB_IMG_1760253383644.pdf', '2025-10-12 16:26:03'),
+(64, 57, 'uploads/transaction_57/1760287394_Screenshot_20251012_181741.pdf', '2025-10-12 16:43:14');
 
 -- --------------------------------------------------------
 
@@ -1029,7 +1049,63 @@ INSERT INTO `transaction_logs` (`log_id`, `transaction_id`, `transaction_code`, 
 (117, 42, '12084', 'Papers Received', 'Papers received by client', 9, '2025-10-02 09:48:44'),
 (118, 43, '38162', 'Created', 'Transaction created', 9, '2025-10-02 09:49:11'),
 (119, 43, '38162', 'Updated', 'Transaction updated', 9, '2025-10-02 09:49:48'),
-(120, 43, '38162', 'Papers Received', 'Papers received by client', 9, '2025-10-02 10:00:29');
+(120, 43, '38162', 'Papers Received', 'Papers received by client', 9, '2025-10-02 10:00:29'),
+(121, 58, 'TX-1015', 'Updated', 'Transaction updated', 9, '2025-10-12 10:47:39'),
+(122, 58, 'TX-1015', 'Document Uploaded', 'uploads/transaction_58/tx_68eb8dca999f1_photo-1500462918059-b1a0cb512f1d.avif', 9, '2025-10-12 11:15:22'),
+(123, 58, 'TX-1015', 'Updated', 'Transaction updated', 9, '2025-10-12 11:15:22'),
+(124, 58, 'TX-1015', 'Updated', 'Transaction updated', 9, '2025-10-12 11:27:02'),
+(125, 56, NULL, 'Deleted', 'Transaction deleted', 9, '2025-10-12 11:27:30'),
+(126, 58, 'TX-1015', 'Document Deleted', 'Deleted document: uploads/transaction_58/tx_68eb8dca999f1_photo-1500462918059-b1a0cb512f1d.avif', 9, '2025-10-12 11:28:39'),
+(127, 58, 'TX-1015', 'Papers Received', 'Papers received by client', 9, '2025-10-12 11:37:36'),
+(128, 55, 'TX-1012', 'Document Uploaded', 'uploads/transaction_55/tx_68eb97dd597fe_1473216391897_gif__1600__900_.gif', 9, '2025-10-12 11:58:21'),
+(129, 55, 'TX-1012', 'Updated', 'Transaction updated', 9, '2025-10-12 11:58:21'),
+(130, 55, 'TX-1012', 'Document Deleted', 'Deleted document: uploads/transaction_55/tx_68eb97dd597fe_1473216391897_gif__1600__900_.gif', 9, '2025-10-12 11:58:30'),
+(131, 57, 'TX-1014', 'Mobile Upload', 'uploads/transaction_57/1760276805_17602767976178486282545429110742.jpg', 0, '2025-10-12 13:46:45'),
+(132, 57, 'TX-1014', 'Mobile Upload', 'uploads/transaction_57/1760277091_1760277078085458691757065411211.jpg', 0, '2025-10-12 13:51:31'),
+(133, 57, 'TX-1014', 'Mobile Upload', 'uploads/transaction_57/1760285454_17602854373913725204252983909266.jpg', 0, '2025-10-12 16:10:54'),
+(134, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/1760277091_1760277078085458691757065411211.jpg', 9, '2025-10-12 16:11:10'),
+(135, 57, 'TX-1014', 'Mobile Upload', 'uploads/transaction_57/1760285658_FB_IMG_1760253383644.jpg', 0, '2025-10-12 16:14:18'),
+(136, 57, 'TX-1014', 'Mobile Upload', 'uploads/transaction_57/1760285658_FB_IMG_1760254477732.jpg', 0, '2025-10-12 16:14:18'),
+(137, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/1760276805_17602767976178486282545429110742.jpg', 9, '2025-10-12 16:15:16'),
+(138, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/1760285454_17602854373913725204252983909266.jpg', 9, '2025-10-12 16:15:18'),
+(139, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/1760285658_FB_IMG_1760253383644.jpg', 9, '2025-10-12 16:15:19'),
+(140, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/1760285658_FB_IMG_1760254477732.jpg', 9, '2025-10-12 16:15:20'),
+(141, 57, 'TX-1014', 'Mobile Upload', 'uploads/transaction_57/1760286019_scanned_images.pdf', 0, '2025-10-12 16:20:19'),
+(142, 57, 'TX-1014', 'Mobile Upload', 'uploads/transaction_57/1760286363_Screenshot_20251012_175126.pdf', 0, '2025-10-12 16:26:03'),
+(143, 57, 'TX-1014', 'Mobile Upload', 'uploads/transaction_57/1760286363_Screenshot_20251012_181741.pdf', 0, '2025-10-12 16:26:03'),
+(144, 57, 'TX-1014', 'Mobile Upload', 'uploads/transaction_57/1760286363_FB_IMG_1760254477732.pdf', 0, '2025-10-12 16:26:03'),
+(145, 57, 'TX-1014', 'Mobile Upload', 'uploads/transaction_57/1760286363_FB_IMG_1760253383644.pdf', 0, '2025-10-12 16:26:03'),
+(146, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/1760286019_scanned_images.pdf', 9, '2025-10-12 16:26:13'),
+(147, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/1760286363_Screenshot_20251012_181741.pdf', 9, '2025-10-12 16:32:28'),
+(148, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/1760286363_Screenshot_20251012_175126.pdf', 9, '2025-10-12 16:41:58'),
+(149, 57, 'TX-1014', 'Mobile Upload', 'uploads/transaction_57/1760287394_Screenshot_20251012_175126.pdf', 0, '2025-10-12 16:43:14'),
+(150, 57, 'TX-1014', 'Mobile Upload', 'uploads/transaction_57/1760287394_Screenshot_20251012_181741.pdf', 0, '2025-10-12 16:43:14'),
+(151, 57, 'TX-1014', 'Mobile Upload', 'uploads/transaction_57/1760287394_FB_IMG_1760253383644.pdf', 0, '2025-10-12 16:43:14'),
+(152, 57, 'TX-1014', 'Mobile Upload', 'uploads/transaction_57/1760287394_FB_IMG_1760254477732.pdf', 0, '2025-10-12 16:43:14'),
+(153, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/1760287394_Screenshot_20251012_175126.pdf', 9, '2025-10-13 15:42:27'),
+(154, 59, '01303', 'Linked Pending Upload', 'uploads/transaction_59/1760371613_FB_IMG_1760359050496.pdf', 9, '2025-10-13 16:07:23'),
+(155, 59, '01303', 'Linked Pending Upload', 'uploads/transaction_59/1760371613_Screenshot_20251013_204606.pdf', 9, '2025-10-13 16:07:23'),
+(156, 59, '01303', 'Created', 'Transaction created', 9, '2025-10-13 16:07:23'),
+(157, 59, NULL, 'Deleted', 'Transaction deleted', 9, '2025-10-13 16:32:53'),
+(158, 60, '55664', 'Created', 'Transaction created', 9, '2025-10-13 16:34:47'),
+(159, 61, '69155', 'Document Uploaded', 'uploads/transaction_61/tx_68ed3712442ee_zuelos.png', 9, '2025-10-13 17:29:54'),
+(160, 61, '69155', 'Document Uploaded', 'uploads/transaction_61/tx_68ed3712464c7_Gacho.png', 9, '2025-10-13 17:29:54'),
+(161, 61, '69155', 'Created', 'Transaction created', 9, '2025-10-13 17:29:54'),
+(162, 61, NULL, 'Deleted', 'Transaction deleted', 9, '2025-10-13 17:30:21'),
+(163, 60, NULL, 'Deleted', 'Transaction deleted', 9, '2025-10-13 17:56:19'),
+(164, 62, '02603', 'Document Uploaded', 'uploads/transaction_62/tx_68ed3fb03f5b6_zuelos.pdf', 9, '2025-10-13 18:06:40'),
+(165, 62, '02603', 'Document Uploaded', 'uploads/transaction_62/tx_68ed3fb041734_Gacho.pdf', 9, '2025-10-13 18:06:40'),
+(166, 62, '02603', 'Created', 'Transaction created', 9, '2025-10-13 18:06:40'),
+(167, 62, '02603', 'Document Deleted', 'Deleted document: uploads/transaction_62/tx_68ed3fb041734_Gacho.pdf', 9, '2025-10-13 18:12:24'),
+(168, 62, '02603', 'Document Deleted', 'Deleted document: uploads/transaction_62/tx_68ed3fb03f5b6_zuelos.pdf', 9, '2025-10-13 18:12:27'),
+(169, 62, '02603', 'Document Uploaded', 'uploads/transaction_62/tx_68ed4116ecfe0_zuelos.pdf', 9, '2025-10-13 18:12:38'),
+(170, 62, '02603', 'Document Uploaded', 'uploads/transaction_62/tx_68ed4116ef098_Gacho.pdf', 9, '2025-10-13 18:12:38'),
+(171, 62, '02603', 'Updated', 'Transaction updated', 9, '2025-10-13 18:12:38'),
+(172, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/1760287394_FB_IMG_1760253383644.pdf', 9, '2025-10-13 18:14:14'),
+(173, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/1760287394_FB_IMG_1760254477732.pdf', 9, '2025-10-13 18:14:16'),
+(174, 62, '02603', 'Document Deleted', 'Deleted document: uploads/transaction_62/tx_68ed4116ef098_Gacho.pdf', 9, '2025-10-13 18:15:42'),
+(175, 62, '02603', 'Document Deleted', 'Deleted document: uploads/transaction_62/tx_68ed4116ecfe0_zuelos.pdf', 9, '2025-10-13 18:15:45'),
+(176, 62, '02603', 'Document Deleted', 'Deleted document: uploads/transaction_62/1760379631_17603796241224363308576054988599.pdf', 9, '2025-10-13 18:20:47');
 
 -- --------------------------------------------------------
 
@@ -1244,7 +1320,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT for table `admin_certification`
@@ -1262,7 +1338,7 @@ ALTER TABLE `brgy`
 -- AUTO_INCREMENT for table `certification`
 --
 ALTER TABLE `certification`
-  MODIFY `cert_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `cert_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `classification`
@@ -1286,7 +1362,7 @@ ALTER TABLE `faas`
 -- AUTO_INCREMENT for table `land`
 --
 ALTER TABLE `land`
-  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
+  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT for table `land_use`
@@ -1310,13 +1386,13 @@ ALTER TABLE `owners_tb`
 -- AUTO_INCREMENT for table `owner_audit_log`
 --
 ALTER TABLE `owner_audit_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `propertyowner`
 --
 ALTER TABLE `propertyowner`
-  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
+  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
 
 --
 -- AUTO_INCREMENT for table `province`
@@ -1334,7 +1410,7 @@ ALTER TABLE `p_info`
 -- AUTO_INCREMENT for table `received_papers`
 --
 ALTER TABLE `received_papers`
-  MODIFY `received_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `received_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `region`
@@ -1346,7 +1422,7 @@ ALTER TABLE `region`
 -- AUTO_INCREMENT for table `rpu_dec`
 --
 ALTER TABLE `rpu_dec`
-  MODIFY `dec_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `dec_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `rpu_idnum`
@@ -1364,19 +1440,19 @@ ALTER TABLE `subclass`
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
-  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT for table `transaction_files`
 --
 ALTER TABLE `transaction_files`
-  MODIFY `file_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `file_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
 
 --
 -- AUTO_INCREMENT for table `transaction_logs`
 --
 ALTER TABLE `transaction_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=121;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=177;
 
 --
 -- AUTO_INCREMENT for table `users`
