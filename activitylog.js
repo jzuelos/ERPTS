@@ -1,4 +1,4 @@
-// Enhanced Activity Log Formatter
+// Activity Log Display Handler
 document.addEventListener('DOMContentLoaded', function() {
   
   // Toggle between Activity Logs and Login/Logout Logs
@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const activityLogs = document.getElementById('activitylogs');
   const loginLogs = document.getElementById('loginlogs');
   
-  if (toggleBtn) {
+  if (toggleBtn && activityLogs && loginLogs) {
     toggleBtn.addEventListener('click', function() {
       if (activityLogs.classList.contains('d-none')) {
         activityLogs.classList.remove('d-none');
@@ -20,146 +20,130 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Format activity text for better readability FIRST
-  formatActivityText();
+  // Handle expand/collapse for activity text
+  const toggleButtons = document.querySelectorAll('.toggle-btn');
   
-  // THEN set up toggle functionality
-  document.querySelectorAll('.toggle-btn').forEach(btn => {
+  toggleButtons.forEach(function(btn) {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
       
       const id = this.getAttribute('data-id');
+      const fullText = this.getAttribute('data-full-text');
       const activityDiv = document.getElementById('activity' + id);
+      const parentRow = this.closest('tr');
       
-      if (!activityDiv) return;
+      if (!activityDiv || !fullText) return;
       
-      // Check if currently collapsed
-      const isCollapsed = activityDiv.style.maxHeight === '1.5em' || !activityDiv.style.maxHeight;
+      // Check if currently expanded
+      const isExpanded = this.classList.contains('bi-caret-up-fill');
       
-      if (isCollapsed) {
-        // Expand
-        activityDiv.style.maxHeight = 'none';
-        activityDiv.style.whiteSpace = 'normal';
-        activityDiv.style.overflow = 'visible';
-        this.classList.remove('bi-caret-down-fill');
-        this.classList.add('bi-caret-up-fill');
-      } else {
-        // Collapse
-        activityDiv.style.maxHeight = '1.5em';
+      if (isExpanded) {
+        // Collapse - show only first line
+        const lines = fullText.split('\n');
+        activityDiv.textContent = lines[0];
         activityDiv.style.whiteSpace = 'nowrap';
         activityDiv.style.overflow = 'hidden';
+        activityDiv.style.textOverflow = 'ellipsis';
+        
+        // Reset table cell styling
+        parentRow.querySelectorAll('td').forEach(td => {
+          td.style.verticalAlign = 'middle';
+        });
+        
+        // Change icon to down arrow
         this.classList.remove('bi-caret-up-fill');
         this.classList.add('bi-caret-down-fill');
+      } else {
+        // Expand - show full formatted text
+        const formatted = formatActivityText(fullText);
+        activityDiv.innerHTML = formatted;
+        activityDiv.style.whiteSpace = 'normal';
+        activityDiv.style.overflow = 'visible';
+        activityDiv.style.textOverflow = 'clip';
+        
+        // Adjust table cell styling for multiline content
+        parentRow.querySelectorAll('td').forEach(td => {
+          td.style.verticalAlign = 'top';
+        });
+        
+        // Change icon to up arrow
+        this.classList.remove('bi-caret-down-fill');
+        this.classList.add('bi-caret-up-fill');
       }
     });
   });
   
-  // Initialize all activity divs to collapsed state
-  document.querySelectorAll('.activity-text').forEach(element => {
-    element.style.maxHeight = '1.5em';
-    element.style.overflow = 'hidden';
-    element.style.whiteSpace = 'nowrap';
-    element.style.textOverflow = 'ellipsis';
+  // Make activity text clickable too
+  document.querySelectorAll('.activity-text').forEach(function(text) {
+    text.addEventListener('click', function() {
+      const id = this.id.replace('activity', '');
+      const toggleBtn = document.querySelector(`.toggle-btn[data-id="${id}"]`);
+      if (toggleBtn) {
+        toggleBtn.click();
+      }
+    });
   });
 });
 
-function formatActivityText() {
-  document.querySelectorAll('.activity-text').forEach(element => {
-    let text = element.textContent.trim();
+/**
+ * Format activity text - converts \n to <br> and preserves formatting
+ */
+function formatActivityText(text) {
+  if (!text) return '';
+  
+  // Split by newlines
+  const lines = text.split('\n');
+  let result = '';
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
     
-    // Format "Updated user account" logs
-    if (text.includes('Updated user account')) {
-      text = formatUserAccountUpdate(text);
+    if (line === '') {
+      // Empty line - add extra spacing
+      result += '<br>';
+    } else {
+      // Add line break before each line (except first)
+      if (result !== '') {
+        result += '<br>';
+      }
+      
+      // Escape HTML
+      const escaped = escapeHtml(line);
+      
+      // Check if line starts with bullet point
+      if (line.startsWith('•')) {
+        // Add indentation for bullet points
+        result += '<span style="display: inline-block; padding-left: 1em;">' + escaped + '</span>';
+      } else {
+        result += escaped;
+      }
     }
-    // Format "Added new" logs
-    else if (text.includes('Added new')) {
-      text = formatAddedNew(text);
-    }
-    // Format other logs with "Changes:"
-    else if (text.includes('Changes:')) {
-      text = formatChanges(text);
-    }
-    
-    element.innerHTML = text;
-  });
-}
-
-function formatUserAccountUpdate(text) {
-  // Extract main parts
-  const parts = text.split('Changes:');
-  if (parts.length < 2) return text;
-  
-  const header = parts[0].trim();
-  const changes = parts[1].trim();
-  
-  // Extract user info from header (Username, Full Name, Role)
-  const userInfoMatch = header.match(/Updated user account\s+(.+)/);
-  const userInfo = userInfoMatch ? userInfoMatch[1].trim() : '';
-  
-  // Split user info into separate lines
-  let formattedHeader = 'Updated user account';
-  if (userInfo) {
-    formattedHeader += '<br>' + userInfo.replace(/\s+(Username:|Full Name:|Role:)/g, '<br>$1');
   }
   
-  // Split changes by bullet points
-  const changeItems = changes.split('•').filter(item => item.trim());
-  
-  let formatted = `${formattedHeader}<br><br>Changes:`;
-  
-  changeItems.forEach(item => {
-    const trimmed = item.trim();
-    if (trimmed) {
-      formatted += `<br>• ${trimmed}`;
-    }
-  });
-  
-  return formatted;
+  return result;
 }
 
-function formatAddedNew(text) {
-  // Format "Added new" entries
-  const parts = text.split(/Details:|with details:/i);
-  if (parts.length < 2) return text;
-  
-  const header = parts[0].trim();
-  const details = parts[1].trim();
-  
-  // Split details by commas or semicolons
-  const detailItems = details.split(/,(?![^()]*\))/).filter(item => item.trim());
-  
-  let formatted = `${header}<br><br>Details:`;
-  
-  detailItems.forEach(item => {
-    const trimmed = item.trim();
-    if (trimmed) {
-      formatted += `<br>• ${trimmed}`;
-    }
-  });
-  
-  return formatted;
+/**
+ * Escape HTML special characters
+ */
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
-function formatChanges(text) {
-  // Generic changes formatter
-  const parts = text.split('Changes:');
-  if (parts.length < 2) return text;
-  
-  const header = parts[0].trim();
-  const changes = parts[1].trim();
-  
-  // Try to split by common delimiters
-  const changeItems = changes.split(/[•|]/).filter(item => item.trim());
-  
-  let formatted = `${header}<br><br>Changes:`;
-  
-  changeItems.forEach(item => {
-    const trimmed = item.trim();
-    if (trimmed) {
-      formatted += `<br>• ${trimmed}`;
-    }
-  });
-  
-  return formatted;
-}
+/**
+ * Preserve scroll position on page navigation
+ */
+window.addEventListener('beforeunload', function() {
+  sessionStorage.setItem('scrollPos', window.scrollY);
+});
+
+window.addEventListener('load', function() {
+  const scrollPos = sessionStorage.getItem('scrollPos');
+  if (scrollPos) {
+    window.scrollTo(0, parseInt(scrollPos));
+    sessionStorage.removeItem('scrollPos');
+  }
+});

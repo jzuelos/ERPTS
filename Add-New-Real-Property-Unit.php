@@ -207,7 +207,7 @@
               throw new Exception("Error preparing FAAS statement: " . $conn->error);
             }
 
-            // ✅ LOG ACTIVITY - Property Added
+            // ✅ LOG ACTIVITY - Property Added (Replace the existing logging section)
             if (isset($_SESSION['user_id'])) {
               $userId = $_SESSION['user_id'];
 
@@ -216,15 +216,17 @@
               $barangayName = getBarangayName($conn, $barangay);
               $districtName = getDistrictName($conn, $district);
 
-              // Build detailed log message
-              $logMessage = "Added new property\n";
+              // Build clean log message (similar to User-Control.php format)
+              $logMessage  = "Added new property\n";
               $logMessage .= "Property ID: $property_id\n\n";
 
               $logMessage .= "Location Details:\n";
               $logMessage .= "• House Number: $house_number\n";
+
               if (!empty($block_number)) {
                 $logMessage .= "• Block Number: $block_number\n";
               }
+
               $logMessage .= "• Municipality: $municipalityName\n";
               $logMessage .= "• District: $districtName\n";
               $logMessage .= "• Barangay: $barangayName\n";
