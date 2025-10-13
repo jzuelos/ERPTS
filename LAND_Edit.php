@@ -798,7 +798,7 @@ echo "<script>
           </div>
 
           <!-- Submit Button -->
-          <input type="submit" name="submit" value="Submit" disabled>
+          <input type="submit" class="btn btn-primary" name="submit" value="Submit" disabled>
 
       </form>
 
@@ -820,189 +820,207 @@ echo "<script>
   </footer>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
+   document.addEventListener("DOMContentLoaded", function() {
 
-      // Set today's date in the date input
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('approvalDate').value = today;
-      document.getElementById('recommendationDate').value = today;
-      document.getElementById('appraisalDate').value = today;
+  // Set today's date in the date input
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('approvalDate').value = today;
+  document.getElementById('recommendationDate').value = today;
+  document.getElementById('appraisalDate').value = today;
 
-      function toggleEdit() {
-        const editButton = document.getElementById('editRPUButton');
-        const inputs = document.querySelectorAll('#rpu-identification-section input, #rpu-identification-section select, #rpu-identification-section textarea');
-
-        // Check current button state to toggle between Edit and Done
-        const isEditing = editButton.textContent.trim() === 'Edit';
-        editButton.textContent = isEditing ? 'Done' : 'Edit';
-
-        // IDs to exclude from being disabled
-        const excludeIds = [
-          "marketValue",
-          "valueAdjustment",
-          "adjustedMarketValue",
-          "assessedValue",
-          "recommendedAssessmentLevel",
-          "recommendedUnitValue"
-        ];
-
-        // Loop through the inputs and enable/disable them based on the button state
-        inputs.forEach(input => {
-          if (excludeIds.includes(input.id)) return; // Skip the excluded inputs
-          input.disabled = !isEditing;
-
-          // Enable/Disable radio buttons
-          if (input.type === 'radio') {
-            input.disabled = !isEditing;
-          }
-        });
-
-        // Focus the first editable input field when starting edit mode
-        if (isEditing) {
-          const firstEditableInput = Array.from(inputs).find(input => !input.disabled);
-          if (firstEditableInput) {
-            firstEditableInput.focus();
-          }
-        }
-      }
-
-
-      // Attach event listener for edit button
-      document.getElementById('editRPUButton').addEventListener('click', toggleEdit);
-
-      // DOM Elements
-      const areaInput = document.getElementById("area");
-      const unitValueInput = document.getElementById("unitValue");
-      const marketValueInput = document.getElementById("marketValue");
-
-      const sqmRadio = document.querySelector("input[name='areaUnit'][value='sqm']");
-      const hectareRadio = document.querySelector("input[name='areaUnit'][value='hectare']");
-
-      const percentAdjustmentInput = document.getElementById("percentAdjustment");
-      const valueAdjustmentInput = document.getElementById("valueAdjustment");
-      const adjustedMarketValueInput = document.getElementById("adjustedMarketValue");
-
-      const assessmentLevelInput = document.getElementById("assessmentLevel");
-      const assessedValueInput = document.getElementById("assessedValue");
-
-      // Utility: Debounce
-      function debounce(func, wait) {
-        let timeout;
-        return function(...args) {
-          clearTimeout(timeout);
-          timeout = setTimeout(() => func.apply(this, args), wait);
-        };
-      }
-
-      // Convert area between sqm and hectare
-      function convertArea() {
-        const raw = areaInput.value.trim();
-        if (raw === '' || isNaN(raw)) {
-          marketValueInput.value = '';
-          return;
-        }
-
-        const val = parseFloat(raw);
-        areaInput.value = hectareRadio.checked ?
-          (val / 10000).toFixed(4) // sqm → ha
-          :
-          (val * 10000).toFixed(2); // ha → sqm
-
-        calculateMarketValue();
-      }
-
-      // Calculate market value = area * unit value
-      function calculateMarketValue() {
-        const area = parseFloat(areaInput.value);
-        const unitValue = parseFloat(unitValueInput.value);
-
-        if (isNaN(area) || isNaN(unitValue)) {
-          clearValues([marketValueInput, valueAdjustmentInput, adjustedMarketValueInput]);
-          return;
-        }
-
-        const marketValue = area * unitValue;
-        marketValueInput.value = marketValue.toFixed(2);
-        calculateAdjustment(marketValue);
-      }
-
-      // Calculate adjustment and adjusted market value
-      function calculateAdjustment(marketValue) {
-        const percent = parseFloat(percentAdjustmentInput.value);
-        if (isNaN(percent)) {
-          clearValues([valueAdjustmentInput, adjustedMarketValueInput]);
-          return;
-        }
-
-        const adjustedValue = marketValue * (percent / 100);
-        const adjustment = adjustedValue - marketValue;
-
-        valueAdjustmentInput.value = formatSigned(adjustment);
-        adjustedMarketValueInput.value = adjustedValue.toFixed(2);
-
-        calculateAssessedValue(); // Recalculate assessed value on adjustment
-      }
-
-      // Calculate assessed value = adjustedMarketValue * (assessmentLevel / 100)
-      function calculateAssessedValue() {
-        const adjustedMarketValue = parseFloat(adjustedMarketValueInput.value.replace(/,/g, '')) || 0;
-        const assessmentLevel = parseFloat(assessmentLevelInput.value) || 0;
-
-        if (!isNaN(adjustedMarketValue) && !isNaN(assessmentLevel) && assessmentLevel > 0) {
-          const assessed = adjustedMarketValue * (assessmentLevel / 100);
-          assessedValueInput.value = assessed.toFixed(2).toLocaleString();
-        } else {
-          assessedValueInput.value = '';
-        }
-      }
-
-      // Visual input validation
-      function validateInputs() {
-        highlightInvalid(areaInput, isNaN(parseFloat(areaInput.value)) || parseFloat(areaInput.value) <= 0);
-        highlightInvalid(unitValueInput, isNaN(parseFloat(unitValueInput.value)) || parseFloat(unitValueInput.value) <= 0);
-      }
-
-      // Helpers
-      function formatSigned(num) {
-        return (num < 0 ? "-" : "") + Math.abs(num).toFixed(2);
-      }
-
-      function clearValues(elements) {
-        elements.forEach(el => el.value = '');
-      }
-
-      function highlightInvalid(input, condition) {
-        input.classList.toggle('is-invalid', condition);
-        input.style.borderColor = condition ? 'red' : '';
-      }
-
-      // Event listeners
-      sqmRadio.addEventListener('change', convertArea);
-      hectareRadio.addEventListener('change', convertArea);
-
-      areaInput.addEventListener('input', debounce(() => {
-        calculateMarketValue();
-        validateInputs();
-      }, 300));
-
-      unitValueInput.addEventListener('input', debounce(() => {
-        calculateMarketValue();
-        validateInputs();
-      }, 300));
-
-      percentAdjustmentInput.addEventListener('input', debounce(() => {
-        const marketValue = parseFloat(marketValueInput.value) || 0;
-        calculateAdjustment(marketValue);
-      }, 300));
-
-      assessmentLevelInput.addEventListener('input', debounce(calculateAssessedValue, 300));
-
-      // Initial run
-      calculateMarketValue();
-      validateInputs();
-
+  // === Auto Calculation Toggle ===
+  let autoCalcEnabled = true;
+  document.querySelectorAll('input[name="autoCalc"]').forEach(radio => {
+    radio.addEventListener('change', function () {
+      autoCalcEnabled = (this.value === 'on');
+      console.log("Auto calculation is", autoCalcEnabled ? "ENABLED" : "DISABLED");
     });
+  });
+
+  function toggleEdit() {
+    const editButton = document.getElementById('editRPUButton');
+    const inputs = document.querySelectorAll('#rpu-identification-section input, #rpu-identification-section select, #rpu-identification-section textarea');
+
+    // Check current button state to toggle between Edit and Done
+    const isEditing = editButton.textContent.trim() === 'Edit';
+    editButton.textContent = isEditing ? 'Done' : 'Edit';
+
+    // IDs to exclude from being disabled
+    const excludeIds = [
+      "marketValue",
+      "valueAdjustment",
+      "adjustedMarketValue",
+      "assessedValue",
+      "recommendedAssessmentLevel",
+      "recommendedUnitValue"
+    ];
+
+    // Loop through the inputs and enable/disable them based on the button state
+    inputs.forEach(input => {
+      if (excludeIds.includes(input.id)) return; // Skip the excluded inputs
+      input.disabled = !isEditing;
+
+      // Enable/Disable radio buttons
+      if (input.type === 'radio') {
+        input.disabled = !isEditing;
+      }
+    });
+
+    // Focus the first editable input field when starting edit mode
+    if (isEditing) {
+      const firstEditableInput = Array.from(inputs).find(input => !input.disabled);
+      if (firstEditableInput) {
+        firstEditableInput.focus();
+      }
+    }
+  }
+
+  // Attach event listener for edit button
+  document.getElementById('editRPUButton').addEventListener('click', toggleEdit);
+
+  // DOM Elements
+  const areaInput = document.getElementById("area");
+  const unitValueInput = document.getElementById("unitValue");
+  const marketValueInput = document.getElementById("marketValue");
+
+  const sqmRadio = document.querySelector("input[name='areaUnit'][value='sqm']");
+  const hectareRadio = document.querySelector("input[name='areaUnit'][value='hectare']");
+
+  const percentAdjustmentInput = document.getElementById("percentAdjustment");
+  const valueAdjustmentInput = document.getElementById("valueAdjustment");
+  const adjustedMarketValueInput = document.getElementById("adjustedMarketValue");
+
+  const assessmentLevelInput = document.getElementById("assessmentLevel");
+  const assessedValueInput = document.getElementById("assessedValue");
+
+  // Utility: Debounce
+  function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  }
+
+  // Convert area between sqm and hectare
+  function convertArea() {
+    if (!autoCalcEnabled) return;
+
+    const raw = areaInput.value.trim();
+    if (raw === '' || isNaN(raw)) {
+      marketValueInput.value = '';
+      return;
+    }
+
+    const val = parseFloat(raw);
+    areaInput.value = hectareRadio.checked ?
+      (val / 10000).toFixed(4) // sqm → ha
+      :
+      (val * 10000).toFixed(2); // ha → sqm
+
+    calculateMarketValue();
+  }
+
+  // Calculate market value = area * unit value
+  function calculateMarketValue() {
+    if (!autoCalcEnabled) return;
+
+    const area = parseFloat(areaInput.value);
+    const unitValue = parseFloat(unitValueInput.value);
+
+    if (isNaN(area) || isNaN(unitValue)) {
+      clearValues([marketValueInput, valueAdjustmentInput, adjustedMarketValueInput]);
+      return;
+    }
+
+    const marketValue = area * unitValue;
+    marketValueInput.value = marketValue.toFixed(2);
+    calculateAdjustment(marketValue);
+  }
+
+  // Calculate adjustment and adjusted market value
+  function calculateAdjustment(marketValue) {
+    if (!autoCalcEnabled) return;
+
+    const percent = parseFloat(percentAdjustmentInput.value);
+    if (isNaN(percent)) {
+      clearValues([valueAdjustmentInput, adjustedMarketValueInput]);
+      return;
+    }
+
+    const adjustedValue = marketValue * (percent / 100);
+    const adjustment = adjustedValue - marketValue;
+
+    valueAdjustmentInput.value = formatSigned(adjustment);
+    adjustedMarketValueInput.value = adjustedValue.toFixed(2);
+
+    calculateAssessedValue(); // Recalculate assessed value on adjustment
+  }
+
+  // Calculate assessed value = adjustedMarketValue * (assessmentLevel / 100)
+  function calculateAssessedValue() {
+    if (!autoCalcEnabled) return;
+
+    const adjustedMarketValue = parseFloat(adjustedMarketValueInput.value.replace(/,/g, '')) || 0;
+    const assessmentLevel = parseFloat(assessmentLevelInput.value) || 0;
+
+    if (!isNaN(adjustedMarketValue) && !isNaN(assessmentLevel) && assessmentLevel > 0) {
+      const assessed = adjustedMarketValue * (assessmentLevel / 100);
+      assessedValueInput.value = assessed.toFixed(2).toLocaleString();
+    } else {
+      assessedValueInput.value = '';
+    }
+  }
+
+  // Visual input validation
+  function validateInputs() {
+    highlightInvalid(areaInput, isNaN(parseFloat(areaInput.value)) || parseFloat(areaInput.value) <= 0);
+    highlightInvalid(unitValueInput, isNaN(parseFloat(unitValueInput.value)) || parseFloat(unitValueInput.value) <= 0);
+  }
+
+  // Helpers
+  function formatSigned(num) {
+    return (num < 0 ? "-" : "") + Math.abs(num).toFixed(2);
+  }
+
+  function clearValues(elements) {
+    elements.forEach(el => el.value = '');
+  }
+
+  function highlightInvalid(input, condition) {
+    input.classList.toggle('is-invalid', condition);
+    input.style.borderColor = condition ? 'red' : '';
+  }
+
+  // Event listeners
+  sqmRadio.addEventListener('change', convertArea);
+  hectareRadio.addEventListener('change', convertArea);
+
+  areaInput.addEventListener('input', debounce(() => {
+    calculateMarketValue();
+    validateInputs();
+  }, 300));
+
+  unitValueInput.addEventListener('input', debounce(() => {
+    calculateMarketValue();
+    validateInputs();
+  }, 300));
+
+  percentAdjustmentInput.addEventListener('input', debounce(() => {
+    const marketValue = parseFloat(marketValueInput.value) || 0;
+    calculateAdjustment(marketValue);
+  }, 300));
+
+  assessmentLevelInput.addEventListener('input', debounce(calculateAssessedValue, 300));
+
+  // Initial run
+  calculateMarketValue();
+  validateInputs();
+
+});
+
   </script>
+
 
 
   <!-- Load External Scripts -->

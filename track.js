@@ -720,8 +720,9 @@ function showDocuments(transactionId) {
               style="width:80px; height:100px; cursor:pointer;"
               onclick="viewDocument('${filePath}', '${fileName}', ${isPdf})">
             <i class="bi bi-file-earmark-pdf text-danger" style="font-size:2rem;"></i>
-          </div>`;
-
+          </div>
+        `;
+        
           wrapper.innerHTML = `
             <div class="d-flex align-items-center justify-content-between w-100">
               ${previewHtml}
