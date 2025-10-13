@@ -457,6 +457,7 @@ if ($result && $result->num_rows > 0) {
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   <script src="track.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <!-- Script for Transaction Table Pagination -->
   <script>

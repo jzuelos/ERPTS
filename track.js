@@ -181,7 +181,48 @@ function closeModal() {
   }
 }
 
-function saveTransaction() {
+// helper: converts an image File to a PDF File using jsPDF
+function imageFileToPdfFile(imageFile) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Failed to read image file'));
+    reader.onload = () => {
+      const imgDataUrl = reader.result; // data:... base64
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const { jsPDF } = window.jspdf;
+          // choose orientation based on image aspect ratio
+          const orientation = img.width > img.height ? 'landscape' : 'portrait';
+          // use points units; pick a page size close to image pixel size (pt ~= px at 72dpi)
+          // For reliable printing, scale to A4 or keep native size — we keep native image size here
+          const pdf = new jsPDF({
+            orientation,
+            unit: 'pt',
+            format: [img.width, img.height]
+          });
+
+          // add the image (use 'JPEG' for jpg/png as well — jsPDF handles PNG)
+          pdf.addImage(imgDataUrl, 'JPEG', 0, 0, img.width, img.height);
+
+          // get blob and wrap as File
+          const blob = pdf.output('blob');
+          const pdfName = imageFile.name.replace(/\.[^/.]+$/, '') + '.pdf';
+          const pdfFile = new File([blob], pdfName, { type: 'application/pdf' });
+          resolve(pdfFile);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      img.onerror = () => reject(new Error('Failed to load image into DOM'));
+      img.src = imgDataUrl;
+    };
+    reader.readAsDataURL(imageFile);
+  });
+}
+
+// make saveTransaction async so we can await conversions
+async function saveTransaction() {
   const t_code = document.getElementById("transactionID").value.trim();
   const t_name = document.getElementById("nameInput").value.trim();
   const t_contact = document.getElementById("contactInput").value.trim();
@@ -203,10 +244,29 @@ function saveTransaction() {
   formData.append("transactionType", transactionType);
   formData.append("t_status", t_status);
 
-  const files = document.getElementById("fileUpload").files;
-  if (files.length > 0) {
-    for (let i = 0; i < files.length; i++) {
-      formData.append("t_file[]", files[i]); // send all files
+  // Handle files: convert images -> PDFs, keep PDFs as-is
+  const inputFiles = document.getElementById("fileUpload").files;
+  if (inputFiles && inputFiles.length > 0) {
+    // process sequentially to avoid huge memory usage; you may parallelize if desired
+    for (let i = 0; i < inputFiles.length; i++) {
+      const f = inputFiles[i];
+      // if it's already a PDF, append straight away
+      if (f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')) {
+        formData.append("t_file[]", f);
+      } else if (f.type.startsWith('image/')) {
+        try {
+          // convert image to PDF File
+          const pdfFile = await imageFileToPdfFile(f);
+          formData.append("t_file[]", pdfFile);
+        } catch (err) {
+          console.error('Failed to convert image to PDF for file', f.name, err);
+          // fallback: append original image if conversion fails
+          formData.append("t_file[]", f);
+        }
+      } else {
+        // other types: append as-is
+        formData.append("t_file[]", f);
+      }
     }
   }
 
@@ -214,35 +274,32 @@ function saveTransaction() {
     formData.append("transaction_id", editId);
   }
 
-  fetch("trackFunctions.php", {  // keep consistent backend
-    method: "POST",
-    body: formData
-  })
-    .then(async (response) => {
-      const text = await response.text();
-      console.log("RAW server response:", text);
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch (e) {
-        throw new Error("Server did not return JSON. Raw: " + text);
-      }
-      return data;
-    })
-    .then((data) => {
-      if (data.success) {
-        alert(editId ? "Transaction updated!" : "Transaction saved!");
-        if (transactionModal) transactionModal.hide();
-        if (typeof loadTransactions === "function") loadTransactions();
-        if (typeof loadActivity === "function") loadActivity(); // refresh activity
-      } else {
-        alert("Error: " + (data.message || "Unknown error"));
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      alert("Something went wrong while saving.");
+  try {
+    const response = await fetch("trackFunctions.php", {
+      method: "POST",
+      body: formData
     });
+    const text = await response.text();
+    console.log("RAW server response:", text);
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      throw new Error("Server did not return JSON. Raw: " + text);
+    }
+
+    if (data.success) {
+      alert(editId ? "Transaction updated!" : "Transaction saved!");
+      if (transactionModal) transactionModal.hide();
+      if (typeof loadTransactions === "function") loadTransactions();
+      if (typeof loadActivity === "function") loadActivity();
+    } else {
+      alert("Error: " + (data.message || "Unknown error"));
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong while saving.");
+  }
 }
 
 function loadTransactions() {
