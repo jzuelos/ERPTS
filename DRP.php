@@ -174,10 +174,10 @@ function formatPin($value)
             <p class="bold">RPA Form NO. 1A</p>
             <p>
                 <span class="bold">Assessment of Real Property No.:</span>
-                <u>_________<?= htmlspecialchars($rpu_data['arp'] ?? 'N/A') ?>_______________</u>
+                <u>_________<?= htmlspecialchars($rpu_data['arp'] ?? 'N/A') ?>_________</u>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <span class="bold">Property Index No.:</span>
-                <u>________<?= isset($rpu_data['pin']) ? formatPin($rpu_data['pin']) : 'N/A' ?>___________</u>
+                <u>_____<?= isset($rpu_data['pin']) ? formatPin($rpu_data['pin']) : 'N/A' ?>_____</u>
         </div>
 
         <div class="section center" style="text-align: center;">

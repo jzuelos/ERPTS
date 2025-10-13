@@ -28,7 +28,11 @@ $user_role = $_SESSION['user_type'] ?? 'user';
  <?php include 'header.php'; ?>
 
  <div class="container mt-4">
-  <a href="Real-Property-Unit-List.php" class="btn btn-outline-secondary btn-sm">
+
+  <?php
+  $p_id = isset($_GET['p_id']) ? htmlspecialchars($_GET['p_id']) : '';
+  ?>
+  <a href="FAAS.php?id=<?=$p_id; ?>" class="btn btn-outline-secondary btn-sm">
     <i class="fas fa-arrow-left"></i> Back
   </a>
 </div>
