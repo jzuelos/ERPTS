@@ -352,7 +352,7 @@ if ($result && $result->num_rows > 0) {
               <small>Accepts JPG, PNG, and PDF format only</small>
               <input type="file" class="form-control" id="fileUpload" name="t_file[]" multiple>
             </div>
-            <button type="button" class="btn btn-info ms-2 mt-4" id="generateQrBtn"
+            <button type="button" class="btn btn-info ms-2 mt-5" id="generateQrBtn"
               title="Generate QR for phone upload">
               <i class="fas fa-qrcode"></i>
             </button>

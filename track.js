@@ -690,7 +690,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// Show Documents
+// Show Documents (Grid + Compact)
 function showDocuments(transactionId) {
   fetch(`trackFunctions.php?action=getDocuments&transaction_id=${transactionId}`)
     .then(res => res.json())
@@ -699,48 +699,43 @@ function showDocuments(transactionId) {
       container.innerHTML = "";
 
       if (!Array.isArray(files) || files.length === 0) {
-        container.innerHTML = "<p>No documents uploaded.</p>";
-      } else {
-        files.forEach(file => {
-          const wrapper = document.createElement("div");
-          wrapper.className = "doc-item mb-3 d-flex align-items-center justify-content-between";
-
-          const filePath = file.file_path;
-          const fileName = file.original_name || filePath.split("/").pop();
-          const isPdf = filePath.toLowerCase().endsWith(".pdf");
-
-          // Truncate file name for display
-          let displayName = fileName.length > 70
-            ? fileName.substring(0, 22) + "..."
-            : fileName;
-
-          // Always show a PDF-style thumbnail, clickable
-          let previewHtml = `
-          <div class="pdf-thumb bg-light border rounded d-flex align-items-center justify-content-center" 
-              style="width:80px; height:100px; cursor:pointer;"
-              onclick="viewDocument('${filePath}', '${fileName}', ${isPdf})">
-            <i class="bi bi-file-earmark-pdf text-danger" style="font-size:2rem;"></i>
-          </div>
-        `;
-        
-          wrapper.innerHTML = `
-            <div class="d-flex align-items-center justify-content-between w-100">
-              ${previewHtml}
-              <div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 mx-3" style="max-width: 300px; overflow: hidden;">
-                <span class="doc-name text-truncate text-center w-100" title="${fileName}">
-                  ${displayName}
-                </span>
-                <small class="text-muted text-center">${file.uploaded_at}</small>
-              </div>
-              <button class="btn btn-sm btn-danger" onclick="deleteDocument(${file.file_id}, ${transactionId})">
-                <i class="fas fa-trash"></i> Delete
-              </button>
-            </div>
-          `;
-
-          container.appendChild(wrapper);
-        });
+        container.innerHTML = "<p class='text-center text-muted my-2'>No documents uploaded.</p>";
+        return;
       }
+
+      // Grid container styles
+      container.className = "d-grid gap-2";
+      container.style.gridTemplateColumns = "repeat(auto-fill, minmax(130px, 1fr))";
+      container.style.gridAutoRows = "1fr";
+
+      files.forEach(file => {
+        const filePath = file.file_path;
+        const fileName = file.original_name || filePath.split("/").pop();
+        const isPdf = filePath.toLowerCase().endsWith(".pdf");
+        const displayName = fileName.length > 30 ? fileName.substring(0, 27) + "…" : fileName;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "doc-item border rounded bg-light text-center p-2 position-relative shadow-sm";
+        wrapper.style.fontSize = "0.85rem";
+
+        wrapper.innerHTML = `
+          <div class="pdf-thumb d-flex align-items-center justify-content-center rounded bg-white border mx-auto mb-1"
+               style="width:70px; height:90px; cursor:pointer;"
+               onclick="viewDocument('${filePath}', '${fileName}', ${isPdf})">
+            <i class="bi bi-file-earmark-pdf text-danger" style="font-size:1.8rem;"></i>
+          </div>
+          <div class="text-truncate fw-semibold" title="${fileName}">${displayName}</div>
+          <small class="text-muted d-block">${file.uploaded_at || ""}</small>
+          <button class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-1 py-0 px-1"
+                  style="font-size:0.75rem;" 
+                  title="Delete" 
+                  onclick="deleteDocument(${file.file_id}, ${transactionId})">
+            <i class="bi bi-x"></i>
+          </button>
+        `;
+
+        container.appendChild(wrapper);
+      });
 
       new bootstrap.Modal(document.getElementById("documentsModal")).show();
     })
@@ -891,39 +886,59 @@ function initActivityTable() {
   renderPagination();
 }
 
+// Update the generateQrFromModal function in track.js
+
 function generateQrFromModal() {
   const t_code = document.getElementById("transactionID").value.trim();
   if (!t_code) {
-    alert("Please save the transaction first.");
+    alert("Please wait for transaction code to generate.");
     return;
   }
 
-  const domain = "https://responsively-interfulgent-thad.ngrok-free.dev/erpts";// Replace with your actual domain
+  // Check if we're in edit mode or add mode
+  const isEditMode = editId !== null;
+
+  if (!isEditMode) {
+    // In ADD mode: warn user to save first
+    const confirmProceed = confirm(
+      "⚠️ IMPORTANT: You haven't saved this transaction yet.\n\n" +
+      "The QR code will work, but files uploaded via QR will only be linked " +
+      "AFTER you save this transaction.\n\n" +
+      "Recommended: Save the transaction first, then generate QR.\n\n" +
+      "Do you want to continue anyway?"
+    );
+
+    if (!confirmProceed) {
+      return;
+    }
+  }
+
+  const domain = "https://responsively-interfulgent-thad.ngrok-free.dev/erpts";
   const uploadUrl = `${domain}/mobile_upload.php?t_code=${encodeURIComponent(t_code)}`;
 
-  //Using api.qrserver.com (stable public QR generator)
   const qrImage = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(uploadUrl)}`;
 
-  //Calculate centered popup position
   const popupWidth = 400;
-  const popupHeight = 450;
+  const popupHeight = 500;
   const left = (window.screen.width / 2) - (popupWidth / 2);
   const top = (window.screen.height / 2) - (popupHeight / 2);
 
-  //Open a centered popup window
   const qrWindow = window.open(
     '',
     'QR Upload',
     `width=${popupWidth},height=${popupHeight},left=${left},top=${top},resizable=no,scrollbars=no,status=no`
   );
 
-  //Build HTML content safely (no document.write)
+  const statusMessage = isEditMode
+    ? `<p>Scan this QR to upload documents for <b>${t_code}</b></p>`
+    : `<p class="warning">⚠️ Save transaction first!<br>Scan to upload for <b>${t_code}</b></p>`;
+
   const htmlContent = `
     <!DOCTYPE html>
     <html lang="en">
       <head>
         <meta charset="UTF-8">
-        <title>QR Upload</title>
+        <title>QR Upload - ${t_code}</title>
         <style>
           body { 
             text-align:center; 
@@ -938,17 +953,25 @@ function generateQrFromModal() {
           }
           h3 { margin-bottom:8px; }
           p { font-size:14px; }
+          .warning {
+            color: #d9534f;
+            font-weight: bold;
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+          }
         </style>
       </head>
       <body>
-        <h3>Scan to Upload</h3>
+        <h3>📱 Scan to Upload</h3>
         <img src="${qrImage}" alt="QR Code">
-        <p>Scan this QR to upload documents for <b>${t_code}</b></p>
+        ${statusMessage}
+        ${!isEditMode ? '<small style="color:#666;">Files will be linked after you save the transaction</small>' : ''}
       </body>
     </html>
   `;
 
-  // ✅ Write the content using DOM methods
   qrWindow.document.open();
   qrWindow.document.write(htmlContent);
   qrWindow.document.close();

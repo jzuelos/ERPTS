@@ -249,27 +249,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $transaction_type = trim($_POST['transactionType'] ?? '');
             $status = trim($_POST['t_status'] ?? '');
 
-            // Generate unique transaction code
-            do {
-                $transaction_code = str_pad(rand(0, 99999), 5, "0", STR_PAD_LEFT);
-                $check = $conn->query("SELECT 1 FROM transactions WHERE transaction_code='$transaction_code' LIMIT 1");
-            } while ($check && $check->num_rows > 0);
+            // Use provided transaction code or generate new one
+            $transaction_code = trim($_POST['t_code'] ?? '');
+            if (empty($transaction_code)) {
+                do {
+                    $transaction_code = str_pad(rand(0, 99999), 5, "0", STR_PAD_LEFT);
+                    $check = $conn->query("SELECT 1 FROM transactions WHERE transaction_code='$transaction_code' LIMIT 1");
+                } while ($check && $check->num_rows > 0);
+            }
 
             $stmt = $conn->prepare("INSERT INTO transactions 
-                (transaction_code, name, contact_number, description, transaction_type, status, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())");
+        (transaction_code, name, contact_number, description, transaction_type, status, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())");
             $stmt->bind_param("ssssss", $transaction_code, $name, $contact, $description, $transaction_type, $status);
 
             if ($stmt->execute()) {
                 $transaction_id = $stmt->insert_id;
-                handleMultipleUploads($transaction_id);
-                logActivity($transaction_id, "Created", "Transaction created", $_SESSION['user_id'], $transaction_code);
-                /* SEND SMS via Semaphore
-                if (!empty($contact) && !empty($description)) {
-                    sendSMS($contact, $description);
-                }*/
 
-                echo json_encode(["success" => true, "message" => "Transaction saved successfully!", "transaction_id" => $transaction_id]);
+                // Handle regular file uploads
+                handleMultipleUploads($transaction_id);
+
+                // ✅ Check for pending QR uploads and link them
+                $pendingDir = __DIR__ . "/uploads/pending_" . $transaction_code . "/";
+                if (is_dir($pendingDir)) {
+                    $uploadDir = __DIR__ . "/uploads/transaction_" . $transaction_id . "/";
+                    if (!file_exists($uploadDir)) {
+                        mkdir($uploadDir, 0777, true);
+                    }
+
+                    $pendingFiles = array_diff(scandir($pendingDir), ['.', '..']);
+                    foreach ($pendingFiles as $file) {
+                        $source = $pendingDir . $file;
+                        $dest = $uploadDir . $file;
+
+                        if (rename($source, $dest)) {
+                            $relativePath = "uploads/transaction_" . $transaction_id . "/" . $file;
+                            $stmtFile = $conn->prepare("INSERT INTO transaction_files (transaction_id, file_path, uploaded_at) VALUES (?, ?, NOW())");
+                            $stmtFile->bind_param("is", $transaction_id, $relativePath);
+                            $stmtFile->execute();
+                        }
+                    }
+                    rmdir($pendingDir);
+                }
+
+                logActivity($transaction_id, "Created", "Transaction created", $_SESSION['user_id'], $transaction_code);
+
+                echo json_encode([
+                    "success" => true,
+                    "message" => "Transaction saved successfully!",
+                    "transaction_id" => $transaction_id
+                ]);
             } else {
                 echo json_encode(["success" => false, "message" => $stmt->error]);
             }
@@ -404,17 +433,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $tx = $result->fetch_assoc();
 
             if (!$tx) {
-                echo json_encode(['success' => false, 'message' => 'Transaction not found.']);
+                // Transaction doesn't exist yet - create pending uploads folder
+                // Files will be linked when transaction is created
+
+                $pendingDir = __DIR__ . "/uploads/pending_" . $t_code . "/";
+                if (!file_exists($pendingDir)) {
+                    mkdir($pendingDir, 0777, true);
+                }
+
+                $successCount = 0;
+                foreach ($_FILES['t_file']['tmp_name'] as $index => $tmpName) {
+                    if (is_uploaded_file($tmpName)) {
+                        $fileName = basename($_FILES['t_file']['name'][$index]);
+                        $targetPath = $pendingDir . time() . "_" . $fileName;
+
+                        if (move_uploaded_file($tmpName, $targetPath)) {
+                            $successCount++;
+                        }
+                    }
+                }
+
+                echo json_encode([
+                    'success' => true,
+                    'message' => "Uploaded $successCount file(s). Files will be linked when transaction is saved.",
+                    'pending' => true
+                ]);
                 exit;
             }
 
+            // Transaction exists - normal flow
             $transaction_id = $tx['transaction_id'];
             $uploadDir = __DIR__ . "/uploads/transaction_" . $transaction_id . "/";
-            if (!file_exists($uploadDir))
+            if (!file_exists($uploadDir)) {
                 mkdir($uploadDir, 0777, true);
+            }
+
+            // Check for pending files and move them
+            $pendingDir = __DIR__ . "/uploads/pending_" . $t_code . "/";
+            if (is_dir($pendingDir)) {
+                $pendingFiles = array_diff(scandir($pendingDir), ['.', '..']);
+                foreach ($pendingFiles as $file) {
+                    $source = $pendingDir . $file;
+                    $dest = $uploadDir . $file;
+
+                    if (rename($source, $dest)) {
+                        $relativePath = "uploads/transaction_" . $transaction_id . "/" . $file;
+                        $stmt = $conn->prepare("INSERT INTO transaction_files (transaction_id, file_path, uploaded_at) VALUES (?, ?, NOW())");
+                        $stmt->bind_param("is", $transaction_id, $relativePath);
+                        $stmt->execute();
+                    }
+                }
+                rmdir($pendingDir);
+            }
 
             $successCount = 0;
-
             foreach ($_FILES['t_file']['tmp_name'] as $index => $tmpName) {
                 if (is_uploaded_file($tmpName)) {
                     $fileName = basename($_FILES['t_file']['name'][$index]);
@@ -423,14 +495,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     if (move_uploaded_file($tmpName, $targetPath)) {
                         $relativePath = "uploads/transaction_" . $transaction_id . "/" . basename($targetPath);
 
-                        // Save file record
                         $stmt = $conn->prepare("INSERT INTO transaction_files (transaction_id, file_path, uploaded_at) VALUES (?, ?, NOW())");
                         $stmt->bind_param("is", $transaction_id, $relativePath);
                         $stmt->execute();
-
-                        // Optional: log activity
-                        logActivity($transaction_id, "Mobile Upload", $relativePath, null, $t_code);
-
                         $successCount++;
                     }
                 }
