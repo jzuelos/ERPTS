@@ -296,7 +296,8 @@ echo "<script>
         Land
       </h4>
       <div>
-
+        <label><input type="radio" name="autoCalc" value="on" checked> Enable Auto Calculation</label>
+        <label class="me-3"><input type="radio" name="autoCalc" value="off" class="ml-3"> Disable Auto Calculation</label>
         <button type="button" id="editRPUButton" class="btn btn-outline-primary btn-sm"
           onclick="toggleEdit()">Edit</button>
       </div>
