@@ -931,7 +931,7 @@ function generateQrFromModal() {
 
   const statusMessage = isEditMode
     ? `<p>Scan this QR to upload documents for <b>${t_code}</b></p>`
-    : `<p class="warning">⚠️ Save transaction first!<br>Scan to upload for <b>${t_code}</b></p>`;
+    : `<p class="warning">It is recommended to save the transaction first.<br>Scan to upload for <b>${t_code}</b></p>`;
 
   const htmlContent = `
     <!DOCTYPE html>
@@ -964,7 +964,7 @@ function generateQrFromModal() {
         </style>
       </head>
       <body>
-        <h3>📱 Scan to Upload</h3>
+        <h3>Scan to Upload</h3>
         <img src="${qrImage}" alt="QR Code">
         ${statusMessage}
         ${!isEditMode ? '<small style="color:#666;">Files will be linked after you save the transaction</small>' : ''}

@@ -549,4 +549,46 @@ if (isset($_GET['action']) && $_GET['action'] === 'getActivity') {
     exit;
 }
 
+/**
+ * Automatically delete "pending_" folders older than 5 minutes.
+ * Call this at the start of trackFunctions.php
+ */
+function cleanupOldPendingFolders()
+{
+    $uploadsDir = __DIR__ . "/uploads/";
 
+    if (!is_dir($uploadsDir)) {
+        return;
+    }
+
+    $folders = scandir($uploadsDir);
+    $fiveMinutesAgo = time() - (5 * 60); // 5 minutes in seconds
+
+    foreach ($folders as $folder) {
+        // Process only folders starting with "pending_"
+        if (strpos($folder, 'pending_') === 0) {
+            $folderPath = $uploadsDir . $folder;
+
+            if (is_dir($folderPath)) {
+                $folderTime = filemtime($folderPath);
+
+                // Delete if older than 5 minutes
+                if ($folderTime < $fiveMinutesAgo) {
+                    // Delete files inside
+                    $files = array_diff(scandir($folderPath), ['.', '..']);
+                    foreach ($files as $file) {
+                        $filePath = $folderPath . '/' . $file;
+                        if (is_file($filePath)) {
+                            unlink($filePath);
+                        }
+                    }
+                    // Remove the folder
+                    rmdir($folderPath);
+                }
+            }
+        }
+    }
+}
+
+// Call this at the beginning of trackFunctions.php (after session_start and database connection)
+cleanupOldPendingFolders();

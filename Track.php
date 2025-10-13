@@ -345,18 +345,33 @@ if ($result && $result->num_rows > 0) {
             <option value="Completed">Completed</option>
           </select>
 
-          <!-- Upload Image Input -->
-          <div class="mb-1 d-flex align-items-center">
-            <div class="flex-grow-1">
-              <label for="fileUpload" class="form-label">Upload Image</label><br>
-              <small>Accepts JPG, PNG, and PDF format only</small>
-              <input type="file" class="form-control" id="fileUpload" name="t_file[]" multiple>
+          <!-- Upload or Scan Section -->
+          <div class="d-flex align-items-center mb-3">
+            <!-- File Upload (center contents vertically) -->
+            <div class="flex-grow-3 d-flex flex-column justify-content-center pe-3">
+              <label for="fileUpload" class="form-label fw-semibold mb-1">Upload Image or PDF</label>
+              <small class="text-muted d-block mb-2">Accepts JPG, PNG, and PDF format only</small>
+              <input type="file" class="form-control" id="fileUpload" name="t_file[]" accept=".jpg,.jpeg,.png,.pdf"
+                multiple>
             </div>
-            <button type="button" class="btn btn-info ms-2 mt-5" id="generateQrBtn"
-              title="Generate QR for phone upload">
-              <i class="fas fa-qrcode"></i>
-            </button>
+
+            <!-- Separator -->
+            <div class="separator mx-3"></div>
+            
+            <!-- QR Button (centered vertically) -->
+            <div class="ps-3 d-flex flex-column align-items-center justify-content-center">
+              <label class="form-label fw-semibold mb-2 text-center">Upload Image or PDF using Mobile</label>
+              <small class="text-muted">Click the button to generate QR code for your mobile device.</small>
+              <button type="button"
+                class="btn btn-info d-flex align-items-center justify-content-center gap-2 px-3 py-2" id="generateQrBtn"
+                title="Generate QR for phone upload">
+                <i class="fas fa-qrcode" style="font-size:1.3rem;"></i>
+                <span style="font-size:0.9rem;">Scan QR</span>
+              </button>
+            </div>
           </div>
+
+
         </div>
 
         <!-- Footer -->

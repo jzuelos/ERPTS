@@ -114,7 +114,7 @@ if (!$t_code)
         const fullImage = document.getElementById('fullPreviewImage');
         let selectedFiles = [];
 
-        // ✅ Preview only images
+        //Preview only images
         fileInput.addEventListener('change', () => {
             previewContainer.innerHTML = '';
             selectedFiles = Array.from(fileInput.files);
@@ -133,7 +133,7 @@ if (!$t_code)
             });
         });
 
-        // ✅ Convert a single image to a full-page fitted PDF
+        //Convert a single image to a full-page fitted PDF
         async function convertImageToPdf(file) {
             const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
 
@@ -182,7 +182,7 @@ if (!$t_code)
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!selectedFiles.length) {
-                statusEl.textContent = '⚠️ Please select at least one file.';
+                statusEl.textContent = '⚠️Please select at least one file.';
                 return;
             }
 
@@ -210,7 +210,7 @@ if (!$t_code)
                 const data = JSON.parse(text);
 
                 if (data.success) {
-                    statusEl.innerHTML = '✅ Uploaded successfully! Closing...';
+                    statusEl.innerHTML = 'Uploaded, closing...';
                     form.reset();
                     previewContainer.innerHTML = '';
                     selectedFiles = [];
@@ -220,10 +220,10 @@ if (!$t_code)
                         window.location.href = "about:blank";
                     }, 1500);
                 } else {
-                    statusEl.innerHTML = '❌ Error: ' + (data.message || 'Upload failed.');
+                    statusEl.innerHTML = 'Error: ' + (data.message || 'Upload failed.');
                 }
             } catch (err) {
-                statusEl.innerHTML = '❌ Unexpected error: ' + err.message;
+                statusEl.innerHTML = 'Unexpected error: ' + err.message;
             }
         });
     </script>
