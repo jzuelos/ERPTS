@@ -8,9 +8,9 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // Prevent the browser from caching this page
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0"); // Instruct the browser not to store or cache the page
-header("Cache-Control: post-check=0, pre-check=0", false); // Additional caching rules to prevent the page from being reloaded from cache
-header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibility
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 
 // Display all errors for debugging
 error_reporting(E_ALL);
@@ -25,44 +25,198 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
+/**
+ * Function to log activity
+ */
+function logActivity($conn, $userId, $action)
+{
+  $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action) VALUES (?, ?)");
+  $stmt->bind_param("is", $userId, $action);
+  $stmt->execute();
+  $stmt->close();
+}
+
+/**
+ * Helper function to get municipality name
+ */
+function getMunicipalityName($conn, $m_id)
+{
+  if (empty($m_id)) return 'None';
+  $stmt = $conn->prepare("SELECT m_description FROM municipality WHERE m_id = ?");
+  $stmt->bind_param("i", $m_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $row = $result->fetch_assoc();
+  $stmt->close();
+  return $row ? $row['m_description'] : "ID: $m_id";
+}
+
+/**
+ * Helper function to get district name
+ */
+function getDistrictName($conn, $district_id)
+{
+  if (empty($district_id)) return 'None';
+  $stmt = $conn->prepare("SELECT description FROM district WHERE district_id = ?");
+  $stmt->bind_param("i", $district_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $row = $result->fetch_assoc();
+  $stmt->close();
+  return $row ? $row['description'] : "ID: $district_id";
+}
+
+/**
+ * Helper function to get barangay name
+ */
+function getBarangayName($conn, $brgy_id)
+{
+  if (empty($brgy_id)) return 'None';
+  $stmt = $conn->prepare("SELECT brgy_name FROM brgy WHERE brgy_id = ?");
+  $stmt->bind_param("i", $brgy_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $row = $result->fetch_assoc();
+  $stmt->close();
+  return $row ? $row['brgy_name'] : "ID: $brgy_id";
+}
+
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   // Sanitize and retrieve form data
   $firstName = filter_input(INPUT_POST, 'firstName', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
   $middleName = filter_input(INPUT_POST, 'middleName', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
   $surname = filter_input(INPUT_POST, 'surname', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+  $birthday = filter_input(INPUT_POST, 'birthday', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
   $tinNumber = filter_input(INPUT_POST, 'tinNumber', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-  $houseNumber = filter_input(INPUT_POST, 'houseNumber', FILTER_SANITIZE_NUMBER_INT);
-  $street = filter_input(INPUT_POST, 'street', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-  $barangay = filter_input(INPUT_POST, 'barangay', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-  $district = filter_input(INPUT_POST, 'district', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
   $city = filter_input(INPUT_POST, 'city', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+  
+  // Optional address fields - set empty string if not provided
+  $barangay = filter_input(INPUT_POST, 'barangay', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+  $barangay = $barangay ?: ''; // Use empty string if null
+  
+  $district = filter_input(INPUT_POST, 'district', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+  $district = $district ?: ''; // Use empty string if null
+  
   $province = filter_input(INPUT_POST, 'province', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+  $province = $province ?: ''; // Use empty string if null
+  
+  $streetHouse = filter_input(INPUT_POST, 'streetHouse', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+  $streetHouse = $streetHouse ?: ''; // Use empty string if null
 
   // Optional fields for owner information
   $telephone = filter_input(INPUT_POST, 'telephone', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+  $telephone = $telephone ?: ''; // Use empty string if null
+  
   $fax = filter_input(INPUT_POST, 'fax', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+  $fax = $fax ?: ''; // Use empty string if null
+  
   $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+  $email = $email ?: ''; // Use empty string if null
+  
   $website = filter_input(INPUT_POST, 'website', FILTER_SANITIZE_URL);
+  $website = $website ?: ''; // Use empty string if null
 
   // Format optional owner information
   $ownInfo = "Telephone: $telephone, Fax: $fax, Email: $email, Website: $website";
 
   // Prepare and execute insert statement
-  if ($firstName && $surname && $tinNumber && $houseNumber && $city && $province) {
-    $stmt = $conn->prepare("INSERT INTO owners_tb (own_fname, own_mname, own_surname, tin_no, house_no, street, barangay, district, city, province, own_info) 
-                              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+  if ($firstName && $surname && $tinNumber && $city) {
+    // Note: Using streetHouse for both house_no and street since they're combined in one field
+    $stmt = $conn->prepare("INSERT INTO owners_tb (own_fname, own_mname, own_surname, date_birth, tin_no, house_no, street, barangay, district, city, province, own_info) 
+                              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
     if ($stmt) {
-      // Bind parameters
-      $stmt->bind_param("sssssssssss", $firstName, $middleName, $surname, $tinNumber, $houseNumber, $street, $barangay, $district, $city, $province, $ownInfo);
+      // Bind parameters - using streetHouse for both house_no and street
+      $stmt->bind_param("ssssssssssss", $firstName, $middleName, $surname, $birthday, $tinNumber, $streetHouse, $streetHouse, $barangay, $district, $city, $province, $ownInfo);
 
       // Execute the statement
       if ($stmt->execute()) {
+        $owner_id = $stmt->insert_id; // Get the newly inserted owner ID
+
+        // ✅ LOG ACTIVITY - Owner Added
+        if (isset($_SESSION['user_id'])) {
+          $userId = $_SESSION['user_id'];
+          
+          // Get readable names for location (only if IDs are provided)
+          $municipalityName = !empty($city) ? getMunicipalityName($conn, $city) : 'None';
+          $barangayName = !empty($barangay) ? getBarangayName($conn, $barangay) : 'None';
+          $districtName = !empty($district) ? getDistrictName($conn, $district) : 'None';
+          
+          // Build full name
+          $fullName = trim("$firstName $middleName $surname");
+          
+          // Build detailed log message
+          $logMessage  = "Added new property owner\n";
+          $logMessage .= "Owner ID: $owner_id\n";
+          $logMessage .= "Name: $fullName\n\n";
+          
+          $logMessage .= "Personal Information:\n";
+          $logMessage .= "• First Name: $firstName\n";
+          if (!empty($middleName)) {
+            $logMessage .= "• Middle Name: $middleName\n";
+          }
+          $logMessage .= "• Surname: $surname\n";
+          if (!empty($birthday)) {
+            $logMessage .= "• Birthday: $birthday\n";
+          }
+          $logMessage .= "• TIN Number: $tinNumber\n";
+          
+          $logMessage .= "\nAddress Details:\n";
+          $logMessage .= "• Municipality: $municipalityName\n";
+          if (!empty($district)) {
+            $logMessage .= "• District: $districtName\n";
+          }
+          if (!empty($barangay)) {
+            $logMessage .= "• Barangay: $barangayName\n";
+          }
+          if (!empty($streetHouse)) {
+            $logMessage .= "• Street/House: $streetHouse\n";
+          }
+          
+          // Add optional contact information if provided
+          $hasContactInfo = false;
+          $contactInfo = "\nContact Information:\n";
+          
+          if (!empty($telephone)) {
+            $contactInfo .= "• Telephone: $telephone\n";
+            $hasContactInfo = true;
+          }
+          if (!empty($fax)) {
+            $contactInfo .= "• Fax: $fax\n";
+            $hasContactInfo = true;
+          }
+          if (!empty($email)) {
+            $contactInfo .= "• Email: $email\n";
+            $hasContactInfo = true;
+          }
+          if (!empty($website)) {
+            $contactInfo .= "• Website: $website\n";
+            $hasContactInfo = true;
+          }
+          
+          if ($hasContactInfo) {
+            $logMessage .= $contactInfo;
+          }
+          
+          // Save to activity log
+          logActivity($conn, $userId, $logMessage);
+        }
+
         $_SESSION['message'] = "Property owner added successfully!";
         header("Location: " . $_SERVER['PHP_SELF']);
         exit;
       } else {
+        // ✅ LOG FAILED ATTEMPT
+        if (isset($_SESSION['user_id'])) {
+          $userId = $_SESSION['user_id'];
+          $logMessage  = "Failed to add property owner\n";
+          $logMessage .= "Error: " . $stmt->error . "\n";
+          $logMessage .= "Attempted name: $firstName $surname";
+          
+          logActivity($conn, $userId, $logMessage);
+        }
+        
         echo "<p>Error: " . $stmt->error . "</p>";
       }
       $stmt->close();
@@ -229,10 +383,10 @@ $barangays_json = json_encode($barangays);
             </select>
           </div>
 
-          <!-- Street / House Number -->
+          <!-- Street / House Number - Made optional -->
           <div class="col-md-3 mb-3">
-            <label for="streetHouse"><span class="text-danger">*</span> Street / House No.</label>
-            <input type="text" class="form-control" id="streetHouse" name="streetHouse" placeholder="Enter Street / House No." required>
+            <label for="streetHouse">Street / House No.</label>
+            <input type="text" class="form-control" id="streetHouse" name="streetHouse" placeholder="Enter Street / House No.">
           </div>
         </div>
 
