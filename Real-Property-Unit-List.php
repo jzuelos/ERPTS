@@ -29,10 +29,10 @@ $sql = "SELECT
   p.p_id,
   p.street,
   p.block_no,
-  p.barangay,
-  p.province,
-  p.city,
-  p.district,
+  b.brgy_name AS barangay_name,
+  d.description AS district_name,
+  m.m_description AS municipality_name,
+  pr.province_name AS province_name,
   p.land_area,
   p.is_active,
   GROUP_CONCAT(DISTINCT CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname) SEPARATOR ' / ') AS owner
@@ -40,12 +40,19 @@ FROM p_info p
 LEFT JOIN faas f 
   ON f.pro_id = p.p_id
 LEFT JOIN propertyowner po 
-  ON po.property_id = p.p_id AND po.is_retained = 1   -- ✅ Only current owners
+  ON po.property_id = p.p_id AND po.is_retained = 1
 LEFT JOIN owners_tb o 
   ON o.own_id = po.owner_id
+LEFT JOIN brgy b 
+  ON p.barangay = b.brgy_id
+LEFT JOIN district d 
+  ON p.district = d.district_id
+LEFT JOIN municipality m 
+  ON p.city = m.m_id
+LEFT JOIN province pr 
+  ON p.province = pr.province_id
 GROUP BY p.p_id
-ORDER BY p.p_id DESC
-";
+ORDER BY p.p_id DESC";
 
 $propertyUnits = [];
 $result = $conn->query($sql);
@@ -123,10 +130,10 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
           <div class="col-10 col-sm-6 col-md-4 col-lg-4 mb-2 mb-md-0">
             <div class="d-flex">
               <!-- Dropdown -->
-        <select class="form-select me-3 w-50" id="barangayDropdown" name="barangay">
-          <option value="" disabled selected hidden>Select Barangay</option>
-          <?php echo $barangayOptions; ?>
-        </select>
+              <select class="form-select me-3 w-50" id="barangayDropdown" name="barangay">
+                <option value="" disabled selected hidden>Select Barangay</option>
+                <?php echo $barangayOptions; ?>
+              </select>
 
               <!-- Button -->
               <button type="button" class="btn btn-success" onclick="filterTable()">Search</button>
@@ -161,7 +168,7 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
                   <td><?= htmlspecialchars($unit['p_id']) ?></td>
                   <td><?= htmlspecialchars($owner) ?></td>
                   <td>
-                    <?= htmlspecialchars("{$unit['street']}, {$unit['barangay']}, {$unit['city']}, {$unit['province']}") ?>
+                    <?= htmlspecialchars("{$unit['street']}, {$unit['barangay_name']}, {$unit['municipality_name']}, {$unit['province_name']}") ?>
                   </td>
                   <td><?= htmlspecialchars($unit['land_area']) ?></td>
                   <td><a href="FAAS.php?id=<?= htmlspecialchars($unit['p_id']) ?>" class="btn btn-primary">EDIT</a></td>
@@ -342,22 +349,22 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
   </script>
 
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-<!-- Initialize -->
-<script>
-$(document).ready(function() {
-  $('#barangayDropdown').select2({
-    placeholder: "Select Barangay",
-    width: '50%'
-  });
-});
-</script>
+  <!-- Initialize -->
+  <script>
+    $(document).ready(function() {
+      $('#barangayDropdown').select2({
+        placeholder: "Select Barangay",
+        width: '50%'
+      });
+    });
+  </script>
 
 
-  <script src="http://localhost/ERPTS/Real-Property-Unit-List.js"></script>  
-</body> 
+  <script src="http://localhost/ERPTS/Real-Property-Unit-List.js"></script>
+</body>
 
 </html>
