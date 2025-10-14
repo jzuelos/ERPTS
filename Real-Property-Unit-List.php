@@ -24,15 +24,14 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch property units along with their owners, sorted by latest ID first
 $sql = "SELECT 
   p.p_id,
   p.street,
   p.block_no,
-  b.brgy_name AS barangay_name,
-  d.description AS district_name,
-  m.m_description AS municipality_name,
-  pr.province_name AS province_name,
+  p.barangay AS barangay_name,
+  p.district AS district_name,
+  p.city AS municipality_name,
+  p.province AS province_name,
   p.land_area,
   p.is_active,
   GROUP_CONCAT(DISTINCT CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname) SEPARATOR ' / ') AS owner
@@ -43,16 +42,9 @@ LEFT JOIN propertyowner po
   ON po.property_id = p.p_id AND po.is_retained = 1
 LEFT JOIN owners_tb o 
   ON o.own_id = po.owner_id
-LEFT JOIN brgy b 
-  ON p.barangay = b.brgy_id
-LEFT JOIN district d 
-  ON p.district = d.district_id
-LEFT JOIN municipality m 
-  ON p.city = m.m_id
-LEFT JOIN province pr 
-  ON p.province = pr.province_id
 GROUP BY p.p_id
 ORDER BY p.p_id DESC";
+
 
 $propertyUnits = [];
 $result = $conn->query($sql);
@@ -163,7 +155,7 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
                 $ownerRaw = isset($unit['owner']) ? $unit['owner'] : '';
                 $owner = trim((string) $ownerRaw) !== '' ? $ownerRaw : 'None';
                 $rowClass = ($unit['is_active'] == 0) ? 'table-secondary' : ''; // highlight inactive
-              ?>
+                ?>
                 <tr class="<?= $rowClass ?>">
                   <td><?= htmlspecialchars($unit['p_id']) ?></td>
                   <td><?= htmlspecialchars($owner) ?></td>
@@ -317,7 +309,7 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
       tableBody.innerHTML = '';
       var propertyUnits = <?php echo json_encode($propertyUnits); ?>;
 
-      propertyUnits.forEach(function(unit) {
+      propertyUnits.forEach(function (unit) {
         var row = `<tr>
                 <td>${unit.p_id}</td>
                 <td>${unit.owner}</td>
@@ -334,11 +326,11 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
       var searchQuery = document.getElementById("modalSearchInput").value.toLowerCase();
       var tableRows = document.getElementById("modalTableBody").getElementsByTagName("tr");
 
-      Array.from(tableRows).forEach(function(row) {
+      Array.from(tableRows).forEach(function (row) {
         var cells = row.getElementsByTagName("td");
         var matchFound = false;
 
-        Array.from(cells).forEach(function(cell) {
+        Array.from(cells).forEach(function (cell) {
           if (cell.innerText.toLowerCase().includes(searchQuery)) {
             matchFound = true;
           }
@@ -355,7 +347,7 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
 
   <!-- Initialize -->
   <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
       $('#barangayDropdown').select2({
         placeholder: "Select Barangay",
         width: '50%'
