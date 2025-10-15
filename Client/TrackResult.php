@@ -57,123 +57,30 @@ if (isset($_GET['id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Track and Trace Result</title>
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="result.css">
-    <style>
-        /* Timeline container */
-        .timeline-step {
-            position: relative;
-            padding-left: 50px;
-            margin: 30px 0;
-            font-family: "Segoe UI", Tahoma, sans-serif;
-        }
+    <link rel="stylesheet" href="tracktimeline.css">
 
-        /* Vertical line */
-        .timeline-step::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 24px;
-            width: 3px;
-            height: 100%;
-            background: #e0e0e0;
-            z-index: 1;
-        }
-
-        /* Step circle */
-        .timeline-step::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 15px;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #bbb;
-            border: 3px solid #fff;
-            z-index: 2;
-            box-shadow: 0 0 0 2px #bbb;
-        }
-
-        /* Completed steps */
-        .timeline-step.completed::before {
-            background: #4caf50;
-        }
-
-        .timeline-step.completed::after {
-            background: #4caf50;
-            box-shadow: 0 0 0 2px #4caf50;
-        }
-
-        /* Active step */
-        .timeline-step.active::before {
-            background: #FFD700;
-        }
-
-        .timeline-step.active::after {
-            background: #FFD700;
-            box-shadow: 0 0 0 5px rgba(255, 215, 0, 0.5);
-            animation: pulse 1.5s infinite;
-        }
-
-        /* Upcoming step */
-        .timeline-step.upcoming::before {
-            background: #ccc;
-        }
-
-        .timeline-step.upcoming::after {
-            background: #ccc;
-            box-shadow: 0 0 0 2px #ccc;
-        }
-
-        /* Text beside step */
-        .step-title {
-            font-weight: 600;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .step-date {
-            display: block;
-            margin-left: 5px;
-            color: #777;
-            font-size: 13px;
-        }
-
-        /* Received date */
-        .received-date-title {
-            font-weight: 600;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .received-date-value {
-            margin-left: 10px;
-            color: #777;
-            font-size: 14px;
-        }
-
-        /* Pulse animation for active */
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
-            }
-
-            70% {
-                box-shadow: 0 0 0 15px rgba(255, 215, 0, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
-            }
-        }
-    </style>
 </head>
 
 <body>
     <div class="container">
-        <div class="header">
-            <h1>Track and Trace &gt; Result</h1>
-        </div>
+<div class="header d-flex justify-content-between align-items-center flex-wrap mb-3">
+  <!-- Back Button -->
+  <a href="Track.php" class="btn btn-secondary btn-sm">
+    <i class="fas fa-arrow-left me-1"></i> Back
+  </a>
+
+  <!-- Responsive Title -->
+  <h1 class="m-0 text-success fw-semibold text-end text-wrap 
+             fs-6 fs-sm-5 fs-md-4 fs-lg-4 fs-xl-3">
+    Track and Trace &gt; Result
+  </h1>
+</div>
+
+
 
         <div class="order-id">
             Transaction Code: <?php echo htmlspecialchars($transaction['transaction_code']); ?>
@@ -321,6 +228,8 @@ if (isset($_GET['id'])) {
         </div>
 
     </div>
+
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
