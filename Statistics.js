@@ -1,7 +1,7 @@
-const ctx1 = document.getElementById('propertyChart').getContext('2d');
+  const ctx1 = document.getElementById('propertyChart').getContext('2d');
   const ctx2 = document.getElementById('userChart').getContext('2d');
   const ctx3 = document.getElementById('auditChart').getContext('2d');
-
+  
   //Plugins
   // White BG
 const whiteBackground = {
@@ -38,88 +38,95 @@ const addDatePlugin = {
 };
 
 
-// Property Statistics (Line Chart)
-let propertyChart = new Chart(ctx1, {
-  type: 'line',
-  data: {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-    datasets: [
-      {
-        label: 'Land',
-        data: [12, 15, 10, 18, 20, 25, 22],
-        borderColor: 'rgba(75,192,192,1)',
-        backgroundColor: 'rgba(75,192,192,0.2)',
-        fill: true,
-        tension: 0.3
-      },
-      {
-        label: 'Plant/Trees',
-        data: [8, 12, 9, 14, 16, 18, 15],
-        borderColor: 'rgba(255,159,64,1)',
-        backgroundColor: 'rgba(255,159,64,0.2)',
-        fill: true,
-        tension: 0.3
-      },
-      {
-        label: 'Machineries',
-        data: [5, 7, 6, 10, 12, 9, 11],
-        borderColor: 'rgba(153,102,255,1)',
-        backgroundColor: 'rgba(153,102,255,0.2)',
-        fill: true,
-        tension: 0.3
-      },
-      {
-        label: 'Building',
-        data: [20, 22, 18, 25, 28, 30, 27],
-        borderColor: 'rgba(255,99,132,1)',
-        backgroundColor: 'rgba(255,99,132,0.2)',
-        fill: true,
-        tension: 0.3
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: { position: 'top' },
-      title: {
-        display: true,
-        text: 'Property Statistics',
-        font: { size: 18, weight: 'bold' }
-      }
-    }
-  },
-  plugins: [whiteBackground, addDatePlugin],
-});
-
-// User Activity (Bar Chart)
-let userChart = new Chart(ctx2, {
-  type: 'bar',
-  data: {
-    labels: ['Users', 'Transaction Logs', 'Login Counts', 'Transactions Done'],
-    datasets: [{
-      label: 'User Activity',
-      data: [120, 300, 450, 280],
-      backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0']
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: { display: false },
-      title: {
-        display: true,
-        text: 'User Activity',
-        font: { size: 18, weight: 'bold' }
+ // Property Statistics (Line Chart)
+  let propertyChart = new Chart(ctx1, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+      datasets: [
+        {
+          label: 'Land',
+          data: [totalLand, totalLand + 2, totalLand - 1, totalLand + 3, totalLand + 1, totalLand + 4, totalLand + 2],
+          borderColor: 'rgba(75,192,192,1)',
+          backgroundColor: 'rgba(75,192,192,0.2)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Plant/Trees',
+          data: [8, 12, 9, 14, 16, 18, 15], // dummy
+          borderColor: 'rgba(255,159,64,1)',
+          backgroundColor: 'rgba(255,159,64,0.2)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Machineries',
+          data: [totalMachineries, totalMachineries + 1, totalMachineries - 1, totalMachineries + 3, totalMachineries, totalMachineries + 2, totalMachineries - 2],
+          borderColor: 'rgba(153,102,255,1)',
+          backgroundColor: 'rgba(153,102,255,0.2)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Building',
+          data: [20, 22, 18, 25, 28, 30, 27], // dummy
+          borderColor: 'rgba(255,99,132,1)',
+          backgroundColor: 'rgba(255,99,132,0.2)',
+          fill: true,
+          tension: 0.3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' },
+        title: {
+          display: true,
+          text: 'Property Statistics',
+          font: { size: 18, weight: 'bold' }
+        }
       }
     },
-    scales: {
-      y: { beginAtZero: true, title: { display: true, text: 'Count' } }
-    }
-  },
-  plugins: [whiteBackground, addDatePlugin]
-});
+    plugins: [whiteBackground, addDatePlugin],
+  });
 
+  const userChart = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: activityLabels,
+      datasets: [{
+        label: 'User Activity',
+        data: activityData,
+        backgroundColor: [
+          '#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0',
+          '#9966FF', '#FF9F40', '#C9CBCF', '#FFB6C1',
+          '#8AFF8A', '#B19CD9'
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        title: {
+          display: true,
+          text: 'User Activity',
+          font: { size: 18, weight: 'bold' }
+        }
+      },
+      scales: {
+        y: { 
+          beginAtZero: true, 
+          title: { display: true, text: 'Count' } 
+        },
+        x: { title: { display: true, text: 'Users' } }
+      }
+    },
+    plugins: [whiteBackground, addDatePlugin]
+  });
+  
 // Audit Trail (Bar Chart)
 let auditChart = new Chart(ctx3, {
   type: 'bar',
