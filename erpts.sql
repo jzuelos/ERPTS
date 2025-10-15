@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 13, 2025 at 08:27 PM
+-- Generation Time: Oct 15, 2025 at 11:54 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -79,7 +79,16 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (38, 9, 'Logged in to the system', '2025-10-13 14:36:24'),
 (39, 9, 'Logged in to the system', '2025-10-13 15:15:13'),
 (40, 9, 'Logged out of the system', '2025-10-13 15:25:47'),
-(41, 9, 'Logged out of the system', '2025-10-13 18:27:18');
+(41, 9, 'Logged out of the system', '2025-10-13 18:27:18'),
+(42, 9, 'Logged in to the system', '2025-10-14 16:14:08'),
+(43, 9, 'Added new property\nProperty ID: 161\n\nLocation Details:\n• House Number: 432\n• Municipality: Paracale\n• District: District 1\n• Barangay: Mangkasay\n\nProperty Details:\n• Land Area: 543 sq.m\n• Documents: affidavit, barangay\n\nAssociated Owners (1):\n• Jose Cruz (ID: 4)\n\nFAAS record created for this property.', '2025-10-14 17:17:40'),
+(44, 9, 'Failed to add property\nError: Column \'province\' cannot be null\nAttempted location: House #423, Municipality ID: Jose Panganiban', '2025-10-14 17:38:15'),
+(45, 9, 'Failed to add property\nError: Column \'province\' cannot be null\nAttempted location: House #423, Municipality: Jose Panganiban', '2025-10-14 17:42:23'),
+(46, 9, 'Failed to add property\nError: Column \'province\' cannot be null\nAttempted location: House #423, Municipality: Jose Panganiban', '2025-10-14 17:43:29'),
+(47, 9, 'Failed to add property\nError: Column \'province\' cannot be null\nAttempted location: House #423, Municipality ID: Jose Panganiban', '2025-10-14 17:43:49'),
+(48, 9, 'Failed to add property\nError: Column \'province\' cannot be null\nAttempted location: House #423, Municipality ID: Jose Panganiban', '2025-10-14 17:44:24'),
+(49, 9, 'Logged in to the system', '2025-10-15 03:58:29'),
+(50, 9, 'Added new property\nProperty ID: 162\n\nLocation Details:\n• House Number: 432\n• Municipality: ID: Talisay\n• District: District 2\n• Barangay: ID: Gabon\n\nProperty Details:\n• Land Area: 532 sq.m\n• Documents: barangay\n\nAssociated Owners (1):\n• Jose Cruz (ID: 4)\n\nFAAS record created for this property.', '2025-10-15 06:50:06');
 
 -- --------------------------------------------------------
 
@@ -518,7 +527,8 @@ INSERT INTO `faas` (`faas_id`, `pro_id`, `rpu_idno`) VALUES
 (33, 144, 46),
 (36, 147, 62),
 (42, 156, 63),
-(43, 157, NULL);
+(43, 157, 64),
+(47, 162, NULL);
 
 -- --------------------------------------------------------
 
@@ -570,8 +580,7 @@ CREATE TABLE `land` (
 INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `north`, `east`, `south`, `west`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`, `adjust_factor`, `adjust_percent`, `adjust_value`, `adjust_mv`, `assess_lvl`, `assess_value`, `faas_id`, `created_at`, `updated_at`) VALUES
 (55, '12345', '42322', 'Lot 15', 'Barangay Road', 'Rice Field', 'River', 'Bounded by residential and agricultural lands', 'Cruz', 'Juan', 'Dela', '09345678901', 'juan.cruz@example.com', 'Rizal Street', 'Kalamunding', 'District 1', 'Daet', 'Camarines Norte', 'Residential lot with improvements', 'Agricultural', '', 23, 'SC', 20.00, 460.00, 'Depreciation', 17.00, -381.80, 78.20, 20.00, 15.64, 33, '2025-08-27 16:41:18', '2025-09-20 08:44:08'),
 (56, '1234', '3412', 'Lot 22', 'Barangay Road', 'Vacant Lot', 'Riverbank', 'Commercial property near public market', 'Reyes', 'Maria', 'Lopez', '09181234567', 'maria.reyes@example.com', 'Mabini Street', 'Gahon', 'District 2', 'Daet', 'Camarines Norte', 'Commercial lot', 'Commercial', 'Business Establishment', 432, 'Commercial', 34.00, 14688.00, 'Standard', 0.00, 0.00, 14688.00, 34.00, 4993.92, 33, '2025-08-27 16:41:18', '2025-09-09 14:40:08'),
-(61, '56789', '98765', 'Main Road', 'Creek', 'Farm Lot', 'River', 'Bounded by creek and residential area', 'Villanueva', 'Carlos', 'M.', '09171234567', 'carlos.villanueva@example.com', 'Purok 5, Rizal Street', 'Lag-on', 'District 4', 'Daet', 'Camarines Norte', 'Agricultural lot used for coconut plantation', 'Agricultural', 'Coconut Farm', 1200, 'Agricultural', 50.00, 60000.00, 'Depreciation', 10.00, -6000.00, 54000.00, 40.00, 21600.00, 43, '2025-10-10 16:04:03', '2025-10-10 16:04:03'),
-(62, '67890', '11223', 'Lot 7', 'Barangay Road', 'Vacant Lot', 'River', 'Bounded by commercial and residential properties', 'Dela Cruz', 'Ana', 'Ramos', '09193456789', 'ana.delacruz@example.com', 'Quezon Avenue', 'Magpakumbaba', 'District 3', 'Daet', 'Camarines Norte', 'Commercial lot beside the municipal hall', 'Commercial', 'Office Space', 350, 'Commercial', 45.00, 15750.00, 'Standard', 0.00, 0.00, 15750.00, 40.00, 6300.00, 36, '2025-10-11 10:30:00', '2025-10-11 10:30:00');
+(61, '56789', '98765', 'Main Road', 'Creek', 'Farm Lot', 'River', 'Bounded by creek and residential area', 'Villanueva', 'Carlos', 'M.', '09171234567', 'carlos.villanueva@example.com', 'Purok 5, Rizal Street', 'Lag-on', 'District 4', 'Daet', 'Camarines Norte', 'Agricultural lot used for coconut plantation', 'Agricultural', 'Coconut Farm', 1200, 'Agricultural', 50.00, 60000.00, 'Depreciation', 10.00, -6000.00, 54000.00, 40.00, 21600.00, 43, '2025-10-10 16:04:03', '2025-10-10 16:04:03');
 
 -- --------------------------------------------------------
 
@@ -751,7 +760,9 @@ INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`, 
 (78, 144, 10, 0, '2025-09-24 00:51:05', 9),
 (79, 144, 22, 1, '2025-09-24 00:53:05', 9),
 (80, 144, 4, 1, '2025-10-02 15:21:57', 9),
-(81, 147, 2, 1, '2025-10-11 10:43:15', 9);
+(81, 147, 2, 1, '2025-10-11 10:43:15', 9),
+(82, 161, 4, 1, '2025-10-14 17:17:40', NULL),
+(83, 162, 4, 1, '2025-10-15 06:50:06', NULL);
 
 -- --------------------------------------------------------
 
@@ -806,7 +817,8 @@ INSERT INTO `p_info` (`p_id`, `house_no`, `block_no`, `province`, `city`, `distr
 (144, 23, 1, 'Camarines Norte', 'Labo', 'District 1', 'Kalamunding', 'Calabasa Street', 0, 302, 'Residential lot with Affidavit and Barangay Cleara', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-09-21 18:03:49', 1, NULL, NULL),
 (147, 23, 3, 'Camarines Norte', 'Daet', 'District 2', 'Gahon', 'Mabini Street', 0, 453, 'Commercial lot with Affidavit and Barangay Clearan', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-10-11 10:24:47', 1, NULL, NULL),
 (156, 42134, 4, 'Camarines Norte', 'Daet', 'District 2', 'Bagasbas', 'Quezon Avenue', 1, 432, 'Agricultural lot with supporting affidavit', 'Affidavit', '2025-09-05 14:01:18', '2025-09-20 13:22:18', 0, '2025-09-13 14:29:21', 9),
-(157, 5345, 4, 'Camarines Norte', 'Daet', 'District 2', 'Camambugan', 'San Roque', 0, 5345, 'Residential lot with Barangay Clearance', 'Barangay Clearance', '2025-09-05 14:13:20', '2025-09-20 13:22:18', 1, NULL, NULL);
+(157, 5345, 4, 'Camarines Norte', 'Daet', 'District 2', 'Camambugan', 'San Roque', 0, 5345, 'Residential lot with Barangay Clearance', 'Barangay Clearance', '2025-09-05 14:13:20', '2025-09-20 13:22:18', 1, NULL, NULL),
+(162, 432, 0, 'Camarines Norte', 'Talisay', 'District 2', 'Gabon', '', 0, 532, '   ', 'barangay', '2025-10-15 06:50:06', '2025-10-15 06:50:06', 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -895,7 +907,7 @@ CREATE TABLE `rpu_dec` (
 
 INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `pro_assess`, `pro_date`, `mun_assess`, `mun_date`, `td_cancel`, `previous_pin`, `tax_year`, `entered_by`, `entered_year`, `prev_own`, `prev_assess`, `faas_id`, `total_property_value`) VALUES
 (1, '31-2314-23-42-341-23123', 'Provincial Assessor Maria Santos', '2025-08-05', 'Municipal Assessor Luis Cruz', '2025-08-06', 0, 110, '2025-08-07', 1, '2025-08-07', 'Ricardo Delos Reyes', 7000.00, 33, 20157.56),
-(3, '42-5134-21-34-123-51345', 'Mark Bertillo', '2025-09-10', 'Maria Reyes', '2025-09-11', 0, 110, '2025-09-27', 2, '2025-09-23', 'None', 5000.00, 36, 22050.00),
+(3, 'GR-2023-II-01-012-00023', 'Mark Bertillo', '2025-09-10', 'Maria Reyes', '2025-09-11', 0, 110, '2025-09-27', 2, '2025-09-23', 'None', 5000.00, 36, 0.00),
 (4, '42-6345-63-45-634-52345', '', '0000-00-00', '', '0000-00-00', 0, 0, '0000-00-00', 0, '0000-00-00', '', 0.00, 43, 81600.00);
 
 -- --------------------------------------------------------
@@ -920,7 +932,8 @@ CREATE TABLE `rpu_idnum` (
 INSERT INTO `rpu_idnum` (`rpu_id`, `arp`, `pin`, `taxability`, `effectivity`, `faas_id`) VALUES
 (46, '4234-2423-4224-342', '1103456423442', 'taxable', '2025', 33),
 (62, '4234-2', '110123456789', 'taxable', '2025', 36),
-(63, '423234', '110-42342342-', 'taxable', '2025', 42);
+(63, '423234', '110-42342342-', 'taxable', '2025', 42),
+(64, '3212-3412-3121-423', '5324234134512', 'taxable', '2027', 43);
 
 -- --------------------------------------------------------
 
@@ -1320,7 +1333,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT for table `admin_certification`
@@ -1356,7 +1369,7 @@ ALTER TABLE `district`
 -- AUTO_INCREMENT for table `faas`
 --
 ALTER TABLE `faas`
-  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT for table `land`
@@ -1392,7 +1405,7 @@ ALTER TABLE `owner_audit_log`
 -- AUTO_INCREMENT for table `propertyowner`
 --
 ALTER TABLE `propertyowner`
-  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
+  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
 
 --
 -- AUTO_INCREMENT for table `province`
@@ -1404,7 +1417,7 @@ ALTER TABLE `province`
 -- AUTO_INCREMENT for table `p_info`
 --
 ALTER TABLE `p_info`
-  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
+  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=163;
 
 --
 -- AUTO_INCREMENT for table `received_papers`
@@ -1428,7 +1441,7 @@ ALTER TABLE `rpu_dec`
 -- AUTO_INCREMENT for table `rpu_idnum`
 --
 ALTER TABLE `rpu_idnum`
-  MODIFY `rpu_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+  MODIFY `rpu_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT for table `subclass`
