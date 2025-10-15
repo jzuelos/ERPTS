@@ -1,12 +1,96 @@
 <?php
-session_start();
-if (!isset($_SESSION['user_id'])) {
+session_start(); // Start session at the top
+
+// Redirect to login if not logged in
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
   header("Location: index.php");
   exit;
 }
+
+$first_name = $_SESSION['first_name'] ?? 'Guest';
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+require_once 'database.php'; // Include your database connection
+
+$conn = Database::getInstance();
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+
+
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
+
+
+// Fetch total number of owners
+$query_owners = "SELECT COUNT(*) AS total_owners FROM owners_tb";
+$result_owners = $conn->query($query_owners);
+$total_owners = $result_owners->fetch_assoc()['total_owners'];
+
+// Fetch total number of properties
+$query_properties = "SELECT COUNT(*) AS total_properties FROM p_info";
+$result_properties = $conn->query($query_properties);
+$total_properties = $result_properties->fetch_assoc()['total_properties'];
+
+// Fetch counts for land
+$query_land = "SELECT COUNT(*) AS total_land FROM land";
+$result_land = $conn->query($query_land);
+$land_count = $result_land->fetch_assoc()['total_land'];
+
+// Dummy data
+$building_count = 843;
+$plant_count = 327;
+
+// --- Fetch activity logs ---
+$query_activity = "SELECT user_id, action, log_time FROM activity_log ORDER BY log_time ASC";
+$result_activity = $conn->query($query_activity);
+
+// --- Fetch total users ---
+$query_users = "SELECT COUNT(*) AS user_count FROM users";
+$result_users = $conn->query($query_users);
+$user_count = ($result_users && $result_users->num_rows > 0)
+  ? $result_users->fetch_assoc()['user_count']
+  : 0;
+
+// --- Default counts ---
+$loginCount = 0;
+$transactionLogs = 0;
+$transactionsDone = 0;
+
+// --- Analyze activity logs ---
+if ($result_activity && $result_activity->num_rows > 0) {
+  while ($row = $result_activity->fetch_assoc()) {
+    $action = strtolower($row['action']);
+
+    if (strpos($action, 'logged in') !== false) {
+      $loginCount++;
+    } elseif (
+      strpos($action, 'added') !== false ||
+      strpos($action, 'updated') !== false ||
+      strpos($action, 'created') !== false
+    ) {
+      $transactionLogs++;
+    } elseif (strpos($action, 'transaction done') !== false) {
+      $transactionsDone++;
+    }
+  }
+}
+
+// --- Prepare labels and data ---
+$labels = ['Users', 'Transaction Logs', 'Login Counts', 'Transactions Done'];
+$data_counts = [
+  $user_count,
+  $transactionLogs > 0 ? $transactionLogs : 20,  // dummy fallback if 0
+  $loginCount > 0 ? $loginCount : 10,
+  $transactionsDone > 0 ? $transactionsDone : 5
+];
+
+// --- Pass data to JS ---
+$js_labels = json_encode($labels);
+$js_data = json_encode($data_counts);
 ?>
 
 <!doctype html>
@@ -79,6 +163,21 @@ header("Pragma: no-cache");
       <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span>
     </div>
   </footer>
+
+
+  <script>
+  const totalLand = <?= $land_count ?>;
+  const totalBuilding = <?= $building_count ?>;
+  const totalPlant = <?= $plant_count ?>;
+  const totalOwners = <?= $total_owners ?>;
+  const totalProperties = <?= $total_properties ?>;
+</script>
+
+  <script>
+      const activityLabels = <?= $js_labels ?>;
+      const activityData = <?= $js_data ?>;
+  </script>
+
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
