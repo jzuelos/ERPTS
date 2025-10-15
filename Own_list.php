@@ -129,7 +129,7 @@ while ($row = $barangays_result->fetch_assoc()) {
             </div>
           </div>
         </div>
-        <a href="Merge_Owners.php" class="btn btn-primary">Merge Owners</a>
+        <!-- Merge Owner Table --> 
       </div>
 
       <!-- Table -->
