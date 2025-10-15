@@ -105,80 +105,10 @@
 
                 <!-- PRINT BUTTON -->
                 <button type="button" class="btn btn-outline-primary btn-sm"
-                    onclick="confirmPrint(<?= isset($faas_id) ? htmlspecialchars($faas_id) : 'null' ?>)"
+                    onclick="<?php if (!$noLand && isset($property_id)): ?>window.open('DRP.php?p_id=<?= urlencode($property_id) ?>', '_blank')<?php endif; ?>"
                     <?= $printDisabled ?>>
                     <i class="bi bi-printer"></i> Print
                 </button>
-
-                <!-- ACKNOWLEDGEMENT MODAL -->
-                <div class="modal fade" id="acknowledgeModal" tabindex="-1" aria-labelledby="acknowledgeModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <form id="acknowledgeForm" method="post" action="">
-                                <div class="modal-header">
-                                    <h5 class="modal-title text-start" id="acknowledgeModalLabel">Acknowledgement Details</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-
-                                <div class="modal-body text-start" style="direction: ltr; text-align: left;">
-                                    <div class="container-fluid">
-                                        <input type="hidden" name="faas_id" id="modal_faas_id">
-
-                                        <div class="row g-3">
-                                            <!-- Left Column -->
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Owner/Administrator (optional)</label>
-                                                    <input type="text" name="owner_or_admin" class="form-control">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Certification Fee</label>
-                                                    <input type="number" step="0.01" name="certification_fee" class="form-control" required>
-                                                </div>
-                                            </div>
-
-                                            <!-- Right Column -->
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Date</label>
-                                                    <input type="date" name="date_acknowledged" class="form-control" required value="<?= date('Y-m-d') ?>">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">O.R. No.</label>
-                                                    <input type="text" name="or_no" class="form-control" required>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Date Paid</label>
-                                                    <input type="date" name="date_paid" class="form-control" required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="modal-footer">
-                                    <button type="submit" class="btn btn-primary">Proceed to Print</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- JAVASCRIPT -->
-                <script>
-                    function confirmPrint(faasId) {
-                        if (!faasId) {
-                            alert("FAAS ID not found.");
-                            return;
-                        }
-
-                        if (confirm("Do you want to print this FAAS record?")) {
-                            document.getElementById('modal_faas_id').value = faasId;
-                            var myModal = new bootstrap.Modal(document.getElementById('acknowledgeModal'));
-                            myModal.show();
-                        }
-                    }
-                </script>
 
                 <?php if ($noLand): ?>
                     <p class="text-danger small mt-2">

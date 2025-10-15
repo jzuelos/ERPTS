@@ -1,5 +1,4 @@
 <?php
-
 /**
  * FAAS (Field Appraisal and Assessment Sheet) Management System
  * Handles property information, owners, RPU details, and tax declarations
