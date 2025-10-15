@@ -7,6 +7,28 @@ if ($conn->connect_error) {
 }
 
 $p_id = isset($_GET['p_id']) ? (int) $_GET['p_id'] : 0;
+$or_number = isset($_GET['or_number']) ? trim($_GET['or_number']) : '';
+
+// Fetch certification details by OR number (if provided)
+$cert_data = null;
+
+if (!empty($or_number)) {
+    $sql = "SELECT * FROM print_certifications WHERE or_number = ? LIMIT 1";
+    if ($stmt = $conn->prepare($sql)) {
+        $stmt->bind_param("s", $or_number);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $cert_data = $result->fetch_assoc();
+        $stmt->close();
+    }
+}
+
+// If not found or not passed, leave blank placeholders
+$cert_owner = $cert_data['owner_admin'] ?? '';
+$cert_date = $cert_data['certification_date'] ?? '';
+$cert_fee = isset($cert_data['certification_fee']) ? number_format($cert_data['certification_fee'], 2) : '';
+$cert_or_no = $cert_data['or_number'] ?? '';
+$cert_date_paid = $cert_data['date_paid'] ?? '';
 
 function convertNumberToWords($number)
 {
@@ -56,36 +78,39 @@ function getFaasInfo($conn, $p_id)
     return $faas_info;
 }
 
-// Fetch owner full name(s) by p_id using propertyowner + owners_tb
-function getOwnerFullNameByPInfo($conn, $p_id)
+function getOwnerDetailsByPInfo($conn, $p_id)
 {
-    $owners = [];
     $sql = "
-        SELECT CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname) AS full_name
+        SELECT 
+            CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname) AS full_name,
+            CONCAT(o.street, ', ', o.barangay, ', ', o.city, ', ', o.province) AS address
         FROM propertyowner po
         INNER JOIN owners_tb o ON po.owner_id = o.own_id
         WHERE po.property_id = ? AND po.is_retained = 1
     ";
 
-    if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param("i", $p_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        while ($row = $result->fetch_assoc()) {
-            $owners[] = trim($row['full_name']);
-        }
-        $stmt->close();
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) die('Prepare failed: ' . $conn->error);
+    $stmt->bind_param('i', $p_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-        if (empty($owners)) {
-            return "N/A";
-        }
-    } else {
-        die("Prepare failed: " . $conn->error);
+    $owners = [];
+    while ($row = $result->fetch_assoc()) {
+        $owners[] = [
+            'name' => trim($row['full_name']),
+            'address' => trim($row['address'])
+        ];
     }
 
-    // Return as a single string (comma separated)
-    return implode(", ", $owners);
+    $stmt->close();
+
+    if (empty($owners)) {
+        return [['name' => 'N/A', 'address' => 'N/A']];
+    }
+    return $owners;
 }
+
 
 // Fetch all land properties from 'land' table using faas_id
 function getLandProperties($conn, $faas_id)
@@ -129,7 +154,8 @@ function getRpuDataByFaasId($conn, $faas_id)
 // Execute and store data
 $p_info = getPInfo($conn, $p_id);
 $faas_info = getFaasInfo($conn, $p_id);
-$full_name = getOwnerFullNameByPInfo($conn, $p_id);
+$owners = getOwnerDetailsByPInfo($conn, $p_id);
+$owner = $owners[0]; // pick first retained owner
 
 $faas_id = $faas_info['faas_id']; // define this before using in RPU or land
 $rpu_data = getRpuDataByFaasId($conn, $faas_id);
@@ -185,12 +211,14 @@ function formatPin($value)
             <p style="margin: 0; font-size: 14px;">(Filed Under Republic Act No. 7160)</p>
         </div>
 
-
         <div class="section">
-            <p><span class="bold">Owner: </span><u>
-                    _________<?= htmlspecialchars($full_name ?? 'N/A') ?>__________________________</u>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="bold">Address:</span>
-                ___________________________________________</p>
+            <p>
+                <span class="bold">Owner:</span>
+                <u>_________<?= htmlspecialchars($owner['name'] ?? 'N/A') ?>__________________________</u>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span class="bold">Address:</span>
+                <u>__<?= htmlspecialchars($owner['address'] ?? 'N/A') ?>__</u>
+            </p>
             <p><span class="bold">Administration:</span> _______________________________________________
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="bold">Address:</span>
                 ___________________________________________</p>
@@ -350,7 +378,6 @@ function formatPin($value)
             </div>
         </div>
 
-
         <div class="section">
             <p style="display: flex; justify-content: space-between; margin: 0;">
                 <span class="bold">Previous Assessed Value:</span><span
@@ -372,7 +399,7 @@ function formatPin($value)
         </div>
 
         <div
-            style="border: 1px solid black; padding: 15px; width: 92%; margin: auto; margin-top: 25p; min-height: 100px; ">
+            style="border: 1px solid black; padding: 15px; width: 92%; margin: auto; margin-top: 25px; min-height: 100px;">
             <div style="display: flex; justify-content: space-between;">
                 <div>
                     <p style="margin: 0; font-weight: bold;">Acknowledgement:</p>
@@ -380,43 +407,58 @@ function formatPin($value)
                         style="margin-top: 15px; display: flex; justify-content: space-between; width: 100%; min-height: 50px;">
                         <div style="margin-right: 20px;">
                             <span
-                                style="display: inline-block; border-bottom: 1px solid black; width: 250px; height: 25px;"></span><br>
-                            <span
-                                style="font-size: 12px; font-weight: bold; margin-left: 25%;">Owner/Administrator</span>
+                                style="display: inline-block; border-bottom: 1px solid black; width: 250px; height: 25px; text-transform: uppercase;">
+                                <?= htmlspecialchars($cert_owner ?: '__________________') ?>
+                            </span><br>
+                            <span style="font-size: 12px; font-weight: bold; margin-left: 25%;">Owner/Administrator</span>
                         </div>
                         <div>
                             <span
-                                style="display: inline-block; border-bottom: 1px solid black; width: 150px; height: 25px;"></span><br>
+                                style="display: inline-block; border-bottom: 1px solid black; width: 150px; height: 25px;">
+                                <?= htmlspecialchars($cert_date ?: '__________') ?>
+                            </span><br>
                             <span style="font-size: 12px; font-weight: bold; margin-left: 25%;">Date</span>
                         </div>
                     </div>
                 </div>
+
                 <div style="text-align: right;">
-                    <p style="margin: 0; margin-bottom: 5px;"><span style="font-weight: bold;">Certification
-                            Fee:₱</span> <span
-                            style="border-bottom: 1px solid black; display: inline-block; width: 120px; height: 20px;"></span>
+                    <p style="margin: 0; margin-bottom: 5px;">
+                        <span style="font-weight: bold;">Certification Fee: ₱</span>
+                        <span
+                            style="border-bottom: 1px solid black; display: inline-block; width: 120px; height: 20px;">
+                            <?= htmlspecialchars($cert_fee ?: '__________') ?>
+                        </span>
                     </p>
-                    <p style="margin: 0; margin-bottom: 5px;"><span style="font-weight: bold;">O.R. No.:</span> <span
-                            style="border-bottom: 1px solid black; display: inline-block; width: 180px; height: 20px;"></span>
+                    <p style="margin: 0; margin-bottom: 5px;">
+                        <span style="font-weight: bold;">O.R. No.:</span>
+                        <span
+                            style="border-bottom: 1px solid black; display: inline-block; width: 180px; height: 20px;">
+                            <?= htmlspecialchars($cert_or_no ?: '__________') ?>
+                        </span>
                     </p>
-                    <p style="margin: 0;"><span style="font-weight: bold;">Date Paid:</span> <span
-                            style="border-bottom: 1px solid black; display: inline-block; width: 180px; height: 20px;"></span>
+                    <p style="margin: 0;">
+                        <span style="font-weight: bold;">Date Paid:</span>
+                        <span
+                            style="border-bottom: 1px solid black; display: inline-block; width: 180px; height: 20px;">
+                            <?= htmlspecialchars($cert_date_paid ?: '__________') ?>
+                        </span>
                     </p>
                 </div>
             </div>
         </div>
-
 
         <div class="footer" style="padding: 10px; font-size: 15px; margin-top: -5px;">
             <p><span class="bold">IMPORTANT:</span> This declaration is issued only in connection with real property
                 taxation and the validation herein is based on a schedule of market values prepared for the purpose. It
                 should not be considered as title to the property.</p>
         </div>
-
     </div>
 
     <script>
-        setTimeout(() => { window.print(); }, 500);
+        setTimeout(() => {
+            window.print();
+        }, 500);
     </script>
 
 </body>

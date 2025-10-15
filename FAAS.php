@@ -349,6 +349,33 @@ function handleLandDelete($conn)
   exit();
 }
 
+// ========================================================
+// Inline OR Number Duplication Check (AJAX endpoint)
+// ========================================================
+if (isset($_GET['ajax']) && $_GET['ajax'] === 'check_or_number') {
+    header('Content-Type: application/json');
+    require_once 'database.php';
+
+    if (!isset($_GET['or']) || trim($_GET['or']) === '') {
+        echo json_encode(['exists' => false]);
+        exit;
+    }
+
+    $conn = Database::getInstance();
+    $or_number = strtoupper(trim($_GET['or']));
+
+    $stmt = $conn->prepare("SELECT COUNT(*) AS cnt FROM print_certifications WHERE or_number = ?");
+    $stmt->bind_param("s", $or_number);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+
+    echo json_encode(['exists' => $row['cnt'] > 0]);
+    $stmt->close();
+    $conn->close();
+    exit;
+}
+
+
 // ============================================================================
 // MAIN REQUEST PROCESSING
 // ============================================================================

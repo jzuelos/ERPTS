@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Save Print Certification Details
  * Handles saving certification information before printing tax declaration
@@ -21,9 +22,16 @@ $user_id = $_SESSION['user_id'];
 try {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Validate required fields
-        $required_fields = ['property_id', 'faas_id', 'owner_admin', 'certification_date', 
-                           'certification_fee', 'or_number', 'date_paid'];
-        
+        $required_fields = [
+            'property_id',
+            'faas_id',
+            'owner_admin',
+            'certification_date',
+            'certification_fee',
+            'or_number',
+            'date_paid'
+        ];
+
         foreach ($required_fields as $field) {
             if (empty($_POST[$field])) {
                 throw new Exception("Missing required field: $field");
@@ -75,16 +83,17 @@ try {
                        (property_id, faas_id, owner_admin, certification_date, 
                         certification_fee, or_number, date_paid, created_by, created_at)
                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
-        
+
         $stmt = $conn->prepare($insert_sql);
-        $stmt->bind_param("iissdssi", 
-            $property_id, 
-            $faas_id, 
-            $owner_admin, 
-            $certification_date, 
-            $certification_fee, 
-            $or_number, 
-            $date_paid, 
+        $stmt->bind_param(
+            "iissdssi",
+            $property_id,
+            $faas_id,
+            $owner_admin,
+            $certification_date,
+            $certification_fee,
+            $or_number,
+            $date_paid,
             $user_id
         );
 
@@ -93,6 +102,8 @@ try {
         }
 
         $cert_id = $conn->insert_id;
+        // Fetch the saved OR number to confirm and forward to DRP
+        $response_or_number = $or_number;
         $stmt->close();
 
         // Commit transaction
@@ -103,19 +114,18 @@ try {
             'success' => true,
             'message' => 'Certification details saved successfully',
             'cert_id' => $cert_id,
-            'property_id' => $property_id
+            'property_id' => $property_id,
+            'or_number' => $response_or_number
         ]);
-
     } else {
         throw new Exception("Invalid request method");
     }
-
 } catch (Exception $e) {
     // Rollback transaction on error
     if ($conn->inTransaction()) {
         $conn->rollback();
     }
-    
+
     error_log("Print Certification Error: " . $e->getMessage());
     echo json_encode([
         'success' => false,
@@ -124,4 +134,3 @@ try {
 }
 
 $conn->close();
-?>
