@@ -22,7 +22,25 @@
   </style>
 
   <?php
-  include 'database.php';
+  session_start(); // Start session at the top
+
+  // Redirect to login if not logged in
+  if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header("Location: index.php");
+    exit;
+  }
+
+  $first_name = $_SESSION['first_name'] ?? 'Guest';
+
+  error_reporting(E_ALL);
+  ini_set('display_errors', 1);
+
+  require_once 'database.php'; // Include your database connection
+
+  $conn = Database::getInstance();
+  if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+  }
   $conn = Database::getInstance();
   
 

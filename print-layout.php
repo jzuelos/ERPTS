@@ -217,10 +217,10 @@ if ($p_id > 0) {
 <body>
     <!-- Front Page -->
     <div class="front-page">
-        <div class="header">
-            REAL PROPERTY FIELD APPRAISAL AND ASSESSMENT SHEET - LAND/PLANTS & TREES
-        </div>
         <table>
+             <tr>
+                <th colspan="2" class="section-title">  REAL PROPERTY FIELD APPRAISAL AND ASSESSMENT SHEET - LAND/PLANTS & TREES</th>
+            </tr>
             <tr>
                 <td><strong>ARP NO.:</strong> <?= htmlspecialchars($rpu_Data['arp'] ?? 'N/A') ?></td>
                 <td></td>
