@@ -1039,3 +1039,115 @@ document.addEventListener('DOMContentLoaded', () => {
   if (qrBtn) qrBtn.addEventListener('click', generateQrFromModal);
 });
 
+
+// Utility Functions
+
+// Capitalize first letter of each word in a field
+function capitalizeFirstLetter(element) {
+  element.value = element.value.replace(/\b\w/g, char => char.toUpperCase());
+}
+
+// Restrict field to numeric input
+function restrictToNumbers(element) {
+  element.value = element.value.replace(/[^0-9]/g, '');
+}
+
+// Reset all forms inside modals
+function resetForm() {
+  const modals = document.querySelectorAll('.modal');
+  modals.forEach(modal => {
+    const forms = modal.querySelectorAll('form');
+    forms.forEach(form => {
+      form.reset();
+      form.querySelectorAll("input, select, textarea").forEach(field => {
+        if (["text", "textarea", "email", "date"].includes(field.type)) {
+          field.value = "";
+        } else if (["checkbox", "radio"].includes(field.type)) {
+          field.checked = field.defaultChecked;
+        } else if (field.tagName === "SELECT") {
+          field.selectedIndex = 0;
+        }
+      });
+    });
+  });
+}
+
+
+// Print Certification Modal Functions
+function openPrintCertificationModal(propertyId) {
+  document.getElementById('printPropertyId').value = propertyId;
+  const modal = new bootstrap.Modal(document.getElementById('printCertificationModal'));
+  modal.show();
+}
+
+// Handle Print Certification Form Submission
+function handlePrintCertificationSubmit(event) {
+  event.preventDefault();
+  
+  const form = event.target;
+  const formData = new FormData(form);
+  const submitBtn = form.querySelector('button[type="submit"]');
+  
+  // Disable submit button to prevent double submission
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+  
+  fetch('save_print_certification.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Close modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('printCertificationModal'));
+      modal.hide();
+      
+      // Reset form
+      form.reset();
+      
+      // Open print window with certification ID
+      window.open('DRP.php?p_id=' + data.property_id + '&cert_id=' + data.cert_id, '_blank');
+      
+      // Show success message
+      showAlert('success', 'Certification details saved successfully!');
+    } else {
+      showAlert('danger', 'Error: ' + (data.message || 'Failed to save certification details'));
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    showAlert('danger', 'An error occurred while saving certification details');
+  })
+  .finally(() => {
+    // Re-enable submit button
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="bi bi-save"></i> Save & Print';
+  });
+}
+
+// Show alert message
+function showAlert(type, message) {
+  const alertDiv = document.createElement('div');
+  alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+  alertDiv.style.zIndex = '9999';
+  alertDiv.innerHTML = `
+    ${message}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  `;
+  document.body.appendChild(alertDiv);
+  
+  // Auto-dismiss after 5 seconds
+  setTimeout(() => {
+    alertDiv.remove();
+  }, 5000);
+}
+
+// Format currency input
+function formatCurrencyInput(element) {
+  if (element.value) {
+    const value = parseFloat(element.value);
+    if (!isNaN(value)) {
+      element.value = value.toFixed(2);
+    }
+  }
