@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.2
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 15, 2025 at 11:54 AM
+-- Generation Time: Oct 16, 2025 at 12:31 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -88,7 +88,9 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (47, 9, 'Failed to add property\nError: Column \'province\' cannot be null\nAttempted location: House #423, Municipality ID: Jose Panganiban', '2025-10-14 17:43:49'),
 (48, 9, 'Failed to add property\nError: Column \'province\' cannot be null\nAttempted location: House #423, Municipality ID: Jose Panganiban', '2025-10-14 17:44:24'),
 (49, 9, 'Logged in to the system', '2025-10-15 03:58:29'),
-(50, 9, 'Added new property\nProperty ID: 162\n\nLocation Details:\n• House Number: 432\n• Municipality: ID: Talisay\n• District: District 2\n• Barangay: ID: Gabon\n\nProperty Details:\n• Land Area: 532 sq.m\n• Documents: barangay\n\nAssociated Owners (1):\n• Jose Cruz (ID: 4)\n\nFAAS record created for this property.', '2025-10-15 06:50:06');
+(50, 9, 'Added new property\nProperty ID: 162\n\nLocation Details:\n• House Number: 432\n• Municipality: ID: Talisay\n• District: District 2\n• Barangay: ID: Gabon\n\nProperty Details:\n• Land Area: 532 sq.m\n• Documents: barangay\n\nAssociated Owners (1):\n• Jose Cruz (ID: 4)\n\nFAAS record created for this property.', '2025-10-15 06:50:06'),
+(51, 9, 'Logged in to the system', '2025-10-15 13:12:07'),
+(52, 9, 'Updated tax declaration\nProperty ID: 147\nFAAS ID: 36\nLocation: House #23, ID: Gahon, ID: District 2, ID: Daet\n\nTax Declaration Details:\n• ARP Number: GR-2023-II-01-012-00023\n• Tax Year: 2025-09-27\n• Provincial Assessor: Mark Bertillo\n• Provincial Date: 2025-09-10\n• Municipal Assessor: Maria Reyes\n• Municipal Date: 2025-09-11\n• Previous Owner: No\n• Previous Assessed Value: ₱5,000.00\n\nTotal Property Value: ₱0.00', '2025-10-15 22:14:55');
 
 -- --------------------------------------------------------
 
@@ -732,6 +734,42 @@ INSERT INTO `owner_audit_log` (`log_id`, `action`, `owner_id`, `property_id`, `u
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `print_certifications`
+--
+
+CREATE TABLE `print_certifications` (
+  `cert_id` int(11) NOT NULL,
+  `property_id` int(11) NOT NULL,
+  `faas_id` int(11) NOT NULL,
+  `owner_admin` varchar(255) NOT NULL COMMENT 'Owner or Administrator name',
+  `certification_date` date NOT NULL COMMENT 'Date of certification',
+  `certification_fee` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT 'Certification fee amount',
+  `or_number` varchar(50) NOT NULL COMMENT 'Official Receipt Number',
+  `date_paid` date NOT NULL COMMENT 'Date payment was made',
+  `created_by` int(11) NOT NULL COMMENT 'User ID who created this record',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Stores certification details for tax declaration prints';
+
+--
+-- Dumping data for table `print_certifications`
+--
+
+INSERT INTO `print_certifications` (`cert_id`, `property_id`, `faas_id`, `owner_admin`, `certification_date`, `certification_fee`, `or_number`, `date_paid`, `created_by`, `created_at`) VALUES
+(1, 144, 33, 'Renz Dioneda', '2025-10-15', 500.00, '5234', '2025-10-15', 9, '2025-10-16 00:14:57'),
+(2, 157, 43, 'John Lloyd Zuelos', '2025-10-15', 67.00, '04323', '2025-10-15', 9, '2025-10-16 02:20:15'),
+(3, 157, 43, 'John Lloyd Zuelos', '2025-10-15', 70.00, '094234', '2025-10-15', 9, '2025-10-16 05:04:21'),
+(4, 157, 43, 'John Lloyd Zuelos', '2025-10-15', 34.00, '5234', '2025-10-15', 9, '2025-10-16 05:07:59'),
+(5, 157, 43, 'John Lloyd Zuelos', '2025-10-15', 34.00, '5234', '2025-10-15', 9, '2025-10-16 05:11:20'),
+(6, 157, 43, 'John Lloyd Zuelos', '2025-10-15', 34.00, '5234', '2025-10-15', 9, '2025-10-16 05:12:51'),
+(7, 157, 43, 'John Lloyd Zuelos', '2025-10-15', 34.00, '5234', '2025-10-15', 9, '2025-10-16 05:19:37'),
+(8, 157, 43, 'John Lloyd Zuelos', '2025-10-15', 43.00, '52345', '2025-10-15', 9, '2025-10-16 05:52:59'),
+(9, 157, 43, 'John Lloyd Zuelos', '2025-10-15', 43.00, '523456', '2025-10-15', 9, '2025-10-16 05:54:06'),
+(10, 157, 43, 'John Lloyd Zuelos', '2025-10-15', 43.00, '523456', '2025-10-15', 9, '2025-10-16 05:56:45'),
+(11, 157, 43, 'Renz Dioneda', '2025-10-16', 56.00, '523457', '2025-10-16', 9, '2025-10-16 06:12:35');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `propertyowner`
 --
 
@@ -907,8 +945,8 @@ CREATE TABLE `rpu_dec` (
 
 INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `pro_assess`, `pro_date`, `mun_assess`, `mun_date`, `td_cancel`, `previous_pin`, `tax_year`, `entered_by`, `entered_year`, `prev_own`, `prev_assess`, `faas_id`, `total_property_value`) VALUES
 (1, '31-2314-23-42-341-23123', 'Provincial Assessor Maria Santos', '2025-08-05', 'Municipal Assessor Luis Cruz', '2025-08-06', 0, 110, '2025-08-07', 1, '2025-08-07', 'Ricardo Delos Reyes', 7000.00, 33, 20157.56),
-(3, 'GR-2023-II-01-012-00023', 'Mark Bertillo', '2025-09-10', 'Maria Reyes', '2025-09-11', 0, 110, '2025-09-27', 2, '2025-09-23', 'None', 5000.00, 36, 0.00),
-(4, '42-6345-63-45-634-52345', '', '0000-00-00', '', '0000-00-00', 0, 0, '0000-00-00', 0, '0000-00-00', '', 0.00, 43, 81600.00);
+(3, 'GR-2023-II-01-012-00023', 'Mark Bertillo', '2025-09-10', 'Maria Reyes', '2025-09-11', 0, 110, '2025-09-27', 2, '2025-09-23', 'No', 5000.00, 36, 0.00),
+(4, 'GR-2023-II-03-014-00342', 'Juan Dela Cruz', '2025-10-15', 'Maria Reyes', '2025-10-15', 0, 0, '0000-00-00', 0, '0000-00-00', '', 0.00, 43, 81600.00);
 
 -- --------------------------------------------------------
 
@@ -931,9 +969,9 @@ CREATE TABLE `rpu_idnum` (
 
 INSERT INTO `rpu_idnum` (`rpu_id`, `arp`, `pin`, `taxability`, `effectivity`, `faas_id`) VALUES
 (46, '4234-2423-4224-342', '1103456423442', 'taxable', '2025', 33),
-(62, '4234-2', '110123456789', 'taxable', '2025', 36),
+(62, '2342-3423-5252-542', '110123456789', 'taxable', '2025', 36),
 (63, '423234', '110-42342342-', 'taxable', '2025', 42),
-(64, '3212-3412-3121-423', '5324234134512', 'taxable', '2027', 43);
+(64, '3212-3412-3121-422', '5324234134512', 'taxable', '2027', 43);
 
 -- --------------------------------------------------------
 
@@ -1157,6 +1195,40 @@ INSERT INTO `users` (`user_id`, `username`, `password`, `last_name`, `first_name
 (9, 'admin', '$2y$10$uJGu7hoKfqtqSLE2EyV2GetTumt1zHaZOnvIpBeGC5dcwWBr25fc.', 'Zuelos', 'John Lloyd', 'Cruz', 'Male', '2001-11-11', 'Single', '000-123-456-789', '5', 'Purok', 66, 18, 14, 'Camarines Norte', '09123456789', 'johnlloydzuelos@gmail.com', 1, 'admin'),
 (12, 'user', '$2y$10$gmDQWOOqOOy8uUra8gGPQOA.FUDHTpucmbrNQ7mk..FbM/3ndQNt2', 'Cruz', 'Juan', 'Dela', 'Male', '2000-01-01', 'Single', 'NA', '1', 'Purok 1', 4, NULL, 1, 'Camarines Norte', '09123456789', 'user@email.com', 1, 'user');
 
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `vw_print_certifications`
+-- (See below for the actual view)
+--
+CREATE TABLE `vw_print_certifications` (
+`cert_id` int(11)
+,`property_id` int(11)
+,`faas_id` int(11)
+,`owner_admin` varchar(255)
+,`certification_date` date
+,`certification_fee` decimal(10,2)
+,`or_number` varchar(50)
+,`date_paid` date
+,`created_by` int(11)
+,`created_at` datetime
+,`house_no` int(10)
+,`barangay` varchar(30)
+,`city` varchar(30)
+,`province` varchar(30)
+,`tax_declaration_number` varchar(150)
+,`created_by_name` varchar(101)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `vw_print_certifications`
+--
+DROP TABLE IF EXISTS `vw_print_certifications`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_print_certifications`  AS SELECT `pc`.`cert_id` AS `cert_id`, `pc`.`property_id` AS `property_id`, `pc`.`faas_id` AS `faas_id`, `pc`.`owner_admin` AS `owner_admin`, `pc`.`certification_date` AS `certification_date`, `pc`.`certification_fee` AS `certification_fee`, `pc`.`or_number` AS `or_number`, `pc`.`date_paid` AS `date_paid`, `pc`.`created_by` AS `created_by`, `pc`.`created_at` AS `created_at`, `p`.`house_no` AS `house_no`, `p`.`barangay` AS `barangay`, `p`.`city` AS `city`, `p`.`province` AS `province`, `rd`.`arp_no` AS `tax_declaration_number`, concat(`u`.`first_name`,' ',`u`.`last_name`) AS `created_by_name` FROM ((((`print_certifications` `pc` join `p_info` `p` on(`pc`.`property_id` = `p`.`p_id`)) join `faas` `f` on(`pc`.`faas_id` = `f`.`faas_id`)) left join `rpu_dec` `rd` on(`f`.`faas_id` = `rd`.`faas_id`)) left join `users` `u` on(`pc`.`created_by` = `u`.`user_id`)) ORDER BY `pc`.`created_at` DESC ;
+
 --
 -- Indexes for dumped tables
 --
@@ -1240,6 +1312,16 @@ ALTER TABLE `owner_audit_log`
   ADD KEY `owner_id` (`owner_id`),
   ADD KEY `property_id` (`property_id`),
   ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `print_certifications`
+--
+ALTER TABLE `print_certifications`
+  ADD PRIMARY KEY (`cert_id`),
+  ADD KEY `idx_property_id` (`property_id`),
+  ADD KEY `idx_faas_id` (`faas_id`),
+  ADD KEY `idx_or_number` (`or_number`),
+  ADD KEY `idx_created_at` (`created_at`);
 
 --
 -- Indexes for table `propertyowner`
@@ -1333,7 +1415,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `admin_certification`
@@ -1400,6 +1482,12 @@ ALTER TABLE `owners_tb`
 --
 ALTER TABLE `owner_audit_log`
   MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+
+--
+-- AUTO_INCREMENT for table `print_certifications`
+--
+ALTER TABLE `print_certifications`
+  MODIFY `cert_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `propertyowner`
@@ -1500,6 +1588,13 @@ ALTER TABLE `land`
 --
 ALTER TABLE `municipality`
   ADD CONSTRAINT `municipality_ibfk_1` FOREIGN KEY (`r_id`) REFERENCES `region` (`r_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `print_certifications`
+--
+ALTER TABLE `print_certifications`
+  ADD CONSTRAINT `fk_print_cert_faas` FOREIGN KEY (`faas_id`) REFERENCES `faas` (`faas_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_print_cert_property` FOREIGN KEY (`property_id`) REFERENCES `p_info` (`p_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
