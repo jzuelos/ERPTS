@@ -81,6 +81,44 @@ function getBarangayName($conn, $brgy_id)
   return $row ? $row['brgy_name'] : "ID: $brgy_id";
 }
 
+/**
+ * Function to check for duplicate owners
+ * Returns array with 'exists' boolean and 'messages' array
+ */
+function checkDuplicateOwner($conn, $tinNumber, $firstName, $surname, $birthday)
+{
+  $errors = [];
+
+  // Check 1: TIN number already exists
+  $stmt = $conn->prepare("SELECT own_id, own_fname, own_surname FROM owners_tb WHERE tin_no = ?");
+  $stmt->bind_param("s", $tinNumber);
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  if ($result->num_rows > 0) {
+    $existing = $result->fetch_assoc();
+    $errors[] = "A property owner with TIN number '$tinNumber' already exists (Owner: {$existing['own_fname']} {$existing['own_surname']}, ID: {$existing['own_id']}).";
+  }
+  $stmt->close();
+
+  // Check 2: Same name and birthday combination exists
+  $stmt = $conn->prepare("SELECT own_id, tin_no FROM owners_tb WHERE own_fname = ? AND own_surname = ? AND date_birth = ?");
+  $stmt->bind_param("sss", $firstName, $surname, $birthday);
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  if ($result->num_rows > 0) {
+    $existing = $result->fetch_assoc();
+    $errors[] = "A property owner with the same name ('$firstName $surname') and birthday ('$birthday') already exists (TIN: {$existing['tin_no']}, ID: {$existing['own_id']}).";
+  }
+  $stmt->close();
+
+  return [
+    'exists' => count($errors) > 0,
+    'messages' => $errors
+  ];
+}
+
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   // Sanitize and retrieve form data
@@ -90,30 +128,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $birthday = filter_input(INPUT_POST, 'birthday', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
   $tinNumber = filter_input(INPUT_POST, 'tinNumber', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
   $city = filter_input(INPUT_POST, 'city', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-  
+
   // Optional address fields - set empty string if not provided
   $barangay = filter_input(INPUT_POST, 'barangay', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
   $barangay = $barangay ?: ''; // Use empty string if null
-  
+
   $district = filter_input(INPUT_POST, 'district', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
   $district = $district ?: ''; // Use empty string if null
-  
+
   $province = filter_input(INPUT_POST, 'province', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
   $province = $province ?: ''; // Use empty string if null
-  
+
   $streetHouse = filter_input(INPUT_POST, 'streetHouse', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
   $streetHouse = $streetHouse ?: ''; // Use empty string if null
 
   // Optional fields for owner information
   $telephone = filter_input(INPUT_POST, 'telephone', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
   $telephone = $telephone ?: ''; // Use empty string if null
-  
+
   $fax = filter_input(INPUT_POST, 'fax', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
   $fax = $fax ?: ''; // Use empty string if null
-  
+
   $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
   $email = $email ?: ''; // Use empty string if null
-  
+
   $website = filter_input(INPUT_POST, 'website', FILTER_SANITIZE_URL);
   $website = $website ?: ''; // Use empty string if null
 
@@ -122,6 +160,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   // Prepare and execute insert statement
   if ($firstName && $surname && $tinNumber && $city) {
+
+    // ✅ VALIDATE FOR DUPLICATES BEFORE INSERTING
+    $duplicateCheck = checkDuplicateOwner($conn, $tinNumber, $firstName, $surname, $birthday);
+
+    if ($duplicateCheck['exists']) {
+      // Store error messages in session to display after redirect
+      $_SESSION['error_messages'] = $duplicateCheck['messages'];
+      header("Location: " . $_SERVER['PHP_SELF']);
+      exit;
+    }
+
+    // No duplicates found - proceed with insertion
     // Note: Using streetHouse for both house_no and street since they're combined in one field
     $stmt = $conn->prepare("INSERT INTO owners_tb (own_fname, own_mname, own_surname, date_birth, tin_no, house_no, street, barangay, district, city, province, own_info) 
                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -137,20 +187,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // ✅ LOG ACTIVITY - Owner Added
         if (isset($_SESSION['user_id'])) {
           $userId = $_SESSION['user_id'];
-          
+
           // Get readable names for location (only if IDs are provided)
           $municipalityName = !empty($city) ? getMunicipalityName($conn, $city) : 'None';
           $barangayName = !empty($barangay) ? getBarangayName($conn, $barangay) : 'None';
           $districtName = !empty($district) ? getDistrictName($conn, $district) : 'None';
-          
+
           // Build full name
           $fullName = trim("$firstName $middleName $surname");
-          
+
           // Build detailed log message
           $logMessage  = "Added new property owner\n";
           $logMessage .= "Owner ID: $owner_id\n";
           $logMessage .= "Name: $fullName\n\n";
-          
+
           $logMessage .= "Personal Information:\n";
           $logMessage .= "• First Name: $firstName\n";
           if (!empty($middleName)) {
@@ -161,7 +211,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $logMessage .= "• Birthday: $birthday\n";
           }
           $logMessage .= "• TIN Number: $tinNumber\n";
-          
+
           $logMessage .= "\nAddress Details:\n";
           $logMessage .= "• Municipality: $municipalityName\n";
           if (!empty($district)) {
@@ -173,11 +223,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           if (!empty($streetHouse)) {
             $logMessage .= "• Street/House: $streetHouse\n";
           }
-          
+
           // Add optional contact information if provided
           $hasContactInfo = false;
           $contactInfo = "\nContact Information:\n";
-          
+
           if (!empty($telephone)) {
             $contactInfo .= "• Telephone: $telephone\n";
             $hasContactInfo = true;
@@ -194,11 +244,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $contactInfo .= "• Website: $website\n";
             $hasContactInfo = true;
           }
-          
+
           if ($hasContactInfo) {
             $logMessage .= $contactInfo;
           }
-          
+
           // Save to activity log
           logActivity($conn, $userId, $logMessage);
         }
@@ -213,25 +263,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $logMessage  = "Failed to add property owner\n";
           $logMessage .= "Error: " . $stmt->error . "\n";
           $logMessage .= "Attempted name: $firstName $surname";
-          
+
           logActivity($conn, $userId, $logMessage);
         }
-        
-        echo "<p>Error: " . $stmt->error . "</p>";
+
+        $_SESSION['error_messages'] = ["Database error: " . $stmt->error];
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit;
       }
       $stmt->close();
     } else {
-      echo "<p>Error preparing statement: " . $conn->error . "</p>";
+      $_SESSION['error_messages'] = ["Error preparing statement: " . $conn->error];
+      header("Location: " . $_SERVER['PHP_SELF']);
+      exit;
     }
   } else {
-    echo "<p>Error: Please fill in all required fields.</p>";
+    $_SESSION['error_messages'] = ["Please fill in all required fields."];
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
   }
-}
-
-// Display any session message and then clear it
-if (isset($_SESSION['message'])) {
-  echo "<div class='alert alert-success text-center'>" . $_SESSION['message'] . "</div>";
-  unset($_SESSION['message']);
 }
 
 // ✅ Fetch municipalities
@@ -300,9 +350,32 @@ $barangays_json = json_encode($barangays);
         <h3 class="mb-0 text-center flex-grow-1">Add Property Owner</h3>
       </div>
 
+      <?php
+      // Display error messages
+      if (isset($_SESSION['error_messages'])) {
+        echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>";
+        echo "<strong><i class='fas fa-exclamation-triangle'></i> Error:</strong> Unable to add property owner.<br><br>";
+        foreach ($_SESSION['error_messages'] as $error) {
+          echo "• " . htmlspecialchars($error) . "<br>";
+        }
+        echo "<button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>";
+        echo "</div>";
+        unset($_SESSION['error_messages']);
+      }
+
+      // Display success message
+      if (isset($_SESSION['message'])) {
+        echo "<div class='alert alert-success alert-dismissible fade show text-center' role='alert'>";
+        echo "<i class='fas fa-check-circle'></i> " . $_SESSION['message'];
+        echo "<button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>";
+        echo "</div>";
+        unset($_SESSION['message']);
+      }
+      ?>
+
       <form action="" method="POST">
         <div class="row">
-          <!-- Owner’s Information (Row 1) -->
+          <!-- Owner's Information (Row 1) -->
           <div class="col-md-6">
             <h5>Owner's Information <small class="text-muted">(Required)</small></h5>
             <div class="form-group mb-3">
@@ -461,6 +534,23 @@ $barangays_json = json_encode($barangays);
       });
     });
   </script>
+  <script>
+    // Wait for DOM to load
+    document.addEventListener("DOMContentLoaded", function() {
+      // Select all alerts
+      const alerts = document.querySelectorAll(".alert");
+
+      // Set a timer to fade out after 4 seconds
+      setTimeout(() => {
+        alerts.forEach(alert => {
+          alert.classList.remove("show"); // fade out (Bootstrap)
+          alert.classList.add("fade");
+          setTimeout(() => alert.remove(), 500); // remove from DOM after fade
+        });
+      }, 5000); // milliseconds x 1000 = seconds
+    });
+  </script>
+
 
 </body>
 
