@@ -24,7 +24,7 @@
   <div id="selectedOwnerDisplay"></div> <!-- Display area for selected owner IDs -->
   <?php
   session_start(); // Start session at the top
-
+  
   // Prevent the browser from caching this page
   header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
   header("Cache-Control: post-check=0, pre-check=0", false);
@@ -74,7 +74,8 @@
    */
   function getMunicipalityName($conn, $m_id)
   {
-    if (empty($m_id)) return 'None';
+    if (empty($m_id))
+      return 'None';
     $stmt = $conn->prepare("SELECT m_description FROM municipality WHERE m_id = ?");
     $stmt->bind_param("i", $m_id);
     $stmt->execute();
@@ -89,7 +90,8 @@
    */
   function getBarangayName($conn, $brgy_id)
   {
-    if (empty($brgy_id)) return 'None';
+    if (empty($brgy_id))
+      return 'None';
     $stmt = $conn->prepare("SELECT brgy_name FROM brgy WHERE brgy_id = ?");
     $stmt->bind_param("i", $brgy_id);
     $stmt->execute();
@@ -155,11 +157,11 @@
           if ($stmt->execute()) {
             $property_id = $stmt->insert_id; // Get last inserted ID
             $_SESSION['last_property_id'] = $property_id; // Store it in session
-
+  
             // Insert owners into propertyowner table and collect propertyowner_ids
             $propertyowner_ids = [];
             $owner_names = []; // Store owner names for logging
-
+  
             if (!empty($selected_owner_ids)) {
               foreach ($selected_owner_ids as $owner_id) {
                 // Ensure the owner exists
@@ -217,7 +219,7 @@
               $districtName = getDistrictName($conn, $district);
 
               // Build clean log message (similar to User-Control.php format)
-              $logMessage  = "Added new property\n";
+              $logMessage = "Added new property\n";
               $logMessage .= "Property ID: $property_id\n\n";
 
               $logMessage .= "Location Details:\n";
@@ -492,17 +494,16 @@
                     $province_name = htmlspecialchars($row['province_name'], ENT_QUOTES);
 
                     if (strtolower($province_name) === 'camarines norte') {
-                      echo "<option value='$province_id' selected>$province_name</option>";
-                      // Store province_id for hidden input
-                      $selected_province_id = $province_id;
+                      echo "<option value='$province_name' selected>$province_name</option>";
+                      $selected_province_name = $province_name;
                     }
                   }
                   ?>
                 </select>
 
-                <!-- Hidden input to still include province in form submission -->
-                <?php if (isset($selected_province_id)): ?>
-                  <input type="hidden" name="province" value="<?php echo $selected_province_id; ?>">
+                <!-- Hidden input to include province in form submission -->
+                <?php if (isset($selected_province_name)): ?>
+                  <input type="hidden" name="province" value="<?php echo $selected_province_name; ?>">
                 <?php endif; ?>
               </div>
 
@@ -516,7 +517,8 @@
                     $m_id = htmlspecialchars($row['m_id'], ENT_QUOTES);
                     $municipality = htmlspecialchars($row['m_description'], ENT_QUOTES);
                     $district = htmlspecialchars($row['district_name'], ENT_QUOTES);
-                    echo "<option value='$m_id' data-district='$district'>$municipality</option>";
+                    // FIXED: Using data-municipality-id consistently
+                    echo "<option value='$municipality' data-district='$district' data-municipality-id='$m_id'>$municipality</option>";
                   }
                   ?>
                 </select>
@@ -525,8 +527,7 @@
               <!-- District (auto-filled) -->
               <div class="col-md-3">
                 <label for="district" class="form-label">District</label>
-                <input type="text" class="form-control" id="district" name="district" readonly
-                  placeholder="District">
+                <input type="text" class="form-control" id="district" name="district" readonly placeholder="District">
               </div>
 
               <!-- Barangay Dropdown -->
@@ -539,8 +540,9 @@
                     while ($row = $barangays_result->fetch_assoc()) {
                       $brgy_id = htmlspecialchars($row['brgy_id'], ENT_QUOTES);
                       $brgy_name = htmlspecialchars($row['brgy_name'], ENT_QUOTES);
-                      $m_for_brgy = htmlspecialchars($row['m_id'], ENT_QUOTES); // municipality id for this barangay
-                      echo "<option value='{$brgy_id}' data-municipality='{$m_for_brgy}'>{$brgy_name}</option>";
+                      $m_for_brgy = htmlspecialchars($row['m_id'], ENT_QUOTES);
+                      // FIXED: Using data-municipality-id consistently
+                      echo "<option value='{$brgy_name}' data-municipality-id='{$m_for_brgy}'>{$brgy_name}</option>";
                     }
                   } else {
                     echo "<option disabled>No active barangays</option>";
@@ -548,57 +550,57 @@
                   ?>
                 </select>
               </div>
-            </div>
 
-            <!-- House Tag Number and Land Area -->
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label for="house_tag_number" class="form-label">House Tag Number</label>
-                <input type="number" id="house_tag_number" name="house_tag_number" class="form-control"
-                  placeholder="House Tag Number">
+              <!-- House Tag Number and Land Area -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="house_tag_number" class="form-label">House Tag Number</label>
+                  <input type="number" id="house_tag_number" name="house_tag_number" class="form-control"
+                    placeholder="House Tag Number">
+                </div>
+                <div class="col-md-6">
+                  <label for="land_area" class="form-label"><span style="color: red;">*</span> Land Area (sq. m)</label>
+                  <input type="number" id="land_area" name="land_area" class="form-control" placeholder="Land Area"
+                    required>
+                </div>
               </div>
-              <div class="col-md-6">
-                <label for="land_area" class="form-label"><span style="color: red;">*</span> Land Area (sq. m)</label>
-                <input type="number" id="land_area" name="land_area" class="form-control" placeholder="Land Area"
-                  required>
-              </div>
-            </div>
 
-            <!-- Description of Land -->
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label for="lot_no" class="form-label">Lot Number</label>
-                <input type="number" id="lot_no" name="lot_no" class="form-control" placeholder="Lot Number">
+              <!-- Description of Land -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="lot_no" class="form-label">Lot Number</label>
+                  <input type="number" id="lot_no" name="lot_no" class="form-control" placeholder="Lot Number">
+                </div>
+                <div class="col-md-6">
+                  <label for="zone_no" class="form-label">Zone Number</label>
+                  <input type="number" id="zone_no" name="zone_no" class="form-control" placeholder="Zone Number">
+                </div>
               </div>
-              <div class="col-md-6">
-                <label for="zone_no" class="form-label">Zone Number</label>
-                <input type="number" id="zone_no" name="zone_no" class="form-control" placeholder="Zone Number">
-              </div>
-            </div>
 
-            <!-- Documents -->
-            <fieldset class="border p-3 mb-3">
-              <legend class="w-auto">Documents</legend>
-              <div class="form-check">
-                <input type="checkbox" id="cb_affidavit" name="documents[]" value="affidavit" class="form-check-input">
-                <label for="cb_affidavit" class="form-check-label">Affidavit of Ownership</label>
-              </div>
-              <div class="form-check">
-                <input type="checkbox" id="cb_barangay" name="documents[]" value="barangay" class="form-check-input">
-                <label for="cb_barangay" class="form-check-label">Barangay Certificate</label>
-              </div>
-              <div class="form-check">
-                <input type="checkbox" id="cb_tag" name="documents[]" value="land_tagging" class="form-check-input">
-                <label for="cb_tag" class="form-check-label">Land Tagging</label>
-              </div>
-            </fieldset>
+              <!-- Documents -->
+              <fieldset class="border p-3 mb-3">
+                <legend class="w-auto">Documents</legend>
+                <div class="form-check">
+                  <input type="checkbox" id="cb_affidavit" name="documents[]" value="affidavit"
+                    class="form-check-input">
+                  <label for="cb_affidavit" class="form-check-label">Affidavit of Ownership</label>
+                </div>
+                <div class="form-check">
+                  <input type="checkbox" id="cb_barangay" name="documents[]" value="barangay" class="form-check-input">
+                  <label for="cb_barangay" class="form-check-label">Barangay Certificate</label>
+                </div>
+                <div class="form-check">
+                  <input type="checkbox" id="cb_tag" name="documents[]" value="land_tagging" class="form-check-input">
+                  <label for="cb_tag" class="form-check-label">Land Tagging</label>
+                </div>
+              </fieldset>
 
-            <!-- Button Group -->
-            <div class="d-flex justify-content-end mt-4">
-              <button type="submit" class="btn btn-primary">Submit</button>
-              <button type="button" class="btn btn-secondary ml-2" onclick="clearMainForm()">Clear Form</button>
-              <a href="Real-Property-Unit-List.php" class="btn btn-danger ml-2">Cancel</a>
-            </div>
+              <!-- Button Group -->
+              <div class="d-flex justify-content-end mt-4">
+                <a href="Real-Property-Unit-List.php" class="btn btn-danger">Cancel</a>
+                <button type="button" class="btn btn-secondary ml-2" onclick="clearMainForm()">Clear Form</button>
+                <button type="submit" class="btn btn-primary ml-2">Submit</button>
+              </div>
           </form>
         </div>
       </div>
