@@ -214,21 +214,32 @@ function formatPin($value)
             </div>
         </div>
 
-        <div class="section">
-            <p><span class="bold">OCT/TCT No.:</span> <u>_________________</u> &nbsp;&nbsp; <span class="bold">Survey
-                    No.:</span>
-                <u>_________________</u> &nbsp;&nbsp; <span class="bold">Lot No.:</span> <u>_________________</u>
-                &nbsp;&nbsp; <span class="bold">Blk No.:</span> <u>_________________</u>
-            </p>
-        </div>
+        <?php foreach ($land_properties as $land): ?>
+            <div class="section">
+                <p>
+                    <span class="bold">OCT/TCT No.:</span>
+                    <u>_____<?= htmlspecialchars($land['oct_no'] ?? '') ?>_____</u>
+                    &nbsp;&nbsp;
+                    <span class="bold">Survey No.:</span>
+                    <u>_____<?= htmlspecialchars($land['survey_no'] ?? '') ?>_____</u>
+                    &nbsp;&nbsp;
+                    <span class="bold">Lot No.:</span>
+                    <u>_____<?= htmlspecialchars($land['land_desc'] ?? '') ?>_____</u>
+                    &nbsp;&nbsp;
+                    <span class="bold">Blk No.:</span>
+                    <u>_____<?= htmlspecialchars($land['blk_no'] ?? '') ?>_____</u>
+                </p>
+            </div>
 
-        <div class="section" style="display: flex; align-items: center; gap: 20px;">
-            <p class="bold" style="margin: 0;">Boundaries:</p>
-            <p style="margin: 0;">North: ____________________</p>
-            <p style="margin: 0;">East: ____________________</p>
-            <p style="margin: 0;">South: ____________________</p>
-            <p style="margin: 0;">West: ____________________</p>
-        </div>
+            <div class="section" style="display: flex; align-items: center; gap: 20px;">
+                <p class="bold" style="margin: 0;">Boundaries:</p>
+                <p style="margin: 0;">North: ____________________ <?= htmlspecialchars($land['north'] ?? '') ?></p>
+                <p style="margin: 0;">East: ____________________ <?= htmlspecialchars($land['east'] ?? '') ?></p>
+                <p style="margin: 0;">South: ____________________ <?= htmlspecialchars($land['south'] ?? '') ?></p>
+                <p style="margin: 0;">West: ____________________ <?= htmlspecialchars($land['west'] ?? '') ?></p>
+            </div>
+        <?php endforeach; ?>
+
         <p style="font-size: 12px; text-align: center; margin-top: 5px;">
             (State streets, streams or PIN by which bounded, or names of the owner of adjacent lands)
         </p>

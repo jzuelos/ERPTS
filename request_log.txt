@@ -174,3 +174,5 @@ Attempting INSERT into rpu_idnum with: arp=4234, pin=32434, taxability=taxable, 
 {"faasId":"36","arpNumber":"4234-2","propertyNumber":"110123456789","taxability":"taxable","effectivity":"2025"}
 {"faasId":"36","arpNumber":"4234-2","propertyNumber":"110123456789","taxability":"taxable","effectivity":"2025"}
 {"faasId":"36","arpNumber":"4234-2","propertyNumber":"110123456789","taxability":"taxable","effectivity":"2025"}
+{"faasId":"43","arpNumber":"","propertyNumber":"","taxability":"","effectivity":""}
+{"faasId":"43","arpNumber":"3212-3412-3121-423","propertyNumber":"5324234134512","taxability":"taxable","effectivity":"2027"}
