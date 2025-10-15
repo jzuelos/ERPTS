@@ -79,7 +79,7 @@ function saveRPUData() {
       if (data.success) {
         alert('Success');
       } else {
-        alert('Failed to insert data: ' + data.error);
+        alert(data.error || 'Failed to insert data.');
       }
     })
     .catch(error => {
@@ -289,10 +289,10 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 //Eye Icon Hover
-  document.addEventListener("DOMContentLoaded", function () {
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+document.addEventListener("DOMContentLoaded", function () {
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
   });
+});
 

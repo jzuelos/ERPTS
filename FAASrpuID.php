@@ -1,6 +1,5 @@
 <?php
 header('Content-Type: application/json');
-
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('log_errors', 1);
@@ -13,7 +12,6 @@ if ($conn->connect_error) {
     exit(json_encode(['success' => false, 'error' => 'Database connection failed.']));
 }
 
-// Get JSON input
 $data = json_decode(file_get_contents('php://input'), true);
 file_put_contents('request_log.txt', json_encode($data) . PHP_EOL, FILE_APPEND);
 
@@ -21,11 +19,11 @@ if (empty($data['arpNumber']) || empty($data['propertyNumber']) || empty($data['
     exit(json_encode(['success' => false, 'error' => 'Missing required fields.']));
 }
 
-$arpNumber = $data['arpNumber'];
-$propertyNumber = $data['propertyNumber'];
-$taxability = $data['taxability'];
-$effectivity = $data['effectivity'];
-$faasId = $data['faasId'];
+$arpNumber = trim($data['arpNumber']);
+$propertyNumber = trim($data['propertyNumber']);
+$taxability = trim($data['taxability']);
+$effectivity = trim($data['effectivity']);
+$faasId = (int)$data['faasId'];
 
 // Step 1: Check if faas has rpu_idno
 $check_sql = "SELECT rpu_idno FROM faas WHERE faas_id = ?";
@@ -40,11 +38,29 @@ if ($check_result->num_rows > 0) {
     $existing_rpu_id = $row['rpu_idno'];
 
     if (!empty($existing_rpu_id)) {
-        // Step 2: Update rpu_idnum
-        // Update
+        // Step 2: Fetch current rpu_idnum data
+        $get_sql = "SELECT arp, pin, taxability, effectivity FROM rpu_idnum WHERE rpu_id = ?";
+        $get_stmt = $conn->prepare($get_sql);
+        $get_stmt->bind_param("i", $existing_rpu_id);
+        $get_stmt->execute();
+        $current = $get_stmt->get_result()->fetch_assoc();
+        $get_stmt->close();
+
+        // Step 3: Compare existing vs new data
+        if (
+            $current &&
+            $current['arp'] === $arpNumber &&
+            $current['pin'] === $propertyNumber &&
+            $current['taxability'] === $taxability &&
+            $current['effectivity'] === $effectivity
+        ) {
+            exit(json_encode(['success' => false, 'error' => 'No changes detected.']));
+        }
+
+        // Step 4: Update only if changes exist
         $update_sql = "UPDATE rpu_idnum 
-               SET arp = ?, pin = ?, taxability = ?, effectivity = ?, faas_id = ? 
-               WHERE rpu_id = ?";
+                       SET arp = ?, pin = ?, taxability = ?, effectivity = ?, faas_id = ? 
+                       WHERE rpu_id = ?";
         $update_stmt = $conn->prepare($update_sql);
         $update_stmt->bind_param("ssssii", $arpNumber, $propertyNumber, $taxability, $effectivity, $faasId, $existing_rpu_id);
 
@@ -56,8 +72,7 @@ if ($check_result->num_rows > 0) {
     }
 }
 
-// Step 3: Insert new rpu_idnum record
-// Insert
+// Step 5: If no existing rpu_idnum, insert new record
 $insert_sql = "INSERT INTO rpu_idnum (arp, pin, taxability, effectivity, faas_id) 
                VALUES (?, ?, ?, ?, ?)";
 $insert_stmt = $conn->prepare($insert_sql);
@@ -70,7 +85,7 @@ if (!$insert_stmt->execute()) {
 $new_rpu_id = $conn->insert_id;
 $insert_stmt->close();
 
-// Step 4: Update faas table with new rpu_id
+// Step 6: Update faas table with new rpu_id
 $update_faas_sql = "UPDATE faas SET rpu_idno = ? WHERE faas_id = ?";
 $update_faas_stmt = $conn->prepare($update_faas_sql);
 $update_faas_stmt->bind_param("ii", $new_rpu_id, $faasId);
