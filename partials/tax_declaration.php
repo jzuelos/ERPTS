@@ -96,20 +96,24 @@
 
             <div class="text-end mt-4">
                 <?php
-                $p_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
-                $noLand = empty($land_data); // true if no land record found
+                // Use $property_id instead of $p_id
+                $faas_id_for_print = $rpu_declaration['faas_id'] ?? null;
+                $land_data = $faas_id_for_print ? fetchLandRecords($conn, $faas_id_for_print) : [];
+                $noLand = empty($land_data);
+                $printDisabled = $noLand ? 'disabled title="No land record found for this FAAS."' : '';
                 ?>
+
                 <button type="button" class="btn btn-outline-primary btn-sm"
-                    onclick="<?php if (!$noLand): ?>window.open('DRP.php?p_id=<?= urlencode($p_id) ?>', '_blank')<?php endif; ?>"
-                    <?= $disableButton ?> <?= $noLand ? 'disabled title="Cannot print — no land record found for this FAAS."' : '' ?>>
+                    onclick="<?php if (!$noLand && isset($property_id)): ?>window.open('DRP.php?p_id=<?= urlencode($property_id) ?>', '_blank')<?php endif; ?>"
+                    <?= $printDisabled ?>>
                     <i class="bi bi-printer"></i> Print
                 </button>
+
                 <?php if ($noLand): ?>
                     <p class="text-danger small mt-2">
-                        ⚠️ Printing is disabled: No land record is linked to this FAAS.
+                        ⚠️ No land record linked to this FAAS.
                     </p>
                 <?php endif; ?>
-
             </div>
         </form>
     </div>

@@ -422,9 +422,6 @@ if ($faas_id) {
   echo "<div id='faas-id' style='display:none;'>Faas ID: " . htmlspecialchars($faas_id) . "</div>";
 }
 
-
-$conn->close();
-
 // ============================================================================
 // VIEW RENDERING
 // ============================================================================
@@ -491,6 +488,13 @@ $conn->close();
 
   <!-- Valuation Section -->
   <?php include 'partials/valuation.php'; ?>
+
+  <?php
+  // Close the database connection safely AFTER all includes have used it
+  if ($conn) {
+    $conn->close();
+  }
+  ?>
 
   <!-- Floating Navigation Menu -->
   <div class="dropdown" style="position:fixed; bottom:20px; right:20px; z-index:1050;">
