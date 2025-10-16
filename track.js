@@ -1151,3 +1151,4 @@ function formatCurrencyInput(element) {
       element.value = value.toFixed(2);
     }
   }
+}
