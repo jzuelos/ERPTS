@@ -119,6 +119,24 @@ function checkDuplicateOwner($conn, $tinNumber, $firstName, $surname, $birthday)
   ];
 }
 
+// Initialize form data array
+$formData = [
+  'firstName' => '',
+  'middleName' => '',
+  'surname' => '',
+  'birthday' => '',
+  'tinNumber' => '',
+  'city' => '',
+  'barangay' => '',
+  'district' => '',
+  'province' => '',
+  'streetHouse' => '',
+  'telephone' => '',
+  'fax' => '',
+  'email' => '',
+  'website' => ''
+];
+
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   // Sanitize and retrieve form data
@@ -154,6 +172,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   $website = filter_input(INPUT_POST, 'website', FILTER_SANITIZE_URL);
   $website = $website ?: ''; // Use empty string if null
+
+  // Store form data in session for preservation
+  $_SESSION['form_data'] = [
+    'firstName' => $firstName,
+    'middleName' => $middleName,
+    'surname' => $surname,
+    'birthday' => $birthday,
+    'tinNumber' => $tinNumber,
+    'city' => $city,
+    'barangay' => $barangay,
+    'district' => $district,
+    'province' => $province,
+    'streetHouse' => $streetHouse,
+    'telephone' => $telephone,
+    'fax' => $fax,
+    'email' => $email,
+    'website' => $website
+  ];
 
   // Format optional owner information
   $ownInfo = "Telephone: $telephone, Fax: $fax, Email: $email, Website: $website";
@@ -253,6 +289,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           logActivity($conn, $userId, $logMessage);
         }
 
+        // Clear form data on success
+        unset($_SESSION['form_data']);
+        
         $_SESSION['message'] = "Property owner added successfully!";
         header("Location: " . $_SERVER['PHP_SELF']);
         exit;
@@ -282,6 +321,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
   }
+}
+
+// Restore form data from session if available
+if (isset($_SESSION['form_data'])) {
+  $formData = $_SESSION['form_data'];
 }
 
 // ✅ Fetch municipalities
@@ -323,11 +367,7 @@ $barangays_json = json_encode($barangays);
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-KyZXEJr+8+6g5K4r53m5s3xmw1Is0J6wBd04YOeFvXOsZTgmYF9flT/qe6LZ9s+0" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
-    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="header.css">
   <link rel="stylesheet" href="Add_POwner.css">
@@ -380,23 +420,23 @@ $barangays_json = json_encode($barangays);
             <h5>Owner's Information <small class="text-muted">(Required)</small></h5>
             <div class="form-group mb-3">
               <label for="firstName"><span class="text-danger">*</span> First Name</label>
-              <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter First Name" required>
+              <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter First Name" value="<?= htmlspecialchars($formData['firstName']) ?>" required>
             </div>
             <div class="form-group mb-3">
               <label for="middleName">Middle Name</label>
-              <input type="text" class="form-control" id="middleName" name="middleName" placeholder="Enter Middle Name">
+              <input type="text" class="form-control" id="middleName" name="middleName" placeholder="Enter Middle Name" value="<?= htmlspecialchars($formData['middleName']) ?>">
             </div>
             <div class="form-group mb-3">
               <label for="surname"><span class="text-danger">*</span> Surname</label>
-              <input type="text" class="form-control" id="surname" name="surname" placeholder="Enter Surname" required>
+              <input type="text" class="form-control" id="surname" name="surname" placeholder="Enter Surname" value="<?= htmlspecialchars($formData['surname']) ?>" required>
             </div>
             <div class="form-group mb-3">
               <label for="birthday"><span class="text-danger">*</span> Birthday</label>
-              <input type="date" class="form-control" id="birthday" name="birthday" required>
+              <input type="date" class="form-control" id="birthday" name="birthday" value="<?= htmlspecialchars($formData['birthday']) ?>" required>
             </div>
             <div class="form-group mb-3">
               <label for="tinNumber"><span class="text-danger">*</span> TIN No.</label>
-              <input type="text" class="form-control" id="tinNumber" name="tinNumber" placeholder="Enter TIN Number" required>
+              <input type="text" class="form-control" id="tinNumber" name="tinNumber" placeholder="Enter TIN Number" value="<?= htmlspecialchars($formData['tinNumber']) ?>" required>
             </div>
           </div>
 
@@ -404,19 +444,19 @@ $barangays_json = json_encode($barangays);
             <h5>Owner Information <small class="text-muted">(Optional)</small></h5>
             <div class="form-group mb-3">
               <label for="telephone">Telephone</label>
-              <input type="text" class="form-control" id="telephone" name="telephone" placeholder="Enter Telephone Number">
+              <input type="text" class="form-control" id="telephone" name="telephone" placeholder="Enter Telephone Number" value="<?= htmlspecialchars($formData['telephone']) ?>">
             </div>
             <div class="form-group mb-3">
               <label for="fax">Fax</label>
-              <input type="text" class="form-control" id="fax" name="fax" placeholder="Enter Fax Number">
+              <input type="text" class="form-control" id="fax" name="fax" placeholder="Enter Fax Number" value="<?= htmlspecialchars($formData['fax']) ?>">
             </div>
             <div class="form-group mb-3">
               <label for="email">Email</label>
-              <input type="email" class="form-control" id="email" name="email" placeholder="Enter Email Address">
+              <input type="email" class="form-control" id="email" name="email" placeholder="Enter Email Address" value="<?= htmlspecialchars($formData['email']) ?>">
             </div>
             <div class="form-group mb-3">
               <label for="website">Website</label>
-              <input type="url" class="form-control" id="website" name="website" placeholder="Enter Website URL">
+              <input type="url" class="form-control" id="website" name="website" placeholder="Enter Website URL" value="<?= htmlspecialchars($formData['website']) ?>">
             </div>
           </div>
         </div>
@@ -431,9 +471,9 @@ $barangays_json = json_encode($barangays);
           <div class="col-md-3 mb-3">
             <label for="city"><span class="text-danger">*</span> Municipality / City</label>
             <select class="form-select" id="city" name="city" required>
-              <option value="" selected disabled>Select Municipality</option>
+              <option value="" <?= empty($formData['city']) ? 'selected' : '' ?> disabled>Select Municipality</option>
               <?php while ($row = $municipalities_result->fetch_assoc()) { ?>
-                <option value="<?= htmlspecialchars($row['m_id']) ?>">
+                <option value="<?= htmlspecialchars($row['m_id']) ?>" <?= $formData['city'] == $row['m_id'] ? 'selected' : '' ?>>
                   <?= htmlspecialchars($row['m_description']) ?>
                 </option>
               <?php } ?>
@@ -443,23 +483,29 @@ $barangays_json = json_encode($barangays);
           <!-- District -->
           <div class="col-md-3 mb-3">
             <label for="district"><span class="text-danger">*</span> District</label>
-            <select class="form-select" id="district" name="district" required disabled>
-              <option value="" selected disabled>Select District</option>
+            <select class="form-select" id="district" name="district" required <?= empty($formData['district']) ? 'disabled' : '' ?>>
+              <option value="" <?= empty($formData['district']) ? 'selected' : '' ?> disabled>Select District</option>
+              <?php if (!empty($formData['district'])): ?>
+                <option value="<?= htmlspecialchars($formData['district']) ?>" selected><?= htmlspecialchars(getDistrictName($conn, $formData['district'])) ?></option>
+              <?php endif; ?>
             </select>
           </div>
 
           <!-- Barangay -->
           <div class="col-md-3 mb-3">
             <label for="barangay"><span class="text-danger">*</span> Barangay</label>
-            <select class="form-select" id="barangay" name="barangay" required disabled>
-              <option value="" selected disabled>Select Barangay</option>
+            <select class="form-select" id="barangay" name="barangay" required <?= empty($formData['barangay']) ? 'disabled' : '' ?>>
+              <option value="" <?= empty($formData['barangay']) ? 'selected' : '' ?> disabled>Select Barangay</option>
+              <?php if (!empty($formData['barangay'])): ?>
+                <option value="<?= htmlspecialchars($formData['barangay']) ?>" selected><?= htmlspecialchars(getBarangayName($conn, $formData['barangay'])) ?></option>
+              <?php endif; ?>
             </select>
           </div>
 
           <!-- Street / House Number - Made optional -->
           <div class="col-md-3 mb-3">
             <label for="streetHouse">Street / House No.</label>
-            <input type="text" class="form-control" id="streetHouse" name="streetHouse" placeholder="Enter Street / House No.">
+            <input type="text" class="form-control" id="streetHouse" name="streetHouse" placeholder="Enter Street / House No." value="<?= htmlspecialchars($formData['streetHouse']) ?>">
           </div>
         </div>
 
@@ -479,15 +525,6 @@ $barangays_json = json_encode($barangays);
   </footer>
 
   <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3oAi1Kn5/yo9M4aW5rY1LYi9Cj3jRIvYIZAZ5h8oW7B5h2C7z5e8B2CKy7uWgG"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.11.0/dist/umd/popper.min.js"
-    integrity="sha384-1A2Z3A6C0e0gB3b3gmJ3g5BO5x0B1DAIlxgG5F8bB1Zqf7uE2W0p1Fh0b2RM0G1Z9"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-Chfqqxu3y5C8LQXhSh2gN5F6azZ9L2H8eY+mcO8b6Q8R9SQh7PQe0i0K+8zG3p7U"
-    crossorigin="anonymous"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
@@ -499,28 +536,36 @@ $barangays_json = json_encode($barangays);
       const districtSelect = document.getElementById("district");
       const barangaySelect = document.getElementById("barangay");
 
-      citySelect.addEventListener("change", function() {
-        const m_id = this.value;
+      // Preserve selected values
+      const savedCity = "<?= htmlspecialchars($formData['city']) ?>";
+      const savedDistrict = "<?= htmlspecialchars($formData['district']) ?>";
+      const savedBarangay = "<?= htmlspecialchars($formData['barangay']) ?>";
 
-        // Reset dropdowns
+      // Function to populate districts
+      function populateDistricts(m_id, selectDistrictId = null) {
         districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
-        barangaySelect.innerHTML = '<option value="" disabled selected>Select Barangay</option>';
-        districtSelect.disabled = true;
-        barangaySelect.disabled = true;
-
-        // ✅ Auto-fill first district for this municipality
+        
         const filteredDistricts = districts.filter(d => d.m_id == m_id);
         if (filteredDistricts.length > 0) {
-          const d = filteredDistricts[0]; // pick first
+          const d = filteredDistricts[0];
           const opt = document.createElement("option");
           opt.value = d.district_id;
           opt.textContent = d.description;
           districtSelect.appendChild(opt);
-          districtSelect.value = d.district_id;
-          districtSelect.disabled = true; // locked
+          
+          if (selectDistrictId && selectDistrictId == d.district_id) {
+            districtSelect.value = d.district_id;
+          } else {
+            districtSelect.value = d.district_id;
+          }
+          districtSelect.disabled = true;
         }
+      }
 
-        // ✅ Load barangays for this municipality
+      // Function to populate barangays
+      function populateBarangays(m_id, selectBarangayId = null) {
+        barangaySelect.innerHTML = '<option value="" disabled selected>Select Barangay</option>';
+        
         const filteredBarangays = barangays.filter(b => b.m_id == m_id);
         if (filteredBarangays.length > 0) {
           filteredBarangays.forEach(b => {
@@ -529,8 +574,27 @@ $barangays_json = json_encode($barangays);
             opt.textContent = b.brgy_name;
             barangaySelect.appendChild(opt);
           });
+          
+          if (selectBarangayId) {
+            barangaySelect.value = selectBarangayId;
+          }
           barangaySelect.disabled = false;
         }
+      }
+
+      // On page load, restore selections if form data exists
+      if (savedCity) {
+        populateDistricts(savedCity, savedDistrict);
+        populateBarangays(savedCity, savedBarangay);
+      }
+
+      citySelect.addEventListener("change", function() {
+        const m_id = this.value;
+        barangaySelect.innerHTML = '<option value="" disabled selected>Select Barangay</option>';
+        barangaySelect.disabled = true;
+        
+        populateDistricts(m_id);
+        populateBarangays(m_id);
       });
     });
   </script>
@@ -550,8 +614,6 @@ $barangays_json = json_encode($barangays);
       }, 5000); // milliseconds x 1000 = seconds
     });
   </script>
-
-
 </body>
 
 </html>
