@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['captcha_verified']) || $_SESSION['captcha_verified'] !== true) {
+    header("Location: verify.php");
+    exit();
+}
 require_once "../database.php"; // adjust path
 
 $conn = Database::getInstance();
