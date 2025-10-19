@@ -417,6 +417,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             exit;
         }
 
+        // ------------------ RENAME DOCUMENT ------------------
+        elseif ($action === 'renameDocument') {
+            $file_id = intval($_POST['file_id'] ?? 0);
+            $new_name = trim($_POST['new_name'] ?? '');
+
+            if ($file_id <= 0 || $new_name === '') {
+                echo json_encode(["success" => false, "message" => "Invalid file ID or new name"]);
+                exit;
+            }
+
+            // Fetch current file info
+            $stmt = $conn->prepare("SELECT file_path, transaction_id FROM transaction_files WHERE file_id = ?");
+            $stmt->bind_param("i", $file_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows === 0) {
+                echo json_encode(["success" => false, "message" => "File not found in database"]);
+                exit;
+            }
+
+            $file = $result->fetch_assoc();
+            $oldPath = __DIR__ . '/' . $file['file_path'];
+            $dir = dirname($oldPath);
+            $ext = pathinfo($oldPath, PATHINFO_EXTENSION);
+
+            // Sanitize and build new filename (preserving extension)
+            $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', pathinfo($new_name, PATHINFO_FILENAME));
+            $newFileName = $safeName . '.' . $ext;
+            $newPath = $dir . '/' . $newFileName;
+
+            // Check file existence
+            if (!file_exists($oldPath)) {
+                echo json_encode(["success" => false, "message" => "File not found on disk"]);
+                exit;
+            }
+
+            // Perform rename
+            if (!rename($oldPath, $newPath)) {
+                echo json_encode(["success" => false, "message" => "Failed to rename file on server"]);
+                exit;
+            }
+
+            // Update DB path
+            $relativePath = str_replace(__DIR__ . '/', '', $newPath);
+            $stmt = $conn->prepare("UPDATE transaction_files SET file_path = ? WHERE file_id = ?");
+            $stmt->bind_param("si", $relativePath, $file_id);
+            $ok = $stmt->execute();
+
+            echo json_encode([
+                "success" => $ok,
+                "new_name" => $newFileName,
+                "message" => $ok ? "File renamed successfully" : "Database update failed"
+            ]);
+            exit;
+        }
+
         // ------------------ SAVE QR UPLOAD (from mobile_upload.php) ----------
         elseif ($action === 'saveQrUpload') {
             $t_code = $_POST['t_code'] ?? '';

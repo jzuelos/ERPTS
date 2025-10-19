@@ -776,20 +776,37 @@ function showDocuments(transactionId) {
         wrapper.style.fontSize = "0.85rem";
 
         wrapper.innerHTML = `
-          <div class="pdf-thumb d-flex align-items-center justify-content-center rounded bg-white border mx-auto mb-1"
-               style="width:70px; height:90px; cursor:pointer;"
-               onclick="viewDocument('${filePath}', '${fileName}', ${isPdf})">
-            <i class="bi bi-file-earmark-pdf text-danger" style="font-size:1.8rem;"></i>
-          </div>
-          <div class="text-truncate fw-semibold" title="${fileName}">${displayName}</div>
-          <small class="text-muted d-block">${file.uploaded_at || ""}</small>
-          <button class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-1 py-0 px-1"
-                  style="font-size:0.75rem;" 
-                  title="Delete" 
-                  onclick="deleteDocument(${file.file_id}, ${transactionId})">
-            <i class="bi bi-x"></i>
-          </button>
-        `;
+  <div class="position-relative text-center">
+    <!-- Thumbnail -->
+    <div class="pdf-thumb d-flex align-items-center justify-content-center rounded bg-white border mx-auto mb-1"
+         style="width:70px; height:90px; cursor:pointer;"
+         onclick="viewDocument('${filePath}', '${fileName}', ${isPdf})">
+      <i class="bi bi-file-earmark-pdf text-danger" style="font-size:1.8rem;"></i>
+    </div>
+
+    <!-- Filename with rename icon -->
+    <div class="d-flex align-items-center justify-content-center text-truncate fw-semibold px-2"
+         style="max-width:120px;"
+         title="${fileName}">
+      <span class="text-truncate">${displayName}</span>
+      <i class="bi bi-pencil ms-1 text-muted"
+         style="font-size:0.8rem; cursor:pointer;"
+         title="Rename"
+         onclick="renameDocument(${file.file_id}, '${fileName}')"></i>
+    </div>
+
+    <small class="text-muted d-block">${file.uploaded_at || ""}</small>
+
+    <!-- Delete button -->
+    <button class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-1 py-0 px-1"
+            style="font-size:0.75rem;" 
+            title="Delete" 
+            onclick="deleteDocument(${file.file_id}, ${transactionId})">
+      <i class="bi bi-x"></i>
+    </button>
+  </div>
+`;
+
 
         container.appendChild(wrapper);
       });
@@ -797,6 +814,140 @@ function showDocuments(transactionId) {
       new bootstrap.Modal(document.getElementById("documentsModal")).show();
     })
     .catch(err => console.error("Error loading documents:", err));
+}
+
+// Inline Rename Document
+function renameDocument(fileId, oldName) {
+  const pencilIcon = event.target;
+  const fileItem = pencilIcon.closest(".doc-item");
+  if (!fileItem) return;
+
+  const nameSpan = fileItem.querySelector("span.text-truncate");
+  if (!nameSpan) return;
+
+  // Prevent double editing
+  if (fileItem.querySelector(".rename-input")) return;
+
+  const ext = oldName.split('.').pop(); // file extension
+  const baseName = oldName.replace(/\.[^/.]+$/, ""); // remove extension
+
+  // Create input
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = baseName;
+  input.className = "form-control form-control-sm rename-input";
+  input.style.width = "100%";
+  input.style.fontSize = "0.85rem";
+  input.style.textAlign = "center";
+
+  // Replace span
+  nameSpan.replaceWith(input);
+  pencilIcon.style.display = "none";
+  input.focus();
+  input.select();
+
+  // 🔹 Automatically replace spaces with underscores as user types
+  input.addEventListener("input", () => {
+    input.value = input.value.replace(/\s+/g, "_");
+  });
+
+  const restore = (newBase) => {
+    const finalName = newBase.trim() ? `${newBase.trim()}.${ext}` : oldName;
+
+    // Create a new span for the updated name
+    const newSpan = document.createElement("span");
+    newSpan.className = "text-truncate";
+    newSpan.textContent = finalName;
+
+    // Replace input → span
+    input.replaceWith(newSpan);
+    pencilIcon.style.display = "";
+
+    // ✅ Update the parent div title attribute (hover tooltip)
+    const nameContainer = fileItem.querySelector(".fw-semibold");
+    if (nameContainer) nameContainer.setAttribute("title", finalName);
+
+    return finalName;
+  };
+
+
+  const saveName = () => {
+    const newBase = input.value.trim();
+    if (!newBase || `${newBase}.${ext}` === oldName) {
+      restore(baseName);
+      return;
+    }
+
+    const newName = `${newBase}.${ext}`;
+    const formData = new FormData();
+    formData.append("action", "renameDocument");
+    formData.append("file_id", fileId);
+    formData.append("new_name", newName);
+
+    fetch("trackFunctions.php", {
+      method: "POST",
+      body: formData
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const newBase = input.value.trim();
+          const newFileName = `${newBase}.${ext}`;
+
+          // ✅ Update display text
+          const newSpan = document.createElement("span");
+          newSpan.className = "text-truncate";
+          newSpan.textContent = newFileName;
+          input.replaceWith(newSpan);
+          pencilIcon.style.display = "";
+
+          // ✅ Update title tooltip
+          const nameContainer = fileItem.querySelector(".fw-semibold");
+          if (nameContainer) nameContainer.setAttribute("title", newFileName);
+
+          // ✅ Update preview onclick completely with the new name
+          const thumb = fileItem.querySelector(".pdf-thumb");
+          if (thumb) {
+            // Detect if it's a PDF (simple check)
+            const isPdf = newFileName.toLowerCase().endsWith(".pdf");
+
+            // Extract the old filePath from the existing onclick attribute
+            const oldOnClick = thumb.getAttribute("onclick");
+            const pathMatch = oldOnClick.match(/viewDocument\('([^']+)'/);
+            const oldFilePath = pathMatch ? pathMatch[1] : "";
+
+            // Build new file path (replace old name with new one)
+            const newFilePath = oldFilePath.replace(oldName, newFileName);
+
+            // ✅ Rebuild fresh onclick so viewDocument receives updated args
+            thumb.setAttribute(
+              "onclick",
+              `viewDocument('${newFilePath}', '${newFileName}', ${isPdf})`
+            );
+          }
+
+          // ✅ Update the variable so oldName is no longer stale
+          oldName = newFileName;
+        } else {
+          alert("Rename failed: " + (data.message || "Unknown error"));
+        }
+      })
+      .catch(err => {
+        console.error("Error renaming document:", err);
+        alert("An error occurred while renaming the document.");
+        restore(baseName);
+      });
+  };
+
+  input.addEventListener("blur", saveName);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      input.blur();
+    } else if (e.key === "Escape") {
+      restore(baseName);
+    }
+  });
 }
 
 //Viewer Modal Logic
@@ -1083,47 +1234,47 @@ function openPrintCertificationModal(propertyId) {
 // Handle Print Certification Form Submission
 function handlePrintCertificationSubmit(event) {
   event.preventDefault();
-  
+
   const form = event.target;
   const formData = new FormData(form);
   const submitBtn = form.querySelector('button[type="submit"]');
-  
+
   // Disable submit button to prevent double submission
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
-  
+
   fetch('save_print_certification.php', {
     method: 'POST',
     body: formData
   })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      // Close modal
-      const modal = bootstrap.Modal.getInstance(document.getElementById('printCertificationModal'));
-      modal.hide();
-      
-      // Reset form
-      form.reset();
-      
-      // Open print window with certification ID
-      window.open('DRP.php?p_id=' + data.property_id + '&cert_id=' + data.cert_id, '_blank');
-      
-      // Show success message
-      showAlert('success', 'Certification details saved successfully!');
-    } else {
-      showAlert('danger', 'Error: ' + (data.message || 'Failed to save certification details'));
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    showAlert('danger', 'An error occurred while saving certification details');
-  })
-  .finally(() => {
-    // Re-enable submit button
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = '<i class="bi bi-save"></i> Save & Print';
-  });
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('printCertificationModal'));
+        modal.hide();
+
+        // Reset form
+        form.reset();
+
+        // Open print window with certification ID
+        window.open('DRP.php?p_id=' + data.property_id + '&cert_id=' + data.cert_id, '_blank');
+
+        // Show success message
+        showAlert('success', 'Certification details saved successfully!');
+      } else {
+        showAlert('danger', 'Error: ' + (data.message || 'Failed to save certification details'));
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showAlert('danger', 'An error occurred while saving certification details');
+    })
+    .finally(() => {
+      // Re-enable submit button
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="bi bi-save"></i> Save & Print';
+    });
 }
 
 // Show alert message
@@ -1136,7 +1287,7 @@ function showAlert(type, message) {
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
   `;
   document.body.appendChild(alertDiv);
-  
+
   // Auto-dismiss after 5 seconds
   setTimeout(() => {
     alertDiv.remove();
