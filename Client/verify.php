@@ -9,7 +9,7 @@ if (isset($_SESSION['captcha_verified']) && $_SESSION['captcha_verified'] === tr
 
 // When form is submitted
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $secretKey = "6Ld3Ye8rAAAAAPqsf3GYzP0cuodPvjEn0hu4Phhh"; // Replace with your actual secret key from Google reCAPTCHA
+    $secretKey = "6Ld3Ye8rAAAAAPqsf3GYzP0cuodPvjEn0hu4Phhh"; // Replace with your actual secret key
     $responseKey = $_POST['g-recaptcha-response'];
     $userIP = $_SERVER['REMOTE_ADDR'];
 
@@ -45,11 +45,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
     <?php endif; ?>
 
-    <form method="POST">
-        <div class="g-recaptcha d-flex justify-content-center" data-sitekey="6Ld3Ye8rAAAAAIp4F4LzDk1Vx7gEtr-Uz2bDlzpp"></div>
-        <button type="submit" class="btn btn-primary mt-4 w-100">Continue to Tracking</button>
+    <form id="captchaForm" method="POST">
+        <!-- reCAPTCHA with callback -->
+        <div class="g-recaptcha d-flex justify-content-center"
+             data-sitekey="6Ld3Ye8rAAAAAIp4F4LzDk1Vx7gEtr-Uz2bDlzpp"
+             data-callback="onCaptchaSuccess"></div>
     </form>
 </div>
+
+<script>
+function onCaptchaSuccess() {
+    // Automatically submit the form when CAPTCHA is completed
+    document.getElementById("captchaForm").submit();
+}
+</script>
 
 </body>
 </html>
