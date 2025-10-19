@@ -2,6 +2,7 @@
 /**
  * FAAS (Field Appraisal and Assessment Sheet) Management System
  * Handles property information, owners, RPU details, and tax declarations
+ * WITH COMPREHENSIVE ACTIVITY LOGGING
  */
 
 session_start();
@@ -257,7 +258,7 @@ function fetchRPUDeclaration($conn, $faas_id)
 }
 
 // ============================================================================
-// REQUEST HANDLERS
+// REQUEST HANDLERS WITH COMPREHENSIVE LOGGING
 // ============================================================================
 
 /**
@@ -341,7 +342,7 @@ function handleDisableProperty($conn, $user_role, $current_user_id)
 }
 
 /**
- * Handle RPU declaration save/update (WITH LOGGING)
+ * Handle Tax Declaration Update (WITH COMPREHENSIVE LOGGING)
  */
 function handleRPUDeclaration($conn, $faas_id, $property_id = null)
 {
@@ -364,16 +365,16 @@ function handleRPUDeclaration($conn, $faas_id, $property_id = null)
   $totals = calculateTotalLandValues($conn, $faas_id);
   $total_property_value = ($totals['total_market_value'] ?? 0) + ($totals['total_assess_value'] ?? 0);
 
-  // Check if record exists
+  // ✅ Get old data for comparison
   $check_stmt = $conn->prepare("SELECT * FROM rpu_dec WHERE faas_id = ?");
   $check_stmt->bind_param("i", $faas_id);
   $check_stmt->execute();
-  $exists = $check_stmt->get_result()->num_rows > 0;
+  $old_data = $check_stmt->get_result()->fetch_assoc();
   $check_stmt->close();
 
-  $isUpdate = $exists;
+  $isUpdate = !empty($old_data);
 
-  if ($exists) {
+  if ($isUpdate) {
     // UPDATE
     $stmt = $conn->prepare("UPDATE rpu_dec SET
             arp_no = ?, pro_assess = ?, pro_date = ?, mun_assess = ?, mun_date = ?,
@@ -429,47 +430,115 @@ function handleRPUDeclaration($conn, $faas_id, $property_id = null)
   }
 
   if ($stmt->execute()) {
-    // ✅ LOG TAX DECLARATION ACTION
+    // ✅ LOG TAX DECLARATION ACTION WITH CHANGES
     if (isset($_SESSION['user_id']) && $property_id) {
       $userId = $_SESSION['user_id'];
       $locationDetails = getPropertyLocationDetails($conn, $property_id);
 
-      $action = $isUpdate ? "Updated tax declaration" : "Added new tax declaration";
+      if ($isUpdate) {
+        // Compare changes for update
+        $changes = [];
+        
+        if ($old_data['arp_no'] != $data['arp_no']) {
+          $changes[] = "• ARP Number changed from '{$old_data['arp_no']}' to '{$data['arp_no']}'";
+        }
+        if ($old_data['tax_year'] != $data['tax_year']) {
+          $changes[] = "• Tax Year changed from '{$old_data['tax_year']}' to '{$data['tax_year']}'";
+        }
+        if ($old_data['pro_assess'] != $data['pro_assess']) {
+          $changes[] = "• Provincial Assessor changed from '{$old_data['pro_assess']}' to '{$data['pro_assess']}'";
+        }
+        if ($old_data['pro_date'] != $data['pro_date']) {
+          $changes[] = "• Provincial Date changed from '{$old_data['pro_date']}' to '{$data['pro_date']}'";
+        }
+        if ($old_data['mun_assess'] != $data['mun_assess']) {
+          $changes[] = "• Municipal Assessor changed from '{$old_data['mun_assess']}' to '{$data['mun_assess']}'";
+        }
+        if ($old_data['mun_date'] != $data['mun_date']) {
+          $changes[] = "• Municipal Date changed from '{$old_data['mun_date']}' to '{$data['mun_date']}'";
+        }
+        if ($old_data['td_cancel'] != $data['td_cancel']) {
+          $old_val = $old_data['td_cancel'] ?: 'None';
+          $new_val = $data['td_cancel'] ?: 'None';
+          $changes[] = "• TD Cancelled changed from '$old_val' to '$new_val'";
+        }
+        if ($old_data['previous_pin'] != $data['previous_pin']) {
+          $old_val = $old_data['previous_pin'] ?: 'None';
+          $new_val = $data['previous_pin'] ?: 'None';
+          $changes[] = "• Previous PIN changed from '$old_val' to '$new_val'";
+        }
+        if ($old_data['entered_by'] != $data['entered_by']) {
+          $old_val = $old_data['entered_by'] ?: 'None';
+          $new_val = $data['entered_by'] ?: 'None';
+          $changes[] = "• Entered By changed from '$old_val' to '$new_val'";
+        }
+        if ($old_data['entered_year'] != $data['entered_year']) {
+          $old_val = $old_data['entered_year'] ?: 'None';
+          $new_val = $data['entered_year'] ?: 'None';
+          $changes[] = "• Entered Year changed from '$old_val' to '$new_val'";
+        }
+        if ($old_data['prev_own'] != $data['prev_own']) {
+          $old_val = $old_data['prev_own'] ?: 'None';
+          $new_val = $data['prev_own'] ?: 'None';
+          $changes[] = "• Previous Owner changed from '$old_val' to '$new_val'";
+        }
+        if ($old_data['prev_assess'] != $data['prev_assess']) {
+          $old_val = number_format($old_data['prev_assess'], 2);
+          $new_val = number_format($data['prev_assess'], 2);
+          $changes[] = "• Previous Assessed Value changed from '₱{$old_val}' to '₱{$new_val}'";
+        }
+        if ($old_data['total_property_value'] != $total_property_value) {
+          $old_total = number_format($old_data['total_property_value'], 2);
+          $new_total = number_format($total_property_value, 2);
+          $changes[] = "• Total Property Value changed from '₱{$old_total}' to '₱{$new_total}'";
+        }
 
-      $logMessage  = "$action\n";
-      $logMessage .= "Property ID: $property_id\n";
-      $logMessage .= "FAAS ID: $faas_id\n";
-      $logMessage .= "Location: $locationDetails\n\n";
-
-      $logMessage .= "Tax Declaration Details:\n";
-      if (!empty($data['arp_no'])) {
-        $logMessage .= "• ARP Number: {$data['arp_no']}\n";
+        if (!empty($changes)) {
+          $logMessage  = "Updated tax declaration\n";
+          $logMessage .= "Property ID: $property_id\n";
+          $logMessage .= "FAAS ID: $faas_id\n";
+          $logMessage .= "Location: $locationDetails\n\n";
+          $logMessage .= "Changes:\n" . implode("\n", $changes);
+          
+          logActivity($conn, $userId, $logMessage);
+        }
+      } else {
+        // New tax declaration
+        $logMessage  = "Added new tax declaration\n";
+        $logMessage .= "Property ID: $property_id\n";
+        $logMessage .= "FAAS ID: $faas_id\n";
+        $logMessage .= "Location: $locationDetails\n\n";
+        
+        $logMessage .= "Tax Declaration Details:\n";
+        if (!empty($data['arp_no'])) {
+          $logMessage .= "• ARP Number: {$data['arp_no']}\n";
+        }
+        if (!empty($data['tax_year'])) {
+          $logMessage .= "• Tax Year: {$data['tax_year']}\n";
+        }
+        if (!empty($data['pro_assess'])) {
+          $logMessage .= "• Provincial Assessor: {$data['pro_assess']}\n";
+        }
+        if (!empty($data['pro_date'])) {
+          $logMessage .= "• Provincial Date: {$data['pro_date']}\n";
+        }
+        if (!empty($data['mun_assess'])) {
+          $logMessage .= "• Municipal Assessor: {$data['mun_assess']}\n";
+        }
+        if (!empty($data['mun_date'])) {
+          $logMessage .= "• Municipal Date: {$data['mun_date']}\n";
+        }
+        if (!empty($data['prev_own'])) {
+          $logMessage .= "• Previous Owner: {$data['prev_own']}\n";
+        }
+        if (!empty($data['prev_assess']) && $data['prev_assess'] > 0) {
+          $logMessage .= "• Previous Assessed Value: ₱" . number_format($data['prev_assess'], 2) . "\n";
+        }
+        
+        $logMessage .= "\nTotal Property Value: ₱" . number_format($total_property_value, 2);
+        
+        logActivity($conn, $userId, $logMessage);
       }
-      if (!empty($data['tax_year'])) {
-        $logMessage .= "• Tax Year: {$data['tax_year']}\n";
-      }
-      if (!empty($data['pro_assess'])) {
-        $logMessage .= "• Provincial Assessor: {$data['pro_assess']}\n";
-      }
-      if (!empty($data['pro_date'])) {
-        $logMessage .= "• Provincial Date: {$data['pro_date']}\n";
-      }
-      if (!empty($data['mun_assess'])) {
-        $logMessage .= "• Municipal Assessor: {$data['mun_assess']}\n";
-      }
-      if (!empty($data['mun_date'])) {
-        $logMessage .= "• Municipal Date: {$data['mun_date']}\n";
-      }
-      if (!empty($data['prev_own'])) {
-        $logMessage .= "• Previous Owner: {$data['prev_own']}\n";
-      }
-      if (!empty($data['prev_assess']) && $data['prev_assess'] > 0) {
-        $logMessage .= "• Previous Assessed Value: ₱" . number_format($data['prev_assess'], 2) . "\n";
-      }
-
-      $logMessage .= "\nTotal Property Value: ₱" . number_format($total_property_value, 2);
-
-      logActivity($conn, $userId, $logMessage);
     }
 
     echo "<script>alert('$message Total Value: ₱" . number_format($total_property_value, 2) . "');</script>";
@@ -545,39 +614,8 @@ function handleLandDelete($conn)
   exit();
 }
 
-// ========================================================
-// Inline OR Number Duplication Check (AJAX endpoint)
-// ========================================================
-if (isset($_GET['ajax']) && $_GET['ajax'] === 'check_or_number') {
-    header('Content-Type: application/json');
-    require_once 'database.php';
-
-    if (!isset($_GET['or']) || trim($_GET['or']) === '') {
-        echo json_encode(['exists' => false]);
-        exit;
-    }
-
-    $conn = Database::getInstance();
-    $or_number = strtoupper(trim($_GET['or']));
-
-    $stmt = $conn->prepare("SELECT COUNT(*) AS cnt FROM print_certifications WHERE or_number = ?");
-    $stmt->bind_param("s", $or_number);
-    $stmt->execute();
-    $row = $stmt->get_result()->fetch_assoc();
-
-    echo json_encode(['exists' => $row['cnt'] > 0]);
-    $stmt->close();
-    $conn->close();
-    exit;
-}
-
-
-// ============================================================================
-// EDIT OPERATIONS LOGGING (Add these functions after the existing handlers)
-// ============================================================================
-
 /**
- * Handle Property Information Update (WITH LOGGING)
+ * Handle Property Information Update (WITH COMPREHENSIVE LOGGING)
  */
 function handlePropertyUpdate($conn, $property_id)
 {
@@ -612,11 +650,10 @@ function handlePropertyUpdate($conn, $property_id)
   );
 
   if ($stmt->execute()) {
-    // ✅ LOG PROPERTY UPDATE
+    // ✅ LOG PROPERTY UPDATE WITH PREVIOUS VALUES
     if (isset($_SESSION['user_id'])) {
       $userId = $_SESSION['user_id'];
-      $locationDetails = getPropertyLocationDetails($conn, $property_id);
-
+      
       // Compare changes
       $changes = [];
 
@@ -624,7 +661,9 @@ function handlePropertyUpdate($conn, $property_id)
         $changes[] = "• House Number changed from '{$old_property['house_no']}' to '$house_no'";
       }
       if ($old_property['block_no'] != $block_no) {
-        $changes[] = "• Block Number changed from '{$old_property['block_no']}' to '$block_no'";
+        $old_val = $old_property['block_no'] ?: 'None';
+        $new_val = $block_no ?: 'None';
+        $changes[] = "• Block Number changed from '$old_val' to '$new_val'";
       }
       if ($old_property['land_area'] != $land_area) {
         $changes[] = "• Land Area changed from '{$old_property['land_area']}' to '$land_area' sq.m";
@@ -645,13 +684,19 @@ function handlePropertyUpdate($conn, $property_id)
         $changes[] = "• Barangay changed from '$old_brgy' to '$new_brgy'";
       }
       if ($old_property['house_tag_no'] != $house_tag_no) {
-        $changes[] = "• House Tag Number changed from '{$old_property['house_tag_no']}' to '$house_tag_no'";
+        $old_val = $old_property['house_tag_no'] ?: 'None';
+        $new_val = $house_tag_no ?: 'None';
+        $changes[] = "• House Tag Number changed from '$old_val' to '$new_val'";
       }
       if ($old_property['desc_land'] != $desc_land) {
-        $changes[] = "• Land Description changed from '{$old_property['desc_land']}' to '$desc_land'";
+        $old_val = $old_property['desc_land'] ?: 'None';
+        $new_val = $desc_land ?: 'None';
+        $changes[] = "• Land Description changed from '$old_val' to '$new_val'";
       }
 
       if (!empty($changes)) {
+        $locationDetails = getPropertyLocationDetails($conn, $property_id);
+        
         $logMessage  = "Updated property information\n";
         $logMessage .= "Property ID: $property_id\n";
         $logMessage .= "Location: $locationDetails\n\n";
@@ -670,13 +715,16 @@ function handlePropertyUpdate($conn, $property_id)
 }
 
 /**
- * Handle RPU Identification Update (WITH LOGGING)
+ * Handle RPU Identification Update (WITH COMPREHENSIVE LOGGING)
  */
 function handleRPUUpdate($conn, $property_id)
 {
   // Get FAAS ID
   $faas_info = fetchFaasInfo($conn, $property_id);
-  if (!$faas_info) return;
+  if (!$faas_info) {
+    $_SESSION['flash_error'] = "FAAS information not found.";
+    return;
+  }
 
   $faas_id = $faas_info['faas_id'];
 
@@ -704,12 +752,12 @@ function handleRPUUpdate($conn, $property_id)
 
   // Update or insert RPU
   if ($old_rpu_id && $old_rpu) {
-    // UPDATE
+    // UPDATE existing RPU
     $stmt = $conn->prepare("UPDATE rpu_idnum SET arp = ?, pin = ?, taxability = ?, effectivity = ? WHERE rpu_id = ?");
     $stmt->bind_param("ssssi", $arp, $pin, $taxability, $effectivity, $old_rpu_id);
 
     if ($stmt->execute()) {
-      // ✅ LOG RPU UPDATE
+      // ✅ LOG RPU UPDATE WITH PREVIOUS VALUES
       if (isset($_SESSION['user_id'])) {
         $userId = $_SESSION['user_id'];
         $locationDetails = getPropertyLocationDetails($conn, $property_id);
@@ -717,21 +765,30 @@ function handleRPUUpdate($conn, $property_id)
         $changes = [];
 
         if ($old_rpu['arp'] != $arp) {
-          $changes[] = "• ARP changed from '{$old_rpu['arp']}' to '$arp'";
+          $old_val = $old_rpu['arp'] ?: 'None';
+          $new_val = $arp ?: 'None';
+          $changes[] = "• ARP changed from '$old_val' to '$new_val'";
         }
         if ($old_rpu['pin'] != $pin) {
-          $changes[] = "• PIN changed from '{$old_rpu['pin']}' to '$pin'";
+          $old_val = $old_rpu['pin'] ?: 'None';
+          $new_val = $pin ?: 'None';
+          $changes[] = "• PIN changed from '$old_val' to '$new_val'";
         }
         if ($old_rpu['taxability'] != $taxability) {
-          $changes[] = "• Taxability changed from '{$old_rpu['taxability']}' to '$taxability'";
+          $old_val = $old_rpu['taxability'] ?: 'None';
+          $new_val = $taxability ?: 'None';
+          $changes[] = "• Taxability changed from '$old_val' to '$new_val'";
         }
         if ($old_rpu['effectivity'] != $effectivity) {
-          $changes[] = "• Effectivity changed from '{$old_rpu['effectivity']}' to '$effectivity'";
+          $old_val = $old_rpu['effectivity'] ?: 'None';
+          $new_val = $effectivity ?: 'None';
+          $changes[] = "• Effectivity changed from '$old_val' to '$new_val'";
         }
 
         if (!empty($changes)) {
           $logMessage  = "Updated RPU identification\n";
           $logMessage .= "Property ID: $property_id\n";
+          $logMessage .= "FAAS ID: $faas_id\n";
           $logMessage .= "Location: $locationDetails\n\n";
           $logMessage .= "Changes:\n" . implode("\n", $changes);
 
@@ -740,13 +797,54 @@ function handleRPUUpdate($conn, $property_id)
       }
 
       $_SESSION['flash_success'] = "RPU Identification updated successfully!";
+    } else {
+      $_SESSION['flash_error'] = "Error updating RPU: " . $stmt->error;
+    }
+    $stmt->close();
+  } else {
+    // INSERT new RPU
+    $stmt = $conn->prepare("INSERT INTO rpu_idnum (arp, pin, taxability, effectivity) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $arp, $pin, $taxability, $effectivity);
+    
+    if ($stmt->execute()) {
+      $new_rpu_id = $stmt->insert_id;
+      
+      // Link to FAAS
+      $update_faas = $conn->prepare("UPDATE faas SET rpu_idno = ? WHERE faas_id = ?");
+      $update_faas->bind_param("ii", $new_rpu_id, $faas_id);
+      $update_faas->execute();
+      $update_faas->close();
+      
+      // ✅ LOG NEW RPU
+      if (isset($_SESSION['user_id'])) {
+        $userId = $_SESSION['user_id'];
+        $locationDetails = getPropertyLocationDetails($conn, $property_id);
+        
+        $logMessage  = "Added new RPU identification\n";
+        $logMessage .= "Property ID: $property_id\n";
+        $logMessage .= "FAAS ID: $faas_id\n";
+        $logMessage .= "RPU ID: $new_rpu_id\n";
+        $logMessage .= "Location: $locationDetails\n\n";
+        
+        $logMessage .= "RPU Details:\n";
+        if (!empty($arp)) $logMessage .= "• ARP: $arp\n";
+        if (!empty($pin)) $logMessage .= "• PIN: $pin\n";
+        if (!empty($taxability)) $logMessage .= "• Taxability: $taxability\n";
+        if (!empty($effectivity)) $logMessage .= "• Effectivity: $effectivity\n";
+        
+        logActivity($conn, $userId, $logMessage);
+      }
+      
+      $_SESSION['flash_success'] = "RPU Identification added successfully!";
+    } else {
+      $_SESSION['flash_error'] = "Error adding RPU: " . $stmt->error;
     }
     $stmt->close();
   }
 }
 
 /**
- * Handle Land Record Update (WITH LOGGING)
+ * Handle Land Record Update (WITH COMPREHENSIVE LOGGING)
  */
 function handleLandUpdate($conn)
 {
@@ -788,7 +886,7 @@ function handleLandUpdate($conn)
   );
 
   if ($stmt->execute()) {
-    // ✅ LOG LAND UPDATE
+    // ✅ LOG LAND UPDATE WITH PREVIOUS VALUES
     if (isset($_SESSION['user_id'])) {
       $userId = $_SESSION['user_id'];
       $locationDetails = getPropertyLocationDetails($conn, $p_id);
@@ -799,7 +897,9 @@ function handleLandUpdate($conn)
         $changes[] = "• Classification changed from '{$old_land['classification']}' to '$classification'";
       }
       if ($old_land['sub_class'] != $sub_class) {
-        $changes[] = "• Sub-Class changed from '{$old_land['sub_class']}' to '$sub_class'";
+        $old_val = $old_land['sub_class'] ?: 'None';
+        $new_val = $sub_class ?: 'None';
+        $changes[] = "• Sub-Class changed from '$old_val' to '$new_val'";
       }
       if ($old_land['area'] != $area) {
         $changes[] = "• Area changed from '{$old_land['area']}' to '$area' sq.m";
@@ -840,20 +940,35 @@ function handleLandUpdate($conn)
 }
 
 /**
- * Handle Owner Changes (WITH LOGGING)
+ * Handle Owner Changes (WITH COMPREHENSIVE LOGGING)
  */
 function handleOwnerUpdate($conn, $property_id)
 {
-  // Get old owners
-  $old_owners = fetchPropertyOwnerIDs($conn, $property_id);
+  // Get old owners with their details
+  $old_owner_ids = fetchPropertyOwnerIDs($conn, $property_id);
+  $old_owner_details = [];
+  foreach ($old_owner_ids as $owner_id) {
+    $stmt = $conn->prepare("SELECT CONCAT(own_fname, ' ', own_mname, ' ', own_surname) as name FROM owners_tb WHERE own_id = ?");
+    $stmt->bind_param("i", $owner_id);
+    $stmt->execute();
+    $result = $stmt->get_result()->fetch_assoc();
+    $old_owner_details[$owner_id] = $result['name'] ?? "Unknown";
+    $stmt->close();
+  }
 
   // Get new owners from POST
   $new_owners = isset($_POST['owner_ids']) ? explode(',', $_POST['owner_ids']) : [];
-  $new_owners = array_map('intval', $new_owners);
+  $new_owners = array_map('intval', array_filter($new_owners));
 
   // Find added and removed owners
-  $added_owners = array_diff($new_owners, $old_owners);
-  $removed_owners = array_diff($old_owners, $new_owners);
+  $added_owners = array_diff($new_owners, $old_owner_ids);
+  $removed_owners = array_diff($old_owner_ids, $new_owners);
+
+  // Only proceed if there are changes
+  if (empty($added_owners) && empty($removed_owners)) {
+    $_SESSION['flash_info'] = "No changes made to property owners.";
+    return;
+  }
 
   // Update database (mark removed as not retained, add new ones)
   foreach ($removed_owners as $owner_id) {
@@ -886,8 +1001,8 @@ function handleOwnerUpdate($conn, $property_id)
     }
   }
 
-  // ✅ LOG OWNER CHANGES
-  if (isset($_SESSION['user_id']) && (!empty($added_owners) || !empty($removed_owners))) {
+  // ✅ LOG OWNER CHANGES WITH DETAILS
+  if (isset($_SESSION['user_id'])) {
     $userId = $_SESSION['user_id'];
     $locationDetails = getPropertyLocationDetails($conn, $property_id);
 
@@ -895,10 +1010,19 @@ function handleOwnerUpdate($conn, $property_id)
     $logMessage .= "Property ID: $property_id\n";
     $logMessage .= "Location: $locationDetails\n\n";
 
+    // Show previous owners if any were removed
+    if (!empty($removed_owners)) {
+      $logMessage .= "Previous Owners:\n";
+      foreach ($old_owner_ids as $owner_id) {
+        $logMessage .= "• {$old_owner_details[$owner_id]} (ID: $owner_id)\n";
+      }
+      $logMessage .= "\n";
+    }
+
     if (!empty($added_owners)) {
       $logMessage .= "Added Owners:\n";
       foreach ($added_owners as $owner_id) {
-        $stmt = $conn->prepare("SELECT CONCAT(own_fname, ' ', own_surname) as name FROM owners_tb WHERE own_id = ?");
+        $stmt = $conn->prepare("SELECT CONCAT(own_fname, ' ', own_mname, ' ', own_surname) as name FROM owners_tb WHERE own_id = ?");
         $stmt->bind_param("i", $owner_id);
         $stmt->execute();
         $owner_name = $stmt->get_result()->fetch_assoc()['name'] ?? "ID: $owner_id";
@@ -908,15 +1032,22 @@ function handleOwnerUpdate($conn, $property_id)
     }
 
     if (!empty($removed_owners)) {
-      $logMessage .= "\nRemoved Owners:\n";
+      if (!empty($added_owners)) $logMessage .= "\n";
+      $logMessage .= "Removed Owners:\n";
       foreach ($removed_owners as $owner_id) {
-        $stmt = $conn->prepare("SELECT CONCAT(own_fname, ' ', own_surname) as name FROM owners_tb WHERE own_id = ?");
-        $stmt->bind_param("i", $owner_id);
-        $stmt->execute();
-        $owner_name = $stmt->get_result()->fetch_assoc()['name'] ?? "ID: $owner_id";
-        $stmt->close();
-        $logMessage .= "• $owner_name (ID: $owner_id)\n";
+        $logMessage .= "• {$old_owner_details[$owner_id]} (ID: $owner_id)\n";
       }
+    }
+
+    // Show current owners after changes
+    $logMessage .= "\nCurrent Owners:\n";
+    foreach ($new_owners as $owner_id) {
+      $stmt = $conn->prepare("SELECT CONCAT(own_fname, ' ', own_mname, ' ', own_surname) as name FROM owners_tb WHERE own_id = ?");
+      $stmt->bind_param("i", $owner_id);
+      $stmt->execute();
+      $owner_name = $stmt->get_result()->fetch_assoc()['name'] ?? "ID: $owner_id";
+      $stmt->close();
+      $logMessage .= "• $owner_name (ID: $owner_id)\n";
     }
 
     logActivity($conn, $userId, $logMessage);
@@ -925,8 +1056,34 @@ function handleOwnerUpdate($conn, $property_id)
   $_SESSION['flash_success'] = "Property owners updated successfully!";
 }
 
+// ========================================================
+// Inline OR Number Duplication Check (AJAX endpoint)
+// ========================================================
+if (isset($_GET['ajax']) && $_GET['ajax'] === 'check_or_number') {
+    header('Content-Type: application/json');
+    require_once 'database.php';
+
+    if (!isset($_GET['or']) || trim($_GET['or']) === '') {
+        echo json_encode(['exists' => false]);
+        exit;
+    }
+
+    $conn = Database::getInstance();
+    $or_number = strtoupper(trim($_GET['or']));
+
+    $stmt = $conn->prepare("SELECT COUNT(*) AS cnt FROM print_certifications WHERE or_number = ?");
+    $stmt->bind_param("s", $or_number);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+
+    echo json_encode(['exists' => $row['cnt'] > 0]);
+    $stmt->close();
+    $conn->close();
+    exit;
+}
+
 // ============================================================================
-// MAIN REQUEST PROCESSING (REPLACE the existing section)
+// MAIN REQUEST PROCESSING
 // ============================================================================
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
