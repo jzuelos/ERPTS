@@ -471,7 +471,7 @@ echo "<script>
           <div class="col-md-6 col-12 mb-4">
             <div class="mb-3">
               <label for="classification" class="form-label">Classification</label>
-              <select id="classification" name="classification" class="form-select">
+              <select id="classification" name="classification" class="form-select" disabled>
                 <option value="">Select Classification</option>
                 <?php while ($row = mysqli_fetch_assoc($classificationResult)): ?>
                   <option value="<?php echo $row['c_description']; ?>"
@@ -488,7 +488,7 @@ echo "<script>
           <div class="col-md-6 col-12 mb-4">
             <div class="mb-3">
               <label for="actualUse" class="form-label">Actual Use</label>
-              <select id="actualUse" name="actual_use" class="form-select">
+              <select id="actualUse" name="actual_use" class="form-select" disabled>
                 <option value="">Select Actual Use</option>
                 <?php while ($row = mysqli_fetch_assoc($actualUseResult)): ?>
                   <option
@@ -505,7 +505,7 @@ echo "<script>
           <div class="col-md-6 col-12 mb-4">
             <div class="mb-3">
               <label for="subClass" class="form-label">Sub-Class</label>
-              <select id="subClass" name="sub_class" class="form-select">
+              <select id="subClass" name="sub_class" class="form-select" disabled>
                 <option value="">Select Sub-Class</option>
                 <?php while ($row = mysqli_fetch_assoc($subClassResult)): ?>
                   <option value="<?php echo $row['sc_description']; ?>"
