@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 16, 2025 at 12:31 AM
+-- Generation Time: Oct 19, 2025 at 06:16 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -90,7 +90,11 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (49, 9, 'Logged in to the system', '2025-10-15 03:58:29'),
 (50, 9, 'Added new property\nProperty ID: 162\n\nLocation Details:\n• House Number: 432\n• Municipality: ID: Talisay\n• District: District 2\n• Barangay: ID: Gabon\n\nProperty Details:\n• Land Area: 532 sq.m\n• Documents: barangay\n\nAssociated Owners (1):\n• Jose Cruz (ID: 4)\n\nFAAS record created for this property.', '2025-10-15 06:50:06'),
 (51, 9, 'Logged in to the system', '2025-10-15 13:12:07'),
-(52, 9, 'Updated tax declaration\nProperty ID: 147\nFAAS ID: 36\nLocation: House #23, ID: Gahon, ID: District 2, ID: Daet\n\nTax Declaration Details:\n• ARP Number: GR-2023-II-01-012-00023\n• Tax Year: 2025-09-27\n• Provincial Assessor: Mark Bertillo\n• Provincial Date: 2025-09-10\n• Municipal Assessor: Maria Reyes\n• Municipal Date: 2025-09-11\n• Previous Owner: No\n• Previous Assessed Value: ₱5,000.00\n\nTotal Property Value: ₱0.00', '2025-10-15 22:14:55');
+(52, 9, 'Updated tax declaration\nProperty ID: 147\nFAAS ID: 36\nLocation: House #23, ID: Gahon, ID: District 2, ID: Daet\n\nTax Declaration Details:\n• ARP Number: GR-2023-II-01-012-00023\n• Tax Year: 2025-09-27\n• Provincial Assessor: Mark Bertillo\n• Provincial Date: 2025-09-10\n• Municipal Assessor: Maria Reyes\n• Municipal Date: 2025-09-11\n• Previous Owner: No\n• Previous Assessed Value: ₱5,000.00\n\nTotal Property Value: ₱0.00', '2025-10-15 22:14:55'),
+(53, 9, 'Updated tax declaration\nProperty ID: 157\nFAAS ID: 43\nLocation: House #5345, ID: Camambugan, ID: District 2, ID: Daet\n\nTax Declaration Details:\n• ARP Number: GR-2023-II-03-014-00342\n• Tax Year: 2025-10-15\n• Provincial Assessor: Juan Dela Cruz\n• Provincial Date: 2025-10-15\n• Municipal Assessor: Maria Reyes\n• Municipal Date: 2025-10-15\n\nTotal Property Value: ₱81,600.00', '2025-10-16 03:35:45'),
+(54, 9, 'Logged in to the system', '2025-10-19 11:46:06'),
+(55, 9, 'Updated tax declaration\nProperty ID: 144\nFAAS ID: 33\nLocation: House #23, ID: Kalamunding, ID: District 1, ID: Labo\n\nChanges:\n• ARP Number changed from \'31-2314-23-42-341-23123\' to \'GR-2023-II-02-012-00231\'', '2025-10-19 11:49:43'),
+(56, 9, 'Deleted land record\nProperty ID: 144\nLand ID: 55\nLocation: House #23, ID: Kalamunding, ID: District 1, ID: Labo\n\nDeleted Land Details:\n• Classification: Agricultural\n• Area: 23 sq.m\n• Market Value: ₱460.00\n• Assessed Value: ₱15.64', '2025-10-19 11:58:15');
 
 -- --------------------------------------------------------
 
@@ -115,7 +119,7 @@ CREATE TABLE `admin_certification` (
 
 INSERT INTO `admin_certification` (`id`, `name`, `description`, `position`, `status`, `role`, `created_at`, `updated_at`) VALUES
 (6, 'Mark Bertillo', NULL, 'Provincial Assessor', 'active', 'provincial_assessor', '2025-10-07 15:39:00', '2025-10-08 21:54:51'),
-(8, 'Jonard Canaria', NULL, 'Janitor', 'active', 'none', '2025-10-07 16:38:54', '2025-10-08 21:54:51'),
+(8, 'Jonard Canaria', NULL, 'Janitor', 'inactive', 'none', '2025-10-07 16:38:54', '2025-10-19 22:42:09'),
 (9, 'Ma. Salome Bertillo', NULL, 'Assistant Assessor', 'active', 'verifier', '2025-10-07 16:42:41', '2025-10-08 21:54:51');
 
 -- --------------------------------------------------------
@@ -447,7 +451,6 @@ CREATE TABLE `certification` (
 --
 
 INSERT INTO `certification` (`cert_id`, `verified`, `noted`, `recom_approval`, `recom_date`, `plotted`, `appraised`, `appraised_date`, `approved`, `approved_date`, `idle`, `contested`, `land_id`) VALUES
-(1, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-09-20', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-09-20', 'Lingon, Nestor Jacolbia', '2025-09-20', 0, 0, 55),
 (2, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-28', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-28', 'Lingon, Nestor Jacolbia', '2025-04-28', 0, 0, 56);
 
 -- --------------------------------------------------------
@@ -580,9 +583,9 @@ CREATE TABLE `land` (
 --
 
 INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `north`, `east`, `south`, `west`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`, `adjust_factor`, `adjust_percent`, `adjust_value`, `adjust_mv`, `assess_lvl`, `assess_value`, `faas_id`, `created_at`, `updated_at`) VALUES
-(55, '12345', '42322', 'Lot 15', 'Barangay Road', 'Rice Field', 'River', 'Bounded by residential and agricultural lands', 'Cruz', 'Juan', 'Dela', '09345678901', 'juan.cruz@example.com', 'Rizal Street', 'Kalamunding', 'District 1', 'Daet', 'Camarines Norte', 'Residential lot with improvements', 'Agricultural', '', 23, 'SC', 20.00, 460.00, 'Depreciation', 17.00, -381.80, 78.20, 20.00, 15.64, 33, '2025-08-27 16:41:18', '2025-09-20 08:44:08'),
 (56, '1234', '3412', 'Lot 22', 'Barangay Road', 'Vacant Lot', 'Riverbank', 'Commercial property near public market', 'Reyes', 'Maria', 'Lopez', '09181234567', 'maria.reyes@example.com', 'Mabini Street', 'Gahon', 'District 2', 'Daet', 'Camarines Norte', 'Commercial lot', 'Commercial', 'Business Establishment', 432, 'Commercial', 34.00, 14688.00, 'Standard', 0.00, 0.00, 14688.00, 34.00, 4993.92, 33, '2025-08-27 16:41:18', '2025-09-09 14:40:08'),
-(61, '56789', '98765', 'Main Road', 'Creek', 'Farm Lot', 'River', 'Bounded by creek and residential area', 'Villanueva', 'Carlos', 'M.', '09171234567', 'carlos.villanueva@example.com', 'Purok 5, Rizal Street', 'Lag-on', 'District 4', 'Daet', 'Camarines Norte', 'Agricultural lot used for coconut plantation', 'Agricultural', 'Coconut Farm', 1200, 'Agricultural', 50.00, 60000.00, 'Depreciation', 10.00, -6000.00, 54000.00, 40.00, 21600.00, 43, '2025-10-10 16:04:03', '2025-10-10 16:04:03');
+(61, '56789', '98765', 'Main Road', 'Creek', 'Farm Lot', 'River', 'Bounded by creek and residential area', 'Villanueva', 'Carlos', 'M.', '09171234567', 'carlos.villanueva@example.com', 'Purok 5, Rizal Street', 'Lag-on', 'District 4', 'Daet', 'Camarines Norte', 'Agricultural lot used for coconut plantation', 'Agricultural', 'Coconut Farm', 1200, 'Agricultural', 50.00, 60000.00, 'Depreciation', 10.00, -6000.00, 54000.00, 40.00, 21600.00, 43, '2025-10-10 16:04:03', '2025-10-10 16:04:03'),
+(63, '56789', '98765', 'Main Road', 'Creek', 'Farm Lot', 'River', 'Bounded by creek and residential area', 'Villanueva', 'Carlos', 'M.', '09171234567', 'carlos.villanueva@example.com', 'Purok 5, Rizal Street', 'Lag-on', 'District 4', 'Daet', 'Camarines Norte', 'Agricultural lot used for coconut plantation', 'Agricultural', 'Coconut Farm', 1200, 'Agricultural', 50.00, 60000.00, 'Depreciation', 10.00, -6000.00, 54000.00, 34.00, 4993.92, 36, '2025-10-19 16:09:02', '2025-10-19 16:09:02');
 
 -- --------------------------------------------------------
 
@@ -765,7 +768,11 @@ INSERT INTO `print_certifications` (`cert_id`, `property_id`, `faas_id`, `owner_
 (8, 157, 43, 'John Lloyd Zuelos', '2025-10-15', 43.00, '52345', '2025-10-15', 9, '2025-10-16 05:52:59'),
 (9, 157, 43, 'John Lloyd Zuelos', '2025-10-15', 43.00, '523456', '2025-10-15', 9, '2025-10-16 05:54:06'),
 (10, 157, 43, 'John Lloyd Zuelos', '2025-10-15', 43.00, '523456', '2025-10-15', 9, '2025-10-16 05:56:45'),
-(11, 157, 43, 'Renz Dioneda', '2025-10-16', 56.00, '523457', '2025-10-16', 9, '2025-10-16 06:12:35');
+(11, 157, 43, 'Renz Dioneda', '2025-10-16', 56.00, '523457', '2025-10-16', 9, '2025-10-16 06:12:35'),
+(12, 157, 43, 'Renz Dioneda', '2025-10-16', 55.00, '6423452', '2025-10-16', 9, '2025-10-16 11:36:51'),
+(13, 144, 33, 'James Gacho', '2025-10-19', 45.00, '5443212', '2025-10-19', 9, '2025-10-19 19:50:15'),
+(14, 144, 33, 'James Gacho', '2025-10-19', 60.00, '6432312', '2025-10-19', 9, '2025-10-19 20:02:09'),
+(15, 144, 33, 'James Gacho', '2025-10-19', 60.00, '6432311', '2025-10-19', 9, '2025-10-19 20:07:31');
 
 -- --------------------------------------------------------
 
@@ -944,9 +951,9 @@ CREATE TABLE `rpu_dec` (
 --
 
 INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `pro_assess`, `pro_date`, `mun_assess`, `mun_date`, `td_cancel`, `previous_pin`, `tax_year`, `entered_by`, `entered_year`, `prev_own`, `prev_assess`, `faas_id`, `total_property_value`) VALUES
-(1, '31-2314-23-42-341-23123', 'Provincial Assessor Maria Santos', '2025-08-05', 'Municipal Assessor Luis Cruz', '2025-08-06', 0, 110, '2025-08-07', 1, '2025-08-07', 'Ricardo Delos Reyes', 7000.00, 33, 20157.56),
+(1, 'GR-2023-II-02-012-00231', 'Provincial Assessor Maria Santos', '2025-08-05', 'Municipal Assessor Luis Cruz', '2025-08-06', 0, 110, '2025-08-07', 1, '2025-08-07', 'Ricardo Delos Reyes', 7000.00, 33, 20157.56),
 (3, 'GR-2023-II-01-012-00023', 'Mark Bertillo', '2025-09-10', 'Maria Reyes', '2025-09-11', 0, 110, '2025-09-27', 2, '2025-09-23', 'No', 5000.00, 36, 0.00),
-(4, 'GR-2023-II-03-014-00342', 'Juan Dela Cruz', '2025-10-15', 'Maria Reyes', '2025-10-15', 0, 0, '0000-00-00', 0, '0000-00-00', '', 0.00, 43, 81600.00);
+(4, 'GR-2023-II-03-014-00342', 'Juan Dela Cruz', '2025-10-15', 'Maria Reyes', '2025-10-15', 0, 2147483647, '2025-10-15', 0, '2025-10-15', '', 0.00, 43, 81600.00);
 
 -- --------------------------------------------------------
 
@@ -1069,9 +1076,9 @@ CREATE TABLE `transaction_files` (
 
 INSERT INTO `transaction_files` (`file_id`, `transaction_id`, `file_path`, `uploaded_at`) VALUES
 (50, 42, 'uploads/transaction_42/tx_68d34d6e2b15f_business-document-template_1435-229.jpg', '2025-09-24 01:46:22'),
-(61, 57, 'uploads/transaction_57/1760286363_FB_IMG_1760254477732.pdf', '2025-10-12 16:26:03'),
+(61, 57, 'uploads/transaction_57/Birth_Cert.pdf', '2025-10-12 16:26:03'),
 (62, 57, 'uploads/transaction_57/1760286363_FB_IMG_1760253383644.pdf', '2025-10-12 16:26:03'),
-(64, 57, 'uploads/transaction_57/1760287394_Screenshot_20251012_181741.pdf', '2025-10-12 16:43:14');
+(64, 57, 'uploads/transaction_57/Jm_Tin.pdf', '2025-10-12 16:43:14');
 
 -- --------------------------------------------------------
 
@@ -1219,15 +1226,6 @@ CREATE TABLE `vw_print_certifications` (
 ,`tax_declaration_number` varchar(150)
 ,`created_by_name` varchar(101)
 );
-
--- --------------------------------------------------------
-
---
--- Structure for view `vw_print_certifications`
---
-DROP TABLE IF EXISTS `vw_print_certifications`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_print_certifications`  AS SELECT `pc`.`cert_id` AS `cert_id`, `pc`.`property_id` AS `property_id`, `pc`.`faas_id` AS `faas_id`, `pc`.`owner_admin` AS `owner_admin`, `pc`.`certification_date` AS `certification_date`, `pc`.`certification_fee` AS `certification_fee`, `pc`.`or_number` AS `or_number`, `pc`.`date_paid` AS `date_paid`, `pc`.`created_by` AS `created_by`, `pc`.`created_at` AS `created_at`, `p`.`house_no` AS `house_no`, `p`.`barangay` AS `barangay`, `p`.`city` AS `city`, `p`.`province` AS `province`, `rd`.`arp_no` AS `tax_declaration_number`, concat(`u`.`first_name`,' ',`u`.`last_name`) AS `created_by_name` FROM ((((`print_certifications` `pc` join `p_info` `p` on(`pc`.`property_id` = `p`.`p_id`)) join `faas` `f` on(`pc`.`faas_id` = `f`.`faas_id`)) left join `rpu_dec` `rd` on(`f`.`faas_id` = `rd`.`faas_id`)) left join `users` `u` on(`pc`.`created_by` = `u`.`user_id`)) ORDER BY `pc`.`created_at` DESC ;
 
 --
 -- Indexes for dumped tables
@@ -1415,7 +1413,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT for table `admin_certification`
@@ -1457,7 +1455,7 @@ ALTER TABLE `faas`
 -- AUTO_INCREMENT for table `land`
 --
 ALTER TABLE `land`
-  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `land_use`
@@ -1487,7 +1485,7 @@ ALTER TABLE `owner_audit_log`
 -- AUTO_INCREMENT for table `print_certifications`
 --
 ALTER TABLE `print_certifications`
-  MODIFY `cert_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `cert_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `propertyowner`
@@ -1560,6 +1558,15 @@ ALTER TABLE `transaction_logs`
 --
 ALTER TABLE `users`
   MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `vw_print_certifications`
+--
+DROP TABLE IF EXISTS `vw_print_certifications`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_print_certifications`  AS SELECT `pc`.`cert_id` AS `cert_id`, `pc`.`property_id` AS `property_id`, `pc`.`faas_id` AS `faas_id`, `pc`.`owner_admin` AS `owner_admin`, `pc`.`certification_date` AS `certification_date`, `pc`.`certification_fee` AS `certification_fee`, `pc`.`or_number` AS `or_number`, `pc`.`date_paid` AS `date_paid`, `pc`.`created_by` AS `created_by`, `pc`.`created_at` AS `created_at`, `p`.`house_no` AS `house_no`, `p`.`barangay` AS `barangay`, `p`.`city` AS `city`, `p`.`province` AS `province`, `rd`.`arp_no` AS `tax_declaration_number`, concat(`u`.`first_name`,' ',`u`.`last_name`) AS `created_by_name` FROM ((((`print_certifications` `pc` join `p_info` `p` on(`pc`.`property_id` = `p`.`p_id`)) join `faas` `f` on(`pc`.`faas_id` = `f`.`faas_id`)) left join `rpu_dec` `rd` on(`f`.`faas_id` = `rd`.`faas_id`)) left join `users` `u` on(`pc`.`created_by` = `u`.`user_id`)) ORDER BY `pc`.`created_at` DESC ;
 
 --
 -- Constraints for dumped tables
