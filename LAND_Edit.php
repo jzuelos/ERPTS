@@ -17,6 +17,73 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
+// ============================================================================
+// ACTIVITY LOGGING FUNCTIONS
+// ============================================================================
+
+/**
+ * Function to log activity
+ */
+function logActivity($conn, $userId, $action)
+{
+  $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action) VALUES (?, ?)");
+  $stmt->bind_param("is", $userId, $action);
+  $stmt->execute();
+  $stmt->close();
+}
+
+/**
+ * Helper function to get property location details
+ */
+function getPropertyLocationDetails($conn, $property_id)
+{
+  $stmt = $conn->prepare("SELECT house_no, city, district, barangay FROM p_info WHERE p_id = ?");
+  $stmt->bind_param("i", $property_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $property = $result->fetch_assoc();
+  $stmt->close();
+
+  if (!$property) return "Property ID: $property_id";
+
+  // Get readable names
+  $municipalityName = 'Unknown';
+  $barangayName = 'Unknown';
+  $districtName = 'Unknown';
+
+  if (!empty($property['city'])) {
+    $stmt = $conn->prepare("SELECT m_description FROM municipality WHERE m_id = ?");
+    $stmt->bind_param("i", $property['city']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    if ($row) $municipalityName = $row['m_description'];
+    $stmt->close();
+  }
+
+  if (!empty($property['barangay'])) {
+    $stmt = $conn->prepare("SELECT brgy_name FROM brgy WHERE brgy_id = ?");
+    $stmt->bind_param("i", $property['barangay']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    if ($row) $barangayName = $row['brgy_name'];
+    $stmt->close();
+  }
+
+  if (!empty($property['district'])) {
+    $stmt = $conn->prepare("SELECT description FROM district WHERE district_id = ?");
+    $stmt->bind_param("i", $property['district']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    if ($row) $districtName = $row['description'];
+    $stmt->close();
+  }
+
+  return "House #" . $property['house_no'] . ", " . $barangayName . ", " . $districtName . ", " . $municipalityName;
+}
+
 // Get p_id from URL
 $p_id = isset($_GET['p_id']) ? (int) $_GET['p_id'] : 0;
 
@@ -47,8 +114,7 @@ if ($land_result->num_rows > 0) {
   die("Error: No land record found for this FAAS.");
 }
 
-$land_id = $land_data['land_id'] ?? 0; //fetch land_id
-
+$land_id = $land_data['land_id'] ?? 0;
 $land_query->close();
 
 // Fetch certification data using the land_id
@@ -66,6 +132,20 @@ if (isset($land_data['land_id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  // ✅ Get old land data for comparison
+  $old_land_query = $conn->prepare("SELECT * FROM land WHERE land_id = ?");
+  $old_land_query->bind_param("i", $land_id);
+  $old_land_query->execute();
+  $old_land_data = $old_land_query->get_result()->fetch_assoc();
+  $old_land_query->close();
+
+  // Get old certification data
+  $old_cert_query = $conn->prepare("SELECT * FROM certification WHERE land_id = ?");
+  $old_cert_query->bind_param("i", $land_id);
+  $old_cert_query->execute();
+  $old_cert_data = $old_cert_query->get_result()->fetch_assoc();
+  $old_cert_query->close();
+
   // Collect numeric values
   $oct_no = (int) ($_POST['oct_no'] ?? 0);
   $unit_value = (float) ($_POST['unit_value'] ?? 0);
@@ -115,9 +195,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         sub_class = ?, area = ?, actual_use = ?, unit_value = ?, market_value = ?, adjust_factor = ?, 
         adjust_percent = ?, adjust_value = ?, adjust_mv = ?, assess_lvl = ?, assess_value = ?
     WHERE land_id = ?
-");
+  ");
 
-  // Updated bind_param with `i` at the end for land_id
   $stmt->bind_param(
     "isssssssssssssssssssisddsdddddi",
     $oct_no,
@@ -150,20 +229,96 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $adjust_mv,
     $assess_lvl,
     $assess_value,
-    $land_id // <- final parameter
+    $land_id
   );
 
-
   if ($stmt->execute()) {
-    // If the land update is successful, we proceed to update certification
-    // Add land_id to $_POST so it's passed into updateCertification
+    // ✅ LOG LAND UPDATE WITH CHANGES
+    if (isset($_SESSION['user_id'])) {
+      $userId = $_SESSION['user_id'];
+      $locationDetails = getPropertyLocationDetails($conn, $p_id);
+
+      $changes = [];
+
+      // Compare key fields
+      if ($old_land_data['oct_no'] != $oct_no) {
+        $changes[] = "• OCT/TCT Number changed from '{$old_land_data['oct_no']}' to '$oct_no'";
+      }
+      if ($old_land_data['survey_no'] != $survey_no) {
+        $changes[] = "• Survey Number changed from '{$old_land_data['survey_no']}' to '$survey_no'";
+      }
+      if ($old_land_data['classification'] != $classification) {
+        $changes[] = "• Classification changed from '{$old_land_data['classification']}' to '$classification'";
+      }
+      if ($old_land_data['sub_class'] != $sub_class) {
+        $changes[] = "• Sub-Class changed from '{$old_land_data['sub_class']}' to '$sub_class'";
+      }
+      if ($old_land_data['area'] != $area) {
+        $changes[] = "• Area changed from '{$old_land_data['area']}' to '$area' sq.m";
+      }
+      if ($old_land_data['actual_use'] != $actual_use) {
+        $changes[] = "• Actual Use changed from '{$old_land_data['actual_use']}' to '$actual_use'";
+      }
+      if ($old_land_data['unit_value'] != $unit_value) {
+        $changes[] = "• Unit Value changed from '₱" . number_format($old_land_data['unit_value'], 2) . "' to '₱" . number_format($unit_value, 2) . "'";
+      }
+      if ($old_land_data['market_value'] != $market_value) {
+        $changes[] = "• Market Value changed from '₱" . number_format($old_land_data['market_value'], 2) . "' to '₱" . number_format($market_value, 2) . "'";
+      }
+      if ($old_land_data['adjust_percent'] != $adjust_percent) {
+        $changes[] = "• Adjustment Factor changed from '{$old_land_data['adjust_percent']}%' to '{$adjust_percent}%'";
+      }
+      if ($old_land_data['adjust_mv'] != $adjust_mv) {
+        $changes[] = "• Adjusted Market Value changed from '₱" . number_format($old_land_data['adjust_mv'], 2) . "' to '₱" . number_format($adjust_mv, 2) . "'";
+      }
+      if ($old_land_data['assess_lvl'] != $assess_lvl) {
+        $changes[] = "• Assessment Level changed from '{$old_land_data['assess_lvl']}%' to '{$assess_lvl}%'";
+      }
+      if ($old_land_data['assess_value'] != $assess_value) {
+        $changes[] = "• Assessed Value changed from '₱" . number_format($old_land_data['assess_value'], 2) . "' to '₱" . number_format($assess_value, 2) . "'";
+      }
+
+      // Administrator info changes
+      if ($old_land_data['last_name'] != $last_name || $old_land_data['first_name'] != $first_name) {
+        $old_name = trim($old_land_data['first_name'] . ' ' . $old_land_data['last_name']);
+        $new_name = trim($first_name . ' ' . $last_name);
+        $changes[] = "• Administrator Name changed from '$old_name' to '$new_name'";
+      }
+      if ($old_land_data['contact_no'] != $contact_no) {
+        $changes[] = "• Contact Number changed from '{$old_land_data['contact_no']}' to '$contact_no'";
+      }
+
+      // Boundary changes
+      if ($old_land_data['north'] != $north) {
+        $changes[] = "• North Boundary changed from '{$old_land_data['north']}' to '$north'";
+      }
+      if ($old_land_data['south'] != $south) {
+        $changes[] = "• South Boundary changed from '{$old_land_data['south']}' to '$south'";
+      }
+      if ($old_land_data['east'] != $east) {
+        $changes[] = "• East Boundary changed from '{$old_land_data['east']}' to '$east'";
+      }
+      if ($old_land_data['west'] != $west) {
+        $changes[] = "• West Boundary changed from '{$old_land_data['west']}' to '$west'";
+      }
+
+      if (!empty($changes)) {
+        $logMessage  = "Updated land record\n";
+        $logMessage .= "Property ID: $p_id\n";
+        $logMessage .= "Land ID: $land_id\n";
+        $logMessage .= "FAAS ID: $faas_id\n";
+        $logMessage .= "Location: $locationDetails\n\n";
+        $logMessage .= "Changes:\n" . implode("\n", $changes);
+
+        logActivity($conn, $userId, $logMessage);
+      }
+    }
+
+    // Update certification
     $_POST['land_id'] = $land_id;
+    updateCertification($conn, $_POST, $old_cert_data);
 
-    updateCertification($conn, $_POST);
-
-    $p_id = htmlspecialchars($_GET['p_id'] ?? '');
-
-    $_SESSION['update_success'] = true; // Set flag before redirect
+    $_SESSION['update_success'] = true;
     header("Location: " . $_SERVER['PHP_SELF'] . "?p_id=" . urlencode($_GET['p_id'] ?? ''));
     exit();
   } else {
@@ -173,7 +328,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->close();
 }
 
-function updateCertification($conn, $data)
+function updateCertification($conn, $data, $old_cert_data = [])
 {
   $land_id = $data['land_id'] ?? null;
 
@@ -190,11 +345,72 @@ function updateCertification($conn, $data)
   $idle = isset($data['idleStatus']) && $data['idleStatus'] === '1' ? 1 : 0;
   $contested = isset($data['contestedStatus']) && $data['contestedStatus'] === '1' ? 1 : 0;
 
+  // ✅ LOG CERTIFICATION CHANGES
+  if (isset($_SESSION['user_id']) && !empty($old_cert_data)) {
+    $userId = $_SESSION['user_id'];
+    $cert_changes = [];
+
+    if (($old_cert_data['verified'] ?? '') != $verified) {
+      $old_val = $old_cert_data['verified'] ?: 'None';
+      $new_val = $verified ?: 'None';
+      $cert_changes[] = "• Verified By changed from '$old_val' to '$new_val'";
+    }
+    if (($old_cert_data['noted'] ?? '') != $noted) {
+      $old_val = $old_cert_data['noted'] ?: 'None';
+      $new_val = $noted ?: 'None';
+      $cert_changes[] = "• Noted By changed from '$old_val' to '$new_val'";
+    }
+    if (($old_cert_data['plotted'] ?? '') != $plotted) {
+      $old_val = $old_cert_data['plotted'] ?: 'None';
+      $new_val = $plotted ?: 'None';
+      $cert_changes[] = "• Plotted By changed from '$old_val' to '$new_val'";
+    }
+    if (($old_cert_data['appraised'] ?? '') != $appraised) {
+      $old_val = $old_cert_data['appraised'] ?: 'None';
+      $new_val = $appraised ?: 'None';
+      $cert_changes[] = "• Appraised By changed from '$old_val' to '$new_val'";
+    }
+    if (($old_cert_data['recom_approval'] ?? '') != $recomApproval) {
+      $old_val = $old_cert_data['recom_approval'] ?: 'None';
+      $new_val = $recomApproval ?: 'None';
+      $cert_changes[] = "• Recommending Approval changed from '$old_val' to '$new_val'";
+    }
+    if (($old_cert_data['approved'] ?? '') != $approved) {
+      $old_val = $old_cert_data['approved'] ?: 'None';
+      $new_val = $approved ?: 'None';
+      $cert_changes[] = "• Approved By changed from '$old_val' to '$new_val'";
+    }
+    if (($old_cert_data['idle'] ?? 0) != $idle) {
+      $old_val = $old_cert_data['idle'] ? 'Yes' : 'No';
+      $new_val = $idle ? 'Yes' : 'No';
+      $cert_changes[] = "• Idle Status changed from '$old_val' to '$new_val'";
+    }
+    if (($old_cert_data['contested'] ?? 0) != $contested) {
+      $old_val = $old_cert_data['contested'] ? 'Yes' : 'No';
+      $new_val = $contested ? 'Yes' : 'No';
+      $cert_changes[] = "• Contested Status changed from '$old_val' to '$new_val'";
+    }
+
+    if (!empty($cert_changes)) {
+      // Get property location
+      $p_id = $_GET['p_id'] ?? 0;
+      $locationDetails = getPropertyLocationDetails($conn, $p_id);
+
+      $logMessage  = "Updated land certification\n";
+      $logMessage .= "Property ID: $p_id\n";
+      $logMessage .= "Land ID: $land_id\n";
+      $logMessage .= "Location: $locationDetails\n\n";
+      $logMessage .= "Certification Changes:\n" . implode("\n", $cert_changes);
+
+      logActivity($conn, $userId, $logMessage);
+    }
+  }
+
   // Start building dynamic query
   $fields = ['verified', 'noted', 'recom_approval', 'plotted', 'appraised', 'approved', 'idle', 'contested'];
   $placeholders = ['?', '?', '?', '?', '?', '?', '?', '?'];
   $values = [$verified, $noted, $recomApproval, $plotted, $appraised, $approved, $idle, $contested];
-  $types = 'ssssssss';
+  $types = 'ssssssii';
 
   if ($recomDate !== null) {
     $fields[] = 'recom_date';
@@ -225,7 +441,6 @@ function updateCertification($conn, $data)
     return;
   }
 
-  // Add land_id at the end
   $values[] = $land_id;
   $types .= 'i';
 
@@ -266,7 +481,7 @@ echo "<script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <!-- Bootstrap CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -280,7 +495,7 @@ echo "<script>
 </head>
 
 <body>
-      <?php include 'header.php'; ?>
+  <?php include 'header.php'; ?>
 
   <!-- LAND Section -->
   <section class="container my-5" id="rpu-identification-section">
@@ -820,205 +1035,204 @@ echo "<script>
   </footer>
 
   <script>
-   document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function() {
 
-  // Set today's date in the date input
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('approvalDate').value = today;
-  document.getElementById('recommendationDate').value = today;
-  document.getElementById('appraisalDate').value = today;
+      // Set today's date in the date input
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('approvalDate').value = today;
+      document.getElementById('recommendationDate').value = today;
+      document.getElementById('appraisalDate').value = today;
 
-  // === Auto Calculation Toggle ===
-  let autoCalcEnabled = true;
-  document.querySelectorAll('input[name="autoCalc"]').forEach(radio => {
-    radio.addEventListener('change', function () {
-      autoCalcEnabled = (this.value === 'on');
-      console.log("Auto calculation is", autoCalcEnabled ? "ENABLED" : "DISABLED");
-    });
-  });
+      // === Auto Calculation Toggle ===
+      let autoCalcEnabled = true;
+      document.querySelectorAll('input[name="autoCalc"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+          autoCalcEnabled = (this.value === 'on');
+          console.log("Auto calculation is", autoCalcEnabled ? "ENABLED" : "DISABLED");
+        });
+      });
 
-  function toggleEdit() {
-    const editButton = document.getElementById('editRPUButton');
-    const inputs = document.querySelectorAll('#rpu-identification-section input, #rpu-identification-section select, #rpu-identification-section textarea');
+      function toggleEdit() {
+        const editButton = document.getElementById('editRPUButton');
+        const inputs = document.querySelectorAll('#rpu-identification-section input, #rpu-identification-section select, #rpu-identification-section textarea');
 
-    // Check current button state to toggle between Edit and Done
-    const isEditing = editButton.textContent.trim() === 'Edit';
-    editButton.textContent = isEditing ? 'Done' : 'Edit';
+        // Check current button state to toggle between Edit and Done
+        const isEditing = editButton.textContent.trim() === 'Edit';
+        editButton.textContent = isEditing ? 'Done' : 'Edit';
 
-    // IDs to exclude from being disabled
-    const excludeIds = [
-      "marketValue",
-      "valueAdjustment",
-      "adjustedMarketValue",
-      "assessedValue",
-      "recommendedAssessmentLevel",
-      "recommendedUnitValue"
-    ];
+        // IDs to exclude from being disabled
+        const excludeIds = [
+          "marketValue",
+          "valueAdjustment",
+          "adjustedMarketValue",
+          "assessedValue",
+          "recommendedAssessmentLevel",
+          "recommendedUnitValue"
+        ];
 
-    // Loop through the inputs and enable/disable them based on the button state
-    inputs.forEach(input => {
-      if (excludeIds.includes(input.id)) return; // Skip the excluded inputs
-      input.disabled = !isEditing;
+        // Loop through the inputs and enable/disable them based on the button state
+        inputs.forEach(input => {
+          if (excludeIds.includes(input.id)) return; // Skip the excluded inputs
+          input.disabled = !isEditing;
 
-      // Enable/Disable radio buttons
-      if (input.type === 'radio') {
-        input.disabled = !isEditing;
+          // Enable/Disable radio buttons
+          if (input.type === 'radio') {
+            input.disabled = !isEditing;
+          }
+        });
+
+        // Focus the first editable input field when starting edit mode
+        if (isEditing) {
+          const firstEditableInput = Array.from(inputs).find(input => !input.disabled);
+          if (firstEditableInput) {
+            firstEditableInput.focus();
+          }
+        }
       }
-    });
 
-    // Focus the first editable input field when starting edit mode
-    if (isEditing) {
-      const firstEditableInput = Array.from(inputs).find(input => !input.disabled);
-      if (firstEditableInput) {
-        firstEditableInput.focus();
+      // Attach event listener for edit button
+      document.getElementById('editRPUButton').addEventListener('click', toggleEdit);
+
+      // DOM Elements
+      const areaInput = document.getElementById("area");
+      const unitValueInput = document.getElementById("unitValue");
+      const marketValueInput = document.getElementById("marketValue");
+
+      const sqmRadio = document.querySelector("input[name='areaUnit'][value='sqm']");
+      const hectareRadio = document.querySelector("input[name='areaUnit'][value='hectare']");
+
+      const percentAdjustmentInput = document.getElementById("percentAdjustment");
+      const valueAdjustmentInput = document.getElementById("valueAdjustment");
+      const adjustedMarketValueInput = document.getElementById("adjustedMarketValue");
+
+      const assessmentLevelInput = document.getElementById("assessmentLevel");
+      const assessedValueInput = document.getElementById("assessedValue");
+
+      // Utility: Debounce
+      function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func.apply(this, args), wait);
+        };
       }
-    }
-  }
 
-  // Attach event listener for edit button
-  document.getElementById('editRPUButton').addEventListener('click', toggleEdit);
+      // Convert area between sqm and hectare
+      function convertArea() {
+        if (!autoCalcEnabled) return;
 
-  // DOM Elements
-  const areaInput = document.getElementById("area");
-  const unitValueInput = document.getElementById("unitValue");
-  const marketValueInput = document.getElementById("marketValue");
+        const raw = areaInput.value.trim();
+        if (raw === '' || isNaN(raw)) {
+          marketValueInput.value = '';
+          return;
+        }
 
-  const sqmRadio = document.querySelector("input[name='areaUnit'][value='sqm']");
-  const hectareRadio = document.querySelector("input[name='areaUnit'][value='hectare']");
+        const val = parseFloat(raw);
+        areaInput.value = hectareRadio.checked ?
+          (val / 10000).toFixed(4) // sqm → ha
+          :
+          (val * 10000).toFixed(2); // ha → sqm
 
-  const percentAdjustmentInput = document.getElementById("percentAdjustment");
-  const valueAdjustmentInput = document.getElementById("valueAdjustment");
-  const adjustedMarketValueInput = document.getElementById("adjustedMarketValue");
+        calculateMarketValue();
+      }
 
-  const assessmentLevelInput = document.getElementById("assessmentLevel");
-  const assessedValueInput = document.getElementById("assessedValue");
+      // Calculate market value = area * unit value
+      function calculateMarketValue() {
+        if (!autoCalcEnabled) return;
 
-  // Utility: Debounce
-  function debounce(func, wait) {
-    let timeout;
-    return function(...args) {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(this, args), wait);
-    };
-  }
+        const area = parseFloat(areaInput.value);
+        const unitValue = parseFloat(unitValueInput.value);
 
-  // Convert area between sqm and hectare
-  function convertArea() {
-    if (!autoCalcEnabled) return;
+        if (isNaN(area) || isNaN(unitValue)) {
+          clearValues([marketValueInput, valueAdjustmentInput, adjustedMarketValueInput]);
+          return;
+        }
 
-    const raw = areaInput.value.trim();
-    if (raw === '' || isNaN(raw)) {
-      marketValueInput.value = '';
-      return;
-    }
+        const marketValue = area * unitValue;
+        marketValueInput.value = marketValue.toFixed(2);
+        calculateAdjustment(marketValue);
+      }
 
-    const val = parseFloat(raw);
-    areaInput.value = hectareRadio.checked ?
-      (val / 10000).toFixed(4) // sqm → ha
-      :
-      (val * 10000).toFixed(2); // ha → sqm
+      // Calculate adjustment and adjusted market value
+      function calculateAdjustment(marketValue) {
+        if (!autoCalcEnabled) return;
 
-    calculateMarketValue();
-  }
+        const percent = parseFloat(percentAdjustmentInput.value);
+        if (isNaN(percent)) {
+          clearValues([valueAdjustmentInput, adjustedMarketValueInput]);
+          return;
+        }
 
-  // Calculate market value = area * unit value
-  function calculateMarketValue() {
-    if (!autoCalcEnabled) return;
+        const adjustedValue = marketValue * (percent / 100);
+        const adjustment = adjustedValue - marketValue;
 
-    const area = parseFloat(areaInput.value);
-    const unitValue = parseFloat(unitValueInput.value);
+        valueAdjustmentInput.value = formatSigned(adjustment);
+        adjustedMarketValueInput.value = adjustedValue.toFixed(2);
 
-    if (isNaN(area) || isNaN(unitValue)) {
-      clearValues([marketValueInput, valueAdjustmentInput, adjustedMarketValueInput]);
-      return;
-    }
+        calculateAssessedValue(); // Recalculate assessed value on adjustment
+      }
 
-    const marketValue = area * unitValue;
-    marketValueInput.value = marketValue.toFixed(2);
-    calculateAdjustment(marketValue);
-  }
+      // Calculate assessed value = adjustedMarketValue * (assessmentLevel / 100)
+      function calculateAssessedValue() {
+        if (!autoCalcEnabled) return;
 
-  // Calculate adjustment and adjusted market value
-  function calculateAdjustment(marketValue) {
-    if (!autoCalcEnabled) return;
+        const adjustedMarketValue = parseFloat(adjustedMarketValueInput.value.replace(/,/g, '')) || 0;
+        const assessmentLevel = parseFloat(assessmentLevelInput.value) || 0;
 
-    const percent = parseFloat(percentAdjustmentInput.value);
-    if (isNaN(percent)) {
-      clearValues([valueAdjustmentInput, adjustedMarketValueInput]);
-      return;
-    }
+        if (!isNaN(adjustedMarketValue) && !isNaN(assessmentLevel) && assessmentLevel > 0) {
+          const assessed = adjustedMarketValue * (assessmentLevel / 100);
+          assessedValueInput.value = assessed.toFixed(2).toLocaleString();
+        } else {
+          assessedValueInput.value = '';
+        }
+      }
 
-    const adjustedValue = marketValue * (percent / 100);
-    const adjustment = adjustedValue - marketValue;
+      // Visual input validation
+      function validateInputs() {
+        highlightInvalid(areaInput, isNaN(parseFloat(areaInput.value)) || parseFloat(areaInput.value) <= 0);
+        highlightInvalid(unitValueInput, isNaN(parseFloat(unitValueInput.value)) || parseFloat(unitValueInput.value) <= 0);
+      }
 
-    valueAdjustmentInput.value = formatSigned(adjustment);
-    adjustedMarketValueInput.value = adjustedValue.toFixed(2);
+      // Helpers
+      function formatSigned(num) {
+        return (num < 0 ? "-" : "") + Math.abs(num).toFixed(2);
+      }
 
-    calculateAssessedValue(); // Recalculate assessed value on adjustment
-  }
+      function clearValues(elements) {
+        elements.forEach(el => el.value = '');
+      }
 
-  // Calculate assessed value = adjustedMarketValue * (assessmentLevel / 100)
-  function calculateAssessedValue() {
-    if (!autoCalcEnabled) return;
+      function highlightInvalid(input, condition) {
+        input.classList.toggle('is-invalid', condition);
+        input.style.borderColor = condition ? 'red' : '';
+      }
 
-    const adjustedMarketValue = parseFloat(adjustedMarketValueInput.value.replace(/,/g, '')) || 0;
-    const assessmentLevel = parseFloat(assessmentLevelInput.value) || 0;
+      // Event listeners
+      sqmRadio.addEventListener('change', convertArea);
+      hectareRadio.addEventListener('change', convertArea);
 
-    if (!isNaN(adjustedMarketValue) && !isNaN(assessmentLevel) && assessmentLevel > 0) {
-      const assessed = adjustedMarketValue * (assessmentLevel / 100);
-      assessedValueInput.value = assessed.toFixed(2).toLocaleString();
-    } else {
-      assessedValueInput.value = '';
-    }
-  }
+      areaInput.addEventListener('input', debounce(() => {
+        calculateMarketValue();
+        validateInputs();
+      }, 300));
 
-  // Visual input validation
-  function validateInputs() {
-    highlightInvalid(areaInput, isNaN(parseFloat(areaInput.value)) || parseFloat(areaInput.value) <= 0);
-    highlightInvalid(unitValueInput, isNaN(parseFloat(unitValueInput.value)) || parseFloat(unitValueInput.value) <= 0);
-  }
+      unitValueInput.addEventListener('input', debounce(() => {
+        calculateMarketValue();
+        validateInputs();
+      }, 300));
 
-  // Helpers
-  function formatSigned(num) {
-    return (num < 0 ? "-" : "") + Math.abs(num).toFixed(2);
-  }
+      percentAdjustmentInput.addEventListener('input', debounce(() => {
+        const marketValue = parseFloat(marketValueInput.value) || 0;
+        calculateAdjustment(marketValue);
+      }, 300));
 
-  function clearValues(elements) {
-    elements.forEach(el => el.value = '');
-  }
+      assessmentLevelInput.addEventListener('input', debounce(calculateAssessedValue, 300));
 
-  function highlightInvalid(input, condition) {
-    input.classList.toggle('is-invalid', condition);
-    input.style.borderColor = condition ? 'red' : '';
-  }
+      // Initial run
+      calculateMarketValue();
+      validateInputs();
 
-  // Event listeners
-  sqmRadio.addEventListener('change', convertArea);
-  hectareRadio.addEventListener('change', convertArea);
-
-  areaInput.addEventListener('input', debounce(() => {
-    calculateMarketValue();
-    validateInputs();
-  }, 300));
-
-  unitValueInput.addEventListener('input', debounce(() => {
-    calculateMarketValue();
-    validateInputs();
-  }, 300));
-
-  percentAdjustmentInput.addEventListener('input', debounce(() => {
-    const marketValue = parseFloat(marketValueInput.value) || 0;
-    calculateAdjustment(marketValue);
-  }, 300));
-
-  assessmentLevelInput.addEventListener('input', debounce(calculateAssessedValue, 300));
-
-  // Initial run
-  calculateMarketValue();
-  validateInputs();
-
-});
-
+    });
   </script>
 
 
@@ -1028,4 +1242,5 @@ echo "<script>
     integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/5hb5g5/5hb5g5/5hb5g5/5hb5g5/5hb5g5" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
