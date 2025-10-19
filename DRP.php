@@ -90,7 +90,8 @@ function getOwnerDetailsByPInfo($conn, $p_id)
     ";
 
     $stmt = $conn->prepare($sql);
-    if (!$stmt) die('Prepare failed: ' . $conn->error);
+    if (!$stmt)
+        die('Prepare failed: ' . $conn->error);
     $stmt->bind_param('i', $p_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -135,7 +136,21 @@ function getLandProperties($conn, $faas_id)
 function getRpuDataByFaasId($conn, $faas_id)
 {
     $rpu_data = null;
-    if ($stmt = $conn->prepare("SELECT * FROM rpu_idnum WHERE faas_id = ?")) {
+
+    $sql = "
+        SELECT 
+            ri.*, 
+            rd.arp_no
+        FROM 
+            rpu_idnum AS ri
+        LEFT JOIN 
+            rpu_dec AS rd ON ri.faas_id = rd.faas_id
+        WHERE 
+            ri.faas_id = ?
+        LIMIT 1
+    ";
+
+    if ($stmt = $conn->prepare($sql)) {
         $stmt->bind_param("i", $faas_id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -148,8 +163,10 @@ function getRpuDataByFaasId($conn, $faas_id)
     } else {
         die("Prepare failed: " . $conn->error);
     }
+
     return $rpu_data;
 }
+
 
 // Execute and store data
 $p_info = getPInfo($conn, $p_id);
@@ -200,10 +217,10 @@ function formatPin($value)
             <p class="bold">RPA Form NO. 1A</p>
             <p>
                 <span class="bold">Assessment of Real Property No.:</span>
-                <u>_________<?= htmlspecialchars($rpu_data['arp'] ?? 'N/A') ?>_________</u>
+                _____<u><?= htmlspecialchars($rpu_data['arp_no'] ?? 'N/A') ?></u>_____
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <span class="bold">Property Index No.:</span>
-                <u>_____<?= isset($rpu_data['pin']) ? formatPin($rpu_data['pin']) : 'N/A' ?>_____</u>
+                _____<?= isset($rpu_data['pin']) ? formatPin($rpu_data['pin']) : 'N/A' ?>_____
         </div>
 
         <div class="section center" style="text-align: center;">
@@ -410,7 +427,8 @@ function formatPin($value)
                                 style="display: inline-block; border-bottom: 1px solid black; width: 250px; height: 25px; text-transform: uppercase;">
                                 <?= htmlspecialchars($cert_owner ?: '__________________') ?>
                             </span><br>
-                            <span style="font-size: 12px; font-weight: bold; margin-left: 25%;">Owner/Administrator</span>
+                            <span
+                                style="font-size: 12px; font-weight: bold; margin-left: 25%;">Owner/Administrator</span>
                         </div>
                         <div>
                             <span
