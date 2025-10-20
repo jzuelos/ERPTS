@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 19, 2025 at 06:16 PM
+-- Generation Time: Oct 20, 2025 at 06:08 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -94,7 +94,12 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (53, 9, 'Updated tax declaration\nProperty ID: 157\nFAAS ID: 43\nLocation: House #5345, ID: Camambugan, ID: District 2, ID: Daet\n\nTax Declaration Details:\n• ARP Number: GR-2023-II-03-014-00342\n• Tax Year: 2025-10-15\n• Provincial Assessor: Juan Dela Cruz\n• Provincial Date: 2025-10-15\n• Municipal Assessor: Maria Reyes\n• Municipal Date: 2025-10-15\n\nTotal Property Value: ₱81,600.00', '2025-10-16 03:35:45'),
 (54, 9, 'Logged in to the system', '2025-10-19 11:46:06'),
 (55, 9, 'Updated tax declaration\nProperty ID: 144\nFAAS ID: 33\nLocation: House #23, ID: Kalamunding, ID: District 1, ID: Labo\n\nChanges:\n• ARP Number changed from \'31-2314-23-42-341-23123\' to \'GR-2023-II-02-012-00231\'', '2025-10-19 11:49:43'),
-(56, 9, 'Deleted land record\nProperty ID: 144\nLand ID: 55\nLocation: House #23, ID: Kalamunding, ID: District 1, ID: Labo\n\nDeleted Land Details:\n• Classification: Agricultural\n• Area: 23 sq.m\n• Market Value: ₱460.00\n• Assessed Value: ₱15.64', '2025-10-19 11:58:15');
+(56, 9, 'Deleted land record\nProperty ID: 144\nLand ID: 55\nLocation: House #23, ID: Kalamunding, ID: District 1, ID: Labo\n\nDeleted Land Details:\n• Classification: Agricultural\n• Area: 23 sq.m\n• Market Value: ₱460.00\n• Assessed Value: ₱15.64', '2025-10-19 11:58:15'),
+(57, 9, 'Logged in to the system', '2025-10-20 02:56:32'),
+(58, 9, 'Logged out of the system', '2025-10-20 02:57:15'),
+(59, 12, 'Logged in to the system', '2025-10-20 02:57:24'),
+(60, 12, 'Logged out of the system', '2025-10-20 02:57:48'),
+(61, 9, 'Logged in to the system', '2025-10-20 02:58:04');
 
 -- --------------------------------------------------------
 
@@ -1076,9 +1081,12 @@ CREATE TABLE `transaction_files` (
 
 INSERT INTO `transaction_files` (`file_id`, `transaction_id`, `file_path`, `uploaded_at`) VALUES
 (50, 42, 'uploads/transaction_42/tx_68d34d6e2b15f_business-document-template_1435-229.jpg', '2025-09-24 01:46:22'),
-(61, 57, 'uploads/transaction_57/Birth_Cert.pdf', '2025-10-12 16:26:03'),
-(62, 57, 'uploads/transaction_57/1760286363_FB_IMG_1760253383644.pdf', '2025-10-12 16:26:03'),
-(64, 57, 'uploads/transaction_57/Jm_Tin.pdf', '2025-10-12 16:43:14');
+(81, 57, 'uploads/transaction_57/1760932323_17609323098217198016003940274513.pdf', '2025-10-20 03:52:03'),
+(82, 57, 'uploads/transaction_57/1760932323_Messenger_creation_CEAD8B37-7258-45FB-80AD-2F2C99F21150.pdf', '2025-10-20 03:52:03'),
+(83, 57, 'uploads/transaction_57/1760932323_Messenger_creation_B731EE51-8920-4726-839A-8BBBB70FA178.pdf', '2025-10-20 03:52:03'),
+(84, 62, 'uploads/transaction_62/1760932471_Screenshot_20251020_002219.pdf', '2025-10-20 03:54:31'),
+(85, 62, 'uploads/transaction_62/1760932471_17609324673033823871870564330439.pdf', '2025-10-20 03:54:31'),
+(86, 62, 'uploads/transaction_62/ERPTS.pdf', '2025-10-20 03:58:51');
 
 -- --------------------------------------------------------
 
@@ -1163,7 +1171,13 @@ INSERT INTO `transaction_logs` (`log_id`, `transaction_id`, `transaction_code`, 
 (173, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/1760287394_FB_IMG_1760254477732.pdf', 9, '2025-10-13 18:14:16'),
 (174, 62, '02603', 'Document Deleted', 'Deleted document: uploads/transaction_62/tx_68ed4116ef098_Gacho.pdf', 9, '2025-10-13 18:15:42'),
 (175, 62, '02603', 'Document Deleted', 'Deleted document: uploads/transaction_62/tx_68ed4116ecfe0_zuelos.pdf', 9, '2025-10-13 18:15:45'),
-(176, 62, '02603', 'Document Deleted', 'Deleted document: uploads/transaction_62/1760379631_17603796241224363308576054988599.pdf', 9, '2025-10-13 18:20:47');
+(176, 62, '02603', 'Document Deleted', 'Deleted document: uploads/transaction_62/1760379631_17603796241224363308576054988599.pdf', 9, '2025-10-13 18:20:47'),
+(177, 62, '02603', 'Document Deleted', 'Deleted document: uploads/transaction_62/1760930452_17609304497356340843951931172250.pdf', 9, '2025-10-20 03:21:12'),
+(178, 62, '02603', 'Document Deleted', 'Deleted document: uploads/transaction_62/1760930452_Messenger_creation_B731EE51-8920-4726-839A-8BBBB70FA178.pdf', 9, '2025-10-20 03:21:15'),
+(179, 62, '02603', 'Document Deleted', 'Deleted document: uploads/transaction_62/1760930452_Messenger_creation_CEAD8B37-7258-45FB-80AD-2F2C99F21150.pdf', 9, '2025-10-20 03:21:17'),
+(180, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/Jm_Tin.pdf', 9, '2025-10-20 03:50:27'),
+(181, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/1760286363_FB_IMG_1760253383644.pdf', 9, '2025-10-20 03:50:30'),
+(182, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/Birth_Cert.pdf', 9, '2025-10-20 03:50:32');
 
 -- --------------------------------------------------------
 
@@ -1413,7 +1427,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT for table `admin_certification`
@@ -1545,13 +1559,13 @@ ALTER TABLE `transactions`
 -- AUTO_INCREMENT for table `transaction_files`
 --
 ALTER TABLE `transaction_files`
-  MODIFY `file_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
+  MODIFY `file_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
 
 --
 -- AUTO_INCREMENT for table `transaction_logs`
 --
 ALTER TABLE `transaction_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=177;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=183;
 
 --
 -- AUTO_INCREMENT for table `users`
