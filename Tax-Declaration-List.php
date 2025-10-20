@@ -63,75 +63,107 @@ $result = $conn->query($sql);
 <body>
   <?php include 'header.php'; ?>
 
-  <section class="container mt-4">
-    <div class="mb-4 d-flex justify-content-start">
-      <a href="Home.php" class="btn btn-outline-secondary btn-sm">
-        <i class="fas fa-arrow-left"></i> Back
-      </a>
-    </div>
+<section class="container mt-5">
+  <!-- Back Button -->
+  <div class="mb-4 d-flex justify-content-start">
+    <a href="Home.php" class="btn btn-outline-secondary btn-sm">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+  </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div class="d-flex align-items-stretch" style="width: 250px;">
-        <input type="text" id="searchInput" placeholder="Search..." class="form-control" style="width: 400px;">
-        <button type="button" id="filterBtn" class="btn btn-success ms-1">Search</button>
-      </div>
-      <div class="d-flex align-items-center">
-        <label class="mb-0 me-2" for="propertyType">Filter by Property Type:</label>
-        <select id="propertyType" class="form-control me-2" style="width: 150px;">
-          <option value="">Select Type</option>
-          <option value="Land">Land</option>
-          <option value="Building">Building</option>
-          <option value="Vehicle">Vehicle</option>
-        </select>
-        <button type="button" class="btn btn-success">Go</button>
-      </div>
-    </div>
+  <!-- Card Container -->
+  <div class="card p-4">
+    <h3 class="mb-4">Tax Declaration List</h3>
 
-    <div class="table-responsive">
-      <table class="table table-hover table-striped modern-table" id="dataTable">
-        <thead class="table-dark">
-          <tr>
-            <th class="text-center">TD ID</th>
-            <th class="text-center">OWNER<br><span class="owner-subtext">(person) (company/group)</span></th>
-            <th class="text-center">TD NUMBER</th>
-            <th class="text-center">PROPERTY VALUE</th>
-            <th class="text-center">YEAR</th>
-            <th class="text-center">ACTIONS</th>
-          </tr>
-        </thead>
-        <tbody class="text-center">
-          <?php
-          if ($result && $result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-              $dec_id = $row['dec_id'];
-              $faas_id = $row['faas_id'];
-              $p_id = $row['p_id'];
-              $owner_names = $row['owner_names'] ?? '';
+    <!-- Search + Filter Row -->
+    <div class="form-row mb-4">
+      <div class="row mb-4 align-items-center">
+        <!-- Search Input -->
+        <div class="col-12 col-md-6 col-lg-3 mb-2 mb-md-0">
+          <input type="text" class="form-control" id="searchInput" placeholder="Search" onkeyup="filterTable()">
+        </div>
 
-              echo "<tr>";
-              echo "<td>" . htmlspecialchars($dec_id) . "</td>";
-              echo "<td>" . htmlspecialchars($owner_names) . "</td>";
-              echo "<td>" . htmlspecialchars($row['arp_no']) . "</td>";
-              echo "<td>₱ " . number_format($row['total_property_value'], 2) . "</td>";
-              echo "<td>" . htmlspecialchars($row['tax_year']) . "</td>";
-              if (!empty($p_id)) {
-                echo "<td class='text-center'><a href='FAAS.php?id={$p_id}' class='btn btn-success btn-sm'><i class='fas fa-edit'></i></a </td>";
-              } else {
-                echo "<td><span class='text-muted'>No Property</span></td>";
+        <!-- Dropdown + Search Button -->
+        <div class="col-10 col-sm-6 col-md-4 col-lg-4 mb-2 mb-md-0">
+          <div class="d-flex">
+            <select class="form-select me-3 w-50" id="propertyType" name="propertyType">
+              <option value="" disabled selected hidden>Select Type</option>
+              <option value="Land">Land</option>
+              <option value="Building">Building</option>
+              <option value="Machinery">Machinery</option>
+              <option value="Other">Other</option>
+            </select>
+            <button type="button" class="btn btn-success" onclick="filterTable()">Search</button>
+          </div>
+        </div>
+
+
+      <!-- Table -->
+      <div class="table-responsive">
+        <table class="table table-bordered text-start modern-table" id="dataTable">
+          <thead>
+            <tr>
+              <th>TD ID</th>
+              <th>Owner<br><small>(Person / Company)</small></th>
+              <th>TD Number</th>
+              <th>Property Value</th>
+              <th>Year</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            if ($result && $result->num_rows > 0) {
+              while ($row = $result->fetch_assoc()) {
+                $dec_id = $row['dec_id'];
+                $faas_id = $row['faas_id'];
+                $p_id = $row['p_id'];
+                $owner_names = $row['owner_names'] ?? '';
+                $owner_display = trim($owner_names) !== '' ? $owner_names : 'None';
+                $rowClass = empty($p_id) ? 'table-secondary' : ''; // gray if no property
+
+                echo "<tr class='{$rowClass}'>";
+                echo "<td>" . htmlspecialchars($dec_id) . "</td>";
+                echo "<td>" . htmlspecialchars($owner_display) . "</td>";
+                echo "<td>" . htmlspecialchars($row['arp_no']) . "</td>";
+                echo "<td>₱ " . number_format($row['total_property_value'], 2) . "</td>";
+                echo "<td>" . htmlspecialchars($row['tax_year']) . "</td>";
+                if (!empty($p_id)) {
+                  echo "<td><a href='FAAS.php?id={$p_id}' class='btn btn-primary btn-sm'>EDIT</a></td>";
+                } else {
+                  echo "<td><span class='text-muted'>No Property</span></td>";
+                }
+                echo "</tr>";
               }
-              echo "</tr>";
+            } else {
+              echo "<tr><td colspan='6' class='text-center'>No records found.</td></tr>";
             }
-          } else {
-            echo "<tr><td colspan='6' class='text-center'>No records found.</td></tr>";
-          }
-          ?>
-        </tbody>
-      </table>
-      <div class="d-flex justify-content-between mt-3">
-        <div class="d-flex justify-content-center align-items-center mt-3" id="paginationControls"></div>
-        <button type="button" class="btn btn-success mb-2" data-bs-toggle="modal" data-bs-target="#viewAllModal">View All</button>
+            ?>
+          </tbody>
+        </table>
       </div>
-  </section>
+
+      <!-- Pagination -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+      <div class="pagination-controls d-flex align-items-center">
+        <button class="btn btn-outline-success me-2" id="prevPage">Previous</button>
+        <button class="btn btn-success me-2 active" id="currentPage">1</button>
+        <button class="btn btn-outline-success" id="nextPage">Next</button>
+      </div>
+
+      <!-- View All Button -->
+      <div class="view-all-container d-flex mt-3">
+        <div class="ml-auto">
+          <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#viewAllModal">
+            View All
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
 
   <!--View All Modal-->
   <div class="modal fade" id="viewAllModal" tabindex="-1" aria-labelledby="viewAllModalLabel" aria-hidden="true">
@@ -178,7 +210,9 @@ $result = $conn->query($sql);
 
   <!-- Scripts -->
   <script src="Tax-Declaration-List.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </body>
 
 </html>
