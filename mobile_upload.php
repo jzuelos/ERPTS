@@ -72,7 +72,7 @@ if (!$t_code)
                 <div class="mb-3">
                     <label for="fileInput" class="form-label fw-semibold">Select Files (Images or PDFs)</label>
                     <input type="file" class="form-control" id="fileInput" name="t_file[]"
-                        accept="image/*,application/pdf" capture="environment" multiple required>
+                        accept="image/*,application/pdf" capture="environment" multiple>
                     <div class="form-text">Images will be automatically converted into a PDF before upload.</div>
                 </div>
 
@@ -114,24 +114,77 @@ if (!$t_code)
         const fullImage = document.getElementById('fullPreviewImage');
         let selectedFiles = [];
 
-        //Preview only images
+        //Preview and accumulate images
         fileInput.addEventListener('change', () => {
-            previewContainer.innerHTML = '';
-            selectedFiles = Array.from(fileInput.files);
-            if (!selectedFiles.length) return;
+            const newFiles = Array.from(fileInput.files);
 
-            selectedFiles.forEach(file => {
+            // Add new files to existing ones (accumulate)
+            newFiles.forEach(file => {
+                // Check if file with same name and size already exists
+                const isDuplicate = selectedFiles.some(existing =>
+                    existing.name === file.name && existing.size === file.size
+                );
+                if (!isDuplicate) {
+                    selectedFiles.push(file);
+                }
+            });
+
+            // Clear input to allow selecting same file again
+            fileInput.value = '';
+
+            // Redraw all previews
+            updatePreview();
+        });
+
+        function updatePreview() {
+            previewContainer.innerHTML = '';
+
+            selectedFiles.forEach((file, index) => {
                 if (file.type.startsWith('image/')) {
+                    const wrapper = document.createElement('div');
+                    wrapper.style.position = 'relative';
+                    wrapper.style.display = 'inline-block';
+
                     const img = document.createElement('img');
                     img.src = URL.createObjectURL(file);
                     img.addEventListener('click', () => {
                         fullImage.src = img.src;
                         fullModal.show();
                     });
-                    previewContainer.appendChild(img);
+
+                    // Add remove button
+                    const removeBtn = document.createElement('button');
+                    removeBtn.innerHTML = '&times;';
+                    removeBtn.className = 'btn btn-danger btn-sm';
+                    removeBtn.style.position = 'absolute';
+                    removeBtn.style.top = '-5px';
+                    removeBtn.style.right = '-5px';
+                    removeBtn.style.width = '25px';
+                    removeBtn.style.height = '25px';
+                    removeBtn.style.padding = '0';
+                    removeBtn.style.borderRadius = '50%';
+                    removeBtn.style.fontSize = '18px';
+                    removeBtn.style.lineHeight = '1';
+                    removeBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        selectedFiles.splice(index, 1);
+                        updatePreview();
+                    });
+
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(removeBtn);
+                    previewContainer.appendChild(wrapper);
                 }
             });
-        });
+
+            // Update status
+            if (selectedFiles.length > 0) {
+                statusEl.textContent = `${selectedFiles.length} photo(s) selected`;
+                statusEl.className = 'fw-semibold text-success small';
+            } else {
+                statusEl.textContent = '';
+            }
+        }
 
         //Convert a single image to a full-page fitted PDF
         async function convertImageToPdf(file) {
@@ -204,7 +257,7 @@ if (!$t_code)
                 // Append any existing PDFs directly
                 pdfs.forEach(f => formData.append('t_file[]', f, f.name));
 
-                statusEl.textContent = '⏳ Uploading...';
+                statusEl.textContent = 'Uploading...';
                 const res = await fetch('trackFunctions.php', { method: 'POST', body: formData });
                 const text = await res.text();
                 const data = JSON.parse(text);
