@@ -78,12 +78,11 @@ document.addEventListener("DOMContentLoaded", () => {
     })
       .then(res => res.json())
       .then(data => {
-        //AJAX success callback for Add/Edit
-        if (response.success) {
+        if (data.success) {
           alert('Saved successfully!');
           location.reload();
-        } else if (response.error) {
-          alert(response.error);
+        } else if (data.error) {
+          alert(data.error);
         } else {
           alert('An error occurred.');
         }
