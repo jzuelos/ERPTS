@@ -293,14 +293,14 @@ if ($verifierQuery) {
 
           <!-- Approved By (Right Side) -->
           <div style="text-align: center;">
-            <div style="text-align: left; font-weight:bold;">Approved By:</div>
+            <div style="text-align: left; font-weight:bold; margin-right: 20%;">Approved By:</div>
             <?php
             $isNotAssigned = empty($currentAssessor);
             ?>
             <u style="<?= $isNotAssigned ? 'color: red;' : '' ?>">
               <?= htmlspecialchars($currentAssessor ?? 'Not Assigned') ?>
             </u>
-            <div style="margin-top: 2px; text-align: center;">
+            <div style="margin-top: 2px; text-align: center; font-weight:bold;">
               Provincial Assessor
             </div>
           </div>

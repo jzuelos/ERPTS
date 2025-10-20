@@ -17,13 +17,12 @@ document.addEventListener("DOMContentLoaded", () => {
       body: new URLSearchParams({ action: "add", name, position, status })
     })
       .then(res => res.json())
-      .then(data => {
-        //AJAX success callback for Add/Edit
-        if (response.success) {
+      .then(data => {  // ✅ use 'data' here
+        if (data.success) {
           alert('Saved successfully!');
           location.reload();
-        } else if (response.error) {
-          alert(response.error);
+        } else if (data.error) {
+          alert(data.error);
         } else {
           alert('An error occurred.');
         }
