@@ -31,9 +31,13 @@ $inProgressCount = $inProgressResult->fetch_assoc()['total'];
 $completedResult = $conn->query("SELECT COUNT(*) AS total FROM transactions WHERE status='Completed'");
 $completedCount = $completedResult->fetch_assoc()['total'];
 
-// Fetch paginated transactions (include transaction_type now)
-$sql = "SELECT transaction_id, transaction_code, name, contact_number, description, transaction_type, status 
-        FROM transactions ORDER BY transaction_id DESC 
+// Fetch paginated transactions with file count
+$sql = "SELECT t.transaction_id, t.transaction_code, t.name, t.contact_number, t.description, t.transaction_type, t.status,
+        COUNT(f.file_id) AS file_count
+        FROM transactions t
+        LEFT JOIN transaction_files f ON t.transaction_id = f.transaction_id
+        GROUP BY t.transaction_id
+        ORDER BY t.transaction_id DESC 
         LIMIT $limit OFFSET $offset";
 $result = $conn->query($sql);
 
@@ -41,8 +45,14 @@ $result = $conn->query($sql);
 $transactionRows = "";
 if ($result && $result->num_rows > 0) {
   while ($row = $result->fetch_assoc()) {
-    $statusClass = strtolower(str_replace(' ', '-', $row['status'])); // e.g., "In Progress" → "in-progress"
+    $statusClass = strtolower(str_replace(' ', '-', $row['status']));
     $transaction_type = htmlspecialchars($row['transaction_type'] ?? '', ENT_QUOTES);
+    
+    // Check if there are files
+    $fileCount = (int)$row['file_count'];
+    $docBtnClass = $fileCount > 0 ? 'btn-dark' : 'btn-secondary';
+    $docBtnStyle = $fileCount > 0 ? 'padding:8px 12px; font-size:12px;' : 'padding:8px 12px; font-size:12px; opacity:0.6; cursor:not-allowed;';
+    $docBtnTitle = $fileCount > 0 ? 'View documents' : 'No documents uploaded';
 
     $transactionRows .= "
 <tr>
@@ -61,7 +71,7 @@ if ($result && $result->num_rows > 0) {
     <i class='fas fa-trash'></i> Delete
   </button>
 
-  <button class='btn btn-sm btn-dark me-1 mb-1' style='padding:8px 12px; font-size:12px;' onclick='showDocuments(" . $row['transaction_id'] . ")'>
+  <button class='btn btn-sm {$docBtnClass} me-1 mb-1' style='{$docBtnStyle}' onclick='showDocuments(" . $row['transaction_id'] . ")' title='{$docBtnTitle}'>
     <i class='fas fa-file-alt'></i> Documents
   </button>
 </td>
@@ -70,7 +80,6 @@ if ($result && $result->num_rows > 0) {
     <i class='fas fa-check'></i>
   </button>
 </td>
-
 
 </tr>";
   }

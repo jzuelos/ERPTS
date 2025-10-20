@@ -1169,6 +1169,11 @@ function generateQrFromModal() {
             border-radius: 5px;
             margin: 10px 0;
           }
+          #countdown {
+            color: #666;
+            font-size: 12px;
+            margin-top: 15px;
+          }
         </style>
       </head>
       <body>
@@ -1176,6 +1181,28 @@ function generateQrFromModal() {
         <img src="${qrImage}" alt="QR Code">
         ${statusMessage}
         ${!isEditMode ? '<small style="color:#666;">Files will be linked after you save the transaction</small>' : ''}
+        <div id="countdown">This window will close in <span id="timer">5:00</span></div>
+        
+        <script>
+          // Auto-close after 5 minutes (300 seconds)
+          let secondsLeft = 300;
+          
+          function updateTimer() {
+            const minutes = Math.floor(secondsLeft / 60);
+            const seconds = secondsLeft % 60;
+            document.getElementById('timer').textContent = 
+              minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+            
+            if (secondsLeft <= 0) {
+              window.close();
+            } else {
+              secondsLeft--;
+              setTimeout(updateTimer, 1000);
+            }
+          }
+          
+          updateTimer();
+        </script>
       </body>
     </html>
   `;

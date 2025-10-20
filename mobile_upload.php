@@ -249,7 +249,7 @@ if (!$t_code)
             try {
                 // Convert and append each image as a separate PDF
                 for (let i = 0; i < images.length; i++) {
-                    statusEl.textContent = `⏳ Converting image ${i + 1} of ${images.length}...`;
+                    statusEl.textContent = `Converting image ${i + 1} of ${images.length}...`;
                     const pdfBlob = await convertImageToPdf(images[i]);
                     formData.append('t_file[]', pdfBlob, images[i].name.replace(/\.[^.]+$/, '') + '.pdf');
                 }
