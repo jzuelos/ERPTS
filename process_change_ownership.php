@@ -9,10 +9,77 @@ $property_id = (int) ($_POST['property_id'] ?? 0);
 $remove_ids = $_POST['owners_to_remove'] ?? [];
 $add_ids = $_POST['owners_to_add'] ?? [];
 
+// ============================================================================
+// ACTIVITY LOGGING FUNCTIONS
+// ============================================================================
+
+/**
+ * Function to log activity
+ */
+function logActivity($conn, $userId, $action)
+{
+  $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action) VALUES (?, ?)");
+  $stmt->bind_param("is", $userId, $action);
+  $stmt->execute();
+  $stmt->close();
+}
+
+/**
+ * Helper function to get property location details
+ */
+function getPropertyLocationDetails($conn, $property_id)
+{
+  $stmt = $conn->prepare("SELECT house_no, city, district, barangay FROM p_info WHERE p_id = ?");
+  $stmt->bind_param("i", $property_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $property = $result->fetch_assoc();
+  $stmt->close();
+  
+  if (!$property) return "Property ID: $property_id";
+  
+  // Get readable names
+  $municipalityName = 'Unknown';
+  $barangayName = 'Unknown';
+  $districtName = 'Unknown';
+  
+  if (!empty($property['city'])) {
+    $stmt = $conn->prepare("SELECT m_description FROM municipality WHERE m_id = ?");
+    $stmt->bind_param("i", $property['city']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    if ($row) $municipalityName = $row['m_description'];
+    $stmt->close();
+  }
+  
+  if (!empty($property['barangay'])) {
+    $stmt = $conn->prepare("SELECT brgy_name FROM brgy WHERE brgy_id = ?");
+    $stmt->bind_param("i", $property['barangay']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    if ($row) $barangayName = $row['brgy_name'];
+    $stmt->close();
+  }
+  
+  if (!empty($property['district'])) {
+    $stmt = $conn->prepare("SELECT description FROM district WHERE district_id = ?");
+    $stmt->bind_param("i", $property['district']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    if ($row) $districtName = $row['description'];
+    $stmt->close();
+  }
+  
+  return "House #" . $property['house_no'] . ", " . $barangayName . ", " . $districtName . ", " . $municipalityName;
+}
+
 // ----------------------
 // Lookup tax declaration via FAAS
 // ----------------------
-$sql = "SELECT r.dec_id, r.faas_id
+$sql = "SELECT r.dec_id, r.faas_id, r.arp_no, r.tax_year
         FROM rpu_dec r
         JOIN faas f ON f.faas_id = r.faas_id
         WHERE f.pro_id = ?
@@ -23,6 +90,8 @@ $stmt->execute();
 $taxdec = $stmt->get_result()->fetch_assoc();
 $tax_dec_id = $taxdec['dec_id'] ?? 0;
 $faas_id = $taxdec['faas_id'] ?? 0;
+$arp_no = $taxdec['arp_no'] ?? 'N/A';
+$tax_year = $taxdec['tax_year'] ?? 'N/A';
 
 if (!$tax_dec_id) {
     die("No tax declaration found for property ID $property_id");
@@ -44,6 +113,19 @@ function getOwnerDetails($conn, $oid)
     $addressParts = array_filter([$owner['street'] ?? '', $owner['barangay'] ?? '', $owner['city'] ?? '', $owner['province'] ?? ''], fn($p) => trim($p) !== '');
     $address = implode(', ', $addressParts);
     return "$fullname ($address)";
+}
+
+/**
+ * Helper: get owner name only (no address)
+ */
+function getOwnerName($conn, $oid)
+{
+    $stmt = $conn->prepare("SELECT own_fname, own_mname, own_surname FROM owners_tb WHERE own_id = ?");
+    $stmt->bind_param("i", $oid);
+    $stmt->execute();
+    $owner = $stmt->get_result()->fetch_assoc();
+    if (!$owner) return "Owner ID $oid";
+    return trim(($owner['own_fname'] ?? '') . ' ' . ($owner['own_mname'] ?? '') . ' ' . ($owner['own_surname'] ?? ''));
 }
 
 // ----------------------
@@ -68,7 +150,6 @@ if (!isset($_POST['confirm'])) {
 
             .list-group {
                 text-align: left;
-                /* keep items aligned inside */
             }
         </style>
     </head>
@@ -88,6 +169,8 @@ if (!isset($_POST['confirm'])) {
                     <hr>
                     <p><strong>Property ID:</strong> <?= htmlspecialchars($property_id) ?></p>
                     <p><strong>Tax Declaration ID:</strong> <?= htmlspecialchars($tax_dec_id) ?></p>
+                    <p><strong>ARP Number:</strong> <?= htmlspecialchars($arp_no) ?></p>
+                    <p><strong>Tax Year:</strong> <?= htmlspecialchars($tax_year) ?></p>
 
                     <h6 class="mt-4">Owners to be Removed</h6>
                     <?php if (!empty($removeDetails)): ?>
@@ -154,11 +237,25 @@ if (!isset($_POST['confirm'])) {
 }
 
 // ----------------------
-// Step 2: Actual update logic
+// Step 2: Actual update logic WITH COMPREHENSIVE LOGGING
 // ----------------------
 $conn->begin_transaction();
 
 try {
+    // ✅ Get property location for logging
+    $locationDetails = getPropertyLocationDetails($conn, $property_id);
+    
+    // ✅ Get all current owners before changes
+    $current_owners_stmt = $conn->prepare("SELECT owner_id FROM propertyowner WHERE property_id = ? AND is_retained = 1");
+    $current_owners_stmt->bind_param("i", $property_id);
+    $current_owners_stmt->execute();
+    $current_owners_result = $current_owners_stmt->get_result();
+    $previous_owner_ids = [];
+    while ($row = $current_owners_result->fetch_assoc()) {
+        $previous_owner_ids[] = $row['owner_id'];
+    }
+    $current_owners_stmt->close();
+    
     // --- 1. Handle Removed Owners (with audit log) ---
     foreach ($remove_ids as $oid) {
         $stmt = $conn->prepare("UPDATE propertyowner 
@@ -167,7 +264,7 @@ try {
         $stmt->bind_param("ii", $property_id, $oid);
         $stmt->execute();
 
-        // log only removals
+        // Keep your existing owner_audit_log
         $ownerDetails = getOwnerDetails($conn, $oid);
         $details = "Removed: $ownerDetails from property $property_id";
         $stmt2 = $conn->prepare("INSERT INTO owner_audit_log 
@@ -177,17 +274,89 @@ try {
         $stmt2->execute();
     }
 
-    // --- 2. Handle Added Owners (no audit log) ---
+    // --- 2. Handle Added Owners ---
     foreach ($add_ids as $oid) {
         $stmt = $conn->prepare("INSERT INTO propertyowner 
             (property_id, owner_id, is_retained, created_by) 
             VALUES (?, ?, 1, ?)");
         $stmt->bind_param("iii", $property_id, $oid, $user_id);
         $stmt->execute();
-        // no log here
+        
+        // Keep your existing owner_audit_log
+        $ownerDetails = getOwnerDetails($conn, $oid);
+        $details = "Added: $ownerDetails to property $property_id";
+        $stmt2 = $conn->prepare("INSERT INTO owner_audit_log 
+            (action, owner_id, property_id, user_id, `tax-dec_id`, details) 
+            VALUES ('Added', ?, ?, ?, ?, ?)");
+        $stmt2->bind_param("iiiis", $oid, $property_id, $user_id, $tax_dec_id, $details);
+        $stmt2->execute();
     }
+    
+    // ✅ Get new current owners after changes
+    $new_owners_stmt = $conn->prepare("SELECT owner_id FROM propertyowner WHERE property_id = ? AND is_retained = 1");
+    $new_owners_stmt->bind_param("i", $property_id);
+    $new_owners_stmt->execute();
+    $new_owners_result = $new_owners_stmt->get_result();
+    $new_owner_ids = [];
+    while ($row = $new_owners_result->fetch_assoc()) {
+        $new_owner_ids[] = $row['owner_id'];
+    }
+    $new_owners_stmt->close();
 
-    // --- 3. Skip snapshot logging entirely ---
+    // ✅ LOG COMPREHENSIVE OWNERSHIP TRANSFER TO ACTIVITY LOG
+    if ($user_id && (!empty($remove_ids) || !empty($add_ids))) {
+        $logMessage  = "Ownership Transfer Completed\n";
+        $logMessage .= "Property ID: $property_id\n";
+        $logMessage .= "Location: $locationDetails\n";
+        $logMessage .= "Tax Declaration ID: $tax_dec_id\n";
+        $logMessage .= "ARP Number: $arp_no\n";
+        $logMessage .= "Tax Year: $tax_year\n\n";
+        
+        // Previous owners
+        if (!empty($previous_owner_ids)) {
+            $logMessage .= "Previous Owners:\n";
+            foreach ($previous_owner_ids as $prev_id) {
+                $name = getOwnerName($conn, $prev_id);
+                $logMessage .= "• $name (ID: $prev_id)\n";
+            }
+            $logMessage .= "\n";
+        }
+        
+        // Removed owners
+        if (!empty($remove_ids)) {
+            $logMessage .= "Removed Owners:\n";
+            foreach ($remove_ids as $rem_id) {
+                $name = getOwnerName($conn, $rem_id);
+                $logMessage .= "• $name (ID: $rem_id)\n";
+            }
+            $logMessage .= "\n";
+        }
+        
+        // Added owners
+        if (!empty($add_ids)) {
+            $logMessage .= "Added Owners (New Title Holders):\n";
+            foreach ($add_ids as $add_id) {
+                $name = getOwnerName($conn, $add_id);
+                $logMessage .= "• $name (ID: $add_id)\n";
+            }
+            $logMessage .= "\n";
+        }
+        
+        // Current owners after transfer
+        $logMessage .= "Current Owners After Transfer:\n";
+        if (!empty($new_owner_ids)) {
+            foreach ($new_owner_ids as $curr_id) {
+                $name = getOwnerName($conn, $curr_id);
+                $logMessage .= "• $name (ID: $curr_id)\n";
+            }
+        } else {
+            $logMessage .= "• None\n";
+        }
+        
+        $logMessage .= "\nTransfer Status: Successfully completed";
+        
+        logActivity($conn, $user_id, $logMessage);
+    }
 
     $conn->commit();
 
@@ -195,6 +364,18 @@ try {
     exit;
 } catch (Exception $e) {
     $conn->rollback();
+    
+    // ✅ LOG FAILED TRANSFER
+    if ($user_id) {
+        $locationDetails = getPropertyLocationDetails($conn, $property_id);
+        $logMessage  = "Failed Ownership Transfer\n";
+        $logMessage .= "Property ID: $property_id\n";
+        $logMessage .= "Location: $locationDetails\n";
+        $logMessage .= "Tax Declaration ID: $tax_dec_id\n";
+        $logMessage .= "Error: " . $e->getMessage();
+        
+        logActivity($conn, $user_id, $logMessage);
+    }
+    
     die("Ownership transfer failed: " . $e->getMessage());
 }
-
