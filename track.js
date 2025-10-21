@@ -67,11 +67,39 @@ function openModal(id = null) {
 
       const statusSelect = document.getElementById('statusInput');
       statusSelect.disabled = false; // ✅ Re-enable dropdown in edit mode
-      statusSelect.innerHTML = `
-      <option value="" disabled selected>Select Status</option>
-      <option value="In Progress">In Progress</option>
-      <option value="Completed">Completed</option>
-    `;
+
+      // Build status options based on current status
+      if (tx.status === 'Pending') {
+        // From Pending: can only stay Pending or go to In Progress
+        statusSelect.innerHTML = `
+          <option value="" disabled selected>Select Status</option>
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+        `;
+      } else if (tx.status === 'In Progress') {
+        // From In Progress: can stay In Progress or go to Completed
+        statusSelect.innerHTML = `
+          <option value="" disabled selected>Select Status</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        `;
+      } else if (tx.status === 'Completed') {
+        // From Completed: can stay Completed or revert to In Progress (with confirmation)
+        statusSelect.innerHTML = `
+          <option value="" disabled selected>Select Status</option>
+          <option value="Completed">Completed</option>
+          <option value="In Progress">In Progress</option>
+        `;
+      } else {
+        // Fallback for any other status
+        statusSelect.innerHTML = `
+          <option value="" disabled selected>Select Status</option>
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        `;
+      }
+
       statusSelect.value = tx.status || '';
 
       editId = id;
@@ -97,8 +125,8 @@ function openModal(id = null) {
 
     const statusSelect = document.getElementById('statusInput');
     statusSelect.innerHTML = `
-  <option value="Pending" selected>Pending</option>
-`;
+      <option value="Pending" selected>Pending</option>
+    `;
     statusSelect.selectedIndex = 0;
     statusSelect.disabled = true; // ✅ keep this
 
@@ -159,7 +187,58 @@ function generateAutoMessage() {
 
 // Handle status change to auto-generate description
 function handleStatusChange() {
-  generateAutoMessage();
+  const statusSelect = document.getElementById('statusInput');
+  const newStatus = statusSelect.value;
+
+  // Get the current transaction's old status
+  const transaction = transactions.find(t => t.id === editId);
+  const oldStatus = transaction ? transaction.status : null;
+
+  // Check if reverting from Completed to In Progress
+  if (oldStatus === 'Completed' && newStatus === 'In Progress') {
+    // Show Bootstrap confirmation modal
+    const revertModal = new bootstrap.Modal(document.getElementById('revertStatusModal'));
+
+    // Setup one-time event handlers
+    const confirmBtn = document.getElementById('confirmRevertBtn');
+    const modalElement = document.getElementById('revertStatusModal');
+
+    // Store original status to revert if cancelled
+    const originalStatus = oldStatus;
+    let userConfirmed = false;
+
+    // Handler for confirm button
+    function handleConfirm() {
+      userConfirmed = true;
+      generateAutoMessage();
+      revertModal.hide();
+      // Clean up listeners
+      confirmBtn.removeEventListener('click', handleConfirm);
+      modalElement.removeEventListener('hidden.bs.modal', handleCancel);
+    }
+
+    // Handler for cancel/close
+    function handleCancel() {
+      if (!userConfirmed) {
+        // User cancelled, revert back to Completed
+        statusSelect.value = originalStatus;
+        generateAutoMessage();
+      }
+      // Clean up listeners
+      confirmBtn.removeEventListener('click', handleConfirm);
+      modalElement.removeEventListener('hidden.bs.modal', handleCancel);
+    }
+
+    // Attach event listeners
+    confirmBtn.addEventListener('click', handleConfirm);
+    modalElement.addEventListener('hidden.bs.modal', handleCancel);
+
+    // Show the modal
+    revertModal.show();
+  } else {
+    // Normal status change, just generate message
+    generateAutoMessage();
+  }
 }
 
 // Handle transaction type change to auto-generate description

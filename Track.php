@@ -47,9 +47,9 @@ if ($result && $result->num_rows > 0) {
   while ($row = $result->fetch_assoc()) {
     $statusClass = strtolower(str_replace(' ', '-', $row['status']));
     $transaction_type = htmlspecialchars($row['transaction_type'] ?? '', ENT_QUOTES);
-    
+
     // Check if there are files
-    $fileCount = (int)$row['file_count'];
+    $fileCount = (int) $row['file_count'];
     $docBtnClass = $fileCount > 0 ? 'btn-dark' : 'btn-secondary';
     $docBtnStyle = $fileCount > 0 ? 'padding:8px 12px; font-size:12px;' : 'padding:8px 12px; font-size:12px; opacity:0.6; cursor:not-allowed;';
     $docBtnTitle = $fileCount > 0 ? 'View documents' : 'No documents uploaded';
@@ -451,6 +451,35 @@ if ($result && $result->num_rows > 0) {
           <button type="button" class="btn btn-success" id="confirmBtn">Yes, Confirm</button>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+  <!-- Revert Status to In Progress Confirmation Modal -->
+  <div class="modal fade" id="revertStatusModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-warning text-dark">
+          <h5 class="modal-title">
+            <i class="fas fa-exclamation-triangle"></i> Revert Transaction Status
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-warning">
+            <strong>⚠️ Warning:</strong> You are about to revert a COMPLETED transaction back to IN PROGRESS.
+          </div>
+          <p>This action should only be done if there was a mistake in marking the transaction as completed.</p>
+          <p class="mb-0"><strong>Are you sure you want to continue?</strong></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+          <button type="button" class="btn btn-warning" id="confirmRevertBtn">
+            <i class="fas fa-undo"></i> Yes
+          </button>
+        </div>
       </div>
     </div>
   </div>
