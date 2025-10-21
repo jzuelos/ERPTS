@@ -65,36 +65,44 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   const editForm = document.getElementById("editForm");
-  if (editForm) {
-    editForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      const id = document.getElementById("editId").value;
-      const name = document.getElementById("editName").value.trim();
-      const position = document.getElementById("editPosition").value.trim();
-      const status = document.querySelector('#editForm input[name="editStatus"]:checked').value;
+if (editForm) {
+  editForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const id = document.getElementById("editId").value;
+    const name = document.getElementById("editName").value.trim();
+    const position = document.getElementById("editPosition").value.trim();
+    const status = document.querySelector('#editForm input[name="editStatus"]:checked').value;
 
-      fetch("", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ action: "edit", id, name, position, status })
+    // 🛑 Prevent inactivating Provincial Assessor
+    if ((name.toLowerCase() === "provincial assessor" || position.toLowerCase() === "provincial assessor") && status.toLowerCase() !== "active") {
+      alert("⚠️The Provincial Assessor cannot be set to inactive.");
+      return; // stop here, do not submit
+    }
+
+    // Proceed normally for others
+    fetch("", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ action: "edit", id, name, position, status })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('Saved successfully!');
+          location.reload();
+        } else if (data.error) {
+          alert(data.error);
+        } else {
+          alert('An error occurred.');
+        }
       })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            alert('Saved successfully!');
-            location.reload();
-          } else if (data.error) {
-            alert(data.error);
-          } else {
-            alert('An error occurred.');
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          alert("Error updating record.");
-        });
-    });
-  }
+      .catch(err => {
+        console.error(err);
+        alert("Error updating record.");
+      });
+  });
+}
+
 
   // =========================
   // DELETE RECORD
