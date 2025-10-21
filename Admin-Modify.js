@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (name === "provincial assessor" || position === "provincial assessor") {
         // Small timeout helps avoid UI flicker if some other UI event is queued
         setTimeout(() => {
-          alert("❌ You cannot delete the Provincial Assessor record.");
+          alert("You cannot delete the Provincial Assessor record.");
         }, 50);
         // do not set rowToDelete (or keep it but ensure confirm won't delete) — just return
         rowToDelete = null;
@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Defensive check: block deletion if it's changed to Provincial Assessor
       if (name === "provincial assessor" || position === "provincial assessor") {
-        alert("❌ The Provincial Assessor record cannot be deleted.");
+        alert("The Provincial Assessor record cannot be deleted.");
         const modalInstance = bootstrap.Modal.getInstance(document.getElementById("deleteModal"));
         if (modalInstance) modalInstance.hide();
         rowToDelete = null;
