@@ -168,8 +168,7 @@ if (!isset($_POST['confirm'])) {
                     </p>
                     <hr>
                     <p><strong>Property ID:</strong> <?= htmlspecialchars($property_id) ?></p>
-                    <p><strong>Tax Declaration ID:</strong> <?= htmlspecialchars($tax_dec_id) ?></p>
-                    <p><strong>ARP Number:</strong> <?= htmlspecialchars($arp_no) ?></p>
+                    <p><strong>Tax Declaration ID:</strong> <?= htmlspecialchars($arp_no) ?></p>
                     <p><strong>Tax Year:</strong> <?= htmlspecialchars($tax_year) ?></p>
 
                     <h6 class="mt-4">Owners to be Removed</h6>
