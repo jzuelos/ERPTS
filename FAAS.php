@@ -1257,6 +1257,9 @@ if ($faas_id) {
   <!-- Memoranda Section -->
   <?php include 'partials/memoranda.php'; ?>
 
+  <!-- History Section --> 
+  <?php include 'partials/history.php'; ?>
+
   <!-- Valuation Section -->
   <?php include 'partials/valuation.php'; ?>
 
