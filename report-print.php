@@ -27,52 +27,50 @@
       text-align: center;
     }
 
-    @media print{
-    @page {
+    @media print {
+      @page {
         size: landscape;
       }
-      
-     body::before {
-    content: "";
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: url('images/Seal.png') no-repeat center;
-    background-size: 500px; /* 🔹 Increase this value (try 400px–600px) */
-    opacity: 0.08; /* 🔹 Adjust transparency if needed */
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    pointer-events: none;
-  }  
-    }
 
+      body::before {
+        content: "";
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: url('images/Seal.png') no-repeat center;
+        background-size: 500px;
+        opacity: 0.08;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+      }
+    }
   </style>
 </head>
 
 <body>
-
   <?php
   session_start();
   require_once "database.php";
   $conn = Database::getInstance();
   date_default_timezone_set('Asia/Manila');
 
-
   // Fetch username of the logged-in user
-$username = 'Guest';
-if (isset($_SESSION['user_id'])) {
+  $username = 'Guest';
+  $user_id = null;
+  if (isset($_SESSION['user_id'])) {
     $user_id = intval($_SESSION['user_id']);
     $query = "SELECT username FROM users WHERE user_id = $user_id LIMIT 1";
     $result = $conn->query($query);
     if ($result && $result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $username = $row['username'];
+      $row = $result->fetch_assoc();
+      $username = $row['username'];
     }
-}
+  }
 
-  // Capture filters     
+  // Capture filters
   $classification = $_GET['classification'] ?? '';
   $province = $_GET['province'] ?? '';
   $municipality = $_GET['municipality'] ?? '';
@@ -94,21 +92,21 @@ if (isset($_SESSION['user_id'])) {
 
   // Base query
   $sql = "
-SELECT 
-  r.pin AS property_index_no,
-  d.arp_no AS tax_declaration_no,
-  CONCAT(p.street, ', ', p.barangay, ', ', p.city, ', ', p.province) AS property_location,
-  p.land_area AS area,
-  'Land' AS kind,
-  l.adjust_mv AS market_value,
-  l.assess_value AS assessed_value
-FROM faas f
-LEFT JOIN p_info p ON f.pro_id = p.p_id
-LEFT JOIN rpu_idnum r ON f.rpu_idno = r.rpu_id
-LEFT JOIN rpu_dec d ON f.faas_id = d.faas_id
-LEFT JOIN land l ON f.faas_id = l.faas_id
-WHERE 1=1
-";
+  SELECT 
+    r.pin AS property_index_no,
+    d.arp_no AS tax_declaration_no,
+    CONCAT(p.street, ', ', p.barangay, ', ', p.city, ', ', p.province) AS property_location,
+    p.land_area AS area,
+    'Land' AS kind,
+    l.adjust_mv AS market_value,
+    l.assess_value AS assessed_value
+  FROM faas f
+  LEFT JOIN p_info p ON f.pro_id = p.p_id
+  LEFT JOIN rpu_idnum r ON f.rpu_idno = r.rpu_id
+  LEFT JOIN rpu_dec d ON f.faas_id = d.faas_id
+  LEFT JOIN land l ON f.faas_id = l.faas_id
+  WHERE 1=1
+  ";
 
   // Apply filters if not printing all
   if (!$print_all) {
@@ -136,12 +134,55 @@ WHERE 1=1
   }
 
   $result = $conn->query($sql);
+
+  // 🔹 ACTIVITY LOGGING SECTION
+  if ($user_id) {
+
+    // Helper function to get readable names
+    function getValue($conn, $table, $column, $id_column, $id)
+    {
+      if (!$id) return null;
+
+      $stmt = $conn->prepare("SELECT $column FROM $table WHERE $id_column = ?");
+      $stmt->bind_param("i", $id);
+      $stmt->execute();
+
+      $result = $stmt->get_result();
+      $row = $result->fetch_assoc();
+
+      $stmt->close();
+
+      return $row[$column] ?? null; // safely returns null if not found
+    }
+
+    // Fetch readable values
+    $classification_name = getValue($conn, "classification", "c_description", "c_id", $classification);
+    $province_name       = getValue($conn, "province", "province_name", "province_id", $province);
+    $municipality_name   = getValue($conn, "municipality", "m_description", "m_id", $municipality);
+    $district_name       = getValue($conn, "district", "description", "district_id", $district);
+    $barangay_name       = getValue($conn, "brgy", "brgy_name", "brgy_id", $barangay);
+
+    // Build readable activity message
+    $activity = "Printed Property Report\n" .
+      "• Classification: " . ($classification_name ?: 'All') . "\n" .
+      "• Province: " . ($province_name ?: 'All') . "\n" .
+      "• Municipality/City: " . ($municipality_name ?: 'All') . "\n" .
+      "• District: " . ($district_name ?: 'All') . "\n" .
+      "• Barangay: " . ($barangay_name ?: 'All') . "\n" .
+      "• Date Range: " . ($date_display ?: 'All');
+
+    // Insert into activity log
+    $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action) VALUES (?, ?)");
+    $stmt->bind_param("is", $user_id, $activity);
+    $stmt->execute();
+    $stmt->close();
+  }
   ?>
 
   <h1 style="text-align:center; font-size:22px; margin-bottom:20px;">
     PROVINCE OF CAMARINES NORTE <br>
     <span style="font-size:18px;">(PROVINCIAL ASSESSOR'S OFFICE)</span><br>
-    <span style="font-size:15px;">(Property By: Classification Agricultural)</span>
+    <span style="font-size:15px;">(Property By: Classification <?= htmlspecialchars($classification ?: 'All') ?>)</span>
   </h1>
 
   <div class="header">
@@ -174,8 +215,8 @@ WHERE 1=1
           <tr>
             <td><?= htmlspecialchars($row['property_index_no']) ?></td>
             <td><?= htmlspecialchars($row['tax_declaration_no']) ?></td>
-            <td></td> <!-- Owner Name skipped -->
-            <td></td> <!-- Owner Address skipped -->
+            <td></td>
+            <td></td>
             <td><?= htmlspecialchars($row['property_location']) ?></td>
             <td><?= htmlspecialchars($row['area']) ?></td>
             <td><?= htmlspecialchars($row['kind']) ?></td>
@@ -202,7 +243,6 @@ WHERE 1=1
       window.print();
     };
   </script>
-
 </body>
 
 </html>
