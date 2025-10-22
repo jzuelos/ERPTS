@@ -176,6 +176,16 @@ if ($result && $result->num_rows > 0) {
         <i class="fas fa-plus"></i> Add Transaction
       </button>
 
+
+
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <input type="text" id="transactionSearchInput" class="form-control" placeholder="Search...">
+        <button id="transactionResetBtn" class="btn btn-secondary shadow-sm">
+          <i class="fas fa-rotate-left me-1"></i> Reset
+        </button>
+      </div>
+
+
       <!-- Toggle Button -->
       <button id="toggleBtn" class="btn btn-primary" onclick="toggleTables()">
         <i class="fas fa-exchange-alt"></i> Show Received Table
@@ -608,6 +618,71 @@ if ($result && $result->num_rows > 0) {
 
 
   </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const searchInput = document.getElementById("transactionSearchInput");
+  const resetBtn = document.getElementById("transactionResetBtn");
+  const transactionSection = document.getElementById("transactionSection");
+  const receivedSection = document.getElementById("receivedSection");
+
+  if (!searchInput || !resetBtn || !transactionSection || !receivedSection) {
+    console.warn("Missing elements for search functionality");
+    return;
+  }
+
+  // Determine which table is active (visible)
+  function getActiveTableBody() {
+    if (!transactionSection.classList.contains("d-none")) {
+      return transactionSection.querySelector("tbody");
+    } else {
+      return receivedSection.querySelector("tbody");
+    }
+  }
+
+  // Perform the search
+  function performSearch() {
+    const filter = searchInput.value.toLowerCase().trim();
+    const tbody = getActiveTableBody();
+    if (!tbody) return;
+
+    const rows = tbody.querySelectorAll("tr");
+
+    rows.forEach((row) => {
+      const cells = Array.from(row.querySelectorAll("td"));
+      if (cells.length === 0) return;
+
+      // If in transaction section → exclude last two columns (Actions, Confirm)
+      let searchableCells = cells;
+      if (!transactionSection.classList.contains("d-none")) {
+        searchableCells = cells.slice(0, -2);
+      }
+
+      const match = searchableCells.some((cell) =>
+        cell.textContent.toLowerCase().includes(filter)
+      );
+
+      row.style.display = match ? "" : "none";
+    });
+  }
+
+  // Reset the search
+  function resetSearch() {
+    searchInput.value = "";
+    const tbody = getActiveTableBody();
+    if (!tbody) return;
+    tbody.querySelectorAll("tr").forEach((row) => (row.style.display = ""));
+  }
+
+  // Attach listeners
+  searchInput.addEventListener("input", performSearch);
+  resetBtn.addEventListener("click", resetSearch);
+});
+</script>
+
+
+
+
 </body>
 
 </html>

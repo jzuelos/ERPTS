@@ -85,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         );
 
         if ($stmt->execute()) {
-            // ✅ Log admin activity instead of the new user
+          
             if (isset($_SESSION['user_id'])) {
                 $userId = $_SESSION['user_id']; // current logged-in admin
                 $fullname = trim("$firstname $middlename $lastname");
@@ -140,6 +140,11 @@ if (isset($_SESSION['message'])) {
         <h2 class="text-center mb-4" style="color: #379777; font-weight: 600;">Create New User</h2>
         <form action="" method="POST" class="bg-white p-4 rounded-lg" style="border: 1px solid #379777; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
 
+         <div class="mb-3">
+         <a href="User-Control.php" class="btn btn-outline-secondary btn-sm">
+           <i class="fas fa-arrow-left"></i> Back
+         </a>
+       </div>
             <!-- User Credentials Section -->
             <div class="mb-4 p-3" style="border-radius: 8px; border-left: 4px solid #379777;">
                 <legend class="font-weight-bold mb-3" style="color: #379777; font-size: 1.1rem;">User Credentials</legend>
@@ -336,6 +341,7 @@ if (isset($_SESSION['message'])) {
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
@@ -345,7 +351,6 @@ if (isset($_SESSION['message'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
         integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
         crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="ADD_User.js"></script>
 
 </body>

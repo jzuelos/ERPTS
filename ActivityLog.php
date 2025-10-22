@@ -106,7 +106,8 @@
   $stmt_login->bind_param($types_login, ...$params_login2);
   $stmt_login->execute();
   $result_login = $stmt_login->get_result();
-  ?>
+
+?>
 
  <!doctype html>
  <html lang="en">
@@ -144,8 +145,32 @@
            <input type="date" name="end_date" class="form-control" value="<?= htmlspecialchars($end_date) ?>" placeholder="End Date">
          </div>
          <div class="col-auto">
-           <button type="submit" class="btn btn-success">Filter</button>
+           <button type="submit" class="btn btn-success">Go</button>
          </div>
+
+          <!-- FILTER SECTION -->
+          <div class="col-auto">
+            <input 
+              type="text" 
+              id="filter_value"
+              class="form-control" 
+              placeholder="Filter by Activity, User, or No.">
+          </div>
+
+          <!-- APPLY FILTER BUTTON -->
+          <div class="col-auto">
+            <button type="button" id="applyFilterBtn" class="btn btn-outline-success">
+              <i class="fas fa-filter me-1"></i> Apply
+            </button>
+          </div>
+
+          <!-- RESET BUTTON -->
+          <div class="col-auto">
+            <button type="button" id="resetFilterBtn" class="btn btn-outline-secondary">
+              <i class="fas fa-rotate-left me-1"></i> Reset
+            </button>
+          </div>
+
 
          <div class="col-auto ms-auto">
            <button type="button" id="toggleLogsBtn" class="btn btn-primary">
@@ -295,6 +320,70 @@
        <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span>
      </div>
    </footer>
+  
+<script>
+  const filterInput = document.getElementById('filter_value');
+  const applyBtn = document.getElementById('applyFilterBtn');
+  const resetBtn = document.getElementById('resetFilterBtn');
+
+  // Detect active table (visible one)
+  function getActiveTableRows() {
+    const activityVisible = !document.getElementById('activitylogs').classList.contains('d-none');
+    const loginVisible = !document.getElementById('loginlogs').classList.contains('d-none');
+
+    if (activityVisible) {
+      return { rows: document.querySelectorAll('#activitylogs tbody tr'), type: 'activity' };
+    } else if (loginVisible) {
+      return { rows: document.querySelectorAll('#loginlogs tbody tr'), type: 'login' };
+    }
+    return { rows: [], type: null };
+  }
+
+  // Core filtering logic
+  function filterTable() {
+    const filterValue = filterInput.value.toLowerCase().trim();
+    const { rows, type } = getActiveTableRows();
+
+    rows.forEach(row => {
+      const cells = row.children;
+      if (!cells.length) return;
+
+      let no = '', activity = '', user = '';
+
+      if (type === 'activity') {
+        // For ACTIVITY LOGS: [0]=No, [1]=Activity, [2]=User, [3]=Date/Time
+        no = cells[0]?.textContent.toLowerCase() || '';
+        activity = cells[1]?.textContent.toLowerCase() || '';
+        user = cells[2]?.textContent.toLowerCase() || '';
+      } 
+      else if (type === 'login') {
+        // For LOGIN LOGS: [0]=No, [1]=Activity, [2]=Date/Time, [3]=User
+        no = cells[0]?.textContent.toLowerCase() || '';
+        activity = cells[1]?.textContent.toLowerCase() || '';
+        user = cells[3]?.textContent.toLowerCase() || '';
+      }
+
+      // Only search these three columns
+      if (no.includes(filterValue) || activity.includes(filterValue) || user.includes(filterValue)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
+  // Event listeners
+  filterInput.addEventListener('keyup', filterTable); // live search
+  applyBtn.addEventListener('click', filterTable);    // manual apply
+  resetBtn.addEventListener('click', () => {
+    filterInput.value = '';
+    const { rows } = getActiveTableRows();
+    rows.forEach(row => row.style.display = '');
+  });
+</script>
+
+
+
 
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
    <script src="activitylog.js"></script>
