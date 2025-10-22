@@ -125,9 +125,14 @@ function fetchProperty($conn, $p_id)
 function fetchOwners($conn)
 {
   $sql = "SELECT own_id,
-                   CONCAT(own_fname, ' ', own_mname, ' ', own_surname) AS owner_name,
-                   CONCAT(house_no, ', ', barangay, ', ', city, ', ', province) AS address
-            FROM owners_tb";
+                 own_fname,
+                 own_mname,
+                 own_surname,
+                 house_no,
+                 barangay,
+                 city,
+                 province
+          FROM owners_tb";
 
   $result = $conn->query($sql);
   return $result->fetch_all(MYSQLI_ASSOC);
