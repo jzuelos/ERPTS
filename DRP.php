@@ -1,9 +1,24 @@
 <?php
+session_start(); // Start session at the top
+
 require_once 'database.php';
 
 $conn = Database::getInstance();
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
+}
+
+/**
+ * Function to log user activity
+ */
+function logActivity($conn, $userId, $action)
+{
+    $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
+    if ($stmt) {
+        $stmt->bind_param("is", $userId, $action);
+        $stmt->execute();
+        $stmt->close();
+    }
 }
 
 $p_id = isset($_GET['p_id']) ? (int) $_GET['p_id'] : 0;
@@ -178,7 +193,53 @@ $faas_id = $faas_info['faas_id']; // define this before using in RPU or land
 $rpu_data = getRpuDataByFaasId($conn, $faas_id);
 $land_properties = getLandProperties($conn, $faas_id);
 
-// Now $p_info, $faas_info, $rpu_data, and $land_properties are ready to use
+// Log the activity when viewing/printing the DRP
+if (isset($_SESSION['user_id'])) {
+    $owner_name = $owner['name'] ?? 'N/A';
+    $owner_address = $owner['address'] ?? 'N/A';
+    $arp_no = $rpu_data['arp_no'] ?? 'N/A';
+    $pin = isset($rpu_data['pin']) ? formatPin($rpu_data['pin']) : 'N/A';
+    $effectivity = $rpu_data['effectivity'] ?? 'N/A';
+    
+    // Get property location details
+    $location = ($p_info['house_no'] ?? '') . ' ' . ($p_info['street'] ?? '');
+    $location = trim($location) ?: 'N/A';
+    $barangay = $p_info['barangay'] ?? 'N/A';
+    $city = $p_info['province'] ?? 'N/A';
+    $land_area = $p_info['land_area'] ?? 'N/A';
+    
+    // Calculate totals
+    $total_market = 0;
+    $total_assessed = 0;
+    foreach ($land_properties as $land) {
+        $total_market += $land['market_value'];
+        $total_assessed += $land['assess_value'];
+    }
+    
+    $action = "Viewed/Printed Declaration of Real Property (DRP)\n";
+    $action .= "• Property ID: $p_id\n";
+    $action .= "• ARP Number: $arp_no\n";
+    $action .= "• Property Index Number (PIN): $pin\n";
+    $action .= "• Owner: $owner_name\n";
+    $action .= "• Owner Address: $owner_address\n";
+    $action .= "• Location: $location, $barangay, $city\n";
+    $action .= "• Total Land Area: $land_area\n";
+    $action .= "• Tax Effectivity: $effectivity\n";
+    $action .= "• Total Market Value: ₱" . number_format($total_market, 2) . "\n";
+    $action .= "• Total Assessed Value: ₱" . number_format($total_assessed, 2);
+    
+    if (!empty($or_number)) {
+        $action .= "\n• OR Number: $or_number";
+        if ($cert_fee) {
+            $action .= "\n• Certification Fee: ₱$cert_fee";
+        }
+        if ($cert_date_paid) {
+            $action .= "\n• Date Paid: $cert_date_paid";
+        }
+    }
+    
+    logActivity($conn, $_SESSION['user_id'], $action);
+}
 
 // helper: format PIN as 000-00-000-00-000
 function formatPin($value)
