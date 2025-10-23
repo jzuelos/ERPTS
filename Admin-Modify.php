@@ -578,7 +578,15 @@ if ($verifierQuery) {
             </div>
             <div class="mb-3">
               <label for="addPosition" class="form-label">Position</label>
-              <input type="text" class="form-control" id="addPosition" required>
+              <select class="form-select" id="addPosition" required>
+                <option value="" disabled selected>Select Position</option>
+                <option value="Provincial Assessor">Provincial Assessor</option>
+                <option value="Assistant Provincial Assessor">Assistant Provincial Assessor</option>
+                <option value="Local Assessment Operations Officer IV">Local Assessment Operations Officer IV</option>
+                <option value="Local Assessment Officer II">Local Assessment Officer II</option>
+                <option value="Local Assessment Operations Officer I">Local Assessment Operations Officer I</option>
+                <option value="Administrative Clerk III">Administrative Clerk III</option>
+              </select>
             </div>
             <div class="mb-3">
               <label class="form-label d-block">Status</label>
@@ -620,7 +628,15 @@ if ($verifierQuery) {
 
             <div class="mb-3">
               <label for="editPosition" class="form-label">Position</label>
-              <input type="text" class="form-control" id="editPosition" name="position" required>
+              <select class="form-select" id="editPosition" name="position" required>
+                <option value="" disabled>Select Position</option>
+                <option value="Provincial Assessor">Provincial Assessor</option>
+                <option value="Assistant Provincial Assessor">Assistant Provincial Assessor</option>
+                <option value="Local Assessment Operations Officer IV">Local Assessment Operations Officer IV</option>
+                <option value="Local Assessment Officer II">Local Assessment Officer II</option>
+                <option value="Local Assessment Operations Officer I">Local Assessment Operations Officer I</option>
+                <option value="Administrative Clerk III">Administrative Clerk III</option>
+              </select>
             </div>
 
             <div class="mb-3">
