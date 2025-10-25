@@ -1,6 +1,67 @@
 <?php
 session_start();
 
+// Handle AJAX request for logging export activity
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['action'] === 'log_export') {
+    header('Content-Type: application/json');
+    
+    // Check if user is logged in
+    if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+        echo json_encode(['success' => false, 'error' => 'Not authenticated']);
+        exit;
+    }
+    
+    require_once 'database.php';
+    
+    try {
+        $conn = Database::getInstance();
+        
+        // Get JSON input
+        $input = file_get_contents('php://input');
+        $data = json_decode($input, true);
+        
+        if (!$data || !isset($data['user_id']) || !isset($data['chart_title']) || !isset($data['chart_type'])) {
+            throw new Exception('Invalid request data');
+        }
+        
+        $user_id = (int)$data['user_id'];
+        $chart_title = $conn->real_escape_string($data['chart_title']);
+        $chart_type = $conn->real_escape_string($data['chart_type']);
+        
+        // Create detailed action message
+        $action = "Exported statistics chart\n";
+        $action .= "• Chart Type: " . ucfirst(str_replace('_', ' ', $chart_type)) . "\n";
+        $action .= "• Chart Title: {$chart_title}\n";
+        $action .= "• Export Format: PNG Image\n";
+        $action .= "• Export Time: " . date('Y-m-d H:i:s');
+        
+        // Insert into activity_log
+        $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
+        $stmt->bind_param("is", $user_id, $action);
+        
+        if ($stmt->execute()) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Export activity logged successfully',
+                'log_id' => $stmt->insert_id
+            ]);
+        } else {
+            throw new Exception('Failed to insert log: ' . $stmt->error);
+        }
+        
+        $stmt->close();
+        $conn->close();
+        
+    } catch (Exception $e) {
+        echo json_encode([
+            'success' => false,
+            'error' => $e->getMessage()
+        ]);
+    }
+    
+    exit;
+}
+
 // Redirect to login if not logged in
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
   header("Location: index.php");
@@ -314,6 +375,8 @@ $transaction_breakdown = [
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
+    const userId = <?= $_SESSION['user_id'] ?? 0 ?>;
+    
     // Data from PHP
     const statisticsData = {
       property: <?= json_encode($property_stats) ?>,
@@ -464,12 +527,46 @@ $transaction_breakdown = [
     // Export button
     document.getElementById('exportBtn').addEventListener('click', function() {
       if (currentChart) {
+        const selectedStat = document.getElementById('chartSelector').value;
+        const chartTitle = getChartTitle(selectedStat);
+        const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        
+        // Log the export activity
+        logExportActivity(chartTitle, selectedStat);
+        
+        // Export the chart
         const link = document.createElement('a');
-        link.download = 'statistics-chart.png';
+        link.download = `statistics-${selectedStat}-${Date.now()}.png`;
         link.href = currentChart.toBase64Image();
         link.click();
       }
     });
+
+    // Function to log export activity
+    function logExportActivity(chartTitle, chartType) {
+      const currentFileName = window.location.pathname.split('/').pop();
+      
+      fetch(`${currentFileName}?action=log_export`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          chart_title: chartTitle,
+          chart_type: chartType
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          console.log('Export activity logged successfully');
+        }
+      })
+      .catch(error => {
+        console.error('Error logging export activity:', error);
+      });
+    }
 
     // Initialize with property statistics
     updateChart('property');
