@@ -165,12 +165,15 @@ $js_data = json_encode($data_counts);
   </footer>
 
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <script>
   const totalLand = <?= $land_count ?>;
   const totalBuilding = <?= $building_count ?>;
   const totalPlant = <?= $plant_count ?>;
   const totalOwners = <?= $total_owners ?>;
   const totalProperties = <?= $total_properties ?>;
+  const totalMachineries = 15; 
 </script>
 
   <script>
@@ -180,7 +183,6 @@ $js_data = json_encode($data_counts);
 
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src ="Statistics.js"></script>
    
 </body>
