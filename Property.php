@@ -10,25 +10,20 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-// Activity Logging Function
+// Activity Logging Function (using NOW() for consistency)
 function logActivity($user_id, $action)
 {
   global $conn;
-  $log_time = date("Y-m-d H:i:s"); // Current timestamp
 
-  // Prepare the statement
-  $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, ?)");
+  $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
 
-  // Check if prepare statement was successful
   if ($stmt === false) {
     error_log("Failed to prepare log statement: " . $conn->error);
     return false;
   }
 
-  // Bind parameters
-  $stmt->bind_param("iss", $user_id, $action, $log_time);
+  $stmt->bind_param("is", $user_id, $action);
 
-  // Execute the statement and check for success
   if ($stmt->execute()) {
     return true;
   } else {
@@ -37,13 +32,17 @@ function logActivity($user_id, $action)
   }
 }
 
-// Handle AJAX updates
+// Get user_id from session
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
+
+// Handle AJAX updates and form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
   $action = $_POST['action'];
 
-  // Simulate retrieving user_id from session (replace with actual session variable)
-  $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1; // Default to 1 for testing
-
+  // ========================================
+  // UPDATE OPERATIONS
+  // ========================================
+  
   // Update Classification
   if ($action === 'update_classification') {
     $code = $_POST['code'];
@@ -55,13 +54,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $stmt->bind_param("sdss", $description, $assessment, $status, $code);
     $result = $stmt->execute() ? "success" : "error";
 
-    // Log the update action
     if ($result === "success") {
-      $log_action = "Updated classification with code: $code";
-      logActivity($user_id, $log_action); // Log activity
+      $log_action = "Updated Classification\n";
+      $log_action .= "• Code: $code\n";
+      $log_action .= "• Description: $description\n";
+      $log_action .= "• Assessment Level: $assessment%\n";
+      $log_action .= "• Status: $status";
+      logActivity($user_id, $log_action);
     }
 
     echo $result;
+    $stmt->close();
     exit;
   }
 
@@ -77,13 +80,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $stmt->bind_param("sdsss", $description, $assessment, $status, $reportCode, $code);
     $result = $stmt->execute() ? "success" : "error";
 
-    // Log the update action
     if ($result === "success") {
-      $log_action = "Updated land use for reportCode: $reportCode, luCode: $code";
-      logActivity($user_id, $log_action); // Log activity
+      $log_action = "Updated Actual Uses (Land Use)\n";
+      $log_action .= "• Report Code: $reportCode\n";
+      $log_action .= "• Code: $code\n";
+      $log_action .= "• Description: $description\n";
+      $log_action .= "• Assessment Level: $assessment%\n";
+      $log_action .= "• Status: $status";
+      logActivity($user_id, $log_action);
     }
 
     echo $result;
+    $stmt->close();
     exit;
   }
 
@@ -98,13 +106,169 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $stmt->bind_param("sdss", $description, $assessment, $status, $code);
     $result = $stmt->execute() ? "success" : "error";
 
-    // Log the update action
     if ($result === "success") {
-      $log_action = "Updated subclass with code: $code";
-      logActivity($user_id, $log_action); // Log activity
+      $log_action = "Updated Sub-Class\n";
+      $log_action .= "• Code: $code\n";
+      $log_action .= "• Description: $description\n";
+      $log_action .= "• Unit Value: ₱" . number_format($assessment, 2) . "\n";
+      $log_action .= "• Status: $status";
+      logActivity($user_id, $log_action);
     }
 
     echo $result;
+    $stmt->close();
+    exit;
+  }
+
+  // ========================================
+  // ADD OPERATIONS
+  // ========================================
+  
+  // Add Classification
+  if ($action === 'add_classification') {
+    $code = $_POST['c_code'];
+    $description = $_POST['c_description'];
+    $uv = $_POST['c_uv'];
+    $status = $_POST['c_status'];
+
+    $stmt = $conn->prepare("INSERT INTO classification (c_code, c_description, c_uv, c_status) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssds", $code, $description, $uv, $status);
+    
+    if ($stmt->execute()) {
+      $log_action = "Added New Classification\n";
+      $log_action .= "• Code: $code\n";
+      $log_action .= "• Description: $description\n";
+      $log_action .= "• Assessment Level: $uv%\n";
+      $log_action .= "• Status: $status";
+      logActivity($user_id, $log_action);
+      echo "success";
+    } else {
+      echo "error: " . $stmt->error;
+    }
+    $stmt->close();
+    exit;
+  }
+
+  // Add Land Use (Actual Uses)
+  if ($action === 'add_land_use') {
+    $reportCode = $_POST['report_code'];
+    $code = $_POST['lu_code'];
+    $description = $_POST['lu_description'];
+    $al = $_POST['lu_al'];
+    $status = $_POST['lu_status'];
+
+    $stmt = $conn->prepare("INSERT INTO land_use (report_code, lu_code, lu_description, lu_al, lu_status) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssds", $reportCode, $code, $description, $al, $status);
+    
+    if ($stmt->execute()) {
+      $log_action = "Added New Actual Use (Land Use)\n";
+      $log_action .= "• Report Code: $reportCode\n";
+      $log_action .= "• Code: $code\n";
+      $log_action .= "• Description: $description\n";
+      $log_action .= "• Assessment Level: $al%\n";
+      $log_action .= "• Status: $status";
+      logActivity($user_id, $log_action);
+      echo "success";
+    } else {
+      echo "error: " . $stmt->error;
+    }
+    $stmt->close();
+    exit;
+  }
+
+  // Add Sub-Class
+  if ($action === 'add_subclass') {
+    $code = $_POST['sc_code'];
+    $description = $_POST['sc_description'];
+    $uv = $_POST['sc_uv'];
+    $status = $_POST['sc_status'];
+
+    $stmt = $conn->prepare("INSERT INTO subclass (sc_code, sc_description, sc_uv, sc_status) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssds", $code, $description, $uv, $status);
+    
+    if ($stmt->execute()) {
+      $log_action = "Added New Sub-Class\n";
+      $log_action .= "• Code: $code\n";
+      $log_action .= "• Description: $description\n";
+      $log_action .= "• Unit Value: ₱" . number_format($uv, 2) . "\n";
+      $log_action .= "• Status: $status";
+      logActivity($user_id, $log_action);
+      echo "success";
+    } else {
+      echo "error: " . $stmt->error;
+    }
+    $stmt->close();
+    exit;
+  }
+
+  // ========================================
+  // DELETE OPERATIONS
+  // ========================================
+  
+  // Delete Record
+  if ($action === 'delete_record') {
+    $id = intval($_POST['id']);
+    $table = $_POST['table'];
+    
+    // Map table to primary key column
+    $primaryKey = [
+      "classification" => "c_id",
+      "land_use"       => "lu_id",
+      "subclass"       => "sc_id"
+    ];
+
+    if (!array_key_exists($table, $primaryKey)) {
+      echo "error: Invalid table";
+      exit;
+    }
+
+    $col = $primaryKey[$table];
+    
+    // Get record details before deletion for logging
+    $details = "";
+    if ($table === 'classification') {
+      $stmt = $conn->prepare("SELECT c_code, c_description FROM classification WHERE c_id = ?");
+      $stmt->bind_param("i", $id);
+      $stmt->execute();
+      $result = $stmt->get_result();
+      if ($row = $result->fetch_assoc()) {
+        $details = "Classification: {$row['c_code']} - {$row['c_description']}";
+      }
+      $stmt->close();
+    } elseif ($table === 'land_use') {
+      $stmt = $conn->prepare("SELECT report_code, lu_code, lu_description FROM land_use WHERE lu_id = ?");
+      $stmt->bind_param("i", $id);
+      $stmt->execute();
+      $result = $stmt->get_result();
+      if ($row = $result->fetch_assoc()) {
+        $details = "Actual Use: {$row['report_code']}-{$row['lu_code']} - {$row['lu_description']}";
+      }
+      $stmt->close();
+    } elseif ($table === 'subclass') {
+      $stmt = $conn->prepare("SELECT sc_code, sc_description FROM subclass WHERE sc_id = ?");
+      $stmt->bind_param("i", $id);
+      $stmt->execute();
+      $result = $stmt->get_result();
+      if ($row = $result->fetch_assoc()) {
+        $details = "Sub-Class: {$row['sc_code']} - {$row['sc_description']}";
+      }
+      $stmt->close();
+    }
+
+    // Delete the record
+    $stmt = $conn->prepare("DELETE FROM $table WHERE $col = ?");
+    $stmt->bind_param("i", $id);
+    
+    if ($stmt->execute()) {
+      $log_action = "Deleted Record\n";
+      $log_action .= "• Table: $table\n";
+      $log_action .= "• Details: $details";
+      logActivity($user_id, $log_action);
+      echo "success";
+    } else {
+      echo "error: " . $stmt->error;
+    }
+    $stmt->close();
     exit;
   }
 }
@@ -114,18 +278,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 <html lang="en">
 
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-  <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
-    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-KyZXEJr+8+6g5K4r53m5s3xmw1Is0J6wBd04YOeFvXOsZTgmYF9flT/qe6LZ9s+0" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="header.css">
   <link rel="stylesheet" href="Location.css">
@@ -133,46 +290,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 </head>
 
 <body>
-  <!-- Header Navigation -->
   <?php include 'header.php'; ?>
 
-
-  <!-- Main Body -->
   <main class="container my-5">
-    <!-- Back Button (Positioned to the top left) -->
     <div class="mb-4 d-flex justify-content-start">
       <a href="Admin-Page-2.php" class="btn btn-outline-secondary btn-sm">
         <i class="fas fa-arrow-left"></i> Back
       </a>
     </div>
 
-    <!-- Location Title -->
     <div class="text-center mb-5">
       <h2 class="text-secondary font-weight-bold" style="font-size: 2.5rem;">Land</h2>
     </div>
 
-    <!-- Property Categories Table Section -->
     <div class="card border-0 shadow p-4 rounded-3 mb-4">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h5 class="section-title mb-0">Land Category Information</h5>
         <div class="d-flex align-items-center">
-          <!-- Search Bar -->
           <div class="input-group me-4" style="width: 250px;">
             <input type="text" class="form-control border-start-0" id="tableSearch" placeholder="Search...">
             <span class="input-group-text bg-transparent border-end-0">
               <i class="fas fa-search"></i>
             </span>
           </div>
-
-          <!-- Dropdown -->
           <div class="dropdown ml-5">
             <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="categoryTypeDropdown"
               data-bs-toggle="dropdown" aria-expanded="false">
               Classification
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="categoryTypeDropdown">
-              <li><a class="dropdown-item" href="#" onclick="changeCategoryType('Classification')">Classification</a>
-              </li>
+              <li><a class="dropdown-item" href="#" onclick="changeCategoryType('Classification')">Classification</a></li>
               <li><a class="dropdown-item" href="#" onclick="changeCategoryType('ActualUses')">Actual Uses</a></li>
               <li><a class="dropdown-item" href="#" onclick="changeCategoryType('SubClasses')">Sub-Classes</a></li>
             </ul>
@@ -338,15 +485,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
       </div>
     </div>
 
-    <!-- Add Table -->
     <div class="py-4"></div>
     <div class="text-center mb-5">
       <h2 class="text-secondary font-weight-bold" style="font-size: 2.5rem;">Add Property</h2>
     </div>
 
-    <!-- Property Selection Options -->
     <div class="row justify-content-center">
-      <!-- Classification -->
       <div class="col-md-4 col-sm-6 mb-4 d-flex justify-content-center">
         <a href="#" class="card border-0 shadow-lg p-5 text-center location-card h-100" data-toggle="modal"
           data-target="#confirmationModal" data-name="Classification" data-form="classificationModal">
@@ -357,7 +501,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         </a>
       </div>
 
-      <!-- Actual Uses -->
       <div class="col-md-4 col-sm-6 mb-4 d-flex justify-content-center">
         <a href="#" class="card border-0 shadow-lg p-5 text-center location-card h-100" data-toggle="modal"
           data-target="#confirmationModal" data-name="Actual Uses" data-form="actUsesModal">
@@ -368,7 +511,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         </a>
       </div>
 
-      <!-- Sub-Classes -->
       <div class="col-md-4 col-sm-6 mb-4 d-flex justify-content-center">
         <a href="#" class="card border-0 shadow-lg p-5 text-center location-card h-100" data-toggle="modal"
           data-target="#confirmationModal" data-name="Sub-Classes" data-form="subClassesModal">
@@ -381,8 +523,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     </div>
   </main>
 
-  <!--Modal Section-->
-  <!-- Table Modal Section -->
   <!-- Edit Classification Modal -->
   <div class="modal fade" id="editClassificationModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
@@ -406,16 +546,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           </div>
           <div class="mb-2">
             <label for="editClassificationStatus" class="form-label">Status</label>
-            <div class="dropdown">
-              <select class="form-select" id="editClassificationStatus" aria-label="Select status">
-                <option value="Active" class="status-active">
-                  <i class="bi bi-check-circle me-2"></i>Active
-                </option>
-                <option value="Inactive" class="status-inactive">
-                  <i class="bi bi-x-circle me-2"></i>Inactive
-                </option>
-              </select>
-            </div>
+            <select class="form-select" id="editClassificationStatus">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
           </div>
         </div>
         <div class="modal-footer">
@@ -453,16 +587,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           </div>
           <div class="mb-2">
             <label for="editActualUsesStatus" class="form-label">Status</label>
-            <div class="dropdown">
-              <select class="form-select" id="editActualUsesStatus" aria-label="Select status">
-                <option value="Active" class="status-active">
-                  <i class="bi bi-check-circle me-2"></i>Active
-                </option>
-                <option value="Inactive" class="status-inactive">
-                  <i class="bi bi-x-circle me-2"></i>Inactive
-                </option>
-              </select>
-            </div>
+            <select class="form-select" id="editActualUsesStatus">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
           </div>
         </div>
         <div class="modal-footer">
@@ -496,16 +624,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           </div>
           <div class="mb-2">
             <label for="editSubClassesStatus" class="form-label">Status</label>
-            <div class="dropdown">
-              <select class="form-select" id="editSubClassesStatus" aria-label="Select status">
-                <option value="Active" class="status-active">
-                  <i class="bi bi-check-circle me-2"></i>Active
-                </option>
-                <option value="Inactive" class="status-inactive">
-                  <i class="bi bi-x-circle me-2"></i>Inactive
-                </option>
-              </select>
-            </div>
+            <select class="form-select" id="editSubClassesStatus">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
           </div>
         </div>
         <div class="modal-footer">
@@ -516,7 +638,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     </div>
   </div>
 
-  <!--Delete Confirmation Modal-->
+  <!-- Delete Confirmation Modal -->
   <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -535,7 +657,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     </div>
   </div>
 
-  <!-- Add Property Category Modal -->
   <!-- Confirmation Modal -->
   <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel"
     aria-hidden="true">
@@ -558,7 +679,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     </div>
   </div>
 
-
   <!-- Classification Form Modal -->
   <div class="modal fade" id="classificationModal" tabindex="-1" role="dialog"
     aria-labelledby="classificationModalLabel" aria-hidden="true">
@@ -572,13 +692,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         </div>
         <div class="modal-body">
           <form id="classificationForm">
-            <input type="hidden" name="form_type" value="classification">
             <div class="form-group">
               <label for="classificationCode">Code</label>
               <input type="text" class="form-control" id="classificationCode" name="c_code"
                 placeholder="Enter Classification Code" maxlength="6" required>
             </div>
-
             <div class="form-group">
               <label for="classificationDescription">Description</label>
               <select class="form-control" id="classificationDescription" name="c_description" required>
@@ -591,7 +709,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 <option value="Special">Special</option>
               </select>
             </div>
-
             <div class="form-group">
               <label for="unitValue">Assessment Level</label>
               <div class="input-group">
@@ -602,7 +719,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                   placeholder="Enter Assessment Level" min="0" step="0.01" required>
               </div>
             </div>
-
             <div class="form-group">
               <label>Status</label><br>
               <div class="form-check form-check-inline">
@@ -620,7 +736,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-warning reset-btn">Reset</button>
-          <button type="button" class="btn btn-primary submit-btn">Submit</button>
+          <button type="button" class="btn btn-primary submit-btn" data-form="classification">Submit</button>
         </div>
       </div>
     </div>
@@ -639,37 +755,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         </div>
         <div class="modal-body">
           <form id="reportForm">
-            <input type="hidden" name="form_type" value="land_use">
             <div class="form-group">
               <label for="reportCode">Report Code</label>
-              <select class="form-control" id="reportCode" required>
+              <select class="form-control" id="reportCode" name="report_code" required>
                 <option value="" selected disabled>Select Report Code</option>
                 <option value="SC">Scientific (SC)</option>
-                <!-- Add more report codes here if needed -->
+                <option value="RES">Residential (RES)</option>
+                <option value="COM">Commercial (COM)</option>
+                <option value="IND">Industrial (IND)</option>
+                <option value="AGR">Agricultural (AGR)</option>
               </select>
             </div>
             <div class="form-group">
               <label for="reportCodeValue">Code</label>
-              <input type="text" class="form-control" id="reportCodeValue" placeholder="Enter Code" maxlength="6" required>
+              <input type="text" class="form-control" id="reportCodeValue" name="lu_code" placeholder="Enter Code" maxlength="6" required>
             </div>
             <div class="form-group">
               <label for="reportDescription">Description</label>
-              <input type="text" class="form-control" id="reportDescription" placeholder="Enter Description" maxlength="100" required>
+              <input type="text" class="form-control" id="reportDescription" name="lu_description" placeholder="Enter Description" maxlength="100" required>
             </div>
             <div class="form-group">
               <label for="reportAssessmentLevel">Assessment Level (%)</label>
-              <input type="number" class="form-control" id="reportAssessmentLevel" placeholder="Enter Assessment Level"
+              <input type="number" class="form-control" id="reportAssessmentLevel" name="lu_al" placeholder="Enter Assessment Level"
                 min="0" max="100" step="0.01" required>
             </div>
             <div class="form-group">
               <label>Status</label><br>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="reportStatus" id="reportActive" value="Active"
+                <input class="form-check-input" type="radio" name="lu_status" id="reportActive" value="Active"
                   required checked>
                 <label class="form-check-label" for="reportActive">Active</label>
               </div>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="reportStatus" id="reportInactive" value="Inactive">
+                <input class="form-check-input" type="radio" name="lu_status" id="reportInactive" value="Inactive">
                 <label class="form-check-label" for="reportInactive">Inactive</label>
               </div>
             </div>
@@ -677,7 +795,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-warning reset-btn">Reset</button>
-          <button type="button" class="btn btn-primary submit-btn">Submit</button>
+          <button type="button" class="btn btn-primary submit-btn" data-form="land_use">Submit</button>
         </div>
       </div>
     </div>
@@ -698,15 +816,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           <form id="subClassesForm">
             <div class="form-group">
               <label for="subClassesCode">Code</label>
-              <input type="text" class="form-control" id="subClassesCode" placeholder="Enter Code" maxlenght="6" required>
+              <input type="text" class="form-control" id="subClassesCode" name="sc_code" placeholder="Enter Code" maxlength="6" required>
             </div>
             <div class="form-group">
               <label for="subClassesDescription">Description</label>
-              <input type="text" class="form-control" id="subClassesDescription" placeholder="Enter Description"
-                maxlenght="100 " required>
+              <input type="text" class="form-control" id="subClassesDescription" name="sc_description" placeholder="Enter Description"
+                maxlength="100" required>
             </div>
             <div class="form-group">
-              <label for="unitValue">Unit Value</label>
+              <label for="SunitValue">Unit Value</label>
               <div class="input-group">
                 <div class="input-group-prepend">
                   <span class="input-group-text">₱</span>
@@ -718,12 +836,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             <div class="form-group">
               <label>Status</label><br>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="subClassesStatus" id="subClassesActive"
+                <input class="form-check-input" type="radio" name="sc_status" id="subClassesActive"
                   value="Active" required checked>
                 <label class="form-check-label" for="subClassesActive">Active</label>
               </div>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="subClassesStatus" id="subClassesInactive"
+                <input class="form-check-input" type="radio" name="sc_status" id="subClassesInactive"
                   value="Inactive">
                 <label class="form-check-label" for="subClassesInactive">Inactive</label>
               </div>
@@ -732,13 +850,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-warning reset-btn">Reset</button>
-          <button type="button" class="btn btn-primary submit-btn">Submit</button>
+          <button type="button" class="btn btn-primary submit-btn" data-form="subclass">Submit</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start">
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
       <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span>
@@ -747,18 +864,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
-  <script src="Property.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"></script>
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       let selectedForm = "";
 
-      // Handle location card click → open confirmation modal
+      // Handle location card click
       document.querySelectorAll(".location-card").forEach((card) => {
         card.addEventListener("click", function(event) {
           event.preventDefault();
@@ -769,7 +881,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         });
       });
 
-      // Confirm selection → show the correct modal
+      // Confirm selection
       document.getElementById("confirmBtn").addEventListener("click", function() {
         $("#confirmationModal").modal("hide");
         setTimeout(() => {
@@ -777,12 +889,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }, 500);
       });
 
-      // Cancel button inside confirmation modal
+      // Cancel button
       document.getElementById("cancelBtn").addEventListener("click", function() {
         $("#confirmationModal").modal("hide");
       });
 
-      // Reset button inside any modal → reset the form
+      // Reset button
       document.querySelectorAll(".reset-btn").forEach((button) => {
         button.addEventListener("click", function() {
           const modal = this.closest(".modal");
@@ -791,25 +903,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         });
       });
 
-      // Submit button inside any modal
+      // Submit button for adding new records
       document.querySelectorAll(".submit-btn").forEach((button) => {
         button.addEventListener("click", function() {
+          const formType = this.getAttribute("data-form");
           const modal = this.closest(".modal");
           const form = modal.querySelector("form");
+          
           if (form && form.checkValidity()) {
-            alert("Form submitted: " + form.id);
+            const formData = new FormData(form);
+            
+            let action = "";
+            if (formType === "classification") {
+              action = "add_classification";
+            } else if (formType === "land_use") {
+              action = "add_land_use";
+            } else if (formType === "subclass") {
+              action = "add_subclass";
+            }
+            
+            formData.append("action", action);
+            
+            fetch(window.location.href, {
+              method: "POST",
+              body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+              if (data.trim() === "success") {
+                alert("Record added successfully!");
+                location.reload();
+              } else {
+                alert("Error adding record: " + data);
+              }
+            });
+            
             $(modal).modal("hide");
           } else {
             form.reportValidity();
           }
-        });
-      });
-
-      // Close button inside any modal
-      document.querySelectorAll(".close").forEach((button) => {
-        button.addEventListener("click", function() {
-          const modal = this.closest(".modal");
-          $(modal).modal("hide");
         });
       });
 
@@ -829,9 +961,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
       };
 
-      // =========================
-      // EDIT BUTTONS
-      // =========================
+      // Edit buttons
       document.querySelectorAll('.edit-btn').forEach(button => {
         button.addEventListener('click', function() {
           const table = this.getAttribute('data-table');
@@ -842,7 +972,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             document.getElementById('editClassificationAssessment').value = this.getAttribute('data-assessment');
             document.getElementById('editClassificationStatus').value = this.getAttribute('data-status');
           } else if (table === 'actual_uses') {
-            document.getElementById('editReportCode').value = this.getAttribute('data-reportcode');
+            document.getElementById('editReportCode').value = this.getAttribute('data-report-code');
             document.getElementById('editActualUsesCode').value = this.getAttribute('data-code');
             document.getElementById('editActualUsesDescription').value = this.getAttribute('data-description');
             document.getElementById('editActualUsesAssessment').value = this.getAttribute('data-assessment');
@@ -850,15 +980,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           } else if (table === 'sub_classes') {
             document.getElementById('editSubClassesCode').value = this.getAttribute('data-code');
             document.getElementById('editSubClassesDescription').value = this.getAttribute('data-description');
-            document.getElementById('editSubClassesAssessment').value = this.getAttribute('data-unitvalue');
+            document.getElementById('editSubClassesAssessment').value = this.getAttribute('data-assessment');
             document.getElementById('editSubClassesStatus').value = this.getAttribute('data-status');
           }
         });
       });
 
-      // =========================
-      // SAVE CHANGES (AJAX)
-      // =========================
+      // Save Classification Changes
       document.getElementById('saveClassificationChanges').addEventListener('click', function() {
         const code = document.getElementById('editClassificationCode').value;
         const description = document.getElementById('editClassificationDescription').value;
@@ -879,6 +1007,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         xhr.send(`action=update_classification&code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
       });
 
+      // Save Actual Uses Changes
       document.getElementById('saveActualUsesChanges').addEventListener('click', function() {
         const reportCode = document.getElementById('editReportCode').value;
         const code = document.getElementById('editActualUsesCode').value;
@@ -900,6 +1029,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         xhr.send(`action=update_actual_uses&reportCode=${reportCode}&code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
       });
 
+      // Save Sub-Classes Changes
       document.getElementById('saveSubClassesChanges').addEventListener('click', function() {
         const code = document.getElementById('editSubClassesCode').value;
         const description = document.getElementById('editSubClassesDescription').value;
@@ -920,52 +1050,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         xhr.send(`action=update_sub_classes&code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
       });
 
-    });
-  </script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
+      // Delete functionality
       let deleteId = null;
       let deleteTable = null;
 
-      // When delete button is clicked
       document.querySelectorAll(".delete-btn").forEach(button => {
         button.addEventListener("click", function() {
           deleteId = this.getAttribute("data-id");
           deleteTable = this.getAttribute("data-table");
-          // Show modal
           let modal = new bootstrap.Modal(document.getElementById("deleteModal"));
           modal.show();
         });
       });
 
-      // When confirm delete is clicked
       document.getElementById("confirmDeleteBtn").addEventListener("click", function() {
         if (deleteId && deleteTable) {
-          // Example AJAX call (adjust according to your backend)
-          fetch("delete.php", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-              },
-              body: `id=${deleteId}&table=${deleteTable}`
-            })
-            .then(response => response.text())
-            .then(data => {
-              // Optionally remove row from table
-              document.querySelector(`[data-id='${deleteId}'][data-table='${deleteTable}']`).closest("tr").remove();
-
-              // Hide modal
-              let modalEl = document.getElementById("deleteModal");
-              let modal = bootstrap.Modal.getInstance(modalEl);
-              modal.hide();
-            });
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", window.location.href, true);
+          xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+          xhr.onload = function() {
+            if (xhr.status === 200 && xhr.responseText.trim() === "success") {
+              alert("Record deleted successfully!");
+              location.reload();
+            } else {
+              alert("Error deleting record: " + xhr.responseText);
+            }
+          };
+          xhr.send(`action=delete_record&id=${deleteId}&table=${deleteTable}`);
         }
       });
-    });
-  </script>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
+      // Pagination for tables
       const tables = ["classificationTable", "actualUsesTable", "subClassesTable"];
       const rowsPerPage = 5;
 
@@ -975,9 +1090,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         const rows = Array.from(tbody.querySelectorAll("tr"));
         const totalPages = Math.ceil(rows.length / rowsPerPage);
 
-        // Create pagination container
         const pagination = document.createElement("div");
-        pagination.classList.add("mt-3", "pagination-container");
+        pagination.classList.add("mt-3", "pagination-container", "d-flex", "justify-content-center", "align-items-center");
         table.parentNode.appendChild(pagination);
 
         let currentPage = 1;
@@ -998,32 +1112,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
           pagination.innerHTML = "";
 
-            // Previous arrow
-            const prevBtn = document.createElement("button");
-            prevBtn.innerHTML = "&laquo;";
-            prevBtn.classList.add("btn", "btn-sm", "btn-outline-success");
-            prevBtn.disabled = page === 1;
-            prevBtn.addEventListener("click", () => renderPage(currentPage - 1));
-            pagination.appendChild(prevBtn);
+          const prevBtn = document.createElement("button");
+          prevBtn.innerHTML = "&laquo;";
+          prevBtn.classList.add("btn", "btn-sm", "btn-outline-success");
+          prevBtn.disabled = page === 1;
+          prevBtn.addEventListener("click", () => renderPage(currentPage - 1));
+          pagination.appendChild(prevBtn);
 
-            // Current page text
-            const pageInfo = document.createElement("span");
-            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-            pageInfo.classList.add("mx-2", "fw-semibold");
-            pagination.appendChild(pageInfo);
+          const pageInfo = document.createElement("span");
+          pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+          pageInfo.classList.add("mx-2", "fw-semibold");
+          pagination.appendChild(pageInfo);
 
-            // Next arrow
-            const nextBtn = document.createElement("button");
-            nextBtn.innerHTML = "&raquo;";
-            nextBtn.classList.add("btn", "btn-sm", "btn-outline-success");
-            nextBtn.disabled = page === totalPages;
-            nextBtn.addEventListener("click", () => renderPage(currentPage + 1));
-            pagination.appendChild(nextBtn);
+          const nextBtn = document.createElement("button");
+          nextBtn.innerHTML = "&raquo;";
+          nextBtn.classList.add("btn", "btn-sm", "btn-outline-success");
+          nextBtn.disabled = page === totalPages;
+          nextBtn.addEventListener("click", () => renderPage(currentPage + 1));
+          pagination.appendChild(nextBtn);
         }
 
         renderPage(1);
 
-        // Watch for table visibility changes
         const observer = new MutationObserver(() => renderPage(1));
         observer.observe(table, {
           attributes: true,
