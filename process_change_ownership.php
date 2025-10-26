@@ -139,7 +139,7 @@ function getOwnerName($conn, $oid)
 if (!isset($_POST['confirm'])) {
     $removeDetails = array_map(fn($id) => getOwnerDetails($conn, $id), $remove_ids);
     $addDetails = array_map(fn($id) => getOwnerDetails($conn, $id), $add_ids);
-    ?>
+?>
     <!DOCTYPE html>
     <html lang="en">
 
@@ -236,7 +236,7 @@ if (!isset($_POST['confirm'])) {
     </body>
 
     </html>
-    <?php
+<?php
     exit;
 }
 
@@ -247,7 +247,7 @@ $conn->begin_transaction();
 
 try {
     // ✅ SNAPSHOT: Capture all related records BEFORE changes
-    
+
     // 1. Snapshot rpu_dec
     $rpu_dec_stmt = $conn->prepare("SELECT * FROM rpu_dec WHERE faas_id = ?");
     $rpu_dec_stmt->bind_param("i", $faas_id);
@@ -303,7 +303,7 @@ try {
         // Keep your existing owner_audit_log with snapshot
         $ownerDetails = getOwnerDetails($conn, $oid);
         $details = "Removed: $ownerDetails from property $property_id";
-        
+
         // Add snapshot to owner_audit_log details
         $snapshot_data = json_encode([
             'rpu_dec' => $rpu_dec_snapshot,
@@ -311,7 +311,7 @@ try {
             'p_info' => $p_info_snapshot,
             'land' => $land_snapshots
         ]);
-        
+
         $stmt2 = $conn->prepare("INSERT INTO owner_audit_log 
             (action, owner_id, property_id, user_id, `tax-dec_id`, details) 
             VALUES ('Snapshot', ?, ?, ?, ?, ?)");
@@ -391,25 +391,25 @@ try {
 
         // ✅ ADD SNAPSHOT SUMMARY
         $logMessage .= "\n--- Record Snapshot (Before Transfer) ---\n";
-        
+
         if ($rpu_dec_snapshot) {
             $logMessage .= "RPU Declaration:\n";
             $logMessage .= "  • ARP: {$rpu_dec_snapshot['arp_no']}\n";
             $logMessage .= "  • Total Property Value: ₱" . number_format($rpu_dec_snapshot['total_property_value'], 2) . "\n";
         }
-        
+
         if ($rpu_idnum_snapshot) {
             $logMessage .= "RPU Identification:\n";
             $logMessage .= "  • PIN: {$rpu_idnum_snapshot['pin']}\n";
             $logMessage .= "  • Taxability: {$rpu_idnum_snapshot['taxability']}\n";
         }
-        
+
         if ($p_info_snapshot) {
             $logMessage .= "Property Info:\n";
             $logMessage .= "  • House #: {$p_info_snapshot['house_no']}\n";
             $logMessage .= "  • Land Area: {$p_info_snapshot['land_area']} sq.m\n";
         }
-        
+
         if (!empty($land_snapshots)) {
             $logMessage .= "Land Records: " . count($land_snapshots) . " record(s) captured\n";
             $total_land_value = array_sum(array_column($land_snapshots, 'market_value'));
@@ -420,6 +420,27 @@ try {
         $logMessage .= "\nSnapshot stored in owner_audit_log for historical reference";
 
         logActivity($conn, $user_id, $logMessage);
+    }
+
+    // --- 3. Nullify FAAS relationships after ownership transfer ---
+    $nullify_faas_stmt = $conn->prepare("UPDATE faas SET rpu_idno = NULL WHERE faas_id = ?");
+    $nullify_faas_stmt->bind_param("i", $faas_id);
+    $nullify_faas_stmt->execute();
+    $nullify_faas_stmt->close();
+
+    $nullify_land_stmt = $conn->prepare("UPDATE land SET faas_id = NULL WHERE faas_id = ?");
+    $nullify_land_stmt->bind_param("i", $faas_id);
+    $nullify_land_stmt->execute();
+    $nullify_land_stmt->close();
+
+    $nullify_rpu_dec_stmt = $conn->prepare("UPDATE rpu_dec SET faas_id = NULL WHERE faas_id = ?");
+    $nullify_rpu_dec_stmt->bind_param("i", $faas_id);
+    $nullify_rpu_dec_stmt->execute();
+    $nullify_rpu_dec_stmt->close();
+
+    // Log this event in activity log
+    if ($user_id) {
+        logActivity($conn, $user_id, "FAAS relationships nullified for FAAS ID $faas_id (property $property_id)");
     }
 
     $conn->commit();
