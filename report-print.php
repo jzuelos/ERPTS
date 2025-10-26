@@ -90,7 +90,20 @@
     $date_display = "Until " . date("F d, Y", strtotime($to_date));
   }
 
-  // Base query
+  // Get classification name if ID is provided
+  $classification_name = '';
+  if (!empty($classification)) {
+    $stmt = $conn->prepare("SELECT c_description FROM classification WHERE c_id = ?");
+    $stmt->bind_param("i", $classification);
+    $stmt->execute();
+    $result_class = $stmt->get_result();
+    if ($row = $result_class->fetch_assoc()) {
+      $classification_name = $row['c_description'];
+    }
+    $stmt->close();
+  }
+
+  // Base query - note that land.classification stores VARCHAR (text), not ID
   $sql = "
   SELECT 
     r.pin AS property_index_no,
@@ -110,21 +123,59 @@
 
   // Apply filters if not printing all
   if (!$print_all) {
-    if (!empty($classification)) {
-      $sql .= " AND l.classification = '" . $conn->real_escape_string($classification) . "'";
+    // Classification filter - land.classification is VARCHAR, so match against description
+    if (!empty($classification) && !empty($classification_name)) {
+      $sql .= " AND l.classification = '" . $conn->real_escape_string($classification_name) . "'";
     }
+    
+    // Province filter - p_info.province stores VARCHAR (province name), not ID
     if (!empty($province)) {
-      $sql .= " AND p.province = '" . $conn->real_escape_string($province) . "'";
+      $stmt = $conn->prepare("SELECT province_name FROM province WHERE province_id = ?");
+      $stmt->bind_param("i", $province);
+      $stmt->execute();
+      $result_prov = $stmt->get_result();
+      if ($row = $result_prov->fetch_assoc()) {
+        $sql .= " AND p.province = '" . $conn->real_escape_string($row['province_name']) . "'";
+      }
+      $stmt->close();
     }
+    
+    // Municipality filter - p_info.city stores VARCHAR (municipality name), not ID
     if (!empty($municipality)) {
-      $sql .= " AND p.city = '" . $conn->real_escape_string($municipality) . "'";
+      $stmt = $conn->prepare("SELECT m_description FROM municipality WHERE m_id = ?");
+      $stmt->bind_param("i", $municipality);
+      $stmt->execute();
+      $result_mun = $stmt->get_result();
+      if ($row = $result_mun->fetch_assoc()) {
+        $sql .= " AND p.city = '" . $conn->real_escape_string($row['m_description']) . "'";
+      }
+      $stmt->close();
     }
+    
+    // District filter - p_info.district stores VARCHAR (district name), not ID
     if (!empty($district)) {
-      $sql .= " AND p.district = '" . $conn->real_escape_string($district) . "'";
+      $stmt = $conn->prepare("SELECT description FROM district WHERE district_id = ?");
+      $stmt->bind_param("i", $district);
+      $stmt->execute();
+      $result_dist = $stmt->get_result();
+      if ($row = $result_dist->fetch_assoc()) {
+        $sql .= " AND p.district = '" . $conn->real_escape_string($row['description']) . "'";
+      }
+      $stmt->close();
     }
+    
+    // Barangay filter - p_info.barangay stores VARCHAR (barangay name), not ID
     if (!empty($barangay)) {
-      $sql .= " AND p.barangay = '" . $conn->real_escape_string($barangay) . "'";
+      $stmt = $conn->prepare("SELECT brgy_name FROM brgy WHERE brgy_id = ?");
+      $stmt->bind_param("i", $barangay);
+      $stmt->execute();
+      $result_brgy = $stmt->get_result();
+      if ($row = $result_brgy->fetch_assoc()) {
+        $sql .= " AND p.barangay = '" . $conn->real_escape_string($row['brgy_name']) . "'";
+      }
+      $stmt->close();
     }
+    
     if (!empty($from_date)) {
       $sql .= " AND DATE(p.created_at) >= '" . $conn->real_escape_string($from_date) . "'";
     }
@@ -135,40 +186,35 @@
 
   $result = $conn->query($sql);
 
-  // 🔹 ACTIVITY LOGGING SECTION
+  // ACTIVITY LOGGING SECTION
   if ($user_id) {
-
     // Helper function to get readable names
     function getValue($conn, $table, $column, $id_column, $id)
     {
       if (!$id) return null;
-
       $stmt = $conn->prepare("SELECT $column FROM $table WHERE $id_column = ?");
       $stmt->bind_param("i", $id);
       $stmt->execute();
-
       $result = $stmt->get_result();
       $row = $result->fetch_assoc();
-
       $stmt->close();
-
-      return $row[$column] ?? null; // safely returns null if not found
+      return $row[$column] ?? null;
     }
 
     // Fetch readable values
-    $classification_name = getValue($conn, "classification", "c_description", "c_id", $classification);
-    $province_name       = getValue($conn, "province", "province_name", "province_id", $province);
-    $municipality_name   = getValue($conn, "municipality", "m_description", "m_id", $municipality);
-    $district_name       = getValue($conn, "district", "description", "district_id", $district);
-    $barangay_name       = getValue($conn, "brgy", "brgy_name", "brgy_id", $barangay);
+    $classification_display = getValue($conn, "classification", "c_description", "c_id", $classification);
+    $province_display       = getValue($conn, "province", "province_name", "province_id", $province);
+    $municipality_display   = getValue($conn, "municipality", "m_description", "m_id", $municipality);
+    $district_display       = getValue($conn, "district", "description", "district_id", $district);
+    $barangay_display       = getValue($conn, "brgy", "brgy_name", "brgy_id", $barangay);
 
     // Build readable activity message
     $activity = "Printed Property Report\n" .
-      "• Classification: " . ($classification_name ?: 'All') . "\n" .
-      "• Province: " . ($province_name ?: 'All') . "\n" .
-      "• Municipality/City: " . ($municipality_name ?: 'All') . "\n" .
-      "• District: " . ($district_name ?: 'All') . "\n" .
-      "• Barangay: " . ($barangay_name ?: 'All') . "\n" .
+      "• Classification: " . ($classification_display ?: 'All') . "\n" .
+      "• Province: " . ($province_display ?: 'All') . "\n" .
+      "• Municipality/City: " . ($municipality_display ?: 'All') . "\n" .
+      "• District: " . ($district_display ?: 'All') . "\n" .
+      "• Barangay: " . ($barangay_display ?: 'All') . "\n" .
       "• Date Range: " . ($date_display ?: 'All');
 
     // Insert into activity log
@@ -182,15 +228,15 @@
   <h1 style="text-align:center; font-size:22px; margin-bottom:20px;">
     PROVINCE OF CAMARINES NORTE <br>
     <span style="font-size:18px;">(PROVINCIAL ASSESSOR'S OFFICE)</span><br>
-    <span style="font-size:15px;">(Property By: Classification <?= htmlspecialchars($classification ?: 'All') ?>)</span>
+    <span style="font-size:15px;">(Property By: Classification <?= htmlspecialchars($classification_display ?? 'All') ?>)</span>
   </h1>
 
   <div class="header">
-    <span><b>Classification:</b> <?= htmlspecialchars($classification) ?></span>
-    <span><b>Province:</b> <?= htmlspecialchars($province) ?></span>
-    <span><b>Municipality/City:</b> <?= htmlspecialchars($municipality) ?></span>
-    <span><b>District:</b> <?= htmlspecialchars($district) ?></span>
-    <span><b>Barangay:</b> <?= htmlspecialchars($barangay) ?></span>
+    <span><b>Classification:</b> <?= htmlspecialchars($classification_display ?? '') ?></span>
+    <span><b>Province:</b> <?= htmlspecialchars($province_display ?? '') ?></span>
+    <span><b>Municipality/City:</b> <?= htmlspecialchars($municipality_display ?? '') ?></span>
+    <span><b>District:</b> <?= htmlspecialchars($district_display ?? '') ?></span>
+    <span><b>Barangay:</b> <?= htmlspecialchars($barangay_display ?? '') ?></span>
     <span><b>Date:</b> <?= $date_display ?: date("F d, Y") ?></span>
   </div>
 
