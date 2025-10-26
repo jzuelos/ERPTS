@@ -42,10 +42,16 @@
     die("Connection failed: " . $conn->connect_error);
   }
   $conn = Database::getInstance();
-  
+
 
   // Fetch classifications
-  $classification_stmt = $conn->prepare("SELECT c_id, c_description FROM classification");
+  // NEW - only shows classifications used in land table
+  $classification_stmt = $conn->prepare("
+  SELECT DISTINCT c.c_id, c.c_description 
+  FROM classification c
+  INNER JOIN land l ON c.c_description = l.classification
+  ORDER BY c.c_description ASC
+");
   $classification_stmt->execute();
   $classification_result = $classification_stmt->get_result();
 
@@ -419,38 +425,38 @@
         window.open("report-print.php?" + params.toString(), "_blank");
       });
 
-        // Reset
+      // Reset
       resetBtn.addEventListener("click", () => {
-      // Clear all fields
-      formElements.forEach(el => {
-        if (!el) return;
-        if (el.tagName === "SELECT") {
-          el.selectedIndex = 0;
-        } else {
-          el.value = "";
-        }
-        el.classList.remove("is-invalid"); // ✅ Clear red borders
+        // Clear all fields
+        formElements.forEach(el => {
+          if (!el) return;
+          if (el.tagName === "SELECT") {
+            el.selectedIndex = 0;
+          } else {
+            el.value = "";
+          }
+          el.classList.remove("is-invalid"); // ✅ Clear red borders
+        });
+
+        // Re-lock province and keep "Camarines Norte" selected
+        [...provinceSelect.options].forEach(opt => {
+          opt.selected = opt.textContent.trim().toLowerCase() === "camarines norte";
+        });
+        provinceSelect.disabled = true;
+
+        // Reset dependent selects
+        districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
+        districtSelect.disabled = true;
+        barangaySelect.innerHTML = '<option value="" disabled selected>Select Barangay</option>';
+        barangaySelect.disabled = true;
+
+        //  Re-enable and uncheck Print All
+        printAllCheck.disabled = false;
+        printAllCheck.checked = false;
+
+        // Refresh state
+        toggleFilters();
       });
-
-      // Re-lock province and keep "Camarines Norte" selected
-      [...provinceSelect.options].forEach(opt => {
-        opt.selected = opt.textContent.trim().toLowerCase() === "camarines norte";
-      });
-      provinceSelect.disabled = true;
-
-      // Reset dependent selects
-      districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
-      districtSelect.disabled = true;
-      barangaySelect.innerHTML = '<option value="" disabled selected>Select Barangay</option>';
-      barangaySelect.disabled = true;
-
-      //  Re-enable and uncheck Print All
-      printAllCheck.disabled = false;
-      printAllCheck.checked = false;
-
-      // Refresh state
-      toggleFilters();
-    });
 
     });
   </script>
