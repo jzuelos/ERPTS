@@ -62,6 +62,8 @@ if ($_SESSION['lock_expires'] > $current_time) {
               $_SESSION['username'] = $user['username'];
               $_SESSION['user_type'] = $user['user_type'];
               $_SESSION['first_name'] = $user['first_name'];
+              $_SESSION['middle_name'] = $user['middle_name'];
+              $_SESSION['last_name'] = $user['last_name'];
               $_SESSION['logged_in'] = true;
 
               // Insert login activity (safe-check)

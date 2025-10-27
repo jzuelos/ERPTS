@@ -7,7 +7,14 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
   exit;
 }
 
-$first_name = $_SESSION['first_name'] ?? 'Guest';
+// Build full name
+$first_name = $_SESSION['first_name'] ?? '';
+$last_name = $_SESSION['last_name'] ?? '';
+
+$full_name = trim("$first_name $last_name");
+if (empty($full_name)) {
+  $full_name = 'Guest';
+}
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -69,7 +76,7 @@ $plant_count = 327;
   <div class="container-fluid p-0 main-content" style="margin-top: 20px;">
     <div class="row px-4">
       <h2 class="fw-bold fst-italic text-black">
-        Welcome, <?php echo htmlspecialchars($first_name); ?>!
+        Welcome, <?php echo htmlspecialchars($full_name); ?>!
       </h2>
       <div class="row mt-4">
         <!-- Left Column -->
