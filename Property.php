@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
   // ========================================
   // UPDATE OPERATIONS
   // ========================================
-  
+
   // Update Classification
   if ($action === 'update_classification') {
     $code = $_POST['code'];
@@ -50,17 +50,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $assessment = $_POST['assessment'];
     $status = $_POST['status'];
 
+    // Get old values before update
+    $stmt = $conn->prepare("SELECT c_description, c_uv, c_status FROM classification WHERE c_code=?");
+    $stmt->bind_param("s", $code);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $old_data = $result->fetch_assoc();
+    $stmt->close();
+
+    // Perform update
     $stmt = $conn->prepare("UPDATE classification SET c_description=?, c_uv=?, c_status=? WHERE c_code=?");
     $stmt->bind_param("sdss", $description, $assessment, $status, $code);
     $result = $stmt->execute() ? "success" : "error";
 
-    if ($result === "success") {
-      $log_action = "Updated Classification\n";
-      $log_action .= "• Code: $code\n";
-      $log_action .= "• Description: $description\n";
-      $log_action .= "• Assessment Level: $assessment%\n";
-      $log_action .= "• Status: $status";
-      logActivity($user_id, $log_action);
+    if ($result === "success" && $old_data) {
+      $log_action = "Updated Classification Record.\n";
+      $log_action .= "• Code: $code.\n\n";
+
+      $changes = [];
+
+      // Track changes
+      if ($old_data['c_description'] !== $description) {
+        $changes[] = "• Description changed from \"{$old_data['c_description']}\" to \"$description\".";
+      }
+
+      if ($old_data['c_uv'] != $assessment) {
+        $changes[] = "• Assessment Level changed from \"{$old_data['c_uv']}%\" to \"{$assessment}%\".";
+      }
+
+      if ($old_data['c_status'] !== $status) {
+        $changes[] = "• Status changed from \"{$old_data['c_status']}\" to \"$status\".";
+      }
+
+      if (!empty($changes)) {
+        $log_action .= "Changes Made:\n" . implode("\n", $changes);
+        logActivity($user_id, $log_action);
+      }
     }
 
     echo $result;
@@ -76,17 +101,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $assessment = $_POST['assessment'];
     $status = $_POST['status'];
 
+    // Get old values before update
+    $stmt = $conn->prepare("SELECT lu_description, lu_al, lu_status FROM land_use WHERE report_code=? AND lu_code=?");
+    $stmt->bind_param("ss", $reportCode, $code);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $old_data = $result->fetch_assoc();
+    $stmt->close();
+
+    // Perform update
     $stmt = $conn->prepare("UPDATE land_use SET lu_description=?, lu_al=?, lu_status=? WHERE report_code=? AND lu_code=?");
     $stmt->bind_param("sdsss", $description, $assessment, $status, $reportCode, $code);
     $result = $stmt->execute() ? "success" : "error";
 
-    if ($result === "success") {
-      $log_action = "Updated Actual Uses (Land Use)\n";
-      $log_action .= "• Report Code: $reportCode\n";
-      $log_action .= "• Code: $code\n";
-      $log_action .= "• Description: $description\n";
-      $log_action .= "• Assessment Level: $assessment%\n";
-      $log_action .= "• Status: $status";
+    if ($result === "success" && $old_data) {
+      $log_action = "Updated Actual Use Record.\n";
+      $log_action .= "• Report Code: $reportCode.\n";
+      $log_action .= "• Code: $code.\n\n";
+
+      // Show changes
+      if ($old_data['lu_description'] !== $description) {
+        $log_action .= "Description:\n";
+        $log_action .= "  Before: {$old_data['lu_description']}.\n";
+        $log_action .= "  After: $description.\n\n";
+      }
+
+      if ($old_data['lu_al'] != $assessment) {
+        $log_action .= "Assessment Level:\n";
+        $log_action .= "  Before: {$old_data['lu_al']}%.\n";
+        $log_action .= "  After: {$assessment}%.\n\n";
+      }
+
+      if ($old_data['lu_status'] !== $status) {
+        $log_action .= "Status:\n";
+        $log_action .= "  Before: {$old_data['lu_status']}.\n";
+        $log_action .= "  After: $status.\n";
+      }
+
       logActivity($user_id, $log_action);
     }
 
@@ -102,16 +153,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $assessment = $_POST['assessment'];
     $status = $_POST['status'];
 
+    // Get old values before update
+    $stmt = $conn->prepare("SELECT sc_description, sc_uv, sc_status FROM subclass WHERE sc_code=?");
+    $stmt->bind_param("s", $code);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $old_data = $result->fetch_assoc();
+    $stmt->close();
+
+    // Perform update
     $stmt = $conn->prepare("UPDATE subclass SET sc_description=?, sc_uv=?, sc_status=? WHERE sc_code=?");
     $stmt->bind_param("sdss", $description, $assessment, $status, $code);
     $result = $stmt->execute() ? "success" : "error";
 
-    if ($result === "success") {
-      $log_action = "Updated Sub-Class\n";
-      $log_action .= "• Code: $code\n";
-      $log_action .= "• Description: $description\n";
-      $log_action .= "• Unit Value: ₱" . number_format($assessment, 2) . "\n";
-      $log_action .= "• Status: $status";
+    if ($result === "success" && $old_data) {
+      $log_action = "Updated Sub-Class Record.\n";
+      $log_action .= "• Code: $code.\n\n";
+
+      // Show changes
+      if ($old_data['sc_description'] !== $description) {
+        $log_action .= "Description:\n";
+        $log_action .= "  Before: {$old_data['sc_description']}.\n";
+        $log_action .= "  After: $description.\n\n";
+      }
+
+      if ($old_data['sc_uv'] != $assessment) {
+        $log_action .= "Unit Value:\n";
+        $log_action .= "  Before: ₱" . number_format($old_data['sc_uv'], 2) . ".\n";
+        $log_action .= "  After: ₱" . number_format($assessment, 2) . ".\n\n";
+      }
+
+      if ($old_data['sc_status'] !== $status) {
+        $log_action .= "Status:\n";
+        $log_action .= "  Before: {$old_data['sc_status']}.\n";
+        $log_action .= "  After: $status.\n";
+      }
+
       logActivity($user_id, $log_action);
     }
 
@@ -123,7 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
   // ========================================
   // ADD OPERATIONS
   // ========================================
-  
+
   // Add Classification
   if ($action === 'add_classification') {
     $code = $_POST['c_code'];
@@ -133,9 +210,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
     $stmt = $conn->prepare("INSERT INTO classification (c_code, c_description, c_uv, c_status) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("ssds", $code, $description, $uv, $status);
-    
+
     if ($stmt->execute()) {
-      $log_action = "Added New Classification\n";
+      $log_action = "Added New Classification Record\n";
       $log_action .= "• Code: $code\n";
       $log_action .= "• Description: $description\n";
       $log_action .= "• Assessment Level: $uv%\n";
@@ -159,9 +236,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
     $stmt = $conn->prepare("INSERT INTO land_use (report_code, lu_code, lu_description, lu_al, lu_status) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("sssds", $reportCode, $code, $description, $al, $status);
-    
+
     if ($stmt->execute()) {
-      $log_action = "Added New Actual Use (Land Use)\n";
+      $log_action = "Added New Actual Use Record\n";
       $log_action .= "• Report Code: $reportCode\n";
       $log_action .= "• Code: $code\n";
       $log_action .= "• Description: $description\n";
@@ -185,9 +262,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
     $stmt = $conn->prepare("INSERT INTO subclass (sc_code, sc_description, sc_uv, sc_status) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("ssds", $code, $description, $uv, $status);
-    
+
     if ($stmt->execute()) {
-      $log_action = "Added New Sub-Class\n";
+      $log_action = "Added New Sub-Class Record\n";
       $log_action .= "• Code: $code\n";
       $log_action .= "• Description: $description\n";
       $log_action .= "• Unit Value: ₱" . number_format($uv, 2) . "\n";
@@ -204,12 +281,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
   // ========================================
   // DELETE OPERATIONS
   // ========================================
-  
+
   // Delete Record
   if ($action === 'delete_record') {
     $id = intval($_POST['id']);
     $table = $_POST['table'];
-    
+
     // Map table to primary key column
     $primaryKey = [
       "classification" => "c_id",
@@ -223,34 +300,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 
     $col = $primaryKey[$table];
-    
+
     // Get record details before deletion for logging
-    $details = "";
+    $log_action = "";
+
     if ($table === 'classification') {
-      $stmt = $conn->prepare("SELECT c_code, c_description FROM classification WHERE c_id = ?");
+      $stmt = $conn->prepare("SELECT c_code, c_description, c_uv, c_status FROM classification WHERE c_id = ?");
       $stmt->bind_param("i", $id);
       $stmt->execute();
       $result = $stmt->get_result();
       if ($row = $result->fetch_assoc()) {
-        $details = "Classification: {$row['c_code']} - {$row['c_description']}";
+        $log_action = "Deleted Land Classification Record\n\n";
+        $log_action .= "Record Details:\n";
+        $log_action .= "• Code: {$row['c_code']}\n";
+        $log_action .= "• Description: {$row['c_description']}\n";
+        $log_action .= "• Assessment Level: {$row['c_uv']}%\n";
+        $log_action .= "• Status: {$row['c_status']}";
       }
       $stmt->close();
     } elseif ($table === 'land_use') {
-      $stmt = $conn->prepare("SELECT report_code, lu_code, lu_description FROM land_use WHERE lu_id = ?");
+      $stmt = $conn->prepare("SELECT report_code, lu_code, lu_description, lu_al, lu_status FROM land_use WHERE lu_id = ?");
       $stmt->bind_param("i", $id);
       $stmt->execute();
       $result = $stmt->get_result();
       if ($row = $result->fetch_assoc()) {
-        $details = "Actual Use: {$row['report_code']}-{$row['lu_code']} - {$row['lu_description']}";
+        $log_action = "Deleted Actual Use Record\n\n";
+        $log_action .= "Record Details:\n";
+        $log_action .= "• Report Code: {$row['report_code']}\n";
+        $log_action .= "• Code: {$row['lu_code']}\n";
+        $log_action .= "• Description: {$row['lu_description']}\n";
+        $log_action .= "• Assessment Level: {$row['lu_al']}%\n";
+        $log_action .= "• Status: {$row['lu_status']}";
       }
       $stmt->close();
     } elseif ($table === 'subclass') {
-      $stmt = $conn->prepare("SELECT sc_code, sc_description FROM subclass WHERE sc_id = ?");
+      $stmt = $conn->prepare("SELECT sc_code, sc_description, sc_uv, sc_status FROM subclass WHERE sc_id = ?");
       $stmt->bind_param("i", $id);
       $stmt->execute();
       $result = $stmt->get_result();
       if ($row = $result->fetch_assoc()) {
-        $details = "Sub-Class: {$row['sc_code']} - {$row['sc_description']}";
+        $log_action = "Deleted Sub-Class Record\n\n";
+        $log_action .= "Record Details:\n";
+        $log_action .= "• Code: {$row['sc_code']}\n";
+        $log_action .= "• Description: {$row['sc_description']}\n";
+        $log_action .= "• Unit Value: ₱" . number_format($row['sc_uv'], 2) . "\n";
+        $log_action .= "• Status: {$row['sc_status']}";
       }
       $stmt->close();
     }
@@ -258,12 +352,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     // Delete the record
     $stmt = $conn->prepare("DELETE FROM $table WHERE $col = ?");
     $stmt->bind_param("i", $id);
-    
+
     if ($stmt->execute()) {
-      $log_action = "Deleted Record\n";
-      $log_action .= "• Table: $table\n";
-      $log_action .= "• Details: $details";
-      logActivity($user_id, $log_action);
+      if ($log_action) {
+        logActivity($user_id, $log_action);
+      }
       echo "success";
     } else {
       echo "error: " . $stmt->error;
@@ -909,10 +1002,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           const formType = this.getAttribute("data-form");
           const modal = this.closest(".modal");
           const form = modal.querySelector("form");
-          
+
           if (form && form.checkValidity()) {
             const formData = new FormData(form);
-            
+
             let action = "";
             if (formType === "classification") {
               action = "add_classification";
@@ -921,23 +1014,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             } else if (formType === "subclass") {
               action = "add_subclass";
             }
-            
+
             formData.append("action", action);
-            
+
             fetch(window.location.href, {
-              method: "POST",
-              body: formData
-            })
-            .then(response => response.text())
-            .then(data => {
-              if (data.trim() === "success") {
-                alert("Record added successfully!");
-                location.reload();
-              } else {
-                alert("Error adding record: " + data);
-              }
-            });
-            
+                method: "POST",
+                body: formData
+              })
+              .then(response => response.text())
+              .then(data => {
+                if (data.trim() === "success") {
+                  alert("Record added successfully!");
+                  location.reload();
+                } else {
+                  alert("Error adding record: " + data);
+                }
+              });
+
             $(modal).modal("hide");
           } else {
             form.reportValidity();
@@ -1083,6 +1176,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
       // Pagination for tables
       const tables = ["classificationTable", "actualUsesTable", "subClassesTable"];
       const rowsPerPage = 5;
+      const paginationContainers = {}; // Store pagination containers
 
       tables.forEach(tableId => {
         const table = document.getElementById(tableId);
@@ -1090,13 +1184,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         const rows = Array.from(tbody.querySelectorAll("tr"));
         const totalPages = Math.ceil(rows.length / rowsPerPage);
 
-        const pagination = document.createElement("div");
-        pagination.classList.add("mt-3", "pagination-container", "d-flex", "justify-content-center", "align-items-center");
-        table.parentNode.appendChild(pagination);
+        // Create pagination container only once
+        if (!paginationContainers[tableId]) {
+          const pagination = document.createElement("div");
+          pagination.classList.add("mt-3", "pagination-container", "d-flex", "justify-content-center", "align-items-center");
+          pagination.setAttribute("data-table", tableId);
+          table.parentNode.appendChild(pagination);
+          paginationContainers[tableId] = pagination;
+        }
 
+        const pagination = paginationContainers[tableId];
         let currentPage = 1;
 
         function renderPage(page) {
+          // Hide/show pagination based on table visibility
           if (table.classList.contains("d-none")) {
             pagination.style.display = "none";
             return;
@@ -1110,8 +1211,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           const end = start + rowsPerPage;
           rows.slice(start, end).forEach(row => tbody.appendChild(row));
 
+          // Clear and rebuild pagination controls
           pagination.innerHTML = "";
 
+          // Previous button
           const prevBtn = document.createElement("button");
           prevBtn.innerHTML = "&laquo;";
           prevBtn.classList.add("btn", "btn-sm", "btn-outline-success");
@@ -1119,11 +1222,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           prevBtn.addEventListener("click", () => renderPage(currentPage - 1));
           pagination.appendChild(prevBtn);
 
+          // Page info
           const pageInfo = document.createElement("span");
           pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
           pageInfo.classList.add("mx-2", "fw-semibold");
           pagination.appendChild(pageInfo);
 
+          // Next button
           const nextBtn = document.createElement("button");
           nextBtn.innerHTML = "&raquo;";
           nextBtn.classList.add("btn", "btn-sm", "btn-outline-success");
@@ -1132,15 +1237,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           pagination.appendChild(nextBtn);
         }
 
-        renderPage(1);
+        // Store render function for later use
+        table.renderPage = renderPage;
 
-        const observer = new MutationObserver(() => renderPage(1));
-        observer.observe(table, {
-          attributes: true,
-          attributeFilter: ["class"]
-        });
+        // Initial render
+        renderPage(1);
       });
+
+      // Update changeCategoryType to properly handle pagination
+      const originalChangeCategoryType = window.changeCategoryType;
+      window.changeCategoryType = function(type) {
+        // Hide all tables first
+        document.getElementById("classificationTable").classList.add("d-none");
+        document.getElementById("actualUsesTable").classList.add("d-none");
+        document.getElementById("subClassesTable").classList.add("d-none");
+
+        // Update dropdown text
+        document.getElementById("categoryTypeDropdown").textContent = type;
+
+        // Show selected table and trigger pagination render
+        if (type === "Classification") {
+          const table = document.getElementById("classificationTable");
+          table.classList.remove("d-none");
+          if (table.renderPage) table.renderPage(1);
+        } else if (type === "ActualUses") {
+          const table = document.getElementById("actualUsesTable");
+          table.classList.remove("d-none");
+          if (table.renderPage) table.renderPage(1);
+        } else if (type === "SubClasses") {
+          const table = document.getElementById("subClassesTable");
+          table.classList.remove("d-none");
+          if (table.renderPage) table.renderPage(1);
+        }
+      };
     });
   </script>
 </body>
+
 </html>
