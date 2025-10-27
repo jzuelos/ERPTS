@@ -29,124 +29,289 @@ header("Pragma: no-cache");
   <link rel="stylesheet" href="header.css">
   <link rel="stylesheet" href="Transaction.css">
 
-  <style>
-    /* === Enhanced Transaction Card Styles === */
+<style>
+    :root {
+      --primary-color: #459577;
+      --primary-dark: #357561;
+      --primary-light: #5eb392;
+      --success-color: #10b981;
+      --bg-gradient: linear-gradient(135deg, #459577 0%, #357561 100%);
+      --card-shadow: 0 8px 25px rgba(69, 149, 119, 0.15);
+      --card-hover-shadow: 0 12px 35px rgba(69, 149, 119, 0.25);
+    }
+
+    body {
+      background: linear-gradient(135deg, #f0f9f6 0%, #e6f4ef 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero-section {
+      background: var(--bg-gradient);
+      padding: 2.5rem 0;
+      margin-bottom: 3rem;
+      box-shadow: 0 8px 25px rgba(69, 149, 119, 0.2);
+    }
+
+    .hero-title {
+      color: white;
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin: 0;
+      text-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    main {
+      flex-grow: 1;
+    }
+
+    .cards-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .cards-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+      align-items: center;
+    }
+
+    .cards-row {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      width: 100%;
+    }
+
     .feature-card {
-      border: none;
-      border-radius: 20px;
-      background: linear-gradient(145deg, #ffffff, #f2f2f2);
-      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
+      background: white;
+      border-radius: 16px;
+      padding: 2rem 1.5rem;
+      box-shadow: var(--card-shadow);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      border: 2px solid transparent;
+      position: relative;
+      overflow: hidden;
+      width: 260px;
+      height: 200px;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-gradient);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 0;
+    }
+
+    .feature-card:hover::before {
+      opacity: 0.06;
     }
 
     .feature-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-      background: linear-gradient(145deg, #f8f9fa, #ffffff);
+      transform: translateY(-8px);
+      box-shadow: var(--card-hover-shadow);
+      border-color: var(--primary-color);
     }
 
-    .feature-card .card-body i {
-      transition: transform 0.3s ease, color 0.3s ease;
+    .card-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      width: 100%;
     }
 
-    .feature-card:hover i {
-      transform: scale(1.2);
+    .icon-wrapper {
+      width: 70px;
+      height: 70px;
+      background: var(--bg-gradient);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(69, 149, 119, 0.25);
     }
 
-    h5.fw-bold {
-      color: #333;
+    .feature-card:hover .icon-wrapper {
+      transform: scale(1.08) rotate(3deg);
+      box-shadow: 0 6px 20px rgba(69, 149, 119, 0.4);
+    }
+
+    .icon-wrapper i {
+      font-size: 1.75rem;
+      color: white;
+    }
+
+    .icon-wrapper.transfer-icons {
+      background: var(--primary-color);
+      box-shadow: 0 4px 15px rgba(69, 149, 119, 0.3);
+    }
+
+.feature-card:hover .icon-wrapper.transfer-icons {
+  background: var(--primary-dark);
+  border-color: var(--primary-light);
+}
+
+   .transfer-icons i {
+  color: white;
+  font-size: 1.2rem;
+    }
+
+    .card-title {
+      font-size: 1.125rem;
       font-weight: 600;
+      color: #1e293b;
+      margin: 0;
+      transition: color 0.3s ease;
+      line-height: 1.4;
     }
 
-    .status-container h3 {
-      font-weight: 700;
-      letter-spacing: 1px;
-      color: #444;
+    .feature-card:hover .card-title {
+      color: var(--primary-color);
     }
 
-    /* Responsive */
+    footer {
+      margin-top: 4rem;
+      background: white;
+      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .footer-content {
+      padding: 1.75rem;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 1200px) {
+      .cards-row {
+        flex-wrap: wrap;
+      }
+    }
+
     @media (max-width: 768px) {
+      .hero-title {
+        font-size: 1.875rem;
+      }
+      
+      .cards-container {
+        padding: 0 1rem;
+      }
+      
+      .cards-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.25rem;
+      }
+
       .feature-card {
-        padding: 2rem 1rem !important;
+        width: 100%;
+        max-width: 400px;
+        height: 180px;
       }
-      .feature-card i {
-        font-size: 1.8rem !important;
+
+      .icon-wrapper {
+        width: 60px;
+        height: 60px;
       }
-      .feature-card h5 {
-        font-size: 1rem !important;
+
+      .icon-wrapper i {
+        font-size: 1.5rem;
+      }
+
+      .card-title {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-title {
+        font-size: 1.5rem;
       }
     }
   </style>
 </head>
 
-<body class="d-flex flex-column min-vh-100">
+<body>
 
-  <!-- Header -->
+  <!-- Header Navigation -->
   <?php include 'header.php'; ?>
 
-  <!-- Main Menu -->
-  <main class="container d-flex flex-column justify-content-center align-items-center my-5 flex-grow-1">
-    <section class="w-100" style="max-width: 1100px;">
-      <div class="status-container mb-5 text-center">
-        <h3 class="text-secondary" style="font-size: 2rem;">Transaction</h3>
-      </div>
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="container text-center">
+      <h1 class="hero-title">Transaction</h1>
+    </div>
+  </div>
 
-      <div class="row justify-content-center g-4">
-
-        <!-- Permanent Cancellation -->
-        <div class="col-md-3 col-sm-6">
-          <a href="Real-Property-Unit-List.php" class="text-decoration-none">
-            <div class="feature-card p-4 h-100 text-center">
-              <div class="card-body">
-                <i class="fas fa-ban text-danger mb-3" style="font-size: 2rem;"></i>
-                <h5 class="fw-bold mb-0">Permanent Cancellation</h5>
+  <!-- Main Content -->
+  <main class="container pb-5">
+    <div class="cards-container">
+      <div class="cards-wrapper">
+        <!-- Single Row: 4 Cards -->
+        <div class="cards-row">
+          <a href="Real-Property-Unit-List.php" class="feature-card">
+            <div class="card-content">
+              <div class="icon-wrapper">
+                <i class="fas fa-ban"></i>
               </div>
+              <h5 class="card-title">Permanent Cancellation</h5>
             </div>
           </a>
-        </div>
 
-        <!-- Track Transaction -->
-        <div class="col-md-3 col-sm-6">
-          <a href="Track.php" class="text-decoration-none">
-            <div class="feature-card p-4 h-100 text-center">
-              <div class="card-body">
-                <i class="fas fa-route text-info mb-3" style="font-size: 2rem;"></i>
-                <h5 class="fw-bold mb-0">Track Transaction</h5>
+          <a href="Track.php" class="feature-card">
+            <div class="card-content">
+              <div class="icon-wrapper">
+                <i class="fas fa-route"></i>
               </div>
+              <h5 class="card-title">Track Transaction</h5>
             </div>
           </a>
-        </div>
 
-        <!-- Transfer of Ownership -->
-        <div class="col-md-3 col-sm-6">
-          <a href="Real-Property-Unit-List.php" class="text-decoration-none">
-            <div class="feature-card p-4 h-100 text-center">
-              <div class="card-body">
-                <div class="d-flex justify-content-center align-items-center mb-3">
-                  <i class="fas fa-user text-success me-1" style="font-size: 1.5rem;"></i>
-                  <i class="fas fa-right-left text-success mx-1" style="font-size: 1rem;"></i>
-                  <i class="fas fa-user text-success ms-1" style="font-size: 1.5rem;"></i>
+          <a href="Real-Property-Unit-List.php" class="feature-card">
+            <div class="card-content">
+              <div class="icon-wrapper transfer-icons">
+                <div class="d-flex align-items-center gap-1">
+                  <i class="fas fa-user"></i>
+                  <i class="fas fa-right-left" style="font-size: 0.9rem;"></i>
+                  <i class="fas fa-user"></i>
                 </div>
-                <h5 class="fw-bold mb-0">Transfer of Ownership</h5>
               </div>
+              <h5 class="card-title">Transfer of Ownership</h5>
+            </div>
+          </a>
+
+          <a href="Add-New-Real-Property-Unit.php" class="feature-card">
+            <div class="card-content">
+              <div class="icon-wrapper">
+                <i class="fas fa-file-signature"></i>
+              </div>
+              <h5 class="card-title">Declaration of New Property Unit</h5>
             </div>
           </a>
         </div>
-
-        <!-- Declaration of New Property Unit -->
-        <div class="col-md-3 col-sm-6">
-          <a href="Add-New-Real-Property-Unit.php" class="text-decoration-none">
-            <div class="feature-card p-4 h-100 text-center">
-              <div class="card-body">
-                <i class="fas fa-file-signature text-primary mb-3" style="font-size: 2rem;"></i>
-                <h5 class="fw-bold mb-0">Declaration of New Property Unit</h5>
-              </div>
-            </div>
-          </a>
-        </div>
-
       </div>
-    </section>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -154,7 +319,7 @@ header("Pragma: no-cache");
     <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span>
   </footer>
 
-  <!-- ✅ Bootstrap JS -->
+
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
