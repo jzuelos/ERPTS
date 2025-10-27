@@ -1,107 +1,90 @@
 <?php
-session_start(); // Start session at the top
+session_start();
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once 'database.php'; // Include your database connection
+require_once 'database.php';
 
 $conn = Database::getInstance();
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-// =====================================
-// LOGIN ATTEMPT LIMITER + LOGIN HANDLER
-// (single POST handler, duplicate removed)
-// =====================================
-
-if (!isset($_SESSION['login_attempts'])) {
-  $_SESSION['login_attempts'] = 0;
-  $_SESSION['lock_expires'] = 0;
+// ✅ Improved logActivity function that works even if user_id is NULL
+function logActivity($conn, $user_id, $action)
+{
+  if ($user_id === 0 || $user_id === null) {
+    // Logs for failed or unknown users
+    $stmtLog = $conn->prepare("INSERT INTO activity_log (action, log_time) VALUES (?, NOW())");
+    if ($stmtLog) {
+      $stmtLog->bind_param("s", $action);
+      $stmtLog->execute();
+      $stmtLog->close();
+    }
+  } else {
+    // Logs for valid users
+    $stmtLog = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
+    if ($stmtLog) {
+      $stmtLog->bind_param("is", $user_id, $action);
+      $stmtLog->execute();
+      $stmtLog->close();
+    }
+  }
 }
 
-$current_time = time();
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+  $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
-// Check if user is currently locked
-if ($_SESSION['lock_expires'] > $current_time) {
-  $remaining = $_SESSION['lock_expires'] - $current_time;
-  $_SESSION['error'] = "Too many failed attempts. Try again in " . ceil($remaining / 60) . " minute(s).";
-} else {
-  // Reset attempts after cooldown
-  if ($_SESSION['lock_expires'] !== 0 && $_SESSION['lock_expires'] <= $current_time) {
-    $_SESSION['login_attempts'] = 0;
-    $_SESSION['lock_expires'] = 0;
-  }
+  if (empty($username) || empty($password)) {
+    $_SESSION['error'] = "Failed login attempt <br>• Username or Password cannot be empty";
+    logActivity($conn, 0, "Failed login attempt \n• Error occurred (Empty Fields)");
+  } else {
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
 
-  // Process login form (only if not locked)
-  if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    if ($stmt) {
+      $stmt->bind_param("s", $username);
+      $stmt->execute();
+      $result = $stmt->get_result();
 
-    if (empty($username) || empty($password)) {
-      $_SESSION['error'] = "Username or password cannot be empty!";
-    } else {
-      $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
+      if ($result && $result->num_rows > 0) {
+        $user = $result->fetch_assoc();
 
-      if ($stmt) {
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        if ($user['status'] == 1) {
+          if (password_verify($password, $user['password'])) {
+            // ✅ Successful login
+            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['user_type'] = $user['user_type'];
+            $_SESSION['first_name'] = $user['first_name'];
+            $_SESSION['middle_name'] = $user['middle_name'];
+            $_SESSION['last_name'] = $user['last_name'];
+            $_SESSION['logged_in'] = true;
 
-        if ($result && $result->num_rows > 0) {
-          $user = $result->fetch_assoc();
+            logActivity($conn, $user['user_id'], "User logged in successfully");
 
-          if ($user['status'] == 1) {
-            if (password_verify($password, $user['password'])) {
-              // ✅ Reset on successful login
-              $_SESSION['login_attempts'] = 0;
-              $_SESSION['lock_expires'] = 0;
-
-              $_SESSION['user_id'] = $user['user_id'];
-              $_SESSION['username'] = $user['username'];
-              $_SESSION['user_type'] = $user['user_type'];
-              $_SESSION['first_name'] = $user['first_name'];
-              $_SESSION['middle_name'] = $user['middle_name'];
-              $_SESSION['last_name'] = $user['last_name'];
-              $_SESSION['logged_in'] = true;
-
-              // Insert login activity (safe-check)
-              $stmtLog = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
-              $action = "Logged in to the system";
-              if ($stmtLog) {
-                $stmtLog->bind_param("is", $user['user_id'], $action);
-                $stmtLog->execute();
-                $stmtLog->close();
-              }
-
-              header("Location: Home.php");
-              exit();
-            } else {
-              $_SESSION['login_attempts']++;
-              $_SESSION['error'] = "Incorrect password!";
-            }
+            header("Location: Home.php");
+            exit();
           } else {
-            $_SESSION['error'] = "Your account is inactive. Please contact the administrator.";
+            // ❌ Incorrect password
+            $_SESSION['error'] = "Incorrect Password";
+            logActivity($conn, $user['user_id'], "Failed login attempt \n• Incorrect Password");
           }
         } else {
-          $_SESSION['login_attempts']++;
-          $_SESSION['error'] = "Username does not exist!";
+          // ❌ Inactive account
+          $_SESSION['error'] = "Account is Inactive. Please contact the administrator.";
+          logActivity($conn, $user['user_id'], "Failed login attempt \n• Inactive Account");
         }
-
-        // 🔒 Apply cooldown
-        if ($_SESSION['login_attempts'] == 3) {
-          $_SESSION['lock_expires'] = $current_time + (3 * 60); // 3 minutes
-          $_SESSION['error'] = "Too many failed attempts. Please wait 3 minutes.";
-        } elseif ($_SESSION['login_attempts'] >= 5) {
-          $_SESSION['lock_expires'] = $current_time + (5 * 60); // 5 minutes
-          $_SESSION['error'] = "Too many failed attempts. Please wait 5 minutes.";
-        }
-
-        $stmt->close();
       } else {
-        $_SESSION['error'] = "Error preparing statement: " . $conn->error;
+        // ❌ Username not found
+        $_SESSION['error'] = "Username does not exist";
+        logActivity($conn, 0, "Failed login attempt \n• Username '{$username}' does not exist in Database");
       }
+      $stmt->close();
+    } else {
+      $_SESSION['error'] = "System Error.";
+      logActivity($conn, 0, "Failed login attempt \n• Error preparing statement: " . $conn->error);
     }
   }
 }
@@ -113,24 +96,18 @@ $conn->close();
 <html lang="en">
 
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-  <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-
   <link rel="stylesheet" href="main_layout.css">
-  <link rel="stylesheet" href="index.css"> <!-- Custom CSS -->
+  <link rel="stylesheet" href="index.css">
   <title>Electronic Real Property Tax System</title>
 </head>
 
 <body>
-  <!-- Main Content -->
   <div class="container d-flex justify-content-center align-items-center vh-100">
-    <!-- Log In Card -->
     <div class="card-container d-flex flex-row">
       <div class="card login-card">
         <div class="logo-container">
@@ -138,10 +115,10 @@ $conn->close();
         </div>
         <h2 class="text-center">LOG IN</h2>
 
-        <!-- Display error message if login fails -->
         <?php if (isset($_SESSION['error'])): ?>
-          <p style="color: red;"><?php echo $_SESSION['error'];
-          unset($_SESSION['error']); ?></p>
+          <div class="alert alert-danger text-center fade show" role="alert" id="errorAlert">
+            <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+          </div>
         <?php endif; ?>
 
         <form method="POST">
@@ -164,14 +141,11 @@ $conn->close();
         </form>
       </div>
 
-
-      <!-- Welcome Box -->
       <div class="welcome-box">
         <h4 class="text-center mt-4">Welcome to ERPTS</h4>
         <p>From the Assessor’s Module you can:</p>
         <ul>
-          <li>Search for information in Owner’s Declaration (OD), Assessor’s Field Sheet/FAAS, Tax Declaration (TD), or
-            RPTOP.</li>
+          <li>Search for information in Owner’s Declaration (OD), Assessor’s Field Sheet/FAAS, Tax Declaration (TD), or RPTOP.</li>
           <li>Encode new real property information.</li>
         </ul>
         <p>To begin:</p>
@@ -186,22 +160,24 @@ $conn->close();
     </div>
   </div>
 
-  <!-- Optional JavaScript (kept as your original includes) -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-    crossorigin="anonymous"></script>
-
-  <!-- Inject server-side lock expiry as a millisecond timestamp for the client -->
-  <script>
-    const lockExpires = <?php echo isset($_SESSION['lock_expires']) ? (int)$_SESSION['lock_expires'] : 0; ?> * 1000;
-  </script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/js/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"></script>
   <script src="http://localhost/ERPTS/index.js"></script>
+
+  <script>
+    // ✅ Automatically hide error message after 4 seconds
+    document.addEventListener('DOMContentLoaded', function () {
+      const alertBox = document.getElementById('errorAlert');
+      if (alertBox) {
+        setTimeout(() => {
+          alertBox.classList.remove('show');
+          alertBox.classList.add('fade');
+          setTimeout(() => alertBox.remove(), 500); // Remove element after fade animation
+        }, 4000); // 4 seconds
+      }
+    });
+  </script>
 </body>
 
 </html>
