@@ -11,57 +11,99 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  // Capture and sanitize form data
-  $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-  $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+// =====================================
+// LOGIN ATTEMPT LIMITER + LOGIN HANDLER
+// (single POST handler, duplicate removed)
+// =====================================
 
-  if (empty($username) || empty($password)) {
-    $_SESSION['error'] = "Username or password cannot be empty!";
-  } else {
-    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
+if (!isset($_SESSION['login_attempts'])) {
+  $_SESSION['login_attempts'] = 0;
+  $_SESSION['lock_expires'] = 0;
+}
 
-    if ($stmt) {
-      $stmt->bind_param("s", $username);
-      $stmt->execute();
-      $result = $stmt->get_result();
+$current_time = time();
 
-      if ($result && $result->num_rows > 0) {
-        $user = $result->fetch_assoc();
+// Check if user is currently locked
+if ($_SESSION['lock_expires'] > $current_time) {
+  $remaining = $_SESSION['lock_expires'] - $current_time;
+  $_SESSION['error'] = "Too many failed attempts. Try again in " . ceil($remaining / 60) . " minute(s).";
+} else {
+  // Reset attempts after cooldown
+  if ($_SESSION['lock_expires'] !== 0 && $_SESSION['lock_expires'] <= $current_time) {
+    $_SESSION['login_attempts'] = 0;
+    $_SESSION['lock_expires'] = 0;
+  }
 
-        if ($user['status'] == 1) {
-          if (password_verify($password, $user['password'])) {
-            // ✅ Set session variables
-            $_SESSION['user_id'] = $user['user_id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['user_type'] = $user['user_type'];
-            $_SESSION['first_name'] = $user['first_name'];
-            $_SESSION['logged_in'] = true;
+  // Process login form (only if not locked)
+  if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
-            // ✅ Insert login activity
-            $stmtLog = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
-            $action = "Logged in to the system";
-            $stmtLog->bind_param("is", $user['user_id'], $action);
-            $stmtLog->execute();
-            $stmtLog->close();
+    if (empty($username) || empty($password)) {
+      $_SESSION['error'] = "Username or password cannot be empty!";
+    } else {
+      $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
 
-            header("Location: Home.php");
-            exit();
+      if ($stmt) {
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result && $result->num_rows > 0) {
+          $user = $result->fetch_assoc();
+
+          if ($user['status'] == 1) {
+            if (password_verify($password, $user['password'])) {
+              // ✅ Reset on successful login
+              $_SESSION['login_attempts'] = 0;
+              $_SESSION['lock_expires'] = 0;
+
+              $_SESSION['user_id'] = $user['user_id'];
+              $_SESSION['username'] = $user['username'];
+              $_SESSION['user_type'] = $user['user_type'];
+              $_SESSION['first_name'] = $user['first_name'];
+              $_SESSION['logged_in'] = true;
+
+              // Insert login activity (safe-check)
+              $stmtLog = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
+              $action = "Logged in to the system";
+              if ($stmtLog) {
+                $stmtLog->bind_param("is", $user['user_id'], $action);
+                $stmtLog->execute();
+                $stmtLog->close();
+              }
+
+              header("Location: Home.php");
+              exit();
+            } else {
+              $_SESSION['login_attempts']++;
+              $_SESSION['error'] = "Incorrect password!";
+            }
           } else {
-            $_SESSION['error'] = "Incorrect password!";
+            $_SESSION['error'] = "Your account is inactive. Please contact the administrator.";
           }
         } else {
-          $_SESSION['error'] = "Your account is inactive. Please contact the administrator.";
+          $_SESSION['login_attempts']++;
+          $_SESSION['error'] = "Username does not exist!";
         }
+
+        // 🔒 Apply cooldown
+        if ($_SESSION['login_attempts'] == 3) {
+          $_SESSION['lock_expires'] = $current_time + (3 * 60); // 3 minutes
+          $_SESSION['error'] = "Too many failed attempts. Please wait 3 minutes.";
+        } elseif ($_SESSION['login_attempts'] >= 5) {
+          $_SESSION['lock_expires'] = $current_time + (5 * 60); // 5 minutes
+          $_SESSION['error'] = "Too many failed attempts. Please wait 5 minutes.";
+        }
+
+        $stmt->close();
       } else {
-        $_SESSION['error'] = "Username does not exist!";
+        $_SESSION['error'] = "Error preparing statement: " . $conn->error;
       }
-      $stmt->close();
-    } else {
-      $_SESSION['error'] = "Error preparing statement: " . $conn->error;
     }
   }
 }
+
 $conn->close();
 ?>
 
@@ -142,16 +184,21 @@ $conn->close();
     </div>
   </div>
 
-  <!-- Optional JavaScript -->
+  <!-- Optional JavaScript (kept as your original includes) -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/js/popper.min.js"
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
     integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
     integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
+
+  <!-- Inject server-side lock expiry as a millisecond timestamp for the client -->
+  <script>
+    const lockExpires = <?php echo isset($_SESSION['lock_expires']) ? (int)$_SESSION['lock_expires'] : 0; ?> * 1000;
+  </script>
   <script src="http://localhost/ERPTS/index.js"></script>
 </body>
 
