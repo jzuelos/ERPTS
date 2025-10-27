@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (activityLogs.classList.contains('d-none')) {
         activityLogs.classList.remove('d-none');
         loginLogs.classList.add('d-none');
-        toggleBtn.innerHTML = '<i class="fas fa-sign-in-alt me-1"></i> Log In/Log Out Logs';
+        toggleBtn.innerHTML = '<i class="fas fa-sign-in-alt me-1"></i> Login Activity';
       } else {
         activityLogs.classList.add('d-none');
         loginLogs.classList.remove('d-none');

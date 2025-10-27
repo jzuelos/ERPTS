@@ -26,6 +26,168 @@
       padding: 4px;
       text-align: center;
     }
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Activity Log Report</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 12px;
+      color: #000;
+      margin: 1cm;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 20px;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 11.5px;
+    }
+
+    th,
+    td {
+      border: 1px solid #000;
+      padding: 6px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      text-align: center;
+      background: #198754;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+
+    /* Fixed footer for signature/date */
+    .footer {
+      position: fixed;
+      bottom: 15px;
+      right: 30px;
+      text-align: right;
+      font-size: 13px;
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait; /* Short bond paper orientation */
+        margin: 1cm;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: url('images/Seal.png') no-repeat center;
+        background-size: 400px;
+        opacity: 0.08;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      .footer {
+        position: fixed;
+        bottom: 1cm;
+        right: 1cm;
+        text-align: right;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <?php
+  session_start();
+  require_once "database.php";
+  $conn = Database::getInstance();
+  date_default_timezone_set('Asia/Manila');
+
+  // Get current user
+  $username = 'Guest';
+  if (isset($_SESSION['user_id'])) {
+    $uid = intval($_SESSION['user_id']);
+    $query = "SELECT username FROM users WHERE user_id = $uid LIMIT 1";
+    $result = $conn->query($query);
+    if ($result && $result->num_rows > 0) {
+      $username = $result->fetch_assoc()['username'];
+    }
+  }
+
+  // Fetch activity logs
+  $sql = "SELECT a.id, u.username, a.action, a.timestamp 
+          FROM activity_log a
+          LEFT JOIN users u ON a.user_id = u.user_id
+          ORDER BY a.timestamp DESC";
+  $result = $conn->query($sql);
+  ?>
+
+  <h1>
+    ELECTRONIC PROPERTY TAX SYSTEM <br>
+    <span style="font-size:17px;">ACTIVITY LOG</span>
+  </h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:5%;">#</th>
+        <th style="width:20%;">Username</th>
+        <th style="width:55%;">Action</th>
+        <th style="width:20%;">Date & Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php if ($result && $result->num_rows > 0): ?>
+        <?php $i = 1; while ($row = $result->fetch_assoc()): ?>
+          <tr>
+            <td style="text-align:center;"><?= $i++ ?></td>
+            <td><?= htmlspecialchars($row['username'] ?? 'Unknown') ?></td>
+            <td><?= nl2br(htmlspecialchars($row['action'])) ?></td>
+            <td style="text-align:center;">
+              <?= date("M d, Y h:i A", strtotime($row['timestamp'])) ?>
+            </td>
+          </tr>
+        <?php endwhile; ?>
+      <?php else: ?>
+        <tr>
+          <td colspan="4" style="text-align:center;">No activity logs found.</td>
+        </tr>
+      <?php endif; ?>
+    </tbody>
+  </table>
+
+  <!-- Footer -->
+  <div class="footer">
+    <b>PRINTED BY:</b> <?= htmlspecialchars($username) ?><br>
+    <b>Date & Time:</b> <?= date("F d, Y h:i A") ?>
+  </div>
+
+  <script>
+    // Auto print on load
+    window.onload = () => {
+      setTimeout(() => window.print(), 500);
+    };
+  </script>
+</body>
+
+</html>
 
     @media print {
       @page {
