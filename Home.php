@@ -37,26 +37,6 @@ $land_count = $result_land->fetch_assoc()['total_land'];
 // Dummy data
 $building_count = 843;
 $plant_count = 327;
-
-// Main query to join rpu_dec with faas
-$sql = "
-  SELECT 
-    r.dec_id,
-    r.arp_no,
-    r.total_property_value,
-    r.tax_year,
-    f.faas_id,
-    f.pro_id AS p_id,
-    GROUP_CONCAT(DISTINCT CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname) SEPARATOR ', ') AS owner_names
-  FROM rpu_dec r
-  LEFT JOIN faas f ON r.faas_id = f.faas_id
-  LEFT JOIN propertyowner po ON po.property_id = f.pro_id
-  LEFT JOIN owners_tb o ON o.own_id = po.owner_id
-  GROUP BY r.dec_id, f.faas_id, f.pro_id
-  ORDER BY r.dec_id DESC
-";
-
-$result = $conn->query($sql);
 ?>
 
 <!doctype html>
@@ -175,29 +155,29 @@ $result = $conn->query($sql);
                   </tr>
                 </thead>
                 <?php
+                // Tax Declaration Table Query - FIXED VERSION
                 $sql = "
-                SELECT 
-                  r.dec_id,
-                  r.arp_no,
-                  r.total_property_value,
-                  r.tax_year,
-                  f.faas_id,
-                  f.pro_id AS p_id,
-                  GROUP_CONCAT(
-                    DISTINCT CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname)
-                    SEPARATOR ', '
-                  ) AS owner_names
-                FROM rpu_dec r
-                LEFT JOIN faas f ON r.faas_id = f.faas_id
-                LEFT JOIN propertyowner po  
-                  ON po.property_id = f.pro_id 
-                  AND po.is_retained = 1  -- ✅ only include retained owners
-                LEFT JOIN owners_tb o ON o.own_id = po.owner_id
-                GROUP BY r.dec_id, f.faas_id, f.pro_id
-                ORDER BY r.dec_id DESC
-              ";
-
-
+                      SELECT 
+                        r.dec_id,
+                        r.arp_no,
+                        r.total_property_value,
+                        r.tax_year,
+                        f.faas_id,
+                        f.pro_id AS p_id,
+                        GROUP_CONCAT(
+                          DISTINCT CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname)
+                          SEPARATOR ', '
+                        ) AS owner_names
+                      FROM rpu_dec r
+                      INNER JOIN faas f ON r.faas_id = f.faas_id  -- ✅ Changed to INNER JOIN
+                      LEFT JOIN propertyowner po  
+                        ON po.property_id = f.pro_id 
+                        AND po.is_retained = 1
+                      LEFT JOIN owners_tb o ON o.own_id = po.owner_id
+                      WHERE f.faas_id IS NOT NULL  -- ✅ Additional safety check
+                      GROUP BY r.dec_id, f.faas_id, f.pro_id
+                      ORDER BY r.dec_id DESC
+                    ";
                 $result = $conn->query($sql);
                 ?>
 
@@ -214,7 +194,7 @@ $result = $conn->query($sql);
                       echo "<td>" . htmlspecialchars($dec_id ?? '') . "</td>";
                       echo "<td>" . htmlspecialchars($owner_names) . "</td>";
                       echo "<td>" . htmlspecialchars($row['arp_no'] ?? '') . "</td>";
-                      $property_value = isset($row['total_property_value']) ? number_format((float)$row['total_property_value'], 2) : '0.00';
+                      $property_value = isset($row['total_property_value']) ? number_format((float) $row['total_property_value'], 2) : '0.00';
                       echo "<td>₱ {$property_value}</td>";
 
                       echo "<td>" . (!empty($row['tax_year']) ? htmlspecialchars(date('Y', strtotime($row['tax_year']))) : '') . "</td>";
@@ -284,13 +264,13 @@ $result = $conn->query($sql);
 
 
     <script>
-  const totalLand = <?= $land_count ?>;
-  const totalBuilding = <?= $building_count ?>;
-  const totalPlant = <?= $plant_count ?>;
-  const totalOwners = <?= $total_owners ?>;
-  const totalProperties = <?= $total_properties ?>;
+      const totalLand = <?= $land_count ?>;
+      const totalBuilding = <?= $building_count ?>;
+      const totalPlant = <?= $plant_count ?>;
+      const totalOwners = <?= $total_owners ?>;
+      const totalProperties = <?= $total_properties ?>;
     </script>
-    
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
