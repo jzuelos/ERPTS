@@ -36,6 +36,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['username'] = $user['username'];
             $_SESSION['user_type'] = $user['user_type'];
             $_SESSION['first_name'] = $user['first_name'];
+            $_SESSION['middle_name'] = $user['middle_name'];
+            $_SESSION['last_name'] = $user['last_name'];
             $_SESSION['logged_in'] = true;
 
             // ✅ Insert login activity
@@ -97,7 +99,7 @@ $conn->close();
         <!-- Display error message if login fails -->
         <?php if (isset($_SESSION['error'])): ?>
           <p style="color: red;"><?php echo $_SESSION['error'];
-          unset($_SESSION['error']); ?></p>
+                                  unset($_SESSION['error']); ?></p>
         <?php endif; ?>
 
         <form method="POST">

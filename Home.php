@@ -7,12 +7,19 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
   exit;
 }
 
-$first_name = $_SESSION['first_name'] ?? 'Guest';
+require_once 'database.php'; // Include your database connection
+
+// Build full name
+$first_name = $_SESSION['first_name'] ?? '';
+$last_name = $_SESSION['last_name'] ?? '';
+
+$full_name = trim("$first_name $last_name");
+if (empty($full_name)) {
+  $full_name = 'Guest';
+}
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
-require_once 'database.php'; // Include your database connection
 
 $conn = Database::getInstance();
 if ($conn->connect_error) {
@@ -69,7 +76,7 @@ $plant_count = 327;
   <div class="container-fluid p-0 main-content" style="margin-top: 20px;">
     <div class="row px-4">
       <h2 class="fw-bold fst-italic text-black">
-        Welcome, <?php echo htmlspecialchars($first_name); ?>!
+        Welcome, <?php echo htmlspecialchars($full_name); ?>!
       </h2>
       <div class="row mt-4">
         <!-- Left Column -->
@@ -155,7 +162,6 @@ $plant_count = 327;
                   </tr>
                 </thead>
                 <?php
-                // Tax Declaration Table Query - FIXED VERSION
                 $sql = "
                       SELECT 
                         r.dec_id,
@@ -169,12 +175,12 @@ $plant_count = 327;
                           SEPARATOR ', '
                         ) AS owner_names
                       FROM rpu_dec r
-                      INNER JOIN faas f ON r.faas_id = f.faas_id  -- ✅ Changed to INNER JOIN
+                      INNER JOIN faas f ON r.faas_id = f.faas_id
                       LEFT JOIN propertyowner po  
                         ON po.property_id = f.pro_id 
                         AND po.is_retained = 1
                       LEFT JOIN owners_tb o ON o.own_id = po.owner_id
-                      WHERE f.faas_id IS NOT NULL  -- ✅ Additional safety check
+                      WHERE f.faas_id IS NOT NULL
                       GROUP BY r.dec_id, f.faas_id, f.pro_id
                       ORDER BY r.dec_id DESC
                     ";
@@ -255,13 +261,11 @@ $plant_count = 327;
       </div>
     </div>
 
-
     <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
       <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
         <span class="text-muted">© 2024 Electronic Real Property Tax System. All Rights Reserved.</span>
       </div>
     </footer>
-
 
     <script>
       const totalLand = <?= $land_count ?>;
