@@ -87,39 +87,26 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /**
- * Format activity text - converts \n to <br> and preserves formatting
+ * Format activity text - converts \n to <br> and preserves formatting with horizontal lines
  */
 function formatActivityText(text) {
   if (!text) return '';
   
-  // Split by newlines
-  const lines = text.split('\n');
+  // Split by newlines and filter out completely empty lines
+  const lines = text.split('\n').filter(line => line.trim() !== '');
   let result = '';
   
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
+  lines.forEach((line, index) => {
+    const trimmedLine = line.trim();
+    const escaped = escapeHtml(trimmedLine);
     
-    if (line === '') {
-      // Empty line - add extra spacing
-      result += '<br>';
+    // Check if line starts with bullet point
+    if (trimmedLine.startsWith('•')) {
+      result += `<div class="activity-detail-line" style="padding: 6px 0; border-bottom: 1px solid #d1d5db;"><span style="display: inline-block; padding-left: 1em;">${escaped}</span></div>`;
     } else {
-      // Add line break before each line (except first)
-      if (result !== '') {
-        result += '<br>';
-      }
-      
-      // Escape HTML
-      const escaped = escapeHtml(line);
-      
-      // Check if line starts with bullet point
-      if (line.startsWith('•')) {
-        // Add indentation for bullet points
-        result += '<span style="display: inline-block; padding-left: 1em;">' + escaped + '</span>';
-      } else {
-        result += escaped;
-      }
+      result += `<div class="activity-detail-line" style="padding: 6px 0; border-bottom: 1px solid #d1d5db;">${escaped}</div>`;
     }
-  }
+  });
   
   return result;
 }
