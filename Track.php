@@ -14,8 +14,9 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
+
 // Pagination Setup
-$limit = 5; // rows
+$limit = 5;
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
@@ -31,13 +32,29 @@ $inProgressCount = $inProgressResult->fetch_assoc()['total'];
 $completedResult = $conn->query("SELECT COUNT(*) AS total FROM transactions WHERE status='Completed'");
 $completedCount = $completedResult->fetch_assoc()['total'];
 
-// Fetch paginated transactions with file count
-$sql = "SELECT t.transaction_id, t.transaction_code, t.name, t.contact_number, t.description, t.transaction_type, t.status,
-        COUNT(f.file_id) AS file_count
+// Capture filters
+$transactionType = isset($_GET['transaction_type']) ? $_GET['transaction_type'] : '';
+$status = isset($_GET['status']) ? $_GET['status'] : '';
+
+// Build WHERE clause dynamically
+$where = [];
+if (!empty($transactionType)) $where[] = "t.transaction_type = '" . $conn->real_escape_string($transactionType) . "'";
+if (!empty($status)) $where[] = "t.status = '" . $conn->real_escape_string($status) . "'";
+$whereSQL = count($where) ? 'WHERE ' . implode(' AND ', $where) : '';
+
+// Count filtered records
+$totalResult = $conn->query("SELECT COUNT(*) AS total FROM transactions t $whereSQL");
+$totalCount = $totalResult->fetch_assoc()['total'];
+$totalPages = ceil($totalCount / $limit);
+
+// Fetch paginated filtered transactions
+$sql = "SELECT t.transaction_id, t.transaction_code, t.name, t.contact_number, t.description,
+        t.transaction_type, t.status, COUNT(f.file_id) AS file_count
         FROM transactions t
         LEFT JOIN transaction_files f ON t.transaction_id = f.transaction_id
+        $whereSQL
         GROUP BY t.transaction_id
-        ORDER BY t.transaction_id DESC 
+        ORDER BY t.transaction_id DESC
         LIMIT $limit OFFSET $offset";
 $result = $conn->query($sql);
 
@@ -180,9 +197,14 @@ if ($result && $result->num_rows > 0) {
 
       <div class="d-flex align-items-center gap-2 mb-3">
         <input type="text" id="transactionSearchInput" class="form-control" placeholder="Search...">
-        <button id="transactionResetBtn" class="btn btn-secondary shadow-sm">
-          <i class="fas fa-rotate-left me-1"></i> Reset
+        <button class="btn btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#filterModal">
+          <i class="fas fa-filter me-1"></i> Filter
         </button>
+      <button id="transactionResetBtn" class="btn btn-secondary shadow-sm d-flex align-items-center gap-1">
+        <i class="bi bi-arrow-counterclockwise"></i>
+        <span>Reset</span>
+      </button>
+
       </div>
 
 
@@ -215,34 +237,37 @@ if ($result && $result->num_rows > 0) {
       <div class="d-flex justify-content-center mt-3 mb-5">
         <ul class="pagination justify-content-center my-3">
 
-          <!-- Previous Button -->
-          <?php if ($page > 1): ?>
-            <li class="page-item">
-              <a class="page-link" href="?page=<?= $page - 1 ?>">&lt;</a>
-            </li>
-          <?php else: ?>
-            <li class="page-item disabled">
-              <span class="page-link">&lt;</span>
-            </li>
-          <?php endif; ?>
+        <?php
+        // Keep filters in pagination links
+        $queryString = http_build_query(array_filter([
+          'transaction_type' => $transactionType,
+          'status' => $status
+        ]));
+        $queryPrefix = $queryString ? "&$queryString" : '';
+        ?>
 
-          <!-- Page Info -->
-          <li class="page-item disabled">
-            <span class="page-link">
-              Page <?= $page ?> of <?= $totalPages ?>
-            </span>
+        <!-- Previous Button -->
+        <?php if ($page > 1): ?>
+          <li class="page-item">
+            <a class="page-link" href="?page=<?= $page - 1 . $queryPrefix ?>">&lt;</a>
           </li>
+        <?php else: ?>
+          <li class="page-item disabled"><span class="page-link">&lt;</span></li>
+        <?php endif; ?>
 
-          <!-- Next Button -->
-          <?php if ($page < $totalPages): ?>
-            <li class="page-item">
-              <a class="page-link" href="?page=<?= $page + 1 ?>">&gt;</a>
-            </li>
-          <?php else: ?>
-            <li class="page-item disabled">
-              <span class="page-link">&gt;</span>
-            </li>
-          <?php endif; ?>
+        <!-- Page Info -->
+        <li class="page-item disabled">
+          <span class="page-link">Page <?= $page ?> of <?= $totalPages ?></span>
+        </li>
+
+        <!-- Next Button -->
+        <?php if ($page < $totalPages): ?>
+          <li class="page-item">
+            <a class="page-link" href="?page=<?= $page + 1 . $queryPrefix ?>">&gt;</a>
+          </li>
+        <?php else: ?>
+          <li class="page-item disabled"><span class="page-link">&gt;</span></li>
+        <?php endif; ?>
 
         </ul>
       </div>
@@ -494,6 +519,52 @@ if ($result && $result->num_rows > 0) {
     </div>
   </div>
 
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form id="filterForm" method="GET">
+        <div class="modal-header">
+          <h5 class="modal-title" id="filterModalLabel">Filter Transactions</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Transaction Type Filter -->
+          <div class="mb-3">
+            <label for="transactionType" class="form-label">Transaction Type</label>
+            <select class="form-select" id="transactionType" name="transaction_type">
+              <option value="">All</option>
+              <option value="Simple Transfer of Ownership">Simple Transfer of Ownership</option>
+              <option value="New Declaration of Real Property">New Declaration of Real Property</option>
+              <option value="Revision/Correction">Revision/Correction of Real Properties</option>
+              <option value="Consolidation">Consolidation of Real Properties</option>
+            </select>
+          </div>
+
+          <!-- Status Filter -->
+          <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" id="status" name="status">
+              <option value="">All</option>
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Apply Filter</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
@@ -666,13 +737,29 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Reset the search
-  function resetSearch() {
-    searchInput.value = "";
-    const tbody = getActiveTableBody();
-    if (!tbody) return;
+// Reset the search and filters
+function resetSearch() {
+  // Reset search input
+  const searchInput = document.getElementById("transactionSearchInput");
+  if (searchInput) searchInput.value = "";
+
+  // Reset filter selects (inside modal)
+  const transactionTypeSelect = document.getElementById("transactionType");
+  const statusSelect = document.getElementById("status");
+  if (transactionTypeSelect) transactionTypeSelect.value = "";
+  if (statusSelect) statusSelect.value = "";
+
+  // Reset table rows visibility (show all rows)
+  const tbody = getActiveTableBody();
+  if (tbody) {
     tbody.querySelectorAll("tr").forEach((row) => (row.style.display = ""));
   }
+
+  // Reload the page without any query parameters (optional but best for pagination reset)
+  const baseUrl = window.location.pathname;
+  window.history.pushState({}, "", baseUrl); // Clears ?page=, ?status=, etc.
+  location.reload(); // Ensures PHP re-fetches all transactions
+}
 
   // Attach listeners
   searchInput.addEventListener("input", performSearch);

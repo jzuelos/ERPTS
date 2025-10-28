@@ -372,6 +372,7 @@ async function saveTransaction() {
       if (transactionModal) transactionModal.hide();
       if (typeof loadTransactions === "function") loadTransactions();
       if (typeof loadActivity === "function") loadActivity();
+        setTimeout(() => location.reload(), 1000);
     } else {
       alert("Error: " + (data.message || "Unknown error"));
     }
@@ -526,7 +527,7 @@ function deleteTransaction(id) {
     .then(data => {
       if (data.success) {
         alert(data.message); // Optional: show deletion success
-        loadTransactions(); // Reload your transaction table
+        location.reload(); // Reload your transaction table
       } else {
         alert("Failed: " + data.message);
       }
