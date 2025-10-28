@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 28, 2025 at 07:21 PM
+-- Generation Time: Oct 29, 2025 at 12:34 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -196,7 +196,9 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (160, NULL, 'Failed login from IP: ::1 - Username \'username\' not found', '2025-10-28 18:20:41'),
 (161, NULL, 'Failed login from IP: ::1 - Username \'username\' not found', '2025-10-28 18:20:46'),
 (162, NULL, 'Failed login from IP: ::1 - Username \'username\' not found', '2025-10-28 18:20:50'),
-(163, NULL, 'Temporary lock activated from IP: ::1', '2025-10-28 18:20:50');
+(163, NULL, 'Temporary lock activated from IP: ::1', '2025-10-28 18:20:50'),
+(164, 9, 'Logged in from IP: ::1', '2025-10-28 22:54:49'),
+(165, 9, 'Exported statistics chart from Dashboard\n• Chart Type: Property\n• Chart Title: Property Statistics Overview\n• Export Format: PNG Image\n• Export Time: 2025-10-29 00:24:30', '2025-10-28 23:24:30');
 
 -- --------------------------------------------------------
 
@@ -1023,7 +1025,8 @@ INSERT INTO `received_papers` (`received_id`, `transaction_id`, `transaction_cod
 (24, 51, 'RCV-1008', 'Josefina Cruz', '+639248889999', 'Partition', 'Clerk01 B. Clerk', '2025-10-02 18:11:44', 'Needs barangay clearance', 'received', '2025-10-02 10:11:44'),
 (25, 52, 'RCV-1009', 'Cynthia Navarro', '+639259990000', 'Exchange', 'Staff02 C. Staff', '2025-10-02 18:11:44', 'Verified and complete', 'received', '2025-10-02 10:11:44'),
 (26, 53, 'RCV-1010', 'Michael Tan', '+639260001111', 'Inheritance', 'Admin A. Admin', '2025-10-02 18:11:44', 'Heirs approved', 'received', '2025-10-02 10:11:44'),
-(27, 54, 'RCV-1011', 'Liza Sarmiento', '+639271112222', 'Transfer Certificate of Title', 'Clerk01 B. Clerk', '2025-10-02 18:11:44', 'Pending notarization', 'received', '2025-10-02 10:11:44');
+(27, 54, 'RCV-1011', 'Liza Sarmiento', '+639271112222', 'Transfer Certificate of Title', 'Clerk01 B. Clerk', '2025-10-02 18:11:44', 'Pending notarization', 'received', '2025-10-02 10:11:44'),
+(46, 65, '58187', 'John Lloyd Zuelos', '+639165217083', 'Simple Transfer of Ownership', 'John Lloyd C. Zuelos', '2025-10-29 07:16:32', '', 'received', '2025-10-28 23:16:32');
 
 -- --------------------------------------------------------
 
@@ -1163,12 +1166,11 @@ CREATE TABLE `transactions` (
 
 INSERT INTO `transactions` (`transaction_id`, `transaction_code`, `name`, `contact_number`, `description`, `status`, `created_at`, `updated_at`, `transaction_type`) VALUES
 (41, '95289', 'Jonard Canaria', '+639432441231', 'Property Revision request #37123 received 09/24/2025. Your application is now pending review. For more info. visit https://erptstrack.erpts.online', 'Pending', '2025-09-24 01:42:33', '2025-09-24 01:42:33', 'Revision/Correction'),
-(44, 'TX-1001', 'Juan Dela Cruz', '+639171111111', 'Simple Transfer request #1001 received', 'Pending', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Simple Transfer of Ownership'),
-(45, 'TX-1002', 'Maria Santos', '+639181111111', 'New Property Declaration request #1002 received', 'In Progress', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'New Declaration of Real Property'),
-(47, 'TX-1004', 'Josefa Manalo', '+639201111111', 'Property Consolidation request #1004 received', 'Pending', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Consolidation'),
-(48, 'TX-1005', 'Carlos Cruz', '+639254353421', 'Simple Transfer request #1005 received', 'In Progress', '2025-10-02 10:19:56', '2025-10-28 16:31:07', 'Simple Transfer of Ownership'),
-(51, 'TX-1008', 'Elena Bautista', '+639165217083', 'Property Consolidation #TX-1008 completed 10/28/2025. Ready for pickup at our office. For more info. visit https://erptstrack.erpts.online', 'Completed', '2025-10-02 10:19:56', '2025-10-28 14:15:18', 'Consolidation'),
-(65, '58187', 'James Gacho', '+639165217083', 'Transfer of Ownership request #58187 received 10/28/2025. Your application is now pending review. For more info. visit https://erptstrack.erpts.online', 'Pending', '2025-10-28 14:21:16', '2025-10-28 14:21:16', 'Simple Transfer of Ownership');
+(44, 'TX-1001', 'Juan Dela Cruz', '+639171423268', 'Transfer of Ownership request #TX-1001 received 10/29/2025. Your application is now pending review. For more info. visit https://erptstrack.erpts.online', 'Pending', '2025-10-02 10:19:56', '2025-10-28 23:07:30', 'Simple Transfer of Ownership'),
+(45, 'TX-1002', 'Maria Santos', '+639181753453', 'New Property Declaration #TX-1002 is being processed. Documents under review as of 10/29/2025. For more info. visit https://erptstrack.erpts.online', 'In Progress', '2025-10-02 10:19:56', '2025-10-28 23:07:54', 'New Declaration of Real Property'),
+(47, 'TX-1004', 'Josefa Manalo', '+639423645758', 'Property Consolidation request #TX-1004 received 10/29/2025. Your application is now pending review. For more info. visit https://erptstrack.erpts.online', 'Pending', '2025-10-02 10:19:56', '2025-10-28 23:08:05', 'Consolidation'),
+(48, 'TX-1005', 'Carlos Cruz', '+639254353421', 'Transfer of Ownership #TX-1005 is being processed. Documents under review as of 10/29/2025. For more info. visit https://erptstrack.erpts.online', 'In Progress', '2025-10-02 10:19:56', '2025-10-28 23:08:13', 'Simple Transfer of Ownership'),
+(51, 'TX-1008', 'Elena Bautista', '+639165217083', 'Property Consolidation #TX-1008 completed 10/28/2025. Ready for pickup at our office. For more info. visit https://erptstrack.erpts.online', 'Completed', '2025-10-02 10:19:56', '2025-10-28 14:15:18', 'Consolidation');
 
 -- --------------------------------------------------------
 
@@ -1317,7 +1319,19 @@ INSERT INTO `transaction_logs` (`log_id`, `transaction_id`, `transaction_code`, 
 (211, 51, 'TX-1008', 'Updated', 'Transaction updated', 9, '2025-10-28 14:15:18'),
 (212, 65, '58187', 'Created', 'Transaction created', 9, '2025-10-28 14:21:16'),
 (213, 65, '58187', 'SMS Sent', 'Notification sent to +639165217083', 9, '2025-10-28 14:21:17'),
-(214, 48, 'TX-1005', 'Updated', 'Transaction updated', 9, '2025-10-28 16:31:07');
+(214, 48, 'TX-1005', 'Updated', 'Transaction updated', 9, '2025-10-28 16:31:07'),
+(215, 65, '58187', 'Updated', 'Transaction updated', 9, '2025-10-28 23:00:56'),
+(216, 65, '58187', 'Updated', 'Transaction updated', 9, '2025-10-28 23:04:46'),
+(217, 65, '58187', 'Updated', 'Transaction updated', 9, '2025-10-28 23:04:59'),
+(218, 65, '58187', 'SMS Sent', 'Status changed: \'In Progress\' → \'Completed\'. Notification sent to +639165217083', 9, '2025-10-28 23:05:00'),
+(219, 47, 'TX-1004', 'Updated', 'Transaction updated', 9, '2025-10-28 23:06:41'),
+(220, 45, 'TX-1002', 'Updated', 'Transaction updated', 9, '2025-10-28 23:06:50'),
+(221, 44, 'TX-1001', 'Updated', 'Transaction updated', 9, '2025-10-28 23:07:30'),
+(222, 45, 'TX-1002', 'Updated', 'Transaction updated', 9, '2025-10-28 23:07:54'),
+(223, 47, 'TX-1004', 'Updated', 'Transaction updated', 9, '2025-10-28 23:08:05'),
+(224, 48, 'TX-1005', 'Updated', 'Transaction updated', 9, '2025-10-28 23:08:13'),
+(225, 65, '58187', 'Papers Received', 'Papers received by client', 9, '2025-10-28 23:16:32'),
+(226, 65, '58187', 'SMS Sent', 'Papers received confirmation sent to +639165217083', 9, '2025-10-28 23:16:32');
 
 -- --------------------------------------------------------
 
@@ -1575,7 +1589,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=164;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=166;
 
 --
 -- AUTO_INCREMENT for table `admin_certification`
@@ -1677,7 +1691,7 @@ ALTER TABLE `p_info`
 -- AUTO_INCREMENT for table `received_papers`
 --
 ALTER TABLE `received_papers`
-  MODIFY `received_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `received_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT for table `region`
@@ -1719,7 +1733,7 @@ ALTER TABLE `transaction_files`
 -- AUTO_INCREMENT for table `transaction_logs`
 --
 ALTER TABLE `transaction_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=215;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=227;
 
 --
 -- AUTO_INCREMENT for table `users`
