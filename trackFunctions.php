@@ -111,6 +111,87 @@ function cleanupEmptyFolder($transaction_id)
     }
 }
 
+/**
+ * Send SMS via Semaphore API
+ * @param string $to Contact number (with country code)
+ * @param string $message SMS content
+ * @return array Response with success status and message
+ */
+function sendSMS($to, $message)
+{
+    // Replace with your actual Semaphore API key
+    $apiKey = '456224d30663f11db6811f48e7924c3b';
+
+    // Validate inputs
+    if (empty($to) || empty($message)) {
+        error_log("SMS send failed: Missing recipient or message");
+        return ['success' => false, 'message' => 'Missing recipient or message'];
+    }
+
+    // Format phone number (remove spaces and special characters)
+    $to = preg_replace('/[^0-9+]/', '', $to);
+
+    // Prepare API request
+    $data = [
+        'apikey' => $apiKey,
+        'number' => $to,
+        'message' => $message,
+        'sendername' => 'TrackERPTS' // Optional: customize sender name (max 11 chars)
+    ];
+
+    $ch = curl_init('https://api.semaphore.co/api/v4/messages');
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $err = curl_error($ch);
+    curl_close($ch);
+
+    // Handle cURL errors
+    if ($err) {
+        error_log("SMS cURL error: $err");
+        return ['success' => false, 'message' => 'Network error: ' . $err];
+    }
+
+    // Parse response
+    $result = json_decode($response, true);
+    
+    // Check for successful send
+    if ($httpCode === 200 && isset($result[0]['message_id'])) {
+        error_log("SMS sent successfully to $to. Message ID: " . $result[0]['message_id']);
+        return ['success' => true, 'message' => 'SMS sent successfully', 'data' => $result];
+    } else {
+        $errorMsg = $result['message'] ?? 'Unknown error';
+        error_log("SMS send failed: $errorMsg (HTTP $httpCode)");
+        return ['success' => false, 'message' => $errorMsg];
+    }
+}
+
+/**
+ * Format SMS message with formal structure
+ * @param string $transactionCode Transaction code
+ * @param string $clientName Client's name
+ * @param string $description Transaction description
+ * @return string Formatted SMS message
+ */
+function formatSMSMessage($transactionCode, $clientName, $description)
+{
+    // Create formal message structure
+    $message = "Dear " . ucwords(strtolower($clientName)) . ",\n\n";
+    $message .= $description . "\n\n";
+    $message .= "- ERPTS Team\n";;
+
+    // Ensure message stays within SMS limit (160 chars for single SMS, 1530 for concatenated)
+    if (strlen($message) > 1530) {
+        $message = substr($message, 0, 1527) . '...';
+    }
+
+    return $message;
+}
+
 // ---------- GET ALL ---------- 
 if (isset($_GET['action']) && $_GET['action'] === 'getTransactions') {
     $sql = "SELECT transaction_id, transaction_code, name, contact_number, description, 
@@ -207,34 +288,6 @@ function handleMultipleUploads($transaction_id, $fieldName = 't_file')
     }
 }
 
-
-/*
-function sendSMS($to, $message)
-{
-    $apiKey = '';
-
-    $data = [
-        'apikey' => $apiKey,
-        'number' => $to,
-        'message' => $message
-    ];
-
-    $ch = curl_init('https://api.semaphore.co/api/v4/messages');
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-    $response = curl_exec($ch);
-    $err = curl_error($ch);
-    curl_close($ch);
-
-    if ($err) {
-        error_log("SMS send error: $err");
-        return false;
-    }
-
-    return $response; // Returns API response
-}*/
-
 // ---------- POST actions ----------
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
@@ -294,6 +347,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
                 logActivity($transaction_id, "Created", "Transaction created", $_SESSION['user_id'], $transaction_code);
 
+                // Send SMS notification for new transaction
+                if (!empty($contact) && !empty($description)) {
+                    $formalMessage = formatSMSMessage($transaction_code, $name, $description);
+                    $smsResult = sendSMS($contact, $formalMessage);
+                    
+                    // Log SMS activity
+                    if ($smsResult['success']) {
+                        logActivity($transaction_id, "SMS Sent", "Notification sent to " . $contact, $_SESSION['user_id'], $transaction_code);
+                    } else {
+                        error_log("Failed to send SMS for transaction $transaction_code: " . $smsResult['message']);
+                    }
+                }
+
                 echo json_encode([
                     "success" => true,
                     "message" => "Transaction saved successfully!",
@@ -329,10 +395,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if ($stmt->execute()) {
                 handleMultipleUploads($transaction_id);
                 logActivity($transaction_id, "Updated", "Transaction updated", $_SESSION['user_id'], $transaction_code);
-                /* SEND SMS via Semaphore
+                
+                // Send SMS notification
                 if (!empty($contact) && !empty($description)) {
-                    sendSMS($contact, $description);
-                }*/
+                    $formalMessage = formatSMSMessage($transaction_code, $name, $description);
+                    $smsResult = sendSMS($contact, $formalMessage);
+                    
+                    // Log SMS activity
+                    if ($smsResult['success']) {
+                        logActivity($transaction_id, "SMS Sent", "Notification sent to " . $contact, $_SESSION['user_id'], $transaction_code);
+                    } else {
+                        error_log("Failed to send SMS for transaction $transaction_code: " . $smsResult['message']);
+                    }
+                }
 
                 echo json_encode(["success" => true, "message" => "Transaction updated successfully!"]);
             } else {
@@ -341,7 +416,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             exit;
         }
 
-        // ------------------ DELETE DOCUMENT ------------------
         // ------------------ DELETE DOCUMENT ------------------
         elseif ($action === 'deleteDocument') {
             $file_id = intval($_POST['file_id'] ?? 0);
@@ -374,7 +448,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 echo json_encode(["success" => false, "message" => "File not found"]);
             }
             exit;
-        } elseif ($action === 'deleteTransaction') {
+        } 
+        
+        // ------------------ DELETE TRANSACTION ------------------
+        elseif ($action === 'deleteTransaction') {
             $transaction_id = isset($_POST['transaction_id']) ? (int) $_POST['transaction_id'] : 0;
 
             if ($transaction_id > 0) {
