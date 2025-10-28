@@ -144,7 +144,7 @@ function sendSMS($to, $message)
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
     curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-    
+
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $err = curl_error($ch);
@@ -158,7 +158,7 @@ function sendSMS($to, $message)
 
     // Parse response
     $result = json_decode($response, true);
-    
+
     // Check for successful send
     if ($httpCode === 200 && isset($result[0]['message_id'])) {
         error_log("SMS sent successfully to $to. Message ID: " . $result[0]['message_id']);
@@ -182,7 +182,8 @@ function formatSMSMessage($transactionCode, $clientName, $description)
     // Create formal message structure
     $message = "Dear " . ucwords(strtolower($clientName)) . ",\n\n";
     $message .= $description . "\n\n";
-    $message .= "- ERPTS Team\n";;
+    $message .= "- ERPTS Team\n";
+    ;
 
     // Ensure message stays within SMS limit (160 chars for single SMS, 1530 for concatenated)
     if (strlen($message) > 1530) {
@@ -351,7 +352,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 if (!empty($contact) && !empty($description)) {
                     $formalMessage = formatSMSMessage($transaction_code, $name, $description);
                     $smsResult = sendSMS($contact, $formalMessage);
-                    
+
                     // Log SMS activity
                     if ($smsResult['success']) {
                         logActivity($transaction_id, "SMS Sent", "Notification sent to " . $contact, $_SESSION['user_id'], $transaction_code);
@@ -395,15 +396,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if ($stmt->execute()) {
                 handleMultipleUploads($transaction_id);
                 logActivity($transaction_id, "Updated", "Transaction updated", $_SESSION['user_id'], $transaction_code);
-                
-                // Send SMS notification
-                if (!empty($contact) && !empty($description)) {
+
+                // 🔹 Only send SMS if status changed
+                $oldDataStmt = $conn->prepare("SELECT status FROM transactions WHERE transaction_id = ?");
+                $oldDataStmt->bind_param("i", $transaction_id);
+                $oldDataStmt->execute();
+                $oldRow = $oldDataStmt->get_result()->fetch_assoc();
+                $oldStatus = $oldRow['status'] ?? '';
+                $oldDataStmt->close();
+
+                $hasStatusChanged = ($oldStatus !== $status);
+
+                if ($hasStatusChanged && !empty($contact) && !empty($description)) {
                     $formalMessage = formatSMSMessage($transaction_code, $name, $description);
                     $smsResult = sendSMS($contact, $formalMessage);
-                    
-                    // Log SMS activity
+
                     if ($smsResult['success']) {
-                        logActivity($transaction_id, "SMS Sent", "Notification sent to " . $contact, $_SESSION['user_id'], $transaction_code);
+                        logActivity($transaction_id, "SMS Sent", "Status changed: '$oldStatus' → '$status'. Notification sent to " . $contact, $_SESSION['user_id'], $transaction_code);
                     } else {
                         error_log("Failed to send SMS for transaction $transaction_code: " . $smsResult['message']);
                     }
@@ -448,8 +457,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 echo json_encode(["success" => false, "message" => "File not found"]);
             }
             exit;
-        } 
-        
+        }
+
         // ------------------ DELETE TRANSACTION ------------------
         elseif ($action === 'deleteTransaction') {
             $transaction_id = isset($_POST['transaction_id']) ? (int) $_POST['transaction_id'] : 0;
