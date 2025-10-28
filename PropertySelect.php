@@ -31,7 +31,7 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="header.css">
-  <link rel="stylesheet" href="Admin-Page-2.css">
+  <link rel="stylesheet" href="propertyselect.css">
   <title>Electronic Real Property Tax System</title>
 </head>
 
@@ -39,40 +39,50 @@ header("Pragma: no-cache"); // Older cache control header for HTTP/1.0 compatibi
   <!-- Header Navigation -->
   <?php include 'header.php'; ?>
 
-<!-- Main Content -->
+ <!-- Main Content -->
 <main class="container my-5 d-flex justify-content-center align-items-center flex-column">
-  <section class="w-100" style="max-width: 1100px;">
-    <div class="status-container mb-4 text-center">
-      <h5 class="text-muted" style="font-size: 1.25rem;">Server Status: 
-        <span class="text-success font-weight-bold">Online</span>
-      </h5>
-      <h3 class="text-secondary" style="font-size: 2rem;">Admin</h3>
-    </div>
+  <section class="w-100" style="max-width: 900px;">
 
-    <div class="row justify-content-center">
-      <div class="col-md-4 mb-4">
-        <a href="Property.php" class="text-decoration-none">
-          <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
-            <div class="card-body d-flex align-items-center justify-content-center">
-              <i class="fas fa-map mr-4" style="font-size: 2rem;"></i>
-              <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">Land</h5>
-            </div>
-          </div>
-        </a>
+          <!-- Server Status -->
+      <div class="status-container mb-4 text-center">
+        <div class="status-badge visible-status">
+          <span class="status-dot"></span>
+          <span class="status-text">Server Status:</span>
+          <strong class="status-online">Online</strong>
+        </div>
+        <h3 class="hero-title">Property</h3>
+
+        <!-- Back Button below title -->
+        <div class="mt-3">
+          <a href="Home.php" class="back-btn-inline">
+            <i class="fas fa-arrow-left me-1"></i>Back
+          </a>
+        </div>
       </div>
-      <div class="col-md-4 mb-4">
-        <a href="Certification.php" class="text-decoration-none">
-          <div class="feature-card bg-light text-dark rounded-lg shadow-sm p-5 h-100">
-            <div class="card-body d-flex align-items-center justify-content-center">
-              <i class="fas fa-certificate mr-4" style="font-size: 2rem;"></i>
-              <h5 class="font-weight-bold mb-0" style="font-size: 1.5rem;">Certification</h5>
-            </div>
+
+    <!-- Cards -->
+    <div class="cards-grid">
+      <a href="Property.php" class="feature-card text-decoration-none">
+        <div class="card-content">
+          <div class="icon-wrapper">
+            <i class="fas fa-map"></i>
           </div>
-        </a>
-      </div>
+          <h5 class="card-title">Land</h5>
+        </div>
+      </a>
+
+      <a href="Certification.php" class="feature-card text-decoration-none">
+        <div class="card-content">
+          <div class="icon-wrapper">
+            <i class="fas fa-certificate"></i>
+          </div>
+          <h5 class="card-title">Certification</h5>
+        </div>
+      </a>
     </div>
   </section>
 </main>
+
 
 
 
