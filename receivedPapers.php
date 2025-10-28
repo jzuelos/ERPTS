@@ -91,18 +91,26 @@ try {
     $transaction_id = intval($_POST['transaction_id'] ?? 0);
     $notes = trim($_POST['notes'] ?? '');
 
+    error_log("DEBUG: Received POST - transaction_id={$transaction_id}, notes={$notes}");
+
     if ($transaction_id <= 0) {
         throw new Exception("Invalid transaction ID");
     }
 
     $conn->begin_transaction();
+    error_log("DEBUG: Transaction started");
 
     // Get transaction details
     $stmt = $conn->prepare("SELECT transaction_code, name, contact_number, transaction_type, status FROM transactions WHERE transaction_id = ?");
+    if (!$stmt) {
+        throw new Exception("Prepare failed (get transaction): " . $conn->error);
+    }
     $stmt->bind_param("i", $transaction_id);
     $stmt->execute();
     $transaction = $stmt->get_result()->fetch_assoc();
     $stmt->close();
+
+    error_log("DEBUG: Transaction fetched: " . json_encode($transaction));
 
     if (!$transaction) {
         throw new Exception("Transaction not found");
@@ -112,16 +120,46 @@ try {
         throw new Exception("Only completed transactions can be confirmed for receipt");
     }
 
-    // Check if already received
-    $checkStmt = $conn->prepare("SELECT received_id FROM received_papers WHERE transaction_id = ?");
-    $checkStmt->bind_param("i", $transaction_id);
+    // Check if already received (based on transaction_code instead of ID)
+    $checkStmt = $conn->prepare("SELECT received_id FROM received_papers WHERE transaction_code = ?");
+    if (!$checkStmt) {
+        throw new Exception("Prepare failed (check received): " . $conn->error);
+    }
+    $checkStmt->bind_param("s", $transaction['transaction_code']);
     $checkStmt->execute();
     $existing = $checkStmt->get_result()->fetch_assoc();
     $checkStmt->close();
 
+    error_log("DEBUG: Existing received entry check result: " . json_encode($existing));
+
     if ($existing) {
-        throw new Exception("Papers already received for this transaction");
+        throw new Exception("Papers already received for this transaction code");
     }
+
+    // Get user info
+    $user_id = intval($_SESSION['user_id']);
+    error_log("DEBUG: Logged in user_id={$user_id}");
+
+    $stmtUser = $conn->prepare("SELECT first_name, middle_name, last_name FROM users WHERE user_id = ? LIMIT 1");
+    if (!$stmtUser) {
+        throw new Exception("Prepare failed (get user): " . $conn->error);
+    }
+    $stmtUser->bind_param("i", $user_id);
+    $stmtUser->execute();
+    $userRow = $stmtUser->get_result()->fetch_assoc();
+    $stmtUser->close();
+
+    error_log("DEBUG: User fetched: " . json_encode($userRow));
+
+    if (!$userRow) {
+        throw new Exception("User not found");
+    }
+
+    // Concatenate name
+    $received_by = trim($userRow['first_name'] .
+        ' ' . ($userRow['middle_name'] ? substr($userRow['middle_name'], 0, 1) . '. ' : '') .
+        $userRow['last_name']);
+    error_log("DEBUG: Received by name = {$received_by}");
 
     // Insert into received_papers
     $insertStmt = $conn->prepare("
@@ -129,30 +167,9 @@ try {
         (transaction_id, transaction_code, client_name, contact_number, transaction_type, received_by, notes, status, received_date)
         VALUES (?, ?, ?, ?, ?, ?, ?, 'received', NOW())
     ");
-    $user_id = intval($_SESSION['user_id']);
-
-    // Get user full name
-    $stmtUser = $conn->prepare("SELECT first_name, middle_name, last_name FROM users WHERE user_id = ? LIMIT 1");
-    $stmtUser->bind_param("i", $user_id);
-    $stmtUser->execute();
-    $userRow = $stmtUser->get_result()->fetch_assoc();
-    $stmtUser->close();
-
-    if (!$userRow) {
-        throw new Exception("User not found");
+    if (!$insertStmt) {
+        throw new Exception("Prepare failed (insert received_papers): " . $conn->error);
     }
-
-    // Concatenate name: First M. Last
-    $received_by = trim($userRow['first_name'] .
-        ' ' . ($userRow['middle_name'] ? substr($userRow['middle_name'], 0, 1) . '. ' : '') .
-        $userRow['last_name']);
-
-    // Insert into received_papers with name instead of ID
-    $insertStmt = $conn->prepare("
-    INSERT INTO received_papers 
-    (transaction_id, transaction_code, client_name, contact_number, transaction_type, received_by, notes, status, received_date)
-    VALUES (?, ?, ?, ?, ?, ?, ?, 'received', NOW())
-");
     $insertStmt->bind_param(
         "issssss",
         $transaction_id,
@@ -168,15 +185,23 @@ try {
     }
     $insertStmt->close();
 
-    // Delete the original transaction (cascades to transaction_files)
+    error_log("DEBUG: Inserted into received_papers successfully for code " . $transaction['transaction_code']);
+
+    // Delete the original transaction
     $deleteStmt = $conn->prepare("DELETE FROM transactions WHERE transaction_id = ?");
+    if (!$deleteStmt) {
+        throw new Exception("Prepare failed (delete transaction): " . $conn->error);
+    }
     $deleteStmt->bind_param("i", $transaction_id);
     if (!$deleteStmt->execute()) {
         throw new Exception("Error deleting original transaction: " . $deleteStmt->error);
     }
     $deleteStmt->close();
 
+    error_log("DEBUG: Deleted transaction_id={$transaction_id}");
+
     $conn->commit();
+    error_log("DEBUG: Transaction committed successfully");
 
     // Delete uploads folder
     deleteTransactionFolder($transaction_id);
@@ -184,6 +209,7 @@ try {
     // Log activity
     $details = "Papers received by client" . ($notes ? " - Notes: " . $notes : "");
     logActivity($transaction_id, "Papers Received", $details, $user_id, $transaction['transaction_code']);
+    error_log("DEBUG: Activity logged for transaction_code=" . $transaction['transaction_code']);
 
     echo json_encode([
         "success" => true,
@@ -193,11 +219,13 @@ try {
 
 } catch (Exception $e) {
     $conn->rollback();
+    error_log("ERROR: " . $e->getMessage());
     echo json_encode([
         "success" => false,
         "message" => $e->getMessage()
     ]);
 }
+
 
 $conn->close();
 ?>
