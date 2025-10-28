@@ -535,16 +535,37 @@
          console.warn('[Filters] reset button not found (#resetFilterBtn).');
        }
 
-       // Print button behaviour (just window.print here)
+       // Print button behaviour - pass date filters and log type
        if (printBtn) {
          printBtn.addEventListener('click', (e) => {
            e.preventDefault();
            console.log('[Filters] Print clicked — opening print view...');
-           window.open('printlogs.php', '_blank'); // open in new tab
+
+           // Get current filter values
+           const startDateInput = document.querySelector('input[name="start_date"]');
+           const endDateInput = document.querySelector('input[name="end_date"]');
+           const startDate = startDateInput ? startDateInput.value : '';
+           const endDate = endDateInput ? endDateInput.value : '';
+
+           // Determine which log type is currently visible
+           const activityLogsDiv = document.getElementById('activitylogs');
+           const loginLogsDiv = document.getElementById('loginlogs');
+           const logType = loginLogsDiv && !loginLogsDiv.classList.contains('d-none') ? 'login' : 'activity';
+
+           // Build URL with parameters
+           let printUrl = 'printlogs.php?';
+           const params = [];
+
+           if (startDate) params.push(`start_date=${encodeURIComponent(startDate)}`);
+           if (endDate) params.push(`end_date=${encodeURIComponent(endDate)}`);
+           params.push(`log_type=${logType}`);
+
+           printUrl += params.join('&');
+
+           console.log('[Filters] Opening print URL:', printUrl);
+           window.open(printUrl, '_blank');
          });
        }
-
-
 
        // On initial load evaluate URL / session to decide print state
        evaluatePrintStateFromURLAndInputs();
