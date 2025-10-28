@@ -23,6 +23,98 @@ if ($conn->connect_error) {
 }
 
 /**
+ * Send SMS via Semaphore API
+ * @param string $to Contact number (with country code)
+ * @param string $message SMS content
+ * @return array Response with success status and message
+ */
+function sendSMS($to, $message)
+{
+    // Replace with your actual Semaphore API key
+    $apiKey = '456224d30663f11db6811f48e7924c3b';
+
+    // Validate inputs
+    if (empty($to) || empty($message)) {
+        error_log("SMS send failed: Missing recipient or message");
+        return ['success' => false, 'message' => 'Missing recipient or message'];
+    }
+
+    // Format phone number (remove spaces and special characters)
+    $to = preg_replace('/[^0-9+]/', '', $to);
+
+    // Prepare API request
+    $data = [
+        'apikey' => $apiKey,
+        'number' => $to,
+        'message' => $message,
+        'sendername' => 'TrackERPTS' // Optional: customize sender name (max 11 chars)
+    ];
+
+    $ch = curl_init('https://api.semaphore.co/api/v4/messages');
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $err = curl_error($ch);
+    curl_close($ch);
+
+    // Handle cURL errors
+    if ($err) {
+        error_log("SMS cURL error: $err");
+        return ['success' => false, 'message' => 'Network error: ' . $err];
+    }
+
+    // Parse response
+    $result = json_decode($response, true);
+
+    // Check for successful send
+    if ($httpCode === 200 && isset($result[0]['message_id'])) {
+        error_log("SMS sent successfully to $to. Message ID: " . $result[0]['message_id']);
+        return ['success' => true, 'message' => 'SMS sent successfully', 'data' => $result];
+    } else {
+        $errorMsg = $result['message'] ?? 'Unknown error';
+        error_log("SMS send failed: $errorMsg (HTTP $httpCode)");
+        return ['success' => false, 'message' => $errorMsg];
+    }
+}
+
+/**
+ * Format SMS message for received papers
+ * @param string $transactionCode Transaction code
+ * @param string $clientName Client's name
+ * @param string $transactionType Transaction type
+ * @return string Formatted SMS message
+ */
+function formatReceivedPapersSMS($transactionCode, $clientName, $transactionType)
+{
+    // Shortened transaction type names for SMS
+    $typeAbbrev = [
+        'Simple Transfer of Ownership' => 'Transfer of Ownership',
+        'New Declaration of Real Property' => 'New Property Declaration',
+        'Revision/Correction' => 'Property Revision',
+        'Consolidation' => 'Property Consolidation'
+    ];
+
+    $shortType = $typeAbbrev[$transactionType] ?? $transactionType;
+    
+    $message = "Dear " . ucwords(strtolower($clientName)) . ",\n\n";
+    $message .= "Your {$shortType} #{$transactionCode} papers have been successfully received. ";
+    $message .= "Thank you for your transaction.\n\n";
+    $message .= "For more info. visit https://erptstrack.erpts.online\n\n";
+    $message .= "- ERPTS Team";
+
+    // Ensure message stays within SMS limit
+    if (strlen($message) > 1530) {
+        $message = substr($message, 0, 1527) . '...';
+    }
+
+    return $message;
+}
+
+/**
  * Log activity helper function
  */
 function logActivity($transaction_id, $action, $details = null, $user_id = null, $transaction_code = null)
@@ -210,6 +302,32 @@ try {
     $details = "Papers received by client" . ($notes ? " - Notes: " . $notes : "");
     logActivity($transaction_id, "Papers Received", $details, $user_id, $transaction['transaction_code']);
     error_log("DEBUG: Activity logged for transaction_code=" . $transaction['transaction_code']);
+
+    // 🔹 Send SMS notification to client
+    if (!empty($transaction['contact_number'])) {
+        $smsMessage = formatReceivedPapersSMS(
+            $transaction['transaction_code'],
+            $transaction['name'],
+            $transaction['transaction_type']
+        );
+        
+        $smsResult = sendSMS($transaction['contact_number'], $smsMessage);
+        
+        if ($smsResult['success']) {
+            error_log("SMS sent successfully for received papers: " . $transaction['transaction_code']);
+            // Log SMS activity
+            logActivity(
+                $transaction_id, 
+                "SMS Sent", 
+                "Papers received confirmation sent to " . $transaction['contact_number'], 
+                $user_id, 
+                $transaction['transaction_code']
+            );
+        } else {
+            error_log("Failed to send SMS for received papers: " . $smsResult['message']);
+            // Don't fail the entire operation if SMS fails
+        }
+    }
 
     echo json_encode([
         "success" => true,
