@@ -1,6 +1,7 @@
-// Eyecandy password toggle + Countdown that updates the existing error <p> element
 document.addEventListener("DOMContentLoaded", () => {
-  // ---------- Password toggle ----------
+  // ========================================
+  // PASSWORD TOGGLE
+  // ========================================
   const passwordField = document.getElementById('password');
   const togglePasswordButton = document.getElementById('togglePassword');
   const eyeIcon = document.getElementById('eyeIcon');
@@ -9,49 +10,129 @@ document.addEventListener("DOMContentLoaded", () => {
     togglePasswordButton.addEventListener('click', () => {
       const isPassword = passwordField.type === 'password';
       passwordField.type = isPassword ? 'text' : 'password';
-
-      // toggle icons cleanly
       eyeIcon.classList.toggle('fa-eye');
       eyeIcon.classList.toggle('fa-eye-slash');
     });
   }
 
-  // ---------- Countdown (reuse existing error paragraph) ----------
   const username = document.getElementById("username");
   const password = document.getElementById("password");
-  const submitBtn = document.querySelector("button[type='submit']");
-  const loginCard = document.querySelector(".login-card");
+  const submitBtn = document.getElementById("loginBtn");
+  const loginForm = document.getElementById("loginForm");
+  const errorAlert = document.getElementById("errorAlert");
 
-  // Select the existing error paragraph that uses inline red style in the original design
-  const errorP = loginCard ? loginCard.querySelector("p[style*='color: red']") : null;
-
-  // Proceed only if lockExpires was injected by PHP, lock active, and we have the error paragraph
-  if (typeof lockExpires !== "undefined" && lockExpires > Date.now() && loginCard && errorP) {
-    let remaining = Math.floor((lockExpires - Date.now()) / 1000);
-
+  // ========================================
+  // PERMANENT LOCK
+  // ========================================
+  if (typeof isPermanentLock !== "undefined" && isPermanentLock) {
     if (username) username.disabled = true;
     if (password) password.disabled = true;
     if (submitBtn) submitBtn.disabled = true;
 
-    const format = (secs) => {
-      const mm = Math.floor(secs / 60).toString().padStart(2, '0');
-      const ss = (secs % 60).toString().padStart(2, '0');
-      return `${mm}:${ss}`;
+    if (errorAlert) {
+      errorAlert.style.backgroundColor = '#dc3545';
+      errorAlert.style.color = '#fff';
+      errorAlert.style.border = '3px solid #bd2130';
+      errorAlert.style.fontWeight = 'bold';
+      errorAlert.style.padding = '20px';
+    }
+    return;
+  }
+
+  // ========================================
+  // TEMPORARY LOCK COUNTDOWN
+  // ========================================
+  if (typeof remainingSeconds !== "undefined" && remainingSeconds > 0) {
+    let remaining = remainingSeconds;
+
+    // Disable form
+    if (username) username.disabled = true;
+    if (password) password.disabled = true;
+    if (submitBtn) submitBtn.disabled = true;
+
+    // Simple countdown format
+    const formatTime = (seconds) => {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
-    // Update the existing red error paragraph with countdown (preserve its red style)
-    const tick = () => {
-      // Replace the original message with countdown + short text
-      errorP.textContent = `Too many failed attempts. Wait ${format(remaining)} to try again.`;
+    // Update every second
+    const updateCountdown = () => {
+      if (errorAlert) {
+        errorAlert.innerHTML = `
+          <i class="fas fa-clock"></i> 
+          <strong>Account Locked</strong><br>
+          Time remaining: <strong>${formatTime(remaining)}</strong><br>
+          <small>Please wait before trying again</small>
+        `;
+      }
+
       remaining--;
+
       if (remaining < 0) {
-        clearInterval(intervalId);
-        // Reload to let server reset attempts and re-enable inputs
+        clearInterval(countdownInterval);
         location.reload();
       }
     };
 
-    tick();
-    const intervalId = setInterval(tick, 1000);
+    updateCountdown();
+    const countdownInterval = setInterval(updateCountdown, 1000);
+
+    if (errorAlert) {
+      errorAlert.style.backgroundColor = '#fff3cd';
+      errorAlert.style.color = '#856404';
+      errorAlert.style.border = '2px solid #ffc107';
+      errorAlert.style.fontWeight = 'bold';
+      errorAlert.style.padding = '20px';
+    }
+  }
+
+  // ========================================
+  // CAPS LOCK WARNING
+  // ========================================
+  if (password) {
+    const capsWarning = document.createElement('small');
+    capsWarning.className = 'text-warning';
+    capsWarning.style.display = 'none';
+    capsWarning.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Caps Lock is ON';
+    password.parentElement.appendChild(capsWarning);
+
+    password.addEventListener('keyup', (e) => {
+      const isCapsLock = e.getModifierState && e.getModifierState('CapsLock');
+      capsWarning.style.display = isCapsLock ? 'block' : 'none';
+    });
+  }
+
+  // ========================================
+  // AUTO-HIDE ERRORS (NON-LOCKOUT)
+  // ========================================
+  if (errorAlert && typeof remainingSeconds === "undefined" && typeof isPermanentLock === "undefined") {
+    setTimeout(() => {
+      errorAlert.style.transition = 'opacity 0.5s';
+      errorAlert.style.opacity = '0';
+      setTimeout(() => errorAlert.remove(), 500);
+    }, 5000);
+  }
+
+  // ========================================
+  // PREVENT MULTIPLE SUBMISSIONS
+  // ========================================
+  if (loginForm) {
+    let isSubmitting = false;
+    
+    loginForm.addEventListener('submit', (e) => {
+      if (isSubmitting) {
+        e.preventDefault();
+        return false;
+      }
+      
+      isSubmitting = true;
+      
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+      }
+    });
   }
 });
