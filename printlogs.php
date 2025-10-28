@@ -1,3 +1,73 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+  header("Location: index.php");
+  exit;
+}
+
+include 'database.php';
+$conn = Database::getInstance();
+
+// Get the current user's name for the footer
+$user_id = $_SESSION['user_id'];
+$stmt_user = $conn->prepare("SELECT CONCAT(first_name, ' ', last_name) AS fullname FROM users WHERE user_id = ?");
+$stmt_user->bind_param("i", $user_id);
+$stmt_user->execute();
+$current_user = $stmt_user->get_result()->fetch_assoc();
+$username = $current_user['fullname'] ?? 'Unknown User';
+
+// Get filter parameters from session or query string
+$start_date = $_GET['start_date'] ?? $_SESSION['print_start_date'] ?? '';
+$end_date = $_GET['end_date'] ?? $_SESSION['print_end_date'] ?? '';
+$log_type = $_GET['log_type'] ?? $_SESSION['print_log_type'] ?? 'activity';
+
+// Store in session for future use
+if (isset($_GET['start_date'])) $_SESSION['print_start_date'] = $start_date;
+if (isset($_GET['end_date'])) $_SESSION['print_end_date'] = $end_date;
+if (isset($_GET['log_type'])) $_SESSION['print_log_type'] = $log_type;
+
+// Build WHERE clause based on log type
+$where = [];
+$params = [];
+
+if ($start_date) {
+  $where[] = "DATE(a.log_time) >= ?";
+  $params[] = $start_date;
+}
+if ($end_date) {
+  $where[] = "DATE(a.log_time) <= ?";
+  $params[] = $end_date;
+}
+
+// Filter based on log type
+if ($log_type === 'login') {
+  $where[] = "(a.action LIKE 'User logged in%' OR a.action LIKE 'Failed login attempt%' OR a.action = 'Logged out of the system')";
+} else {
+  $where[] = "a.action NOT LIKE 'User logged in%' AND a.action NOT LIKE 'Failed login attempt%' AND a.action != 'Logged out of the system'";
+}
+
+$where_sql = $where ? "WHERE " . implode(" AND ", $where) : "";
+
+// Fetch all matching logs (no pagination for print)
+$sql = "SELECT a.log_id, a.action, a.log_time, 
+              CONCAT(u.first_name, ' ', u.last_name) AS fullname,
+              u.email, u.user_type, u.contact_number
+        FROM activity_log a
+        JOIN users u ON a.user_id = u.user_id
+        $where_sql
+        ORDER BY a.log_time DESC";
+
+$stmt = $conn->prepare($sql);
+if ($params) {
+  $stmt->bind_param(str_repeat("s", count($params)), ...$params);
+}
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Determine report title
+$report_title = $log_type === 'login' ? 'LOGIN/LOGOUT ACTIVITY LOG' : 'ACTIVITY LOG';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,8 +85,15 @@
     h1 {
       text-align: center;
       font-size: 20px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       line-height: 1.4;
+    }
+
+    .date-range {
+      text-align: center;
+      font-size: 13px;
+      margin-bottom: 20px;
+      font-weight: 600;
     }
 
     table {
@@ -37,10 +114,18 @@
     th {
       text-align: center;
       font-weight: 600;
+      background-color: #e8e8e8;
     }
 
     tr:nth-child(even) {
       background: #f9f9f9;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 20px;
+      font-style: italic;
+      color: #666;
     }
 
     /* Footer fixed at bottom right */
@@ -54,7 +139,7 @@
 
     @media print {
       @page {
-        size: A4 landscape; /* Horizontal layout */
+        size: A4 landscape;
         margin: 1cm;
       }
 
@@ -64,7 +149,7 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-       /* background: url('images/Seal.png') no-repeat center; */
+        /* background: url('images/Seal.png') no-repeat center; */
         background-size: 400px;
         opacity: 0.08;
         width: 100%;
@@ -80,53 +165,67 @@
       }
 
       thead {
-        display: table-header-group; /* Repeat header on each page */
+        display: table-header-group;
       }
     }
   </style>
 </head>
 
 <body>
-  <?php
-  // Dummy data for testing
-  date_default_timezone_set('Asia/Manila');
-  $username = "AdminUser";
-
-  $dummy_logs = [
-    ['username' => 'AdminUser', 'action' => 'Logged in to the system', 'timestamp' => '2025-10-26 09:30:12'],
-    ['username' => 'Clerk01', 'action' => 'Printed Property Report (Classification: Residential)', 'timestamp' => '2025-10-26 10:05:48'],
-    ['username' => 'Assessor', 'action' => 'Updated land record for parcel #CN-1023', 'timestamp' => '2025-10-26 11:22:09'],
-    ['username' => 'AdminUser', 'action' => 'Deleted duplicate tax declaration record', 'timestamp' => '2025-10-26 13:15:33'],
-    ['username' => 'Inspector', 'action' => 'Generated Valuation Report for Camarines Norte', 'timestamp' => '2025-10-26 14:45:01'],
-    ['username' => 'Clerk02', 'action' => 'Logged out', 'timestamp' => '2025-10-26 15:00:00'],
-  ];
-  ?>
-
   <h1>
     ELECTRONIC PROPERTY TAX SYSTEM <br>
-    <span style="font-size:17px;">ACTIVITY LOG</span>
+    <span style="font-size:17px;"><?= htmlspecialchars($report_title) ?></span>
   </h1>
+
+  <?php if ($start_date && $end_date): ?>
+    <div class="date-range">
+      Period: <?= date("F d, Y", strtotime($start_date)) ?> to <?= date("F d, Y", strtotime($end_date)) ?>
+    </div>
+  <?php elseif ($start_date): ?>
+    <div class="date-range">
+      From: <?= date("F d, Y", strtotime($start_date)) ?>
+    </div>
+  <?php elseif ($end_date): ?>
+    <div class="date-range">
+      Until: <?= date("F d, Y", strtotime($end_date)) ?>
+    </div>
+  <?php endif; ?>
 
   <table>
     <thead>
       <tr>
         <th style="width:5%;">#</th>
-        <th style="width:15%;">Username</th>
-        <th style="width:60%;">Action</th>
+        <th style="width:20%;">User</th>
+        <th style="width:15%;">Role</th>
+        <th style="width:40%;">Action</th>
         <th style="width:20%;">Date & Time</th>
       </tr>
     </thead>
     <tbody>
-      <?php $i = 1; foreach ($dummy_logs as $log): ?>
+      <?php 
+      if ($result->num_rows > 0):
+        $i = 1; 
+        while ($log = $result->fetch_assoc()): 
+      ?>
         <tr>
           <td style="text-align:center;"><?= $i++ ?></td>
-          <td><?= htmlspecialchars($log['username']) ?></td>
+          <td><?= htmlspecialchars($log['fullname']) ?></td>
+          <td><?= htmlspecialchars($log['user_type']) ?></td>
           <td><?= nl2br(htmlspecialchars($log['action'])) ?></td>
           <td style="text-align:center;">
-            <?= date("M d, Y h:i A", strtotime($log['timestamp'])) ?>
+            <?= date("M d, Y h:i A", strtotime($log['log_time'])) ?>
           </td>
         </tr>
-      <?php endforeach; ?>
+      <?php 
+        endwhile;
+      else:
+      ?>
+        <tr>
+          <td colspan="5" class="no-data">
+            No activity logs found for the selected date range.
+          </td>
+        </tr>
+      <?php endif; ?>
     </tbody>
   </table>
 
