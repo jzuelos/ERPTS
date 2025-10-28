@@ -1,92 +1,158 @@
 <?php
 session_start();
-
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 require_once 'database.php';
-
 $conn = Database::getInstance();
-if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
+
+// ========================================
+// SIMPLE SECURITY SETTINGS
+// ========================================
+define('MAX_ATTEMPTS', 3);        // Lock after 3 failed attempts
+define('LOCKOUT_MINUTES', 3);     // Lock for 3 minutes
+define('PERMANENT_ATTEMPTS', 6);  // Permanent lock after 6 attempts
+
+// ========================================
+// INITIALIZE SESSION VARIABLES
+// ========================================
+if (!isset($_SESSION['login_attempts'])) {
+    $_SESSION['login_attempts'] = 0;
+}
+if (!isset($_SESSION['lock_until'])) {
+    $_SESSION['lock_until'] = 0;
+}
+if (!isset($_SESSION['is_permanent_lock'])) {
+    $_SESSION['is_permanent_lock'] = false;
 }
 
-// ✅ Improved logActivity function that works even if user_id is NULL
-function logActivity($conn, $user_id, $action)
-{
-  if ($user_id === 0 || $user_id === null) {
-    // Logs for failed or unknown users
-    $stmtLog = $conn->prepare("INSERT INTO activity_log (action, log_time) VALUES (?, NOW())");
-    if ($stmtLog) {
-      $stmtLog->bind_param("s", $action);
-      $stmtLog->execute();
-      $stmtLog->close();
-    }
-  } else {
-    // Logs for valid users
-    $stmtLog = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
-    if ($stmtLog) {
-      $stmtLog->bind_param("is", $user_id, $action);
-      $stmtLog->execute();
-      $stmtLog->close();
-    }
-  }
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-  $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-
-  if (empty($username) || empty($password)) {
-    $_SESSION['error'] = "Failed login attempt <br>• Username or Password cannot be empty";
-    logActivity($conn, 0, "Failed login attempt \n• Error occurred (Empty Fields)");
-  } else {
-    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
-
-    if ($stmt) {
-      $stmt->bind_param("s", $username);
-      $stmt->execute();
-      $result = $stmt->get_result();
-
-      if ($result && $result->num_rows > 0) {
-        $user = $result->fetch_assoc();
-
-        if ($user['status'] == 1) {
-          if (password_verify($password, $user['password'])) {
-            // ✅ Successful login
-            $_SESSION['user_id'] = $user['user_id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['user_type'] = $user['user_type'];
-            $_SESSION['first_name'] = $user['first_name'];
-            $_SESSION['middle_name'] = $user['middle_name'];
-            $_SESSION['last_name'] = $user['last_name'];
-            $_SESSION['logged_in'] = true;
-
-            logActivity($conn, $user['user_id'], "User logged in to the system");
-
-            header("Location: Home.php");
-            exit();
-          } else {
-            // ❌ Incorrect password
-            $_SESSION['error'] = "Incorrect Password";
-            logActivity($conn, $user['user_id'], "Failed login attempt \n• Incorrect Password");
-          }
-        } else {
-          // ❌ Inactive account
-          $_SESSION['error'] = "Account is Inactive. Please contact the administrator.";
-          logActivity($conn, $user['user_id'], "Failed login attempt \n• Inactive Account");
-        }
-      } else {
-        // ❌ Username not found
-        $_SESSION['error'] = "Username does not exist";
-        logActivity($conn, 0, "Failed login attempt \n• Username '{$username}' does not exist in Database");
-      }
-      $stmt->close();
+// ========================================
+// HELPER FUNCTIONS
+// ========================================
+function logActivity($conn, $user_id, $action) {
+    $action = mysqli_real_escape_string($conn, $action);
+    if ($user_id === 0 || $user_id === null) {
+        $sql = "INSERT INTO activity_log (user_id, action, log_time) VALUES (NULL, '$action', NOW())";
     } else {
-      $_SESSION['error'] = "System Error.";
-      logActivity($conn, 0, "Failed login attempt \n• Error preparing statement: " . $conn->error);
+        $sql = "INSERT INTO activity_log (user_id, action, log_time) VALUES ($user_id, '$action', NOW())";
     }
-  }
+    $conn->query($sql);
+}
+
+function getClientIP() {
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        return $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        return $_SERVER['HTTP_X_FORWARDED_FOR'];
+    }
+    return $_SERVER['REMOTE_ADDR'];
+}
+
+// ========================================
+// CHECK LOCKOUT STATUS
+// ========================================
+$isLocked = false;
+$lockMessage = '';
+$remainingSeconds = 0;
+
+// Check permanent lock
+if ($_SESSION['is_permanent_lock']) {
+    $isLocked = true;
+    $lockMessage = "Account permanently locked. Contact administrator.";
+    $lockType = 'permanent';
+}
+// Check temporary lock
+elseif (time() < $_SESSION['lock_until']) {
+    $isLocked = true;
+    $remainingSeconds = $_SESSION['lock_until'] - time();
+    $remainingMinutes = ceil($remainingSeconds / 60);
+    $lockMessage = "Too many failed attempts. Try again in {$remainingMinutes} minute(s).";
+    $lockType = 'temporary';
+}
+// Lock expired - reset attempts
+elseif ($_SESSION['lock_until'] > 0 && time() >= $_SESSION['lock_until']) {
+    $_SESSION['login_attempts'] = 0;
+    $_SESSION['lock_until'] = 0;
+}
+
+// ========================================
+// HANDLE LOGIN
+// ========================================
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !$isLocked) {
+    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $clientIP = getClientIP();
+
+    if (empty($username) || empty($password)) {
+        $_SESSION['error'] = "Username and Password are required";
+        $_SESSION['login_attempts']++;
+    } else {
+        $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $user = $result->fetch_assoc();
+            
+            if ($user['status'] == 1) {
+                if (password_verify($password, $user['password'])) {
+                    // ✅ SUCCESS - Reset everything
+                    $_SESSION['login_attempts'] = 0;
+                    $_SESSION['lock_until'] = 0;
+                    $_SESSION['is_permanent_lock'] = false;
+                    
+                    $_SESSION['user_id'] = $user['user_id'];
+                    $_SESSION['username'] = $user['username'];
+                    $_SESSION['user_type'] = $user['user_type'];
+                    $_SESSION['first_name'] = $user['first_name'];
+                    $_SESSION['middle_name'] = $user['middle_name'];
+                    $_SESSION['last_name'] = $user['last_name'];
+                    $_SESSION['logged_in'] = true;
+
+                    logActivity($conn, $user['user_id'], "Logged in from IP: {$clientIP}");
+                    header("Location: Home.php");
+                    exit();
+                } else {
+                    // ❌ Wrong password
+                    $_SESSION['login_attempts']++;
+                    $remaining = MAX_ATTEMPTS - $_SESSION['login_attempts'];
+                    $_SESSION['error'] = "Incorrect password. {$remaining} attempt(s) remaining.";
+                    logActivity($conn, $user['user_id'], "Failed login from IP: {$clientIP} - Wrong password");
+                }
+            } else {
+                // ❌ Inactive account
+                $_SESSION['login_attempts']++;
+                $_SESSION['error'] = "Account is inactive. Contact administrator.";
+                logActivity($conn, $user['user_id'], "Failed login from IP: {$clientIP} - Inactive account");
+            }
+        } else {
+            // ❌ Username not found
+            $_SESSION['login_attempts']++;
+            $remaining = MAX_ATTEMPTS - $_SESSION['login_attempts'];
+            $_SESSION['error'] = "Username not found. {$remaining} attempt(s) remaining.";
+            logActivity($conn, 0, "Failed login from IP: {$clientIP} - Username '{$username}' not found");
+        }
+        $stmt->close();
+    }
+
+    // ========================================
+    // APPLY LOCKOUT IF NEEDED
+    // ========================================
+    if ($_SESSION['login_attempts'] >= PERMANENT_ATTEMPTS) {
+        // Permanent lock
+        $_SESSION['is_permanent_lock'] = true;
+        $_SESSION['error'] = "Account permanently locked. Contact administrator.";
+        logActivity($conn, 0, "Permanent lock activated from IP: {$clientIP}");
+    } elseif ($_SESSION['login_attempts'] >= MAX_ATTEMPTS) {
+        // Temporary lock
+        $_SESSION['lock_until'] = time() + (LOCKOUT_MINUTES * 60);
+        $_SESSION['error'] = "Too many failed attempts. Locked for " . LOCKOUT_MINUTES . " minutes.";
+        logActivity($conn, 0, "Temporary lock activated from IP: {$clientIP}");
+    }
+
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
 }
 
 $conn->close();
@@ -94,12 +160,10 @@ $conn->close();
 
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
-    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="index.css">
@@ -115,21 +179,23 @@ $conn->close();
         </div>
         <h2 class="text-center">LOG IN</h2>
 
-        <?php if (isset($_SESSION['error'])): ?>
-          <div class="alert alert-danger text-center fade show" role="alert" id="errorAlert">
-            <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+        <?php if (isset($_SESSION['error']) || $isLocked): ?>
+          <div class="alert alert-danger text-center" role="alert" id="errorAlert">
+            <?php echo $isLocked ? $lockMessage : $_SESSION['error']; ?>
           </div>
         <?php endif; ?>
 
-        <form method="POST">
+        <form method="POST" id="loginForm">
           <div class="form-group">
             <label for="username">Username</label>
-            <input type="text" id="username" name="username" class="form-control rounded-pill" required>
+            <input type="text" id="username" name="username" class="form-control rounded-pill" 
+                   <?php echo $isLocked ? 'disabled' : 'required'; ?>>
           </div>
           <div class="form-group">
             <label for="password">Password</label>
             <div class="position-relative">
-              <input type="password" id="password" name="password" class="form-control rounded-pill" required>
+              <input type="password" id="password" name="password" class="form-control rounded-pill" 
+                     <?php echo $isLocked ? 'disabled' : 'required'; ?>>
               <button type="button" id="togglePassword" class="btn btn-link"
                 style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #000000; cursor: pointer;">
                 <i class="fa fa-eye" id="eyeIcon"></i>
@@ -137,47 +203,41 @@ $conn->close();
             </div>
           </div>
           <a href="ResetPassword.php">Forgot Password?</a>
-          <button type="submit" class="btn btn-dark w-100 mt-4">Log In</button>
+          <button type="submit" class="btn btn-dark w-100 mt-4" id="loginBtn" 
+                  <?php echo $isLocked ? 'disabled' : ''; ?>>
+            Log In
+          </button>
         </form>
       </div>
 
       <div class="welcome-box">
         <h4 class="text-center mt-4">Welcome to ERPTS</h4>
-        <p>From the Assessor’s Module you can:</p>
+        <p>From the Assessor's Module you can:</p>
         <ul>
-          <li>Search for information in Owner’s Declaration (OD), Assessor’s Field Sheet/FAAS, Tax Declaration (TD), or RPTOP.</li>
+          <li>Search for information in Owner's Declaration (OD), Assessor's Field Sheet/FAAS, Tax Declaration (TD), or RPTOP.</li>
           <li>Encode new real property information.</li>
-        </ul>
-        <p>To begin:</p>
-        <ul>
-          <li>Encode Property Information in the OD</li>
-          <li>Select or encode Owner Information</li>
-          <li>Encode Real Property Information in the AFS/FAAS</li>
-          <li>Encode Tax-related Information in the TD</li>
-          <li>Generate the RPTOP</li>
         </ul>
       </div>
     </div>
   </div>
 
+  <?php if ($isLocked && $lockType === 'temporary'): ?>
+    <script>
+      const lockUntil = <?php echo $_SESSION['lock_until']; ?>;
+      const remainingSeconds = <?php echo $remainingSeconds; ?>;
+    </script>
+  <?php endif; ?>
+
+  <?php if ($isLocked && $lockType === 'permanent'): ?>
+    <script>
+      const isPermanentLock = true;
+    </script>
+  <?php endif; ?>
+
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/js/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"></script>
-  <script src="http://localhost/ERPTS/index.js"></script>
+  <script src="index.js"></script>
 
-  <script>
-    // ✅ Automatically hide error message after 4 seconds
-    document.addEventListener('DOMContentLoaded', function () {
-      const alertBox = document.getElementById('errorAlert');
-      if (alertBox) {
-        setTimeout(() => {
-          alertBox.classList.remove('show');
-          alertBox.classList.add('fade');
-          setTimeout(() => alertBox.remove(), 500); // Remove element after fade animation
-        }, 4000); // 4 seconds
-      }
-    });
-  </script>
+  <?php unset($_SESSION['error']); ?>
 </body>
-
 </html>
