@@ -5,6 +5,19 @@
   <meta charset="UTF-8">
   <title>Property Report</title>
   <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 12px;
+      margin: 1cm;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 22px;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
     .header {
       display: flex;
       justify-content: space-between;
@@ -26,45 +39,9 @@
       padding: 4px;
       text-align: center;
     }
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <title>Activity Log Report</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      font-size: 12px;
-      color: #000;
-      margin: 1cm;
-    }
-
-    h1 {
-      text-align: center;
-      font-size: 20px;
-      margin-bottom: 20px;
-      line-height: 1.4;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      font-size: 11.5px;
-    }
-
-    th,
-    td {
-      border: 1px solid #000;
-      padding: 6px;
-      text-align: left;
-      vertical-align: middle;
-    }
 
     th {
-      text-align: center;
-      background: #198754;
+      background: #686868ff;
       color: #fff;
       font-weight: 600;
     }
@@ -73,125 +50,18 @@
       background: #f9f9f9;
     }
 
-    /* Fixed footer for signature/date */
     .footer {
       position: fixed;
-      bottom: 15px;
-      right: 30px;
+      bottom: 20px;
+      right: 20px;
+      font-size: 14px;
       text-align: right;
-      font-size: 13px;
     }
-
-    @media print {
-      @page {
-        size: A4 portrait; /* Short bond paper orientation */
-        margin: 1cm;
-      }
-
-      body::before {
-        content: "";
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: url('images/Seal.png') no-repeat center;
-        background-size: 400px;
-        opacity: 0.08;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        pointer-events: none;
-      }
-
-      .footer {
-        position: fixed;
-        bottom: 1cm;
-        right: 1cm;
-        text-align: right;
-      }
-    }
-  </style>
-</head>
-
-<body>
-  <?php
-  session_start();
-  require_once "database.php";
-  $conn = Database::getInstance();
-  date_default_timezone_set('Asia/Manila');
-
-  // Get current user
-  $username = 'Guest';
-  if (isset($_SESSION['user_id'])) {
-    $uid = intval($_SESSION['user_id']);
-    $query = "SELECT username FROM users WHERE user_id = $uid LIMIT 1";
-    $result = $conn->query($query);
-    if ($result && $result->num_rows > 0) {
-      $username = $result->fetch_assoc()['username'];
-    }
-  }
-
-  // Fetch activity logs
-  $sql = "SELECT a.id, u.username, a.action, a.timestamp 
-          FROM activity_log a
-          LEFT JOIN users u ON a.user_id = u.user_id
-          ORDER BY a.timestamp DESC";
-  $result = $conn->query($sql);
-  ?>
-
-  <h1>
-    ELECTRONIC PROPERTY TAX SYSTEM <br>
-    <span style="font-size:17px;">ACTIVITY LOG</span>
-  </h1>
-
-  <table>
-    <thead>
-      <tr>
-        <th style="width:5%;">#</th>
-        <th style="width:20%;">Username</th>
-        <th style="width:55%;">Action</th>
-        <th style="width:20%;">Date & Time</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php if ($result && $result->num_rows > 0): ?>
-        <?php $i = 1; while ($row = $result->fetch_assoc()): ?>
-          <tr>
-            <td style="text-align:center;"><?= $i++ ?></td>
-            <td><?= htmlspecialchars($row['username'] ?? 'Unknown') ?></td>
-            <td><?= nl2br(htmlspecialchars($row['action'])) ?></td>
-            <td style="text-align:center;">
-              <?= date("M d, Y h:i A", strtotime($row['timestamp'])) ?>
-            </td>
-          </tr>
-        <?php endwhile; ?>
-      <?php else: ?>
-        <tr>
-          <td colspan="4" style="text-align:center;">No activity logs found.</td>
-        </tr>
-      <?php endif; ?>
-    </tbody>
-  </table>
-
-  <!-- Footer -->
-  <div class="footer">
-    <b>PRINTED BY:</b> <?= htmlspecialchars($username) ?><br>
-    <b>Date & Time:</b> <?= date("F d, Y h:i A") ?>
-  </div>
-
-  <script>
-    // Auto print on load
-    window.onload = () => {
-      setTimeout(() => window.print(), 500);
-    };
-  </script>
-</body>
-
-</html>
 
     @media print {
       @page {
         size: landscape;
+        margin: 1cm;
       }
 
       body::before {
@@ -207,6 +77,12 @@
         height: 100%;
         z-index: -1;
         pointer-events: none;
+      }
+
+      .footer {
+        position: fixed;
+        bottom: 1cm;
+        right: 1cm;
       }
     }
   </style>
@@ -265,7 +141,7 @@
     $stmt->close();
   }
 
-  // Base query - note that land.classification stores VARCHAR (text), not ID
+  // Base query
   $sql = "
   SELECT 
     r.pin AS property_index_no,
@@ -285,12 +161,10 @@
 
   // Apply filters if not printing all
   if (!$print_all) {
-    // Classification filter - land.classification is VARCHAR, so match against description
     if (!empty($classification) && !empty($classification_name)) {
       $sql .= " AND l.classification = '" . $conn->real_escape_string($classification_name) . "'";
     }
     
-    // Province filter - p_info.province stores VARCHAR (province name), not ID
     if (!empty($province)) {
       $stmt = $conn->prepare("SELECT province_name FROM province WHERE province_id = ?");
       $stmt->bind_param("i", $province);
@@ -302,7 +176,6 @@
       $stmt->close();
     }
     
-    // Municipality filter - p_info.city stores VARCHAR (municipality name), not ID
     if (!empty($municipality)) {
       $stmt = $conn->prepare("SELECT m_description FROM municipality WHERE m_id = ?");
       $stmt->bind_param("i", $municipality);
@@ -314,7 +187,6 @@
       $stmt->close();
     }
     
-    // District filter - p_info.district stores VARCHAR (district name), not ID
     if (!empty($district)) {
       $stmt = $conn->prepare("SELECT description FROM district WHERE district_id = ?");
       $stmt->bind_param("i", $district);
@@ -326,7 +198,6 @@
       $stmt->close();
     }
     
-    // Barangay filter - p_info.barangay stores VARCHAR (barangay name), not ID
     if (!empty($barangay)) {
       $stmt = $conn->prepare("SELECT brgy_name FROM brgy WHERE brgy_id = ?");
       $stmt->bind_param("i", $barangay);
@@ -348,11 +219,9 @@
 
   $result = $conn->query($sql);
 
-  // ACTIVITY LOGGING SECTION
+  // ACTIVITY LOGGING
   if ($user_id) {
-    // Helper function to get readable names
-    function getValue($conn, $table, $column, $id_column, $id)
-    {
+    function getValue($conn, $table, $column, $id_column, $id) {
       if (!$id) return null;
       $stmt = $conn->prepare("SELECT $column FROM $table WHERE $id_column = ?");
       $stmt->bind_param("i", $id);
@@ -363,14 +232,12 @@
       return $row[$column] ?? null;
     }
 
-    // Fetch readable values
     $classification_display = getValue($conn, "classification", "c_description", "c_id", $classification);
     $province_display       = getValue($conn, "province", "province_name", "province_id", $province);
     $municipality_display   = getValue($conn, "municipality", "m_description", "m_id", $municipality);
     $district_display       = getValue($conn, "district", "description", "district_id", $district);
     $barangay_display       = getValue($conn, "brgy", "brgy_name", "brgy_id", $barangay);
 
-    // Build readable activity message
     $activity = "Printed Property Report\n" .
       "• Classification: " . ($classification_display ?: 'All') . "\n" .
       "• Province: " . ($province_display ?: 'All') . "\n" .
@@ -379,7 +246,6 @@
       "• Barangay: " . ($barangay_display ?: 'All') . "\n" .
       "• Date Range: " . ($date_display ?: 'All');
 
-    // Insert into activity log
     $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action) VALUES (?, ?)");
     $stmt->bind_param("is", $user_id, $activity);
     $stmt->execute();
@@ -387,18 +253,18 @@
   }
   ?>
 
-  <h1 style="text-align:center; font-size:22px; margin-bottom:20px;">
+  <h1>
     PROVINCE OF CAMARINES NORTE <br>
     <span style="font-size:18px;">(PROVINCIAL ASSESSOR'S OFFICE)</span><br>
     <span style="font-size:15px;">(Property By: Classification <?= htmlspecialchars($classification_display ?? 'All') ?>)</span>
   </h1>
 
   <div class="header">
-    <span><b>Classification:</b> <?= htmlspecialchars($classification_display ?? '') ?></span>
-    <span><b>Province:</b> <?= htmlspecialchars($province_display ?? '') ?></span>
-    <span><b>Municipality/City:</b> <?= htmlspecialchars($municipality_display ?? '') ?></span>
-    <span><b>District:</b> <?= htmlspecialchars($district_display ?? '') ?></span>
-    <span><b>Barangay:</b> <?= htmlspecialchars($barangay_display ?? '') ?></span>
+    <span><b>Classification:</b> <?= htmlspecialchars($classification_display ?? 'All') ?></span>
+    <span><b>Province:</b> <?= htmlspecialchars($province_display ?? 'Camarines Norte') ?></span>
+    <span><b>Municipality/City:</b> <?= htmlspecialchars($municipality_display ?? 'All') ?></span>
+    <span><b>District:</b> <?= htmlspecialchars($district_display ?? 'All') ?></span>
+    <span><b>Barangay:</b> <?= htmlspecialchars($barangay_display ?? 'All') ?></span>
     <span><b>Date:</b> <?= $date_display ?: date("F d, Y") ?></span>
   </div>
 
@@ -428,8 +294,8 @@
             <td><?= htmlspecialchars($row['property_location']) ?></td>
             <td><?= htmlspecialchars($row['area']) ?></td>
             <td><?= htmlspecialchars($row['kind']) ?></td>
-            <td><?= htmlspecialchars($row['market_value']) ?></td>
-            <td><?= htmlspecialchars($row['assessed_value']) ?></td>
+            <td><?= number_format($row['market_value'], 2) ?></td>
+            <td><?= number_format($row['assessed_value'], 2) ?></td>
             <td></td>
           </tr>
         <?php endwhile; ?>
@@ -441,14 +307,14 @@
     </tbody>
   </table>
 
-  <div style="position:fixed; bottom:20px; right:20px; font-size:14px; text-align:right;">
+  <div class="footer">
     <b>PROCESSED BY:</b> <?= htmlspecialchars($username) ?><br>
     <b>Date & Time:</b> <?= date("F d, Y h:i A") ?>
   </div>
 
   <script>
     window.onload = function() {
-      window.print();
+      setTimeout(() => window.print(), 500);
     };
   </script>
 </body>
