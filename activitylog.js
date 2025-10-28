@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Handle expand/collapse for activity text
+  // Handle expand/collapse for MAIN activity text
   const toggleButtons = document.querySelectorAll('.toggle-btn');
   
   toggleButtons.forEach(function(btn) {
@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const id = this.getAttribute('data-id');
       const fullText = this.getAttribute('data-full-text');
       const activityDiv = document.getElementById('activity' + id);
+      const userDetailsDiv = document.getElementById('userdetails' + id);
       const parentRow = this.closest('tr');
       
       if (!activityDiv || !fullText) return;
@@ -45,6 +46,11 @@ document.addEventListener('DOMContentLoaded', function() {
         activityDiv.style.whiteSpace = 'nowrap';
         activityDiv.style.overflow = 'hidden';
         activityDiv.style.textOverflow = 'ellipsis';
+        
+        // Hide user details
+        if (userDetailsDiv) {
+          userDetailsDiv.classList.add('d-none');
+        }
         
         // Reset table cell styling
         parentRow.querySelectorAll('td').forEach(td => {
@@ -62,6 +68,11 @@ document.addEventListener('DOMContentLoaded', function() {
         activityDiv.style.overflow = 'visible';
         activityDiv.style.textOverflow = 'clip';
         
+        // Show user details
+        if (userDetailsDiv) {
+          userDetailsDiv.classList.remove('d-none');
+        }
+        
         // Adjust table cell styling for multiline content
         parentRow.querySelectorAll('td').forEach(td => {
           td.style.verticalAlign = 'top';
@@ -74,11 +85,118 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  // Make activity text clickable too
+  // Make MAIN activity text clickable
   document.querySelectorAll('.activity-text').forEach(function(text) {
-    text.addEventListener('click', function() {
-      const id = this.id.replace('activity', '');
+    // Only handle main activity logs (not login logs)
+    if (text.id.startsWith('activity') && !text.id.startsWith('activitylogin')) {
+      text.addEventListener('click', function() {
+        const id = this.id.replace('activity', '');
+        const toggleBtn = document.querySelector(`.toggle-btn[data-id="${id}"]`);
+        if (toggleBtn) {
+          toggleBtn.click();
+        }
+      });
+    }
+  });
+
+  // Make MAIN user names clickable
+  document.querySelectorAll('.user-name-clickable').forEach(function(nameDiv) {
+    nameDiv.addEventListener('click', function() {
+      const id = this.getAttribute('data-id');
       const toggleBtn = document.querySelector(`.toggle-btn[data-id="${id}"]`);
+      if (toggleBtn) {
+        toggleBtn.click();
+      }
+    });
+  });
+
+  // ============================================
+  // LOGIN/LOGOUT TABLE HANDLERS
+  // ============================================
+  
+  // Handle expand/collapse for LOGIN activity text
+  const toggleButtonsLogin = document.querySelectorAll('.toggle-btn-login');
+  
+  toggleButtonsLogin.forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const id = this.getAttribute('data-id');
+      const fullText = this.getAttribute('data-full-text');
+      const activityDiv = document.getElementById('activitylogin' + id);
+      const userDetailsDiv = document.getElementById('userdetailslogin' + id);
+      const parentRow = this.closest('tr');
+      
+      if (!activityDiv || !fullText) return;
+      
+      // Check if currently expanded
+      const isExpanded = this.classList.contains('bi-caret-up-fill');
+      
+      if (isExpanded) {
+        // Collapse - show only first line
+        const lines = fullText.split('\n');
+        activityDiv.textContent = lines[0];
+        activityDiv.style.whiteSpace = 'nowrap';
+        activityDiv.style.overflow = 'hidden';
+        activityDiv.style.textOverflow = 'ellipsis';
+        
+        // Hide user details
+        if (userDetailsDiv) {
+          userDetailsDiv.classList.add('d-none');
+        }
+        
+        // Reset table cell styling
+        parentRow.querySelectorAll('td').forEach(td => {
+          td.style.verticalAlign = 'middle';
+        });
+        
+        // Change icon to down arrow
+        this.classList.remove('bi-caret-up-fill');
+        this.classList.add('bi-caret-down-fill');
+      } else {
+        // Expand - show full formatted text
+        const formatted = formatActivityText(fullText);
+        activityDiv.innerHTML = formatted;
+        activityDiv.style.whiteSpace = 'normal';
+        activityDiv.style.overflow = 'visible';
+        activityDiv.style.textOverflow = 'clip';
+        
+        // Show user details
+        if (userDetailsDiv) {
+          userDetailsDiv.classList.remove('d-none');
+        }
+        
+        // Adjust table cell styling for multiline content
+        parentRow.querySelectorAll('td').forEach(td => {
+          td.style.verticalAlign = 'top';
+        });
+        
+        // Change icon to up arrow
+        this.classList.remove('bi-caret-down-fill');
+        this.classList.add('bi-caret-up-fill');
+      }
+    });
+  });
+
+  // Make LOGIN activity text clickable
+  document.querySelectorAll('.activity-text').forEach(function(text) {
+    if (text.id.startsWith('activitylogin')) {
+      text.addEventListener('click', function() {
+        const id = this.id.replace('activitylogin', '');
+        const toggleBtn = document.querySelector(`.toggle-btn-login[data-id="${id}"]`);
+        if (toggleBtn) {
+          toggleBtn.click();
+        }
+      });
+    }
+  });
+
+  // Make LOGIN user names clickable
+  document.querySelectorAll('.user-name-clickable-login').forEach(function(nameDiv) {
+    nameDiv.addEventListener('click', function() {
+      const id = this.getAttribute('data-id');
+      const toggleBtn = document.querySelector(`.toggle-btn-login[data-id="${id}"]`);
       if (toggleBtn) {
         toggleBtn.click();
       }
@@ -134,4 +252,3 @@ window.addEventListener('load', function() {
     sessionStorage.removeItem('scrollPos');
   }
 });
-

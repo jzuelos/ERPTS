@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['last_name'] = $user['last_name'];
             $_SESSION['logged_in'] = true;
 
-            logActivity($conn, $user['user_id'], "User logged in successfully");
+            logActivity($conn, $user['user_id'], "User logged in to the system");
 
             header("Location: Home.php");
             exit();
