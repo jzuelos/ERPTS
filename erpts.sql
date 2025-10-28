@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 26, 2025 at 09:30 PM
+-- Generation Time: Oct 28, 2025 at 07:21 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `activity_log` (
   `log_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
   `action` mediumtext DEFAULT NULL,
   `log_time` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -39,10 +39,6 @@ CREATE TABLE `activity_log` (
 --
 
 INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
-(1, 12, 'Logged out of the system', '2025-09-21 13:05:14'),
-(2, 9, 'Logged out of the system', '2025-09-21 13:05:23'),
-(3, 9, 'Logged out of the system', '2025-09-21 13:08:00'),
-(4, 9, 'Logged in to the system', '2025-09-21 13:08:14'),
 (5, 12, 'Created new user: test', '2025-09-21 13:17:28'),
 (6, 9, 'Created new user: test2', '2025-09-21 13:20:15'),
 (7, 9, 'Updated user ID: 13', '2025-09-21 13:23:22'),
@@ -110,7 +106,97 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (69, 9, 'Ownership Transfer Completed\nProperty ID: 147\nLocation: House #23, Unknown, Unknown, Unknown\nTax Declaration ID: 3\nARP Number: GR-2023-II-01-012-00023\nTax Year: 2025-09-27\n\nPrevious Owners:\n• Maria Lopez Reyes (ID: 2)\n\nRemoved Owners:\n• Maria Lopez Reyes (ID: 2)\n\nAdded Owners (New Title Holders):\n• Isabel Delos Ramos (ID: 11)\n\nCurrent Owners After Transfer:\n• Isabel Delos Ramos (ID: 11)\n\n--- Record Snapshot (Before Transfer) ---\nRPU Declaration:\n  • ARP: GR-2023-II-01-012-00023\n  • Total Property Value: ₱64,993.92\nRPU Identification:\n  • PIN: 110123456789\n  • Taxability: taxable\nProperty Info:\n  • House #: 23\n  • Land Area: 453 sq.m\nLand Records: 1 record(s) captured\n  • Total Land Market Value: ₱60,000.00\n\nTransfer Status: Successfully completed\nSnapshot stored in owner_audit_log for historical reference', '2025-10-26 17:50:59'),
 (71, 9, 'Failed Ownership Transfer\nProperty ID: 157\nLocation: House #5345, Unknown, Unknown, Unknown\nTax Declaration ID: 4\nError: Cannot add or update a child row: a foreign key constraint fails (`erpts`.`land`, CONSTRAINT `faas_id` FOREIGN KEY (`faas_id`) REFERENCES `faas` (`faas_id`) ON DELETE CASCADE)', '2025-10-26 20:07:37'),
 (72, 9, 'Ownership Transfer Completed\nProperty ID: 157\nLocation: House #5345, Unknown, Unknown, Unknown\nTax Declaration ID: 4\nARP Number: GR-2023-II-03-014-00342\nTax Year: 2025-10-15\n\nPrevious Owners:\n• Ramon Torres Mendoza (ID: 12)\n\nRemoved Owners:\n• Ramon Torres Mendoza (ID: 12)\n\nAdded Owners (New Title Holders):\n• Jose Antonio Cruz (ID: 4)\n\nCurrent Owners After Transfer:\n• Jose Antonio Cruz (ID: 4)\n\n--- Record Snapshot (Before Transfer) ---\nRPU Declaration:\n  • ARP: GR-2023-II-03-014-00342\n  • Total Property Value: ₱81,600.00\nRPU Identification:\n  • PIN: 5324234134512\n  • Taxability: taxable\nProperty Info:\n  • House #: 5345\n  • Land Area: 5345 sq.m\nLand Records: 1 record(s) captured\n  • Total Land Market Value: ₱60,000.00\n\nTransfer Status: Successfully completed\nSnapshot stored in owner_audit_log for historical reference', '2025-10-26 20:27:40'),
-(73, 9, 'FAAS relationships nullified for FAAS ID 43 (property 157)', '2025-10-26 20:27:40');
+(73, 9, 'FAAS relationships nullified for FAAS ID 43 (property 157)', '2025-10-26 20:27:40'),
+(74, 9, 'Logged in to the system', '2025-10-27 04:04:21'),
+(75, 9, 'Logged in to the system', '2025-10-27 10:44:40'),
+(76, 9, 'Logged out of the system', '2025-10-27 12:31:11'),
+(77, 9, 'Logged in to the system', '2025-10-27 13:07:15'),
+(78, 9, 'Logged in to the system', '2025-10-27 13:23:06'),
+(79, 12, 'Logged in to the system', '2025-10-27 13:23:40'),
+(80, 12, 'Logged out of the system', '2025-10-27 13:23:42'),
+(81, 12, 'Failed login attempt - Incorrect password (Attempt 1 from IP: ::1)', '2025-10-27 13:23:48'),
+(82, 12, 'Failed login attempt - Incorrect password (Attempt 1 from IP: ::1)', '2025-10-27 13:25:00'),
+(83, 12, 'Failed login attempt - Incorrect password (Attempt 1 from IP: ::1)', '2025-10-27 13:25:08'),
+(84, 12, 'Failed login attempt - Incorrect password (Attempt 1 from IP: ::1)', '2025-10-27 13:27:57'),
+(85, 9, 'Logged in to the system', '2025-10-27 14:30:14'),
+(86, 9, 'Logged out of the system', '2025-10-27 14:30:31'),
+(87, 9, 'Logged in to the system', '2025-10-28 07:54:10'),
+(88, 9, 'Exported statistics chart\n• Chart Type: Classification\n• Chart Title: Land Classification Distribution\n• Export Format: PNG Image\n• Export Time: 2025-10-28 11:35:27', '2025-10-28 10:35:27'),
+(89, 9, 'Printed Property Report\n• Classification: All\n• Province: All\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-10-28 15:31:29'),
+(90, 9, 'Printed Property Report\n• Classification: Agricultural\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-10-28 15:32:19'),
+(91, 9, 'Printed Property Report\n• Classification: Agricultural\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-10-28 15:32:47'),
+(92, 9, 'Printed Property Report\n• Classification: Agricultural\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-10-28 15:35:41'),
+(93, 9, 'Printed Property Report\n• Classification: Agricultural\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-10-28 15:37:23'),
+(94, 9, 'Printed Property Report\n• Classification: All\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: September 15, 2025 - October 15, 2025', '2025-10-28 15:38:37'),
+(95, 9, 'Printed Property Report\n• Classification: All\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: September 01, 2025 - October 15, 2025', '2025-10-28 15:39:04'),
+(96, 9, 'Printed Property Report\n• Classification: All\n• Province: Camarines Norte\n• Municipality/City: Daet\n• District: District 2\n• Barangay: All\n• Date Range: September 01, 2025 - October 15, 2025', '2025-10-28 15:39:20'),
+(97, 9, 'Logged out of the system', '2025-10-28 16:53:33'),
+(98, 12, 'Failed login attempt \n• Incorrect Password', '2025-10-28 16:56:28'),
+(99, 12, 'Failed login attempt \n• Incorrect Password', '2025-10-28 16:56:32'),
+(100, 12, 'Failed login attempt \n• Incorrect Password', '2025-10-28 16:56:37'),
+(101, 12, 'Failed login attempt \n• Incorrect Password', '2025-10-28 16:56:41'),
+(102, 9, 'User logged in to the system', '2025-10-28 16:56:48'),
+(103, 9, 'Logged out of the system', '2025-10-28 16:56:55'),
+(104, 9, 'User logged in to the system', '2025-10-28 16:57:00'),
+(105, 9, 'Logged out of the system', '2025-10-28 16:59:28'),
+(106, NULL, 'Failed login attempt \n• Username \'fasdf\' does not exist in Database', '2025-10-28 16:59:32'),
+(107, NULL, 'Failed login attempt \n• Username \'asdgasd\' does not exist in Database', '2025-10-28 16:59:36'),
+(108, NULL, 'Failed login attempt \n• Username \'uasdfasd\' does not exist in Database', '2025-10-28 16:59:40'),
+(109, NULL, 'Failed login attempt \n• Username \'uasdgasdg\' does not exist in Database', '2025-10-28 16:59:44'),
+(110, 9, 'User logged in to the system from IP: ::1', '2025-10-28 17:06:07'),
+(111, 9, 'Logged out of the system', '2025-10-28 17:06:30'),
+(112, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:06:44'),
+(113, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:06:57'),
+(114, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:07:28'),
+(115, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:07:35'),
+(116, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:07:39'),
+(117, 9, 'User logged in to the system from IP: ::1', '2025-10-28 17:23:14'),
+(118, 9, 'Logged out of the system', '2025-10-28 17:23:27'),
+(119, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:23:36'),
+(120, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:23:48'),
+(121, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:23:55'),
+(122, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:24:09'),
+(123, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:24:15'),
+(124, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:29:50'),
+(125, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:29:53'),
+(126, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:29:56'),
+(127, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:30:00'),
+(128, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:30:03'),
+(129, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:30:42'),
+(130, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:30:48'),
+(131, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:30:52'),
+(132, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:35:30'),
+(133, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:35:35'),
+(134, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:35:39'),
+(135, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:42:12'),
+(136, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:42:15'),
+(137, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:42:19'),
+(138, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:50:59'),
+(139, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:51:03'),
+(140, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:51:07'),
+(141, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:55:14'),
+(142, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:55:21'),
+(143, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:55:25'),
+(144, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:59:58'),
+(145, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:00:06'),
+(146, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:00:10'),
+(147, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:01:41'),
+(148, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:01:45'),
+(149, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:01:49'),
+(150, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:06:28'),
+(151, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:06:31'),
+(152, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:06:36'),
+(153, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:09:19'),
+(154, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:09:22'),
+(155, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:09:27'),
+(156, NULL, 'Failed login from IP: ::1 - Username \'username\' not found', '2025-10-28 18:12:48'),
+(157, NULL, 'Failed login from IP: ::1 - Username \'username\' not found', '2025-10-28 18:12:53'),
+(158, NULL, 'Failed login from IP: ::1 - Username \'username\' not found', '2025-10-28 18:13:00'),
+(159, NULL, 'Temporary lock activated from IP: ::1', '2025-10-28 18:13:00'),
+(160, NULL, 'Failed login from IP: ::1 - Username \'username\' not found', '2025-10-28 18:20:41'),
+(161, NULL, 'Failed login from IP: ::1 - Username \'username\' not found', '2025-10-28 18:20:46'),
+(162, NULL, 'Failed login from IP: ::1 - Username \'username\' not found', '2025-10-28 18:20:50'),
+(163, NULL, 'Temporary lock activated from IP: ::1', '2025-10-28 18:20:50');
 
 -- --------------------------------------------------------
 
@@ -555,6 +641,21 @@ INSERT INTO `faas` (`faas_id`, `pro_id`, `rpu_idno`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `ip_lockout`
+--
+
+CREATE TABLE `ip_lockout` (
+  `id` int(11) NOT NULL,
+  `ip_address` varchar(45) NOT NULL,
+  `attempts` int(11) DEFAULT 0,
+  `lock_until` int(11) DEFAULT 0,
+  `is_permanent` tinyint(1) DEFAULT 0,
+  `last_attempt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `land`
 --
 
@@ -922,8 +1023,7 @@ INSERT INTO `received_papers` (`received_id`, `transaction_id`, `transaction_cod
 (24, 51, 'RCV-1008', 'Josefina Cruz', '+639248889999', 'Partition', 'Clerk01 B. Clerk', '2025-10-02 18:11:44', 'Needs barangay clearance', 'received', '2025-10-02 10:11:44'),
 (25, 52, 'RCV-1009', 'Cynthia Navarro', '+639259990000', 'Exchange', 'Staff02 C. Staff', '2025-10-02 18:11:44', 'Verified and complete', 'received', '2025-10-02 10:11:44'),
 (26, 53, 'RCV-1010', 'Michael Tan', '+639260001111', 'Inheritance', 'Admin A. Admin', '2025-10-02 18:11:44', 'Heirs approved', 'received', '2025-10-02 10:11:44'),
-(27, 54, 'RCV-1011', 'Liza Sarmiento', '+639271112222', 'Transfer Certificate of Title', 'Clerk01 B. Clerk', '2025-10-02 18:11:44', 'Pending notarization', 'received', '2025-10-02 10:11:44'),
-(28, 58, 'TX-1015', 'Fernando Torres', '+639342342423', 'Revision/Correction', 'John Lloyd C. Zuelos', '2025-10-12 19:37:36', '', 'received', '2025-10-12 11:37:36');
+(27, 54, 'RCV-1011', 'Liza Sarmiento', '+639271112222', 'Transfer Certificate of Title', 'Clerk01 B. Clerk', '2025-10-02 18:11:44', 'Pending notarization', 'received', '2025-10-02 10:11:44');
 
 -- --------------------------------------------------------
 
@@ -1065,18 +1165,10 @@ INSERT INTO `transactions` (`transaction_id`, `transaction_code`, `name`, `conta
 (41, '95289', 'Jonard Canaria', '+639432441231', 'Property Revision request #37123 received 09/24/2025. Your application is now pending review. For more info. visit https://erptstrack.erpts.online', 'Pending', '2025-09-24 01:42:33', '2025-09-24 01:42:33', 'Revision/Correction'),
 (44, 'TX-1001', 'Juan Dela Cruz', '+639171111111', 'Simple Transfer request #1001 received', 'Pending', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Simple Transfer of Ownership'),
 (45, 'TX-1002', 'Maria Santos', '+639181111111', 'New Property Declaration request #1002 received', 'In Progress', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'New Declaration of Real Property'),
-(46, 'TX-1003', 'Pedro Ramirez', '+639191111111', 'Property Revision request #1003 received', 'Completed', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Revision/Correction'),
 (47, 'TX-1004', 'Josefa Manalo', '+639201111111', 'Property Consolidation request #1004 received', 'Pending', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Consolidation'),
-(48, 'TX-1005', 'Carlos Cruz', '+639211111111', 'Simple Transfer request #1005 received', 'In Progress', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Simple Transfer of Ownership'),
-(49, 'TX-1006', 'Ana Villanueva', '+639221111111', 'New Property Declaration request #1006 received', 'Completed', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'New Declaration of Real Property'),
-(50, 'TX-1007', 'Miguel Reyes', '+639231111111', 'Property Revision request #1007 received', 'Pending', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Revision/Correction'),
-(51, 'TX-1008', 'Elena Bautista', '+639241111111', 'Consolidation request #1008 received', 'In Progress', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Consolidation'),
-(52, 'TX-1009', 'Roberto Flores', '+639251111111', 'Simple Transfer request #1009 received', 'Completed', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Simple Transfer of Ownership'),
-(53, 'TX-1010', 'Andrea Pascual', '+639261111111', 'New Property Declaration request #1010 received', 'Pending', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'New Declaration of Real Property'),
-(54, 'TX-1011', 'Lorenzo Aquino', '+639271111111', 'Property Revision request #1011 received', 'In Progress', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'Revision/Correction'),
-(55, 'TX-1012', 'Cecilia Navarro', '+639281111111', 'Consolidation request #1012 received', 'Completed', '2025-10-02 10:19:56', '2025-10-12 11:58:21', 'Consolidation'),
-(57, 'TX-1014', 'Patricia Ramos', '+639301111111', 'New Property Declaration request #1014 received', 'In Progress', '2025-10-02 10:19:56', '2025-10-02 10:19:56', 'New Declaration of Real Property'),
-(62, '02603', 'Jonard Canaria', '+635345352332', 'Property Consolidation #02603 is being processed. Documents under review as of 10/14/2025. For more info. visit https://erptstrack.erpts.online', 'In Progress', '2025-10-13 18:06:40', '2025-10-13 18:12:38', 'Consolidation');
+(48, 'TX-1005', 'Carlos Cruz', '+639254353421', 'Simple Transfer request #1005 received', 'In Progress', '2025-10-02 10:19:56', '2025-10-28 16:31:07', 'Simple Transfer of Ownership'),
+(51, 'TX-1008', 'Elena Bautista', '+639165217083', 'Property Consolidation #TX-1008 completed 10/28/2025. Ready for pickup at our office. For more info. visit https://erptstrack.erpts.online', 'Completed', '2025-10-02 10:19:56', '2025-10-28 14:15:18', 'Consolidation'),
+(65, '58187', 'James Gacho', '+639165217083', 'Transfer of Ownership request #58187 received 10/28/2025. Your application is now pending review. For more info. visit https://erptstrack.erpts.online', 'Pending', '2025-10-28 14:21:16', '2025-10-28 14:21:16', 'Simple Transfer of Ownership');
 
 -- --------------------------------------------------------
 
@@ -1193,7 +1285,39 @@ INSERT INTO `transaction_logs` (`log_id`, `transaction_id`, `transaction_code`, 
 (179, 62, '02603', 'Document Deleted', 'Deleted document: uploads/transaction_62/1760930452_Messenger_creation_CEAD8B37-7258-45FB-80AD-2F2C99F21150.pdf', 9, '2025-10-20 03:21:17'),
 (180, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/Jm_Tin.pdf', 9, '2025-10-20 03:50:27'),
 (181, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/1760286363_FB_IMG_1760253383644.pdf', 9, '2025-10-20 03:50:30'),
-(182, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/Birth_Cert.pdf', 9, '2025-10-20 03:50:32');
+(182, 57, 'TX-1014', 'Document Deleted', 'Deleted document: uploads/transaction_57/Birth_Cert.pdf', 9, '2025-10-20 03:50:32'),
+(183, 62, '02603', 'Updated', 'Transaction updated', 9, '2025-10-28 08:11:59'),
+(184, 62, '02603', 'Updated', 'Transaction updated', 9, '2025-10-28 08:13:39'),
+(185, 63, '18422', 'Created', 'Transaction created', 9, '2025-10-28 08:15:29'),
+(186, 63, '18422', 'Updated', 'Transaction updated', 9, '2025-10-28 08:18:23'),
+(187, 63, '18422', 'SMS Sent', 'Notification sent to +639165217083', 9, '2025-10-28 08:18:23'),
+(188, 64, '50241', 'Created', 'Transaction created', 9, '2025-10-28 09:00:59'),
+(189, 64, '50241', 'SMS Sent', 'Notification sent to +639165217083', 9, '2025-10-28 09:00:59'),
+(190, 55, 'TX-1012', 'Updated', 'Transaction updated', 9, '2025-10-28 09:02:40'),
+(191, 55, 'TX-1012', 'SMS Sent', 'Notification sent to +639165217083', 9, '2025-10-28 09:02:41'),
+(192, 64, '50241', 'Updated', 'Transaction updated', 9, '2025-10-28 09:14:44'),
+(193, 64, '50241', 'SMS Sent', 'Notification sent to +639165217083', 9, '2025-10-28 09:14:45'),
+(194, 64, '50241', 'Updated', 'Transaction updated', 9, '2025-10-28 09:17:49'),
+(195, 64, '50241', 'Updated', 'Transaction updated', 9, '2025-10-28 09:18:07'),
+(196, 55, 'TX-1012', 'Papers Received', 'Papers received by client', 9, '2025-10-28 09:30:00'),
+(197, 50, NULL, 'Deleted', 'Transaction deleted', 9, '2025-10-28 10:27:21'),
+(198, 64, '50241', 'Updated', 'Transaction updated', 9, '2025-10-28 11:08:18'),
+(199, 64, '50241', 'Papers Received', 'Papers received by client', 9, '2025-10-28 11:08:55'),
+(200, 63, '18422', 'Updated', 'Transaction updated', 9, '2025-10-28 12:38:40'),
+(201, 63, '18422', 'Updated', 'Transaction updated', 9, '2025-10-28 12:40:04'),
+(202, 49, 'TX-1006', 'Papers Received', 'Papers received by client', 9, '2025-10-28 13:08:36'),
+(203, 63, '18422', 'Papers Received', 'Papers received by client', 9, '2025-10-28 13:14:01'),
+(204, 46, 'TX-1003', 'Papers Received', 'Papers received by client', 9, '2025-10-28 13:15:06'),
+(205, 54, NULL, 'Deleted', 'Transaction deleted', 9, '2025-10-28 13:16:22'),
+(206, 62, '02603', 'Updated', 'Transaction updated', 9, '2025-10-28 13:20:00'),
+(207, 62, '02603', 'Papers Received', 'Papers received by client', 9, '2025-10-28 13:40:45'),
+(208, 57, 'TX-1014', 'Updated', 'Transaction updated', 9, '2025-10-28 13:41:17'),
+(209, 57, 'TX-1014', 'Papers Received', 'Papers received by client', 9, '2025-10-28 13:41:23'),
+(210, 53, NULL, 'Deleted', 'Transaction deleted', 9, '2025-10-28 13:44:14'),
+(211, 51, 'TX-1008', 'Updated', 'Transaction updated', 9, '2025-10-28 14:15:18'),
+(212, 65, '58187', 'Created', 'Transaction created', 9, '2025-10-28 14:21:16'),
+(213, 65, '58187', 'SMS Sent', 'Notification sent to +639165217083', 9, '2025-10-28 14:21:17'),
+(214, 48, 'TX-1005', 'Updated', 'Transaction updated', 9, '2025-10-28 16:31:07');
 
 -- --------------------------------------------------------
 
@@ -1257,15 +1381,6 @@ CREATE TABLE `vw_print_certifications` (
 ,`created_by_name` varchar(101)
 );
 
--- --------------------------------------------------------
-
---
--- Structure for view `vw_print_certifications`
---
-DROP TABLE IF EXISTS `vw_print_certifications`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_print_certifications`  AS SELECT `pc`.`cert_id` AS `cert_id`, `pc`.`property_id` AS `property_id`, `pc`.`faas_id` AS `faas_id`, `pc`.`owner_admin` AS `owner_admin`, `pc`.`certification_date` AS `certification_date`, `pc`.`certification_fee` AS `certification_fee`, `pc`.`or_number` AS `or_number`, `pc`.`date_paid` AS `date_paid`, `pc`.`created_by` AS `created_by`, `pc`.`created_at` AS `created_at`, `p`.`house_no` AS `house_no`, `p`.`barangay` AS `barangay`, `p`.`city` AS `city`, `p`.`province` AS `province`, `rd`.`arp_no` AS `tax_declaration_number`, concat(`u`.`first_name`,' ',`u`.`last_name`) AS `created_by_name` FROM ((((`print_certifications` `pc` join `p_info` `p` on(`pc`.`property_id` = `p`.`p_id`)) join `faas` `f` on(`pc`.`faas_id` = `f`.`faas_id`)) left join `rpu_dec` `rd` on(`f`.`faas_id` = `rd`.`faas_id`)) left join `users` `u` on(`pc`.`created_by` = `u`.`user_id`)) ORDER BY `pc`.`created_at` DESC ;
-
 --
 -- Indexes for dumped tables
 --
@@ -1314,6 +1429,14 @@ ALTER TABLE `district`
 ALTER TABLE `faas`
   ADD PRIMARY KEY (`faas_id`),
   ADD KEY `pro_id` (`pro_id`);
+
+--
+-- Indexes for table `ip_lockout`
+--
+ALTER TABLE `ip_lockout`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `ip_address` (`ip_address`),
+  ADD KEY `idx_ip` (`ip_address`);
 
 --
 -- Indexes for table `land`
@@ -1385,7 +1508,7 @@ ALTER TABLE `p_info`
 --
 ALTER TABLE `received_papers`
   ADD PRIMARY KEY (`received_id`),
-  ADD UNIQUE KEY `unique_transaction` (`transaction_id`),
+  ADD UNIQUE KEY `unique_transaction_code` (`transaction_code`),
   ADD KEY `received_by` (`received_by`);
 
 --
@@ -1452,7 +1575,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=164;
 
 --
 -- AUTO_INCREMENT for table `admin_certification`
@@ -1489,6 +1612,12 @@ ALTER TABLE `district`
 --
 ALTER TABLE `faas`
   MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+
+--
+-- AUTO_INCREMENT for table `ip_lockout`
+--
+ALTER TABLE `ip_lockout`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `land`
@@ -1548,7 +1677,7 @@ ALTER TABLE `p_info`
 -- AUTO_INCREMENT for table `received_papers`
 --
 ALTER TABLE `received_papers`
-  MODIFY `received_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `received_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT for table `region`
@@ -1578,7 +1707,7 @@ ALTER TABLE `subclass`
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
-  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
 
 --
 -- AUTO_INCREMENT for table `transaction_files`
@@ -1590,13 +1719,22 @@ ALTER TABLE `transaction_files`
 -- AUTO_INCREMENT for table `transaction_logs`
 --
 ALTER TABLE `transaction_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=183;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=215;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
   MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `vw_print_certifications`
+--
+DROP TABLE IF EXISTS `vw_print_certifications`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_print_certifications`  AS SELECT `pc`.`cert_id` AS `cert_id`, `pc`.`property_id` AS `property_id`, `pc`.`faas_id` AS `faas_id`, `pc`.`owner_admin` AS `owner_admin`, `pc`.`certification_date` AS `certification_date`, `pc`.`certification_fee` AS `certification_fee`, `pc`.`or_number` AS `or_number`, `pc`.`date_paid` AS `date_paid`, `pc`.`created_by` AS `created_by`, `pc`.`created_at` AS `created_at`, `p`.`house_no` AS `house_no`, `p`.`barangay` AS `barangay`, `p`.`city` AS `city`, `p`.`province` AS `province`, `rd`.`arp_no` AS `tax_declaration_number`, concat(`u`.`first_name`,' ',`u`.`last_name`) AS `created_by_name` FROM ((((`print_certifications` `pc` join `p_info` `p` on(`pc`.`property_id` = `p`.`p_id`)) join `faas` `f` on(`pc`.`faas_id` = `f`.`faas_id`)) left join `rpu_dec` `rd` on(`f`.`faas_id` = `rd`.`faas_id`)) left join `users` `u` on(`pc`.`created_by` = `u`.`user_id`)) ORDER BY `pc`.`created_at` DESC ;
 
 --
 -- Constraints for dumped tables

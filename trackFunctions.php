@@ -376,35 +376,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         elseif ($action === 'updateTransaction') {
             $transaction_id = intval($_POST['transaction_id'] ?? 0);
 
-            $stmt = $conn->prepare("SELECT transaction_code FROM transactions WHERE transaction_id=?");
-            $stmt->bind_param("i", $transaction_id);
-            $stmt->execute();
-            $row = $stmt->get_result()->fetch_assoc();
-            $transaction_code = $row['transaction_code'] ?? '';
+            // 🔹 FETCH OLD DATA BEFORE UPDATING
+            $oldDataStmt = $conn->prepare("SELECT transaction_code, status FROM transactions WHERE transaction_id = ?");
+            $oldDataStmt->bind_param("i", $transaction_id);
+            $oldDataStmt->execute();
+            $oldRow = $oldDataStmt->get_result()->fetch_assoc();
+            $transaction_code = $oldRow['transaction_code'] ?? '';
+            $oldStatus = $oldRow['status'] ?? '';
+            $oldDataStmt->close();
 
+            // Get new values from POST
             $name = trim($_POST['t_name'] ?? '');
             $contact = trim($_POST['t_contact'] ?? '');
             $description = trim($_POST['t_description'] ?? '');
             $transaction_type = trim($_POST['transactionType'] ?? '');
             $status = trim($_POST['t_status'] ?? '');
 
+            // Update transaction
             $stmt = $conn->prepare("UPDATE transactions 
-                SET transaction_code=?, name=?, contact_number=?, description=?, transaction_type=?, status=?, updated_at=NOW() 
-                WHERE transaction_id=?");
+        SET transaction_code=?, name=?, contact_number=?, description=?, transaction_type=?, status=?, updated_at=NOW() 
+        WHERE transaction_id=?");
             $stmt->bind_param("ssssssi", $transaction_code, $name, $contact, $description, $transaction_type, $status, $transaction_id);
 
             if ($stmt->execute()) {
                 handleMultipleUploads($transaction_id);
                 logActivity($transaction_id, "Updated", "Transaction updated", $_SESSION['user_id'], $transaction_code);
 
-                // 🔹 Only send SMS if status changed
-                $oldDataStmt = $conn->prepare("SELECT status FROM transactions WHERE transaction_id = ?");
-                $oldDataStmt->bind_param("i", $transaction_id);
-                $oldDataStmt->execute();
-                $oldRow = $oldDataStmt->get_result()->fetch_assoc();
-                $oldStatus = $oldRow['status'] ?? '';
-                $oldDataStmt->close();
-
+                // 🔹 Check if status changed (compare old status with new status)
                 $hasStatusChanged = ($oldStatus !== $status);
 
                 if ($hasStatusChanged && !empty($contact) && !empty($description)) {
@@ -421,40 +419,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 echo json_encode(["success" => true, "message" => "Transaction updated successfully!"]);
             } else {
                 echo json_encode(["success" => false, "message" => $stmt->error]);
-            }
-            exit;
-        }
-
-        // ------------------ DELETE DOCUMENT ------------------
-        elseif ($action === 'deleteDocument') {
-            $file_id = intval($_POST['file_id'] ?? 0);
-
-            $stmt = $conn->prepare("SELECT file_path, transaction_id FROM transaction_files WHERE file_id=?");
-            $stmt->bind_param("i", $file_id);
-            $stmt->execute();
-            $file = $stmt->get_result()->fetch_assoc();
-
-            if ($file) {
-                $filePath = __DIR__ . "/" . $file['file_path'];
-                if (file_exists($filePath))
-                    unlink($filePath);
-
-                $stmt = $conn->prepare("DELETE FROM transaction_files WHERE file_id=?");
-                $stmt->bind_param("i", $file_id);
-
-                if ($stmt->execute()) {
-                    $details = "Deleted document: " . $file['file_path'];
-                    logActivity(intval($file['transaction_id']), "Document Deleted", $details, $_SESSION['user_id']);
-
-                    // ✅ Clean up empty folder after deleting file
-                    cleanupEmptyFolder(intval($file['transaction_id']));
-
-                    echo json_encode(["success" => true, "message" => "Document deleted successfully!"]);
-                } else {
-                    echo json_encode(["success" => false, "message" => $stmt->error]);
-                }
-            } else {
-                echo json_encode(["success" => false, "message" => "File not found"]);
             }
             exit;
         }
