@@ -210,12 +210,22 @@ $conn->close();
         </form>
       </div>
 
+   <!-- Welcome Box -->
       <div class="welcome-box">
         <h4 class="text-center mt-4">Welcome to ERPTS</h4>
-        <p>From the Assessor's Module you can:</p>
+        <p>From the Assessor’s Module you can:</p>
         <ul>
-          <li>Search for information in Owner's Declaration (OD), Assessor's Field Sheet/FAAS, Tax Declaration (TD), or RPTOP.</li>
+          <li>Search for information in Owner’s Declaration (OD), Assessor’s Field Sheet/FAAS, Tax Declaration (TD), or
+            RPTOP.</li>
           <li>Encode new real property information.</li>
+        </ul>
+        <p>To begin:</p>
+        <ul>
+          <li>Encode Property Information in the OD</li>
+          <li>Select or encode Owner Information</li>
+          <li>Encode Real Property Information in the AFS/FAAS</li>
+          <li>Encode Tax-related Information in the TD</li>
+          <li>Generate the RPTOP</li>
         </ul>
       </div>
     </div>
