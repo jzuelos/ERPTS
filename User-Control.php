@@ -432,54 +432,55 @@ $conn->close();
     </div>
 
     <!-- BANNED ACCOUNTS/IP TABLE (DUMMY DATA) -->
-    <div id="bannedTable" class="table-responsive d-none">
-      <table class="table table-hover align-middle mb-0">
-        <thead class="bg-danger text-white text-center">
-          <tr>
-            <th style="width: 10%">Ban ID</th>
-            <th style="width: 20%">Username / IP</th>
-            <th style="width: 30%">Reason</th>
-            <th style="width: 20%">Date Banned</th>
-            <th style="width: 20%">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="text-start">
-          <tr>
-            <td>1</td>
-            <td>192.168.0.25</td>
-            <td>Repeated failed logins</td>
-            <td>2025-10-29</td>
-            <td class="text-center">
-              <button class="btn btn-outline-success btn-sm unban-btn">
-                <i class="bi bi-unlock"></i> Unban
-              </button>
-            </td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>john_doe</td>
-            <td>Suspicious activities detected</td>
-            <td>2025-10-30</td>
-            <td class="text-center">
-              <button class="btn btn-outline-success btn-sm unban-btn">
-                <i class="bi bi-unlock"></i> Unban
-              </button>
-            </td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>203.45.23.11</td>
-            <td>IP flagged for spam attempts</td>
-            <td>2025-11-01</td>
-            <td class="text-center">
-              <button class="btn btn-outline-success btn-sm unban-btn">
-                <i class="bi bi-unlock"></i> Unban
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+ <div id="bannedTable" class="table-responsive d-none">
+  <table class="table table-hover align-middle mb-0">
+    <thead class="bg-danger text-white text-center">
+      <tr>
+        <th style="width: 10%">Ban ID</th>
+        <th style="width: 20%">Username / IP</th>
+        <th style="width: 30%">Reason</th>
+        <th style="width: 20%">Date Banned</th>
+        <th style="width: 20%">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="text-start">
+      <tr>
+        <td>1</td>
+        <td>192.168.0.25</td>
+        <td>Repeated failed logins</td>
+        <td>2025-10-29</td>
+        <td class="text-center">
+          <button class="btn btn-outline-success btn-sm unban-btn" data-id="1" data-username="192.168.0.25">
+            <i class="bi bi-unlock"></i> Unban
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>john_doe</td>
+        <td>Suspicious activities detected</td>
+        <td>2025-10-30</td>
+        <td class="text-center">
+          <button class="btn btn-outline-success btn-sm unban-btn" data-id="2" data-username="john_doe">
+            <i class="bi bi-unlock"></i> Unban
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>203.45.23.11</td>
+        <td>IP flagged for spam attempts</td>
+        <td>2025-11-01</td>
+        <td class="text-center">
+          <button class="btn btn-outline-success btn-sm unban-btn" data-id="3" data-username="203.45.23.11">
+            <i class="bi bi-unlock"></i> Unban
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
   </div>
 </div>
 
@@ -671,6 +672,29 @@ $conn->close();
     </div>
   <?php endforeach; ?>
 
+  <!-- UNBAN CONFIRMATION MODAL -->
+<div class="modal fade" id="confirmUnbanModal" tabindex="-1" aria-labelledby="confirmUnbanModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-success shadow">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="confirmUnbanModalLabel">
+          <i class="bi bi-unlock"></i> Confirm Unban
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="fw-semibold mb-3">
+          Are you sure you want to unban <span id="unbanTarget" class="text-danger"></span>?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-success" id="confirmUnbanBtn">Yes, Unban</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 
@@ -795,12 +819,44 @@ document.addEventListener("DOMContentLoaded", function() {
   // Dummy Unban Action
   document.querySelectorAll(".unban-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      alert("This account/IP has been unbanned (dummy action).");
     });
   });
 });
 </script>
 
+
+  <script>
+    //Unban Confirmation Modal 
+  document.addEventListener('DOMContentLoaded', () => {
+    const unbanButtons = document.querySelectorAll('.unban-btn');
+    const confirmUnbanModal = new bootstrap.Modal(document.getElementById('confirmUnbanModal'));
+    const unbanTargetSpan = document.getElementById('unbanTarget');
+    const confirmUnbanBtn = document.getElementById('confirmUnbanBtn');
+
+    let selectedBanId = null;
+
+    // When an Unban button is clicked
+    unbanButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        selectedBanId = button.getAttribute('data-id');
+        const username = button.getAttribute('data-username');
+        unbanTargetSpan.textContent = username;
+        confirmUnbanModal.show();
+      });
+    });
+
+    // When the user confirms the unban
+    confirmUnbanBtn.addEventListener('click', () => {
+      confirmUnbanModal.hide();
+      // Example: perform AJAX or redirect here
+      alert(`User/IP with Ban ID ${selectedBanId} has been unbanned!`);
+
+      // Optional: remove the row dynamically from table
+      const rowToRemove = document.querySelector(`.unban-btn[data-id="${selectedBanId}"]`).closest('tr');
+      if (rowToRemove) rowToRemove.remove();
+    });
+  });
+</script>
 
 </body>
 
