@@ -7,24 +7,11 @@ require_once 'database.php';
 $conn = Database::getInstance();
 
 // ========================================
-// SIMPLE SECURITY SETTINGS
+// SECURITY SETTINGS
 // ========================================
 define('MAX_ATTEMPTS', 3);        // Lock after 3 failed attempts
 define('LOCKOUT_MINUTES', 3);     // Lock for 3 minutes
 define('PERMANENT_ATTEMPTS', 6);  // Permanent lock after 6 attempts
-
-// ========================================
-// INITIALIZE SESSION VARIABLES
-// ========================================
-if (!isset($_SESSION['login_attempts'])) {
-    $_SESSION['login_attempts'] = 0;
-}
-if (!isset($_SESSION['lock_until'])) {
-    $_SESSION['lock_until'] = 0;
-}
-if (!isset($_SESSION['is_permanent_lock'])) {
-    $_SESSION['is_permanent_lock'] = false;
-}
 
 // ========================================
 // HELPER FUNCTIONS
@@ -49,30 +36,101 @@ function getClientIP() {
 }
 
 // ========================================
-// CHECK LOCKOUT STATUS
+// IP LOCKOUT FUNCTIONS
 // ========================================
+function getIPLockoutStatus($conn, $ip) {
+    $stmt = $conn->prepare("SELECT * FROM ip_lockout WHERE ip_address = ? LIMIT 1");
+    $stmt->bind_param("s", $ip);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $status = $result->fetch_assoc();
+    $stmt->close();
+    return $status;
+}
+
+function createOrUpdateIPRecord($conn, $ip, $attempts, $lockUntil = 0, $isPermanent = 0) {
+    $stmt = $conn->prepare("INSERT INTO ip_lockout (ip_address, attempts, lock_until, is_permanent, last_attempt) 
+                            VALUES (?, ?, ?, ?, NOW()) 
+                            ON DUPLICATE KEY UPDATE 
+                            attempts = VALUES(attempts), 
+                            lock_until = VALUES(lock_until), 
+                            is_permanent = VALUES(is_permanent),
+                            last_attempt = NOW()");
+    $stmt->bind_param("siii", $ip, $attempts, $lockUntil, $isPermanent);
+    $result = $stmt->execute();
+    $stmt->close();
+    return $result;
+}
+
+function resetIPAttempts($conn, $ip) {
+    $stmt = $conn->prepare("UPDATE ip_lockout SET attempts = 0, lock_until = 0, is_permanent = 0 WHERE ip_address = ?");
+    $stmt->bind_param("s", $ip);
+    $result = $stmt->execute();
+    $stmt->close();
+    return $result;
+}
+
+function unlockTemporaryIP($conn, $ip) {
+    // Only clear lock_until, keep attempts accumulating
+    $stmt = $conn->prepare("UPDATE ip_lockout SET lock_until = 0 WHERE ip_address = ?");
+    $stmt->bind_param("s", $ip);
+    $result = $stmt->execute();
+    $stmt->close();
+    return $result;
+}
+
+function incrementIPAttempts($conn, $ip, $currentAttempts) {
+    $newAttempts = $currentAttempts + 1;
+    $lockUntil = 0;
+    $isPermanent = 0;
+
+    // Check if should apply permanent lock
+    if ($newAttempts >= PERMANENT_ATTEMPTS) {
+        $isPermanent = 1;
+        logActivity($conn, null, "Permanent lock activated for IP: {$ip}");
+    }
+    // Check if should apply temporary lock (but keep accumulating attempts)
+    elseif ($newAttempts >= MAX_ATTEMPTS && ($newAttempts - MAX_ATTEMPTS) % MAX_ATTEMPTS == 0) {
+        // Lock temporarily every 3 attempts: 3, 6 (but 6 is permanent)
+        $lockUntil = time() + (LOCKOUT_MINUTES * 60);
+        logActivity($conn, null, "Temporary lock activated for IP: {$ip}");
+    }
+
+    return createOrUpdateIPRecord($conn, $ip, $newAttempts, $lockUntil, $isPermanent);
+}
+
+// ========================================
+// CHECK IP LOCKOUT STATUS
+// ========================================
+$clientIP = getClientIP();
+$ipStatus = getIPLockoutStatus($conn, $clientIP);
+
 $isLocked = false;
 $lockMessage = '';
 $remainingSeconds = 0;
+$lockType = '';
 
-// Check permanent lock
-if ($_SESSION['is_permanent_lock']) {
-    $isLocked = true;
-    $lockMessage = "Account permanently locked. Contact administrator.";
-    $lockType = 'permanent';
-}
-// Check temporary lock
-elseif (time() < $_SESSION['lock_until']) {
-    $isLocked = true;
-    $remainingSeconds = $_SESSION['lock_until'] - time();
-    $remainingMinutes = ceil($remainingSeconds / 60);
-    $lockMessage = "Too many failed attempts. Try again in {$remainingMinutes} minute(s).";
-    $lockType = 'temporary';
-}
-// Lock expired - reset attempts
-elseif ($_SESSION['lock_until'] > 0 && time() >= $_SESSION['lock_until']) {
-    $_SESSION['login_attempts'] = 0;
-    $_SESSION['lock_until'] = 0;
+if ($ipStatus) {
+    // Check permanent lock
+    if ($ipStatus['is_permanent'] == 1) {
+        $isLocked = true;
+        $lockMessage = "This IP address has been permanently blocked due to multiple failed login attempts. Contact administrator.";
+        $lockType = 'permanent';
+    }
+    // Check temporary lock
+    elseif (time() < $ipStatus['lock_until']) {
+        $isLocked = true;
+        $remainingSeconds = $ipStatus['lock_until'] - time();
+        $remainingMinutes = ceil($remainingSeconds / 60);
+        $lockMessage = "Too many failed attempts from this IP. Try again in {$remainingMinutes} minute(s).";
+        $lockType = 'temporary';
+    }
+    // Lock expired - reset attempts
+    elseif ($ipStatus['lock_until'] > 0 && time() >= $ipStatus['lock_until']) {
+        unlockTemporaryIP($conn, $clientIP);
+        // Keep attempts count but clear the lock
+        $ipStatus['lock_until'] = 0;
+    }
 }
 
 // ========================================
@@ -81,11 +139,25 @@ elseif ($_SESSION['lock_until'] > 0 && time() >= $_SESSION['lock_until']) {
 if ($_SERVER["REQUEST_METHOD"] == "POST" && !$isLocked) {
     $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $clientIP = getClientIP();
 
     if (empty($username) || empty($password)) {
-        $_SESSION['error'] = "Username and Password are required";
-        $_SESSION['login_attempts']++;
+        $currentAttempts = $ipStatus ? $ipStatus['attempts'] : 0;
+        $newAttempts = $currentAttempts + 1;
+        incrementIPAttempts($conn, $clientIP, $currentAttempts);
+        
+        $totalRemaining = PERMANENT_ATTEMPTS - $newAttempts;
+        
+        // Show warning only on attempts 2, 5, etc. (one before lockout)
+        if ($newAttempts >= (MAX_ATTEMPTS - 1) && ($newAttempts % MAX_ATTEMPTS == MAX_ATTEMPTS - 1)) {
+            $_SESSION['error'] = "Username and Password are required. ({$totalRemaining} attempts remaining until IP block)";
+        } else {
+            $_SESSION['error'] = "Username and Password are required.";
+        }
+        
+        // Only log on significant events
+        if ($newAttempts % MAX_ATTEMPTS == 0 || $newAttempts >= PERMANENT_ATTEMPTS) {
+            logActivity($conn, null, "Failed login from IP: {$clientIP} - Empty credentials");
+        }
     } else {
         $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
         $stmt->bind_param("s", $username);
@@ -97,10 +169,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !$isLocked) {
             
             if ($user['status'] == 1) {
                 if (password_verify($password, $user['password'])) {
-                    // ✅ SUCCESS - Reset everything
-                    $_SESSION['login_attempts'] = 0;
-                    $_SESSION['lock_until'] = 0;
-                    $_SESSION['is_permanent_lock'] = false;
+                    // ✅ SUCCESS - Reset IP attempts
+                    resetIPAttempts($conn, $clientIP);
                     
                     $_SESSION['user_id'] = $user['user_id'];
                     $_SESSION['username'] = $user['username'];
@@ -115,40 +185,73 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !$isLocked) {
                     exit();
                 } else {
                     // ❌ Wrong password
-                    $_SESSION['login_attempts']++;
-                    $remaining = MAX_ATTEMPTS - $_SESSION['login_attempts'];
-                    $_SESSION['error'] = "Incorrect password. {$remaining} attempt(s) remaining.";
-                    logActivity($conn, $user['user_id'], "Failed login from IP: {$clientIP} - Wrong password");
+                    $currentAttempts = $ipStatus ? $ipStatus['attempts'] : 0;
+                    $newAttempts = $currentAttempts + 1;
+                    incrementIPAttempts($conn, $clientIP, $currentAttempts);
+                    
+                    // Calculate remaining attempts dynamically
+                    $remaining = MAX_ATTEMPTS - ($newAttempts % MAX_ATTEMPTS == 0 ? MAX_ATTEMPTS : $newAttempts % MAX_ATTEMPTS);
+                    if ($remaining == 0) $remaining = MAX_ATTEMPTS;
+                    
+                    $totalRemaining = PERMANENT_ATTEMPTS - $newAttempts;
+                    
+                    if ($newAttempts >= PERMANENT_ATTEMPTS) {
+                        $_SESSION['error'] = "IP permanently blocked due to multiple failed attempts.";
+                    } elseif ($newAttempts >= MAX_ATTEMPTS) {
+                        $_SESSION['error'] = "Incorrect password. Account locked for " . LOCKOUT_MINUTES . " minutes. ({$totalRemaining} more failed attempts = permanent block)";
+                    } elseif ($newAttempts >= (MAX_ATTEMPTS - 1)) {
+                        // Show warning only on attempt 2, 5, etc. (one before lockout)
+                        $_SESSION['error'] = "Incorrect password. {$remaining} attempt remaining before temporary lock. ({$totalRemaining} until permanent block)";
+                    } else {
+                        $_SESSION['error'] = "Incorrect password.";
+                    }
+                    
+                    // Only log on significant events (every 3rd attempt or permanent lock)
+                    if ($newAttempts % MAX_ATTEMPTS == 0 || $newAttempts >= PERMANENT_ATTEMPTS) {
+                        logActivity($conn, $user['user_id'], "Failed login from IP: {$clientIP} - Wrong password");
+                    }
                 }
             } else {
                 // ❌ Inactive account
-                $_SESSION['login_attempts']++;
-                $_SESSION['error'] = "Account is inactive. Contact administrator.";
-                logActivity($conn, $user['user_id'], "Failed login from IP: {$clientIP} - Inactive account");
+                $currentAttempts = $ipStatus ? $ipStatus['attempts'] : 0;
+                $newAttempts = $currentAttempts + 1;
+                incrementIPAttempts($conn, $clientIP, $currentAttempts);
+                
+                $totalRemaining = PERMANENT_ATTEMPTS - $newAttempts;
+                
+                // Show warning only on attempts 2, 5, etc. (one before lockout)
+                if ($newAttempts >= (MAX_ATTEMPTS - 1) && ($newAttempts % MAX_ATTEMPTS == MAX_ATTEMPTS - 1)) {
+                    $_SESSION['error'] = "Account is inactive. Contact administrator. ({$totalRemaining} attempts remaining until IP block)";
+                } else {
+                    $_SESSION['error'] = "Account is inactive. Contact administrator.";
+                }
+                
+                // Only log on significant events
+                if ($newAttempts % MAX_ATTEMPTS == 0 || $newAttempts >= PERMANENT_ATTEMPTS) {
+                    logActivity($conn, $user['user_id'], "Failed login from IP: {$clientIP} - Inactive account");
+                }
             }
         } else {
             // ❌ Username not found
-            $_SESSION['login_attempts']++;
-            $remaining = MAX_ATTEMPTS - $_SESSION['login_attempts'];
-            $_SESSION['error'] = "Username not found. {$remaining} attempt(s) remaining.";
-            logActivity($conn, 0, "Failed login from IP: {$clientIP} - Username '{$username}' not found");
+            $currentAttempts = $ipStatus ? $ipStatus['attempts'] : 0;
+            $newAttempts = $currentAttempts + 1;
+            incrementIPAttempts($conn, $clientIP, $currentAttempts);
+            
+            $totalRemaining = PERMANENT_ATTEMPTS - $newAttempts;
+            
+            // Show warning only on attempts 2, 5, etc. (one before lockout)
+            if ($newAttempts >= (MAX_ATTEMPTS - 1) && ($newAttempts % MAX_ATTEMPTS == MAX_ATTEMPTS - 1)) {
+                $_SESSION['error'] = "Username not found. ({$totalRemaining} attempts remaining until IP block)";
+            } else {
+                $_SESSION['error'] = "Username not found.";
+            }
+            
+            // Only log on significant events
+            if ($newAttempts % MAX_ATTEMPTS == 0 || $newAttempts >= PERMANENT_ATTEMPTS) {
+                logActivity($conn, null, "Failed login from IP: {$clientIP} - Username not found");
+            }
         }
         $stmt->close();
-    }
-
-    // ========================================
-    // APPLY LOCKOUT IF NEEDED
-    // ========================================
-    if ($_SESSION['login_attempts'] >= PERMANENT_ATTEMPTS) {
-        // Permanent lock
-        $_SESSION['is_permanent_lock'] = true;
-        $_SESSION['error'] = "Account permanently locked. Contact administrator.";
-        logActivity($conn, 0, "Permanent lock activated from IP: {$clientIP}");
-    } elseif ($_SESSION['login_attempts'] >= MAX_ATTEMPTS) {
-        // Temporary lock
-        $_SESSION['lock_until'] = time() + (LOCKOUT_MINUTES * 60);
-        $_SESSION['error'] = "Too many failed attempts. Locked for " . LOCKOUT_MINUTES . " minutes.";
-        logActivity($conn, 0, "Temporary lock activated from IP: {$clientIP}");
     }
 
     header("Location: " . $_SERVER['PHP_SELF']);
@@ -210,30 +313,30 @@ $conn->close();
         </form>
       </div>
 
-   <!-- Welcome Box -->
-      <div class="welcome-box">
-        <h4 class="text-center mt-4">Welcome to ERPTS</h4>
-        <p>From the Assessor’s Module you can:</p>
-        <ul>
-          <li>Search for information in Owner’s Declaration (OD), Assessor’s Field Sheet/FAAS, Tax Declaration (TD), or
-            RPTOP.</li>
-          <li>Encode new real property information.</li>
-        </ul>
-        <p>To begin:</p>
-        <ul>
-          <li>Encode Property Information in the OD</li>
-          <li>Select or encode Owner Information</li>
-          <li>Encode Real Property Information in the AFS/FAAS</li>
-          <li>Encode Tax-related Information in the TD</li>
-          <li>Generate the RPTOP</li>
-        </ul>
-      </div>
+      <!-- Welcome Box -->
+    <div class="welcome-box">
+      <h4 class="text-center mt-4">Welcome to ERPTS</h4>
+      <p>From the Assessor’s Module you can:</p>
+      <ul>
+        <li>Search for information in Owner’s Declaration (OD), Assessor’s Field Sheet/FAAS, Tax Declaration (TD), or RPTOP.</li>
+        <li>Encode new real property information.</li>
+        <li>Manage document handling such as uploading, viewing, and organizing property-related files.</li>
+        <li>Track transactions and monitor updates or changes made within the system.</li>
+        <li>Modify and manage data sheets for assessment and property details efficiently.</li>
+      </ul>
+      <p>To begin:</p>
+      <ul>
+        <li>Encode Property Information in the OD</li>
+        <li>Select or Encode Owner Information</li>
+        <li>Encode Real Property Information in the AFS/FAAS</li>
+        <li>Encode Tax-related Information in the TD</li>
+      </ul>
+    </div>
     </div>
   </div>
 
   <?php if ($isLocked && $lockType === 'temporary'): ?>
     <script>
-      const lockUntil = <?php echo $_SESSION['lock_until']; ?>;
       const remainingSeconds = <?php echo $remainingSeconds; ?>;
     </script>
   <?php endif; ?>
