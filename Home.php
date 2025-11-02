@@ -3,59 +3,58 @@ session_start();
 
 // Handle AJAX request for logging export activity
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['action'] === 'log_export') {
-    header('Content-Type: application/json');
-    
-    if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-        echo json_encode(['success' => false, 'error' => 'Not authenticated']);
-        exit;
-    }
-    
-    require_once 'database.php';
-    
-    try {
-        $conn = Database::getInstance();
-        
-        $input = file_get_contents('php://input');
-        $data = json_decode($input, true);
-        
-        if (!$data || !isset($data['user_id']) || !isset($data['chart_title']) || !isset($data['chart_type'])) {
-            throw new Exception('Invalid request data');
-        }
-        
-        $user_id = (int)$data['user_id'];
-        $chart_title = $conn->real_escape_string($data['chart_title']);
-        $chart_type = $conn->real_escape_string($data['chart_type']);
-        
-        $action = "Exported statistics chart from Dashboard\n";
-        $action .= "• Chart Type: " . ucfirst(str_replace('_', ' ', $chart_type)) . "\n";
-        $action .= "• Chart Title: {$chart_title}\n";
-        $action .= "• Export Format: PNG Image\n";
-        $action .= "• Export Time: " . date('Y-m-d H:i:s');
-        
-        $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
-        $stmt->bind_param("is", $user_id, $action);
-        
-        if ($stmt->execute()) {
-            echo json_encode([
-                'success' => true,
-                'message' => 'Export activity logged successfully',
-                'log_id' => $stmt->insert_id
-            ]);
-        } else {
-            throw new Exception('Failed to insert log: ' . $stmt->error);
-        }
-        
-        $stmt->close();
-        $conn->close();
-        
-    } catch (Exception $e) {
-        echo json_encode([
-            'success' => false,
-            'error' => $e->getMessage()
-        ]);
-    }
-    
+  header('Content-Type: application/json');
+
+  if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    echo json_encode(['success' => false, 'error' => 'Not authenticated']);
     exit;
+  }
+
+  require_once 'database.php';
+
+  try {
+    $conn = Database::getInstance();
+
+    $input = file_get_contents('php://input');
+    $data = json_decode($input, true);
+
+    if (!$data || !isset($data['user_id']) || !isset($data['chart_title']) || !isset($data['chart_type'])) {
+      throw new Exception('Invalid request data');
+    }
+
+    $user_id = (int)$data['user_id'];
+    $chart_title = $conn->real_escape_string($data['chart_title']);
+    $chart_type = $conn->real_escape_string($data['chart_type']);
+
+    $action = "Exported statistics chart from Dashboard\n";
+    $action .= "• Chart Type: " . ucfirst(str_replace('_', ' ', $chart_type)) . "\n";
+    $action .= "• Chart Title: {$chart_title}\n";
+    $action .= "• Export Format: PNG Image\n";
+    $action .= "• Export Time: " . date('Y-m-d H:i:s');
+
+    $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
+    $stmt->bind_param("is", $user_id, $action);
+
+    if ($stmt->execute()) {
+      echo json_encode([
+        'success' => true,
+        'message' => 'Export activity logged successfully',
+        'log_id' => $stmt->insert_id
+      ]);
+    } else {
+      throw new Exception('Failed to insert log: ' . $stmt->error);
+    }
+
+    $stmt->close();
+    $conn->close();
+  } catch (Exception $e) {
+    echo json_encode([
+      'success' => false,
+      'error' => $e->getMessage()
+    ]);
+  }
+
+  exit;
 }
 
 // Redirect to login if not logged in
@@ -118,7 +117,7 @@ $result_activity = $conn->query($query_activity);
 if ($result_activity && $result_activity->num_rows > 0) {
   while ($row = $result_activity->fetch_assoc()) {
     $action = strtolower($row['action']);
-    
+
     if (strpos($action, 'logged in') !== false) {
       $login_count++;
     } elseif (strpos($action, 'logged out') !== false) {
@@ -162,15 +161,15 @@ for ($i = 5; $i >= 0; $i--) {
   $month_start = date('Y-m-01', strtotime("-$i months"));
   $month_end = date('Y-m-t', strtotime("-$i months"));
   $month_label = date('M Y', strtotime("-$i months"));
-  
+
   $months_labels[] = $month_label;
-  
+
   $q = "SELECT COUNT(*) as count FROM p_info WHERE created_at BETWEEN '$month_start' AND '$month_end 23:59:59'";
   $monthly_properties[] = $conn->query($q)->fetch_assoc()['count'];
-  
+
   $q = "SELECT COUNT(*) as count FROM transactions WHERE created_at BETWEEN '$month_start' AND '$month_end 23:59:59'";
   $monthly_transactions[] = $conn->query($q)->fetch_assoc()['count'];
-  
+
   $q = "SELECT COUNT(*) as count FROM activity_log WHERE action LIKE '%Logged in%' AND log_time BETWEEN '$month_start' AND '$month_end 23:59:59'";
   $monthly_logins[] = $conn->query($q)->fetch_assoc()['count'];
 }
@@ -280,11 +279,8 @@ $plant_count = 327;
               <div class="col-md-8">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                   <h6 class="mb-0"><i class="fas fa-chart-line me-2"></i> Statistics Dashboard</h6>
-                  <button id="exportBtn" class="btn btn-sm btn-success">
-                    <i class="fas fa-download"></i> Export
-                  </button>
                 </div>
-                
+
                 <!-- Chart Type Selector -->
                 <div class="mb-2">
                   <select id="chartSelector" class="form-select form-select-sm">
@@ -439,7 +435,7 @@ $plant_count = 327;
 
   <script>
     const userId = <?= $user_id ?>;
-    
+
     const statisticsData = {
       property: <?= json_encode($property_stats) ?>,
       user: <?= json_encode($user_activity_stats) ?>,
@@ -478,7 +474,7 @@ $plant_count = 327;
 
     function createChart(type, data) {
       const ctx = document.getElementById('dashboardChart').getContext('2d');
-      
+
       if (currentChart) {
         currentChart.destroy();
       }
@@ -524,8 +520,7 @@ $plant_count = 327;
       if (type === 'monthly') {
         chartData = {
           labels: statisticsData.monthly.labels,
-          datasets: [
-            {
+          datasets: [{
               label: 'Properties Created',
               data: statisticsData.monthly.properties,
               backgroundColor: colors[0],
@@ -570,13 +565,13 @@ $plant_count = 327;
 
     function changeChartType(type) {
       currentChartType = type;
-      
+
       // Update active button
       document.querySelectorAll('.btn-group button').forEach(btn => {
         btn.classList.remove('active');
       });
       document.querySelector(`button[data-type="${type}"]`).classList.add('active');
-      
+
       const selectedStat = document.getElementById('chartSelector').value;
       updateChart(selectedStat);
     }
@@ -584,45 +579,6 @@ $plant_count = 327;
     document.getElementById('chartSelector').addEventListener('change', function() {
       updateChart(this.value);
     });
-
-    document.getElementById('exportBtn').addEventListener('click', function() {
-      if (currentChart) {
-        const selectedStat = document.getElementById('chartSelector').value;
-        const chartTitle = getChartTitle(selectedStat);
-        
-        logExportActivity(chartTitle, selectedStat);
-        
-        const link = document.createElement('a');
-        link.download = `dashboard-stats-${selectedStat}-${Date.now()}.png`;
-        link.href = currentChart.toBase64Image();
-        link.click();
-      }
-    });
-
-    function logExportActivity(chartTitle, chartType) {
-      const currentFileName = window.location.pathname.split('/').pop();
-      
-      fetch(`${currentFileName}?action=log_export`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user_id: userId,
-          chart_title: chartTitle,
-          chart_type: chartType
-        })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          console.log('Export activity logged successfully');
-        }
-      })
-      .catch(error => {
-        console.error('Error logging export activity:', error);
-      });
-    }
 
     // Initialize with property statistics
     updateChart('property');
