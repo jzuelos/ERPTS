@@ -18,6 +18,28 @@ function logActivity($conn, $userId, $action)
   $stmt->close();
 }
 
+// Function to unban IP address
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["unban_ip"])) {
+  $lockoutId = filter_input(INPUT_POST, 'lockout_id', FILTER_SANITIZE_NUMBER_INT);
+
+  $stmt = $conn->prepare("DELETE FROM ip_lockout WHERE id = ?");
+  $stmt->bind_param("i", $lockoutId);
+
+  if ($stmt->execute()) {
+    // Log the unban action
+    if (isset($_SESSION['user_id'])) {
+      $adminId = $_SESSION['user_id'];
+      $ipAddress = filter_input(INPUT_POST, 'ip_address', FILTER_SANITIZE_STRING);
+      logActivity($conn, $adminId, "Unbanned IP address: $ipAddress");
+    }
+    echo "<script>alert('IP address unbanned successfully!'); window.location.href='User-Control.php';</script>";
+  } else {
+    echo "<script>alert('Error unbanning IP: " . $stmt->error . "');</script>";
+  }
+
+  $stmt->close();
+}
+
 // Function to update user details with input filtering
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
   // Server-side filtering & sanitization
@@ -302,6 +324,17 @@ if ($result) {
   $result->free();
 }
 
+// ✅ Fetch IP Lockouts from database
+$ip_lockout = [];
+$lockout_query = "SELECT * FROM ip_lockout ORDER BY last_attempt DESC";
+$lockout_result = $conn->query($lockout_query);
+if ($lockout_result) {
+  while ($row = $lockout_result->fetch_assoc()) {
+    $ip_lockout[] = $row;
+  }
+  $lockout_result->free();
+}
+
 $conn->close();
 ?>
 
@@ -330,159 +363,170 @@ $conn->close();
     const barangaysData = <?php echo json_encode($barangays); ?>;
   </script>
 
- <div class="container py-4">
-  <!-- SERVER STATUS + LOGGED IN INFO -->
-  <div class="row mb-4 align-items-center">
-    <div class="col-md-4 mb-3 mb-md-0">
-      <div class="card border-success shadow-sm">
-        <div class="card-body text-center text-success fw-bold">
-          <i class="bi bi-server me-2"></i> Server Status: Online
+  <div class="container py-4">
+    <!-- SERVER STATUS + LOGGED IN INFO -->
+    <div class="row mb-4 align-items-center">
+      <div class="col-md-4 mb-3 mb-md-0">
+        <div class="card border-success shadow-sm">
+          <div class="card-body text-center text-success fw-bold">
+            <i class="bi bi-server me-2"></i> Server Status: Online
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 offset-md-1">
+        <div class="alert alert-info text-center shadow-sm mb-0">
+          <i class="bi bi-person-circle me-2"></i>
+          Logged in as <strong><?= htmlspecialchars($username); ?></strong>
         </div>
       </div>
     </div>
 
-    <div class="col-md-6 offset-md-1">
-      <div class="alert alert-info text-center shadow-sm mb-0">
-        <i class="bi bi-person-circle me-2"></i>
-        Logged in as <strong><?= htmlspecialchars($username); ?></strong>
-      </div>
-    </div>
-  </div>
-
-  <!-- BACK BUTTON -->
-  <div class="mb-4">
-    <a href="Admin-Page-2.php" class="btn btn-outline-secondary">
-      <i class="bi bi-arrow-left"></i> Back
-    </a>
-  </div>
-
-  <!-- USERS SECTION -->
-  <div class="table-section mx-auto" style="width: 85%;">
-    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-      <h3 class="fw-bold text-primary mb-3 mb-md-0">
-        <i class="bi bi-people-fill me-2"></i> Users
-      </h3>
-
-      <div class="d-flex align-items-center flex-wrap gap-3">
-        <!-- Add User -->
-        <a href="ADD_User.php" class="btn btn-outline-primary">
-          <i class="bi bi-person-plus"></i> Add User
-        </a>
-
-        <!-- Show/Hide Disabled Users -->
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="userStatusFilter" id="showDisabled" value="show" checked>
-          <label class="form-check-label" for="showDisabled">Show Disabled User</label>
-        </div>
-
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="userStatusFilter" id="hideDisabled" value="hide">
-          <label class="form-check-label" for="hideDisabled">Hide Disabled User</label>
-        </div>
-
-        <!-- Banned Accounts/IP Toggle -->
-        <div class="form-check form-switch ms-3">
-          <input class="form-check-input" type="checkbox" id="bannedToggle">
-          <label class="form-check-label fw-semibold text-danger" for="bannedToggle">
-            <i class="bi bi-shield-lock"></i> Banned Accounts / IP
-          </label>
-        </div>
-      </div>
+    <!-- BACK BUTTON -->
+    <div class="mb-4">
+      <a href="Admin-Page-2.php" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+      </a>
     </div>
 
-    <!-- USERS TABLES SECTION -->
-    <!-- DEFAULT USERS TABLE -->
-    <div id="defaultUsersTable" class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
-        <thead class="bg-dark text-white text-center">
-          <tr>
-            <th style="width: 8%">ID</th>
-            <th style="width: 18%">Username</th>
-            <th style="width: 25%">Full Name</th>
-            <th style="width: 15%">User Type</th>
-            <th style="width: 15%">Status</th>
-            <th style="width: 10%">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="text-start">
-          <?php foreach ($users as $user): ?>
-            <tr class="border-bottom">
-              <td><?= htmlspecialchars($user['user_id'] ?? '') ?></td>
-              <td class="fw-semibold"><?= htmlspecialchars($user['username'] ?? '') ?></td>
-              <td><?= htmlspecialchars(trim("{$user['first_name']} {$user['middle_name']} {$user['last_name']}")) ?></td>
-              <td><?= htmlspecialchars($user['user_type'] ?? '') ?></td>
-              <td>
-                <?php if ($user['status'] == 1): ?>
-                  <span class="badge bg-success px-3 py-2">Enabled</span>
-                <?php else: ?>
-                  <span class="badge bg-secondary px-3 py-2">Disabled</span>
-                <?php endif; ?>
-              </td>
-              <td class="text-center">
-                <a href="#" data-toggle="modal"
-                   data-target="#editUserModal-<?= $user['user_id'] ?>"
-                   class="btn btn-outline-primary btn-sm rounded-circle">
-                  <i class="bi bi-pencil-square"></i>
-                </a>
-              </td>
+    <!-- USERS SECTION -->
+    <div class="table-section mx-auto" style="width: 85%;">
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <h3 class="fw-bold text-primary mb-3 mb-md-0">
+          <i class="bi bi-people-fill me-2"></i> Users
+        </h3>
+
+        <div class="d-flex align-items-center flex-wrap gap-3">
+          <!-- Add User -->
+          <a href="ADD_User.php" class="btn btn-outline-primary">
+            <i class="bi bi-person-plus"></i> Add User
+          </a>
+
+          <!-- Show/Hide Disabled Users -->
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="userStatusFilter" id="showDisabled" value="show" checked>
+            <label class="form-check-label" for="showDisabled">Show Disabled User</label>
+          </div>
+
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="userStatusFilter" id="hideDisabled" value="hide">
+            <label class="form-check-label" for="hideDisabled">Hide Disabled User</label>
+          </div>
+
+          <!-- Banned Accounts/IP Toggle -->
+          <div class="form-check form-switch ms-3">
+            <input class="form-check-input" type="checkbox" id="bannedToggle">
+            <label class="form-check-label fw-semibold text-danger" for="bannedToggle">
+              <i class="bi bi-shield-lock"></i> Banned Accounts / IP
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- USERS TABLES SECTION -->
+      <!-- DEFAULT USERS TABLE -->
+      <div id="defaultUsersTable" class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-dark text-white text-center">
+            <tr>
+              <th style="width: 8%">ID</th>
+              <th style="width: 18%">Username</th>
+              <th style="width: 25%">Full Name</th>
+              <th style="width: 15%">User Type</th>
+              <th style="width: 15%">Status</th>
+              <th style="width: 10%">Actions</th>
             </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
+          </thead>
+          <tbody class="text-start">
+            <?php foreach ($users as $user): ?>
+              <tr class="border-bottom">
+                <td><?= htmlspecialchars($user['user_id'] ?? '') ?></td>
+                <td class="fw-semibold"><?= htmlspecialchars($user['username'] ?? '') ?></td>
+                <td><?= htmlspecialchars(trim("{$user['first_name']} {$user['middle_name']} {$user['last_name']}")) ?></td>
+                <td><?= htmlspecialchars($user['user_type'] ?? '') ?></td>
+                <td>
+                  <?php if ($user['status'] == 1): ?>
+                    <span class="badge bg-success px-3 py-2">Enabled</span>
+                  <?php else: ?>
+                    <span class="badge bg-secondary px-3 py-2">Disabled</span>
+                  <?php endif; ?>
+                </td>
+                <td class="text-center">
+                  <a href="#" data-toggle="modal"
+                    data-target="#editUserModal-<?= $user['user_id'] ?>"
+                    class="btn btn-outline-primary btn-sm rounded-circle">
+                    <i class="bi bi-pencil-square"></i>
+                  </a>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- BANNED ACCOUNTS/IP TABLE (FROM DATABASE) -->
+      <div id="bannedTable" class="table-responsive d-none">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-danger text-white text-center">
+            <tr>
+              <th style="width: 8%">ID</th>
+              <th style="width: 20%">IP Address</th>
+              <th style="width: 12%">Attempts</th>
+              <th style="width: 20%">Locked Until</th>
+              <th style="width: 15%">Status</th>
+              <th style="width: 20%">Last Attempt</th>
+              <th style="width: 15%">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="text-start">
+            <?php if (empty($ip_lockout)): ?>
+              <tr>
+                <td colspan="7" class="text-center text-muted py-4">
+                  <i class="bi bi-info-circle me-2"></i>No banned IP addresses found
+                </td>
+              </tr>
+            <?php else: ?>
+              <?php foreach ($ip_lockout as $lockout): ?>
+                <tr>
+                  <td><?= htmlspecialchars($lockout['id']) ?></td>
+                  <td class="fw-semibold"><?= htmlspecialchars($lockout['ip_address']) ?></td>
+                  <td><?= htmlspecialchars($lockout['attempts']) ?></td>
+                  <td>
+                    <?php
+                    $lockUntil = $lockout['lock_until'];
+                    if ($lockout['is_permanent'] == 1) {
+                      echo '<span class="badge bg-dark">Permanent</span>';
+                    } elseif ($lockUntil) {
+                      echo date('Y-m-d H:i:s', strtotime($lockUntil));
+                    } else {
+                      echo '<span class="text-muted">N/A</span>';
+                    }
+                    ?>
+                  </td>
+                  <td>
+                    <?php if ($lockout['is_permanent'] == 1): ?>
+                      <span class="badge bg-danger">Permanent Ban</span>
+                    <?php else: ?>
+                      <span class="badge bg-warning text-dark">Temporary Lock</span>
+                    <?php endif; ?>
+                  </td>
+                  <td><?= date('Y-m-d H:i:s', strtotime($lockout['last_attempt'])) ?></td>
+                  <td class="text-center">
+                    <button class="btn btn-outline-success btn-sm unban-btn"
+                      data-id="<?= $lockout['id'] ?>"
+                      data-ip="<?= htmlspecialchars($lockout['ip_address']) ?>">
+                      <i class="bi bi-unlock"></i> Unban
+                    </button>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
+
     </div>
-
-    <!-- BANNED ACCOUNTS/IP TABLE (DUMMY DATA) -->
- <div id="bannedTable" class="table-responsive d-none">
-  <table class="table table-hover align-middle mb-0">
-    <thead class="bg-danger text-white text-center">
-      <tr>
-        <th style="width: 10%">Ban ID</th>
-        <th style="width: 20%">Username / IP</th>
-        <th style="width: 30%">Reason</th>
-        <th style="width: 20%">Date Banned</th>
-        <th style="width: 20%">Actions</th>
-      </tr>
-    </thead>
-    <tbody class="text-start">
-      <tr>
-        <td>1</td>
-        <td>192.168.0.25</td>
-        <td>Repeated failed logins</td>
-        <td>2025-10-29</td>
-        <td class="text-center">
-          <button class="btn btn-outline-success btn-sm unban-btn" data-id="1" data-username="192.168.0.25">
-            <i class="bi bi-unlock"></i> Unban
-          </button>
-        </td>
-      </tr>
-      <tr>
-        <td>2</td>
-        <td>john_doe</td>
-        <td>Suspicious activities detected</td>
-        <td>2025-10-30</td>
-        <td class="text-center">
-          <button class="btn btn-outline-success btn-sm unban-btn" data-id="2" data-username="john_doe">
-            <i class="bi bi-unlock"></i> Unban
-          </button>
-        </td>
-      </tr>
-      <tr>
-        <td>3</td>
-        <td>203.45.23.11</td>
-        <td>IP flagged for spam attempts</td>
-        <td>2025-11-01</td>
-        <td class="text-center">
-          <button class="btn btn-outline-success btn-sm unban-btn" data-id="3" data-username="203.45.23.11">
-            <i class="bi bi-unlock"></i> Unban
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
   </div>
-</div>
 
 
 
@@ -498,8 +542,8 @@ $conn->close();
               <i class="bi bi-pencil-square me-2"></i> Edit User
             </h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
 
           <!-- Modal Form -->
@@ -673,27 +717,36 @@ $conn->close();
   <?php endforeach; ?>
 
   <!-- UNBAN CONFIRMATION MODAL -->
-<div class="modal fade" id="confirmUnbanModal" tabindex="-1" aria-labelledby="confirmUnbanModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-success shadow">
-      <div class="modal-header bg-success text-white">
-        <h5 class="modal-title" id="confirmUnbanModalLabel">
-          <i class="bi bi-unlock"></i> Confirm Unban
-        </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body text-center">
-        <p class="fw-semibold mb-3">
-          Are you sure you want to unban <span id="unbanTarget" class="text-danger"></span>?
-        </p>
-      </div>
-      <div class="modal-footer justify-content-center">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-success" id="confirmUnbanBtn">Yes, Unban</button>
+  <div class="modal fade" id="confirmUnbanModal" tabindex="-1" aria-labelledby="confirmUnbanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-success shadow">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title" id="confirmUnbanModalLabel">
+            <i class="bi bi-unlock"></i> Confirm Unban IP Address
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="POST" id="unbanForm">
+          <input type="hidden" name="unban_ip" value="1">
+          <input type="hidden" name="lockout_id" id="unbanLockoutId">
+          <input type="hidden" name="ip_address" id="unbanIpAddress">
+
+          <div class="modal-body text-center">
+            <p class="fw-semibold mb-3">
+              Are you sure you want to unban the IP address <span id="unbanTarget" class="text-danger"></span>?
+            </p>
+            <p class="text-muted small">This will immediately remove all restrictions for this IP address.</p>
+          </div>
+          <div class="modal-footer justify-content-center">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success">
+              <i class="bi bi-unlock"></i> Yes, Unban
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
-</div>
 
 
 
@@ -708,7 +761,8 @@ $conn->close();
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 
   <script>
@@ -716,7 +770,7 @@ $conn->close();
       // User status filter
       $("input[name='userStatusFilter']").change(function() {
         var showDisabled = $("#showDisabled").is(":checked");
-        $("tbody tr").each(function() {
+        $("#defaultUsersTable tbody tr").each(function() {
           var statusText = $(this).find("td:eq(4)").text().trim();
           if (statusText === "Disabled") {
             $(this).toggle(showDisabled);
@@ -793,70 +847,51 @@ $conn->close();
         populateDistricts(municipalityId, districtSelect);
         populateBarangays(municipalityId, barangaySelect);
       });
-
-      // (Optional) District change event
-      $('.district-select').on('change', function() {
-        // Currently no barangay filtering by district
-      });
     });
   </script>
   <script>
-document.addEventListener("DOMContentLoaded", function() {
-  const bannedToggle = document.getElementById("bannedToggle");
-  const defaultTable = document.getElementById("defaultUsersTable");
-  const bannedTable = document.getElementById("bannedTable");
+    document.addEventListener("DOMContentLoaded", function() {
+      const bannedToggle = document.getElementById("bannedToggle");
+      const defaultTable = document.getElementById("defaultUsersTable");
+      const bannedTable = document.getElementById("bannedTable");
 
-  bannedToggle.addEventListener("change", function() {
-    if (this.checked) {
-      bannedTable.classList.remove("d-none");
-      defaultTable.classList.add("d-none");
-    } else {
-      bannedTable.classList.add("d-none");
-      defaultTable.classList.remove("d-none");
-    }
-  });
-
-  // Dummy Unban Action
-  document.querySelectorAll(".unban-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
+      bannedToggle.addEventListener("change", function() {
+        if (this.checked) {
+          bannedTable.classList.remove("d-none");
+          defaultTable.classList.add("d-none");
+        } else {
+          bannedTable.classList.add("d-none");
+          defaultTable.classList.remove("d-none");
+        }
+      });
     });
-  });
-});
-</script>
+  </script>
 
 
   <script>
-    //Unban Confirmation Modal 
-  document.addEventListener('DOMContentLoaded', () => {
-    const unbanButtons = document.querySelectorAll('.unban-btn');
-    const confirmUnbanModal = new bootstrap.Modal(document.getElementById('confirmUnbanModal'));
-    const unbanTargetSpan = document.getElementById('unbanTarget');
-    const confirmUnbanBtn = document.getElementById('confirmUnbanBtn');
+    // Unban Confirmation Modal with Bootstrap 5
+    document.addEventListener('DOMContentLoaded', () => {
+      const unbanButtons = document.querySelectorAll('.unban-btn');
+      const confirmUnbanModal = new bootstrap.Modal(document.getElementById('confirmUnbanModal'));
+      const unbanTargetSpan = document.getElementById('unbanTarget');
+      const unbanLockoutIdInput = document.getElementById('unbanLockoutId');
+      const unbanIpAddressInput = document.getElementById('unbanIpAddress');
 
-    let selectedBanId = null;
+      // When an Unban button is clicked
+      unbanButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const lockoutId = button.getAttribute('data-id');
+          const ipAddress = button.getAttribute('data-ip');
 
-    // When an Unban button is clicked
-    unbanButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        selectedBanId = button.getAttribute('data-id');
-        const username = button.getAttribute('data-username');
-        unbanTargetSpan.textContent = username;
-        confirmUnbanModal.show();
+          unbanTargetSpan.textContent = ipAddress;
+          unbanLockoutIdInput.value = lockoutId;
+          unbanIpAddressInput.value = ipAddress;
+
+          confirmUnbanModal.show();
+        });
       });
     });
-
-    // When the user confirms the unban
-    confirmUnbanBtn.addEventListener('click', () => {
-      confirmUnbanModal.hide();
-      // Example: perform AJAX or redirect here
-      alert(`User/IP with Ban ID ${selectedBanId} has been unbanned!`);
-
-      // Optional: remove the row dynamically from table
-      const rowToRemove = document.querySelector(`.unban-btn[data-id="${selectedBanId}"]`).closest('tr');
-      if (rowToRemove) rowToRemove.remove();
-    });
-  });
-</script>
+  </script>
 
 </body>
 
