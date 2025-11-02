@@ -330,160 +330,159 @@ $conn->close();
     const barangaysData = <?php echo json_encode($barangays); ?>;
   </script>
 
-  <div class="container py-4">
-    <!-- SERVER STATUS + LOGGED IN INFO -->
-    <div class="row mb-4 align-items-center">
-      <div class="col-md-4 mb-3 mb-md-0">
-        <div class="card border-success shadow-sm">
-          <div class="card-body text-center text-success fw-bold">
-            <i class="bi bi-server me-2"></i> Server Status: Online
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6 offset-md-1">
-        <div class="alert alert-info text-center shadow-sm mb-0">
-          <i class="bi bi-person-circle me-2"></i>
-          Logged in as <strong><?= htmlspecialchars($username); ?></strong>
+ <div class="container py-4">
+  <!-- SERVER STATUS + LOGGED IN INFO -->
+  <div class="row mb-4 align-items-center">
+    <div class="col-md-4 mb-3 mb-md-0">
+      <div class="card border-success shadow-sm">
+        <div class="card-body text-center text-success fw-bold">
+          <i class="bi bi-server me-2"></i> Server Status: Online
         </div>
       </div>
     </div>
 
-    <!-- BACK BUTTON -->
-    <div class="mb-4">
-      <a href="Admin-Page-2.php" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left"></i> Back
-      </a>
-    </div>
-
-    <!-- USERS SECTION -->
-<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-  <h3 class="fw-bold text-primary mb-3 mb-md-0">
-    <i class="bi bi-people-fill me-2"></i> Users
-  </h3>
-
-  <div class="d-flex align-items-center flex-wrap gap-3">
-    <!-- Add User -->
-    <a href="ADD_User.php" class="btn btn-outline-primary">
-      <i class="bi bi-person-plus"></i> Add User
-    </a>
-
-    <!-- Show/Hide Disabled Users -->
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="radio" name="userStatusFilter" id="showDisabled" value="show" checked>
-      <label class="form-check-label" for="showDisabled">Show Disabled User</label>
-    </div>
-
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="radio" name="userStatusFilter" id="hideDisabled" value="hide">
-      <label class="form-check-label" for="hideDisabled">Hide Disabled User</label>
-    </div>
-
-    <!-- Banned Accounts/IP Toggle -->
-    <div class="form-check form-switch ms-3">
-      <input class="form-check-input" type="checkbox" id="bannedToggle">
-      <label class="form-check-label fw-semibold text-danger" for="bannedToggle">
-        <i class="bi bi-shield-lock"></i> Banned Accounts / IP
-      </label>
+    <div class="col-md-6 offset-md-1">
+      <div class="alert alert-info text-center shadow-sm mb-0">
+        <i class="bi bi-person-circle me-2"></i>
+        Logged in as <strong><?= htmlspecialchars($username); ?></strong>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- USERS TABLES SECTION -->
-<div class="table-section mx-auto" style="width: 85%;">
+  <!-- BACK BUTTON -->
+  <div class="mb-4">
+    <a href="Admin-Page-2.php" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
 
-  <!-- DEFAULT USERS TABLE -->
-  <div id="defaultUsersTable" class="table-responsive">
-    <table class="table table-hover align-middle mb-0">
-      <thead class="bg-dark text-white text-center">
-        <tr>
-          <th style="width: 8%">ID</th>
-          <th style="width: 18%">Username</th>
-          <th style="width: 25%">Full Name</th>
-          <th style="width: 15%">User Type</th>
-          <th style="width: 15%">Status</th>
-          <th style="width: 10%">Actions</th>
-        </tr>
-      </thead>
-      <tbody class="text-start">
-        <?php foreach ($users as $user): ?>
-          <tr class="border-bottom">
-            <td><?= htmlspecialchars($user['user_id'] ?? '') ?></td>
-            <td class="fw-semibold"><?= htmlspecialchars($user['username'] ?? '') ?></td>
-            <td><?= htmlspecialchars(trim("{$user['first_name']} {$user['middle_name']} {$user['last_name']}")) ?></td>
-            <td><?= htmlspecialchars($user['user_type'] ?? '') ?></td>
-            <td>
-              <?php if ($user['status'] == 1): ?>
-                <span class="badge bg-success px-3 py-2">Enabled</span>
-              <?php else: ?>
-                <span class="badge bg-secondary px-3 py-2">Disabled</span>
-              <?php endif; ?>
-            </td>
+  <!-- USERS SECTION -->
+  <div class="table-section mx-auto" style="width: 85%;">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+      <h3 class="fw-bold text-primary mb-3 mb-md-0">
+        <i class="bi bi-people-fill me-2"></i> Users
+      </h3>
+
+      <div class="d-flex align-items-center flex-wrap gap-3">
+        <!-- Add User -->
+        <a href="ADD_User.php" class="btn btn-outline-primary">
+          <i class="bi bi-person-plus"></i> Add User
+        </a>
+
+        <!-- Show/Hide Disabled Users -->
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="userStatusFilter" id="showDisabled" value="show" checked>
+          <label class="form-check-label" for="showDisabled">Show Disabled User</label>
+        </div>
+
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="userStatusFilter" id="hideDisabled" value="hide">
+          <label class="form-check-label" for="hideDisabled">Hide Disabled User</label>
+        </div>
+
+        <!-- Banned Accounts/IP Toggle -->
+        <div class="form-check form-switch ms-3">
+          <input class="form-check-input" type="checkbox" id="bannedToggle">
+          <label class="form-check-label fw-semibold text-danger" for="bannedToggle">
+            <i class="bi bi-shield-lock"></i> Banned Accounts / IP
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- USERS TABLES SECTION -->
+    <!-- DEFAULT USERS TABLE -->
+    <div id="defaultUsersTable" class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-dark text-white text-center">
+          <tr>
+            <th style="width: 8%">ID</th>
+            <th style="width: 18%">Username</th>
+            <th style="width: 25%">Full Name</th>
+            <th style="width: 15%">User Type</th>
+            <th style="width: 15%">Status</th>
+            <th style="width: 10%">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="text-start">
+          <?php foreach ($users as $user): ?>
+            <tr class="border-bottom">
+              <td><?= htmlspecialchars($user['user_id'] ?? '') ?></td>
+              <td class="fw-semibold"><?= htmlspecialchars($user['username'] ?? '') ?></td>
+              <td><?= htmlspecialchars(trim("{$user['first_name']} {$user['middle_name']} {$user['last_name']}")) ?></td>
+              <td><?= htmlspecialchars($user['user_type'] ?? '') ?></td>
+              <td>
+                <?php if ($user['status'] == 1): ?>
+                  <span class="badge bg-success px-3 py-2">Enabled</span>
+                <?php else: ?>
+                  <span class="badge bg-secondary px-3 py-2">Disabled</span>
+                <?php endif; ?>
+              </td>
+              <td class="text-center">
+                <a href="#" data-toggle="modal"
+                   data-target="#editUserModal-<?= $user['user_id'] ?>"
+                   class="btn btn-outline-primary btn-sm rounded-circle">
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- BANNED ACCOUNTS/IP TABLE (DUMMY DATA) -->
+    <div id="bannedTable" class="table-responsive d-none">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-danger text-white text-center">
+          <tr>
+            <th style="width: 10%">Ban ID</th>
+            <th style="width: 20%">Username / IP</th>
+            <th style="width: 30%">Reason</th>
+            <th style="width: 20%">Date Banned</th>
+            <th style="width: 20%">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="text-start">
+          <tr>
+            <td>1</td>
+            <td>192.168.0.25</td>
+            <td>Repeated failed logins</td>
+            <td>2025-10-29</td>
             <td class="text-center">
-              <a href="#"
-                data-toggle="modal"
-                data-target="#editUserModal-<?= $user['user_id'] ?>"
-                class="btn btn-outline-primary btn-sm rounded-circle">
-                <i class="bi bi-pencil-square"></i>
-              </a>
+              <button class="btn btn-outline-success btn-sm unban-btn">
+                <i class="bi bi-unlock"></i> Unban
+              </button>
             </td>
           </tr>
-        <?php endforeach; ?>
-      </tbody>
-    </table>
+          <tr>
+            <td>2</td>
+            <td>john_doe</td>
+            <td>Suspicious activities detected</td>
+            <td>2025-10-30</td>
+            <td class="text-center">
+              <button class="btn btn-outline-success btn-sm unban-btn">
+                <i class="bi bi-unlock"></i> Unban
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>203.45.23.11</td>
+            <td>IP flagged for spam attempts</td>
+            <td>2025-11-01</td>
+            <td class="text-center">
+              <button class="btn btn-outline-success btn-sm unban-btn">
+                <i class="bi bi-unlock"></i> Unban
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-
-  <!-- BANNED ACCOUNTS/IP TABLE (DUMMY DATA) -->
-  <div id="bannedTable" class="table-responsive d-none">
-    <table class="table table-hover align-middle mb-0">
-      <thead class="bg-danger text-white text-center">
-        <tr>
-          <th style="width: 10%">Ban ID</th>
-          <th style="width: 20%">Username / IP</th>
-          <th style="width: 30%">Reason</th>
-          <th style="width: 20%">Date Banned</th>
-          <th style="width: 20%">Actions</th>
-        </tr>
-      </thead>
-      <tbody class="text-start">
-        <tr>
-          <td>1</td>
-          <td>192.168.0.25</td>
-          <td>Repeated failed logins</td>
-          <td>2025-10-29</td>
-          <td class="text-center">
-            <button class="btn btn-outline-success btn-sm unban-btn">
-              <i class="bi bi-unlock"></i> Unban
-            </button>
-          </td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>john_doe</td>
-          <td>Suspicious activities detected</td>
-          <td>2025-10-30</td>
-          <td class="text-center">
-            <button class="btn btn-outline-success btn-sm unban-btn">
-              <i class="bi bi-unlock"></i> Unban
-            </button>
-          </td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td>203.45.23.11</td>
-          <td>IP flagged for spam attempts</td>
-          <td>2025-11-01</td>
-          <td class="text-center">
-            <button class="btn btn-outline-success btn-sm unban-btn">
-              <i class="bi bi-unlock"></i> Unban
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-              </div>
 </div>
+
 
 
 

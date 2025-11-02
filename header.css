@@ -1,72 +1,202 @@
- .bg-custom {
-    background-color: #379576;
-  }
-  
-  .navbar {
-    padding: 0.5rem 1rem;
-  }
-  
-.nav-link {
-  padding: 0.5rem 1rem;
-  position: relative;
-  transition: all 0.3s ease;
-  color: rgb(255, 255, 255) !important;
-}
-
-.navbar-dark .navbar-nav .nav-link {
-  color: rgb(255, 255, 255) !important;
-}
-
-.navbar-brand span {
-  color: rgb(255, 255, 255);
-  font-size: 1.1rem;
-  font-weight: 600;
-  line-height: 1;
-}
-  
-.nav-link:hover,
-.nav-link:focus {
-  color: black;
-  background-color: rgba(0, 0, 0, 0.05); /* light hover background */
-}
-  
-.dropdown-menu {
-  background-color: white; /* White background */
-  border: none;
-  margin-top: 0;
-}
-
-.dropdown-item {
-  color: black; /* Black text */
-  padding: 0.5rem 1.5rem;
-  transition: all 0.2s ease;
-  background-color: transparent;
-}
-  
-.dropdown-item:hover,
-.dropdown-item:focus {
-  background-color: #f1f1f1; /* Light gray on hover */
-  color: black;
-}
-
-  .dropdown:hover .dropdown-menu {
-    display: block;
-  }
-  
-    .admin-dashboard-btn {
+  /* Custom Background with Gradient */
+    .bg-custom {
+      background: linear-gradient(135deg, #459577 0%, #38776b 100%);
+      box-shadow: 0 4px 20px rgba(69, 149, 119, 0.3);
+    }
+    
+    .navbar {
+      padding: 0.75rem 1rem;
       transition: all 0.3s ease;
     }
     
-  .admin-dashboard-btn:hover {
-    background-color: #e0a800 !important;
-    color: white !important;
-    transform: translateY(-1px);
-  }
-
-  .navbar-toggler {
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-  
-  .navbar-toggler:focus {
-    box-shadow: 0 0 0 0.15rem rgba(255, 255, 255, 0.25);
-  }
+    /* Brand Styling */
+    .navbar-brand {
+      transition: transform 0.3s ease;
+    }
+    
+    .navbar-brand:hover {
+      transform: translateY(-2px);
+    }
+    
+    .navbar-brand img {
+      transition: transform 0.3s ease;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+    
+    .navbar-brand:hover img {
+      transform: rotate(5deg) scale(1.05);
+    }
+    
+    .navbar-brand span {
+      color: rgb(255, 255, 255);
+      font-size: 1.1rem;
+      font-weight: 600;
+      line-height: 1;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      letter-spacing: 0.3px;
+    }
+    
+    /* Nav Link Styling */
+    .nav-link {
+      padding: 0.5rem 1rem;
+      position: relative;
+      transition: all 0.3s ease;
+      color: rgb(255, 255, 255) !important;
+      border-radius: 8px;
+      font-weight: 500;
+      margin: 0 0.25rem;
+    }
+    
+    .navbar-dark .navbar-nav .nav-link {
+      color: rgb(255, 255, 255) !important;
+    }
+    
+    /* Animated Underline Effect */
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 2px;
+      background-color: white;
+      transition: width 0.3s ease;
+    }
+    
+    .nav-link:hover::after,
+    .nav-link:focus::after {
+      width: 70%;
+    }
+    
+    .nav-link:hover,
+    .nav-link:focus {
+      color: white !important;
+      background-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+    
+    /* Dropdown Styling */
+    .dropdown-menu {
+      background-color: white;
+      border: none;
+      margin-top: 0.5rem;
+      border-radius: 10px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      padding: 0.5rem;
+      animation: fadeInDown 0.3s ease;
+    }
+    
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .dropdown-item {
+      color: #333;
+      padding: 0.65rem 1.5rem;
+      transition: all 0.2s ease;
+      background-color: transparent;
+      border-radius: 6px;
+      margin: 0.15rem 0;
+      font-weight: 500;
+    }
+    
+    .dropdown-item:hover,
+    .dropdown-item:focus {
+      background: linear-gradient(135deg, #459577 0%, #38776b 100%);
+      color: white;
+      transform: translateX(5px);
+    }
+    
+    .dropdown-divider {
+      border-top: 1px solid #e0e0e0;
+      margin: 0.5rem 0;
+    }
+    
+    .dropdown:hover .dropdown-menu {
+      display: block;
+    }
+    
+    /* Admin Dashboard Button */
+    .admin-dashboard-btn {
+      transition: all 0.3s ease;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 0.5rem 1.25rem;
+      box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+    }
+    
+    .admin-dashboard-btn:hover {
+      background-color: #e0a800 !important;
+      color: white !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(255, 193, 7, 0.4);
+    }
+    
+    /* Logout Button */
+    .btn-danger {
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 0.5rem 1.25rem;
+      box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .btn-danger:hover {
+      background-color: #c82333 !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(220, 53, 69, 0.4);
+    }
+    
+    /* Mobile Toggle Button */
+    .navbar-toggler {
+      border-color: rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      transition: all 0.3s ease;
+    }
+    
+    .navbar-toggler:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .navbar-toggler:focus {
+      box-shadow: 0 0 0 0.15rem rgba(255, 255, 255, 0.25);
+    }
+    
+    .navbar-toggler-icon {
+      filter: brightness(0) invert(1);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 991px) {
+      .navbar-collapse {
+        background-color: rgba(69, 149, 119, 0.98);
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+      
+      .nav-link::after {
+        display: none;
+      }
+      
+      .dropdown-menu {
+        background-color: rgba(255, 255, 255, 0.95);
+        margin-left: 1rem;
+      }
+    }
+    
+    /* Active Link State */
+    .nav-link.active {
+      background-color: rgba(255, 255, 255, 0.2);
+      font-weight: 600;
+    }
