@@ -89,3 +89,33 @@ $user_role = 'admin'; // Demo - change to $_SESSION['user_type'] ?? 'user';
     });
   });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const dropdowns = document.querySelectorAll('.nav-item.dropdown');
+
+  dropdowns.forEach(dropdown => {
+    let timeout;
+
+    dropdown.addEventListener('mouseenter', function () {
+      clearTimeout(timeout);
+      const menu = this.querySelector('.dropdown-menu');
+      menu.style.display = 'block';
+      setTimeout(() => {
+        menu.style.opacity = '1';
+      }, 10); // fade-in smoothly
+    });
+
+    dropdown.addEventListener('mouseleave', function () {
+      const menu = this.querySelector('.dropdown-menu');
+      timeout = setTimeout(() => {
+        menu.style.opacity = '0';
+        setTimeout(() => {
+          menu.style.display = 'none';
+        }, 300); // matches your CSS fade duration
+      }, 200); // 200ms delay before hiding (you can tweak)
+    });
+  });
+});
+</script>
+  

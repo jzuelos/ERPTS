@@ -90,6 +90,20 @@ table.modern-table td {
   background-color: #1558a4;
 }
 
+.btn-outline-secondary {
+  color: #38776b !important;
+  border: 1.5px solid #38776b !important;
+  background-color: transparent !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+  background: linear-gradient(135deg, #459577 0%, #38776b 100%) !important;
+  color: #fff !important;
+  border-color: #38776b !important;
+}
+
 /* Inactive (None) rows */
 .table-secondary {
   background-color: #dee2e6 !important;
