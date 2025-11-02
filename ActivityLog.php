@@ -1,4 +1,4 @@
- <?php
+<?php
   session_start();
   if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
@@ -24,7 +24,7 @@
   $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
   $offset = ($page - 1) * $limit;
 
-  // Build WHERE clause
+  // Build WHERE clause - EXCLUDE login/logout activities
   $where = [];
   $params = [];
   if ($start_date) {
@@ -35,13 +35,24 @@
     $where[] = "DATE(a.log_time) <= ?";
     $params[] = $end_date;
   }
-  $where[] = "a.action NOT LIKE 'User logged in%' AND a.action NOT LIKE 'Failed login attempt%' AND a.action != 'Logged out of the system'";
+  // Exclude all login/logout related activities
+  $where[] = "(a.action NOT LIKE '%logged in%' 
+              AND a.action NOT LIKE '%Logged in%'
+              AND a.action NOT LIKE '%login%'
+              AND a.action NOT LIKE '%Login%'
+              AND a.action NOT LIKE '%logged out%'
+              AND a.action NOT LIKE '%Logged out%'
+              AND a.action NOT LIKE '%logout%'
+              AND a.action NOT LIKE '%Logout%'
+              AND a.action NOT LIKE '%Failed%'
+              AND a.action NOT LIKE '%lock%'
+              AND a.action NOT LIKE '%Lock%')";
   $where_sql = $where ? "WHERE " . implode(" AND ", $where) : "";
 
   // Count total rows
   $stmt_count = $conn->prepare("SELECT COUNT(*) as total 
                                 FROM activity_log a
-                                JOIN users u ON a.user_id = u.user_id
+                                LEFT JOIN users u ON a.user_id = u.user_id
                                 $where_sql");
   if ($params) $stmt_count->bind_param(str_repeat("s", count($params)), ...$params);
   $stmt_count->execute();
@@ -50,10 +61,10 @@
 
   // Fetch logs
   $stmt = $conn->prepare("SELECT a.log_id, a.action, a.log_time, 
-                                CONCAT(u.first_name, ' ', u.last_name) AS fullname,
+                                CONCAT(COALESCE(u.first_name, 'Unknown'), ' ', COALESCE(u.last_name, 'User')) AS fullname,
                                 u.email, u.user_type, u.contact_number
                         FROM activity_log a
-                        JOIN users u ON a.user_id = u.user_id
+                        LEFT JOIN users u ON a.user_id = u.user_id
                         $where_sql
                         ORDER BY a.log_time DESC
                         LIMIT ? OFFSET ?");
@@ -79,13 +90,24 @@
     $where_login[] = "DATE(a.log_time) <= ?";
     $params_login[] = $end_date;
   }
-  $where_login[] = "(a.action LIKE 'User logged in%' OR a.action LIKE 'Failed login attempt%' OR a.action = 'Logged out of the system')";
+  // INCLUDE only login/logout related activities
+  $where_login[] = "(a.action LIKE '%logged in%' 
+                     OR a.action LIKE '%Logged in%'
+                     OR a.action LIKE '%login%'
+                     OR a.action LIKE '%Login%'
+                     OR a.action LIKE '%logged out%'
+                     OR a.action LIKE '%Logged out%'
+                     OR a.action LIKE '%logout%'
+                     OR a.action LIKE '%Logout%'
+                     OR a.action LIKE '%Failed%'
+                     OR a.action LIKE '%lock%'
+                     OR a.action LIKE '%Lock%')";
   $where_sql_login = $where_login ? "WHERE " . implode(" AND ", $where_login) : "";
 
   // Count login logs
   $stmt_count_login = $conn->prepare("SELECT COUNT(*) as total 
                                       FROM activity_log a
-                                      JOIN users u ON a.user_id = u.user_id
+                                      LEFT JOIN users u ON a.user_id = u.user_id
                                       $where_sql_login");
   if ($params_login) $stmt_count_login->bind_param(str_repeat("s", count($params_login)), ...$params_login);
   $stmt_count_login->execute();
@@ -93,11 +115,11 @@
   $total_pages_login = ceil($total_rows_login / $limit);
 
   // Fetch login logs
-  $stmt_login = $conn->prepare("SELECT a.log_id, a.action, a.log_time, 
-                                      CONCAT(u.first_name, ' ', u.last_name) AS fullname,
+  $stmt_login = $conn->prepare("SELECT a.log_id, a.action, a.log_time, a.user_id,
+                                      CONCAT(COALESCE(u.first_name, 'Unknown'), ' ', COALESCE(u.last_name, 'User')) AS fullname,
                                       u.email, u.user_type, u.contact_number
                                 FROM activity_log a
-                                JOIN users u ON a.user_id = u.user_id
+                                LEFT JOIN users u ON a.user_id = u.user_id
                                 $where_sql_login
                                 ORDER BY a.log_time DESC
                                 LIMIT ? OFFSET ?");
@@ -269,7 +291,7 @@
                    </button>
                  <?php endif; ?>
 
-                 <span class="fw-semibold text-muted">Page <?= $page ?> of <?= $total_pages ?></span>
+                 <span class="fw-semibold text-muted">Page <?= $page ?> of <?= max(1, $total_pages) ?></span>
 
                  <?php if ($page < $total_pages): ?>
                    <a class="btn btn-outline-primary btn-sm"
@@ -289,7 +311,7 @@
          <!-- Login/Logout Logs Table -->
          <div id="loginlogs" class="d-none">
            <table class="table table-striped table-hover align-middle text-start">
-             <thead>
+             <thead class="table-info">
                <tr>
                  <th style="width: 8%">No.</th>
                  <th style="width: 42%">Activity</th>
@@ -305,6 +327,7 @@
                     $activity_raw = $row['action'];
                     $fullname = htmlspecialchars($row['fullname']);
                     $log_time = htmlspecialchars($row['log_time']);
+                    $user_id = $row['user_id'] ?? 'N/A';
 
                     $lines = explode("\n", $activity_raw);
                     $first_line = htmlspecialchars(trim($lines[0]), ENT_QUOTES, 'UTF-8');
@@ -371,7 +394,7 @@
                    </button>
                  <?php endif; ?>
 
-                 <span class="fw-semibold text-muted">Page <?= $page_login ?> of <?= $total_pages_login ?></span>
+                 <span class="fw-semibold text-muted">Page <?= $page_login ?> of <?= max(1, $total_pages_login) ?></span>
 
                  <?php if ($page_login < $total_pages_login): ?>
                    <a class="btn btn-outline-primary btn-sm"
@@ -403,7 +426,7 @@
        const filterInput = document.getElementById('filter_value');
        const resetBtn = document.getElementById('resetFilterBtn');
        const printBtn = document.getElementById('printBtn');
-       const form = document.querySelector('form[method="get"]'); // your filter form
+       const form = document.querySelector('form[method="get"]');
        const goBtn = form ? form.querySelector('button[type="submit"], input[type="submit"]') : null;
 
        console.log('[Filters] script init', {
@@ -412,21 +435,18 @@
          foundFilter: !!filterInput
        });
 
-       // Safety: ensure printBtn exists
        if (!printBtn) {
          console.warn('[Filters] printBtn not found (#printBtn).');
        } else {
-         printBtn.disabled = true; // initial state
+         printBtn.disabled = true;
        }
 
-       // Utility: enable/disable print button
        function setPrintEnabled(enabled) {
          if (!printBtn) return;
          printBtn.disabled = !enabled;
          console.log('[Filters] setPrintEnabled ->', enabled);
        }
 
-       // Check URL params and inputs to decide if print should be enabled
        function evaluatePrintStateFromURLAndInputs() {
          try {
            const params = new URLSearchParams(window.location.search);
@@ -445,7 +465,6 @@
            });
            setPrintEnabled(shouldEnable);
 
-           // If session flag was used to enable, remove it so future reloads behave naturally
            if (sessionFlag && !textHasValue && !urlHasDates) {
              sessionStorage.removeItem('filtersApplied');
              console.log('[Filters] session flag cleared');
@@ -455,21 +474,16 @@
          }
        }
 
-       // If the user types into the live filter input, update print state immediately
        if (filterInput) {
          filterInput.addEventListener('input', () => {
            const hasText = filterInput.value.trim() !== '';
-           // enable only if there's text (we don't auto-enable based on typing alone if there are no dates)
            setPrintEnabled(hasText);
-           // don't set sessionStorage here — we only set it when the user actually applies (submits) filters
          });
        }
 
-       // When the form is submitted (Go button), set a session flag before navigation so reload knows filters were applied
        if (form) {
          form.addEventListener('submit', (ev) => {
            try {
-             // Determine if filters are actually being applied (dates or text)
              const startVal = form.querySelector('input[name="start_date"]')?.value;
              const endVal = form.querySelector('input[name="end_date"]')?.value;
              const textVal = filterInput?.value?.trim();
@@ -483,16 +497,12 @@
              });
 
              if (applying) {
-               // remember across reload so we can enable print after server render
                sessionStorage.setItem('filtersApplied', '1');
-               // provide visual feedback before reload
                setPrintEnabled(true);
              } else {
-               // ensure disabled if nothing applied
                sessionStorage.removeItem('filtersApplied');
                setPrintEnabled(false);
              }
-             // allow submit to proceed
            } catch (err) {
              console.error('[Filters] form submit handler error', err);
            }
@@ -503,7 +513,6 @@
          console.warn('[Filters] form element not found — cannot detect Go submit.');
        }
 
-       // Reset button behavior: clear inputs, clear session flag, and reload cleaned URL
        if (resetBtn) {
          resetBtn.addEventListener('click', (e) => {
            e.preventDefault();
@@ -515,15 +524,13 @@
            if (sd) sd.value = '';
            if (ed) ed.value = '';
 
-           // clear session flag used for enabling print
            sessionStorage.removeItem('filtersApplied');
 
-           // Clean url params that we know are filter-related
            const url = new URL(window.location.href);
            url.searchParams.delete('start_date');
            url.searchParams.delete('end_date');
            url.searchParams.delete('page');
-           // preserve log_type if present
+           url.searchParams.delete('page_login');
            const logType = url.searchParams.get('log_type');
            let target = url.pathname;
            if (logType) target += '?log_type=' + logType;
@@ -535,24 +542,20 @@
          console.warn('[Filters] reset button not found (#resetFilterBtn).');
        }
 
-       // Print button behaviour - pass date filters and log type
        if (printBtn) {
          printBtn.addEventListener('click', (e) => {
            e.preventDefault();
            console.log('[Filters] Print clicked — opening print view...');
 
-           // Get current filter values
            const startDateInput = document.querySelector('input[name="start_date"]');
            const endDateInput = document.querySelector('input[name="end_date"]');
            const startDate = startDateInput ? startDateInput.value : '';
            const endDate = endDateInput ? endDateInput.value : '';
 
-           // Determine which log type is currently visible
            const activityLogsDiv = document.getElementById('activitylogs');
            const loginLogsDiv = document.getElementById('loginlogs');
            const logType = loginLogsDiv && !loginLogsDiv.classList.contains('d-none') ? 'login' : 'activity';
 
-           // Build URL with parameters
            let printUrl = 'printlogs.php?';
            const params = [];
 
@@ -567,11 +570,7 @@
          });
        }
 
-       // On initial load evaluate URL / session to decide print state
        evaluatePrintStateFromURLAndInputs();
-
-       // Extra: if the page is loaded with filters in the URL but your server renders empty filter inputs,
-       // the session flag helps bridge that. We already set/cleared session flag on submit/reset.
      });
    </script>
 
