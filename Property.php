@@ -374,7 +374,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="header.css">
@@ -420,163 +419,171 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         </div>
       </div>
 
-      <div class="px-3">
-        <div class="table-responsive rounded">
-          <!-- Classification Table -->
-          <table class="table table-hover align-middle mb-0" id="classificationTable">
-            <thead class="table-light">
-              <tr>
-                <th style="width: 15%">Code</th>
-                <th style="width: 40%">Description</th>
-                <th style="width: 15%">Assessment Level</th>
-                <th style="width: 15%">Status</th>
-                <th style="width: 15%">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              $query = "SELECT * FROM classification";
-              $result = mysqli_query($conn, $query);
+    <div class="px-3">
+  <div class="table-responsive rounded">
 
-              while ($row = mysqli_fetch_assoc($result)) {
-                $statusBadge = ($row['c_status'] === 'Active')
-                  ? '<span class="badge bg-success-subtle text-success">Active</span>'
-                  : '<span class="badge bg-danger-subtle text-danger">Inactive</span>';
-
-                echo "<tr>
-              <td>{$row['c_code']}</td>
-              <td>{$row['c_description']}</td>
-              <td>{$row['c_uv']}%</td>
-              <td>{$statusBadge}</td>
+    <!-- Classification Container -->
+    <div id="classificationContainer">
+      <table class="table table-hover align-middle mb-0" id="classificationTable">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 15%">Code</th>
+            <th style="width: 40%">Description</th>
+            <th style="width: 15%">Assessment Level</th>
+            <th style="width: 15%">Status</th>
+            <th style="width: 15%">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php
+          $query = "SELECT * FROM classification";
+          $result = mysqli_query($conn, $query);
+          while ($row = mysqli_fetch_assoc($result)): ?>
+            <tr>
+              <td><?= htmlspecialchars($row['c_code']) ?></td>
+              <td><?= htmlspecialchars($row['c_description']) ?></td>
+              <td><?= htmlspecialchars($row['c_uv']) ?>%</td>
               <td>
-                  <button class='btn btn-sm btn-outline-primary me-1 edit-btn'
-                  data-table='classification'
-                  data-code='{$row['c_code']}'
-                  data-description='{$row['c_description']}'
-                  data-assessment='{$row['c_uv']}'
-                  data-status='{$row['c_status']}'
-                  data-bs-toggle='modal'
-                  data-bs-target='#editClassificationModal' title='Edit'>
-                    <i class='fas fa-edit'></i>
+                <?php if ($row['c_status'] === 'Active'): ?>
+                  <span class="badge bg-success-subtle text-success">Active</span>
+                <?php else: ?>
+                  <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                <?php endif; ?>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary me-1 edit-btn"
+                        data-table="classification"
+                        data-code="<?= htmlspecialchars($row['c_code']) ?>"
+                        data-description="<?= htmlspecialchars($row['c_description']) ?>"
+                        data-assessment="<?= htmlspecialchars($row['c_uv']) ?>"
+                        data-status="<?= htmlspecialchars($row['c_status']) ?>"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editClassificationModal" title="Edit">
+                  <i class="fas fa-edit"></i>
                 </button>
-                <button class='btn btn-sm btn-outline-danger delete-btn' 
-                  data-id='{$row['c_id']}' 
-                  data-table='classification' 
-                  title='Delete'>
-                  <i class='fas fa-trash-alt'></i>
+                <button class="btn btn-sm btn-outline-danger delete-btn"
+                        data-id="<?= (int)$row['c_id'] ?>"
+                        data-table="classification" title="Delete">
+                  <i class="fas fa-trash-alt"></i>
                 </button>
               </td>
-            </tr>";
-              }
-              ?>
-            </tbody>
-          </table>
-
-          <!-- Actual Uses Table -->
-          <table class="table table-hover align-middle mb-0 d-none text-start" id="actualUsesTable">
-            <thead class="table-light">
-              <tr>
-                <th style="width: 15%">Report Code</th>
-                <th style="width: 15%">Code</th>
-                <th style="width: 30%">Description</th>
-                <th style="width: 15%">Assessment</th>
-                <th style="width: 15%">Status</th>
-                <th style="width: 10%">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              $query = "SELECT * FROM land_use";
-              $result = mysqli_query($conn, $query);
-
-              while ($row = mysqli_fetch_assoc($result)) {
-                $statusBadge = ($row['lu_status'] === 'Active')
-                  ? '<span class="badge bg-success-subtle text-success">Active</span>'
-                  : '<span class="badge bg-danger-subtle text-danger">Inactive</span>';
-
-                echo "<tr>
-              <td>{$row['report_code']}</td>
-              <td>{$row['lu_code']}</td>
-              <td>{$row['lu_description']}</td>
-              <td>{$row['lu_al']}%</td>
-              <td>{$statusBadge}</td>
-              <td>
-                <button class='btn btn-sm btn-outline-primary me-1 edit-btn'
-                data-table='actual_uses'
-                data-report-code='{$row['report_code']}'
-                data-code='{$row['lu_code']}'
-                data-description='{$row['lu_description']}'
-                data-assessment='{$row['lu_al']}'
-                data-status='{$row['lu_status']}'
-                data-bs-toggle='modal'
-                data-bs-target='#editActualUsesModal' title='Edit'>
-                  <i class='fas fa-edit'></i>
-                </button>
-                <button class='btn btn-sm btn-outline-danger delete-btn' 
-                  data-id='{$row['lu_id']}' 
-                  data-table='land_use' 
-                  title='Delete'>
-                  <i class='fas fa-trash-alt'></i>
-                </button>
-              </td>
-            </tr>";
-              }
-              ?>
-            </tbody>
-          </table>
-
-          <!-- Sub-Classes Table -->
-          <table class="table table-hover align-middle mb-0 d-none text-start" id="subClassesTable">
-            <thead class="table-light">
-              <tr>
-                <th style="width: 15%">Code</th>
-                <th style="width: 40%">Description</th>
-                <th style="width: 15%">Unit Value</th>
-                <th style="width: 15%">Status</th>
-                <th style="width: 15%">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              $query = "SELECT * FROM subclass";
-              $result = mysqli_query($conn, $query);
-
-              while ($row = mysqli_fetch_assoc($result)) {
-                $statusBadge = ($row['sc_status'] === 'Active')
-                  ? '<span class="badge bg-success-subtle text-success">Active</span>'
-                  : '<span class="badge bg-danger-subtle text-danger">Inactive</span>';
-
-                echo "<tr>
-              <td>{$row['sc_code']}</td>
-              <td>{$row['sc_description']}</td>
-              <td>₱" . number_format($row['sc_uv'], 2) . "</td>
-              <td>{$statusBadge}</td>
-              <td>
-                <button class='btn btn-sm btn-outline-primary me-1 edit-btn'
-                data-table='sub_classes'
-                data-code='{$row['sc_code']}'
-                data-description='{$row['sc_description']}'
-                data-assessment='{$row['sc_uv']}'
-                data-status='{$row['sc_status']}'
-                data-bs-toggle='modal'
-                data-bs-target='#editSubClassesModal' title='Edit'>
-                  <i class='fas fa-edit'></i>
-                </button>
-                <button class='btn btn-sm btn-outline-danger delete-btn' 
-                  data-id='{$row['sc_id']}' 
-                  data-table='subclass' 
-                  title='Delete'>
-                  <i class='fas fa-trash-alt'></i>
-                </button>
-              </td>
-            </tr>";
-              }
-              ?>
-            </tbody>
-          </table>
-        </div>
-      </div>
+            </tr>
+          <?php endwhile; ?>
+        </tbody>
+      </table>
+      <div id="classificationPagination" class="d-flex justify-content-center align-items-center mt-3"></div>
     </div>
+
+    <!-- Actual Uses Container -->
+    <div id="actualUsesContainer" class="d-none">
+      <table class="table table-hover align-middle mb-0 text-start" id="actualUsesTable">
+        <thead class="table-light">
+          <tr>
+            <th>Report Code</th>
+            <th>Code</th>
+            <th>Description</th>
+            <th>Assessment</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php
+          $query = "SELECT * FROM land_use";
+          $result = mysqli_query($conn, $query);
+          while ($row = mysqli_fetch_assoc($result)): ?>
+            <tr>
+              <td><?= htmlspecialchars($row['report_code']) ?></td>
+              <td><?= htmlspecialchars($row['lu_code']) ?></td>
+              <td><?= htmlspecialchars($row['lu_description']) ?></td>
+              <td><?= htmlspecialchars($row['lu_al']) ?>%</td>
+              <td>
+                <?php if ($row['lu_status'] === 'Active'): ?>
+                  <span class="badge bg-success-subtle text-success">Active</span>
+                <?php else: ?>
+                  <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                <?php endif; ?>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary me-1 edit-btn"
+                        data-table="actual_uses"
+                        data-report-code="<?= htmlspecialchars($row['report_code']) ?>"
+                        data-code="<?= htmlspecialchars($row['lu_code']) ?>"
+                        data-description="<?= htmlspecialchars($row['lu_description']) ?>"
+                        data-assessment="<?= htmlspecialchars($row['lu_al']) ?>"
+                        data-status="<?= htmlspecialchars($row['lu_status']) ?>"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editActualUsesModal" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger delete-btn"
+                        data-id="<?= (int)$row['lu_id'] ?>"
+                        data-table="land_use" title="Delete">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+          <?php endwhile; ?>
+        </tbody>
+      </table>
+      <div id="actualUsesPagination" class="d-flex justify-content-center align-items-center mt-3"></div>
+    </div>
+
+    <!-- Sub-Classes Container -->
+    <div id="subClassesContainer" class="d-none">
+      <table class="table table-hover align-middle mb-0 text-start" id="subClassesTable">
+        <thead class="table-light">
+          <tr>
+            <th>Code</th>
+            <th>Description</th>
+            <th>Unit Value</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php
+          $query = "SELECT * FROM subclass";
+          $result = mysqli_query($conn, $query);
+          while ($row = mysqli_fetch_assoc($result)): ?>
+            <tr>
+              <td><?= htmlspecialchars($row['sc_code']) ?></td>
+              <td><?= htmlspecialchars($row['sc_description']) ?></td>
+              <td>₱<?= number_format($row['sc_uv'], 2) ?></td>
+              <td>
+                <?php if ($row['sc_status'] === 'Active'): ?>
+                  <span class="badge bg-success-subtle text-success">Active</span>
+                <?php else: ?>
+                  <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                <?php endif; ?>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary me-1 edit-btn"
+                        data-table="sub_classes"
+                        data-code="<?= htmlspecialchars($row['sc_code']) ?>"
+                        data-description="<?= htmlspecialchars($row['sc_description']) ?>"
+                        data-assessment="<?= htmlspecialchars($row['sc_uv']) ?>"
+                        data-status="<?= htmlspecialchars($row['sc_status']) ?>"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editSubClassesModal" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger delete-btn"
+                        data-id="<?= (int)$row['sc_id'] ?>"
+                        data-table="subclass" title="Delete">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+          <?php endwhile; ?>
+        </tbody>
+      </table>
+      <div id="subClassesPagination" class="d-flex justify-content-center align-items-center mt-3"></div>
+    </div>
+
+  </div>
+</div>
+
 
     <div class="py-4"></div>
     <div class="text-center mb-5">
@@ -757,9 +764,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="confirmationModalLabel">Confirm Property Category</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <p id="confirmationQuestion">Will you encode the <span id="categoryName"></span> details?</p>
@@ -779,9 +784,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="classificationModalLabel">Enter Classification Details</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <form id="classificationForm">
@@ -842,9 +845,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="reportModalLabel">Actual Uses</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <form id="reportForm">
@@ -901,9 +902,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="subClassesModalLabel">Sub-Classes Details</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <form id="subClassesForm">
@@ -959,319 +958,288 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"></script>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      let selectedForm = "";
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  let selectedForm = "";
 
-      // Handle location card click
-      document.querySelectorAll(".location-card").forEach((card) => {
-        card.addEventListener("click", function(event) {
-          event.preventDefault();
-          const categoryName = this.getAttribute("data-name");
-          selectedForm = this.getAttribute("data-form");
-          document.getElementById("categoryName").textContent = categoryName;
-          $("#confirmationModal").modal("show");
-        });
-      });
+  // Handle location card click
+  document.querySelectorAll(".location-card").forEach((card) => {
+    card.addEventListener("click", function(event) {
+      event.preventDefault();
+      const categoryName = this.getAttribute("data-name");
+      selectedForm = this.getAttribute("data-form");
+      document.getElementById("categoryName").textContent = categoryName;
+      $("#confirmationModal").modal("show");
+    });
+  });
 
-      // Confirm selection
-      document.getElementById("confirmBtn").addEventListener("click", function() {
-        $("#confirmationModal").modal("hide");
-        setTimeout(() => {
-          $("#" + selectedForm).modal("show");
-        }, 500);
-      });
+  // Confirm selection
+  document.getElementById("confirmBtn").addEventListener("click", function() {
+    $("#confirmationModal").modal("hide");
+    setTimeout(() => {
+      $("#" + selectedForm).modal("show");
+    }, 500);
+  });
 
-      // Cancel button
-      document.getElementById("cancelBtn").addEventListener("click", function() {
-        $("#confirmationModal").modal("hide");
-      });
+  // Cancel button
+  document.getElementById("cancelBtn").addEventListener("click", function() {
+    $("#confirmationModal").modal("hide");
+  });
 
-      // Reset button
-      document.querySelectorAll(".reset-btn").forEach((button) => {
-        button.addEventListener("click", function() {
-          const modal = this.closest(".modal");
-          const form = modal.querySelector("form");
-          if (form) form.reset();
-        });
-      });
+  // Reset button
+  document.querySelectorAll(".reset-btn").forEach((button) => {
+    button.addEventListener("click", function() {
+      const modal = this.closest(".modal");
+      const form = modal.querySelector("form");
+      if (form) form.reset();
+    });
+  });
 
-      // Submit button for adding new records
-      document.querySelectorAll(".submit-btn").forEach((button) => {
-        button.addEventListener("click", function() {
-          const formType = this.getAttribute("data-form");
-          const modal = this.closest(".modal");
-          const form = modal.querySelector("form");
+  // Submit button for adding new records
+  document.querySelectorAll(".submit-btn").forEach((button) => {
+    button.addEventListener("click", function() {
+      const formType = this.getAttribute("data-form");
+      const modal = this.closest(".modal");
+      const form = modal.querySelector("form");
 
-          if (form && form.checkValidity()) {
-            const formData = new FormData(form);
+      if (form && form.checkValidity()) {
+        const formData = new FormData(form);
 
-            let action = "";
-            if (formType === "classification") {
-              action = "add_classification";
-            } else if (formType === "land_use") {
-              action = "add_land_use";
-            } else if (formType === "subclass") {
-              action = "add_subclass";
-            }
-
-            formData.append("action", action);
-
-            fetch(window.location.href, {
-                method: "POST",
-                body: formData
-              })
-              .then(response => response.text())
-              .then(data => {
-                if (data.trim() === "success") {
-                  alert("Record added successfully!");
-                  location.reload();
-                } else {
-                  alert("Error adding record: " + data);
-                }
-              });
-
-            $(modal).modal("hide");
-          } else {
-            form.reportValidity();
-          }
-        });
-      });
-
-      // Change category dropdown
-      window.changeCategoryType = function(type) {
-        document.getElementById("classificationTable").classList.add("d-none");
-        document.getElementById("actualUsesTable").classList.add("d-none");
-        document.getElementById("subClassesTable").classList.add("d-none");
-        document.getElementById("categoryTypeDropdown").textContent = type;
-
-        if (type === "Classification") {
-          document.getElementById("classificationTable").classList.remove("d-none");
-        } else if (type === "ActualUses") {
-          document.getElementById("actualUsesTable").classList.remove("d-none");
-        } else if (type === "SubClasses") {
-          document.getElementById("subClassesTable").classList.remove("d-none");
+        let action = "";
+        if (formType === "classification") {
+          action = "add_classification";
+        } else if (formType === "land_use") {
+          action = "add_land_use";
+        } else if (formType === "subclass") {
+          action = "add_subclass";
         }
-      };
 
-      // Edit buttons
-      document.querySelectorAll('.edit-btn').forEach(button => {
-        button.addEventListener('click', function() {
-          const table = this.getAttribute('data-table');
+        formData.append("action", action);
 
-          if (table === 'classification') {
-            document.getElementById('editClassificationCode').value = this.getAttribute('data-code');
-            document.getElementById('editClassificationDescription').value = this.getAttribute('data-description');
-            document.getElementById('editClassificationAssessment').value = this.getAttribute('data-assessment');
-            document.getElementById('editClassificationStatus').value = this.getAttribute('data-status');
-          } else if (table === 'actual_uses') {
-            document.getElementById('editReportCode').value = this.getAttribute('data-report-code');
-            document.getElementById('editActualUsesCode').value = this.getAttribute('data-code');
-            document.getElementById('editActualUsesDescription').value = this.getAttribute('data-description');
-            document.getElementById('editActualUsesAssessment').value = this.getAttribute('data-assessment');
-            document.getElementById('editActualUsesStatus').value = this.getAttribute('data-status');
-          } else if (table === 'sub_classes') {
-            document.getElementById('editSubClassesCode').value = this.getAttribute('data-code');
-            document.getElementById('editSubClassesDescription').value = this.getAttribute('data-description');
-            document.getElementById('editSubClassesAssessment').value = this.getAttribute('data-assessment');
-            document.getElementById('editSubClassesStatus').value = this.getAttribute('data-status');
-          }
-        });
-      });
-
-      // Save Classification Changes
-      document.getElementById('saveClassificationChanges').addEventListener('click', function() {
-        const code = document.getElementById('editClassificationCode').value;
-        const description = document.getElementById('editClassificationDescription').value;
-        const assessment = document.getElementById('editClassificationAssessment').value;
-        const status = document.getElementById('editClassificationStatus').value;
-
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", window.location.href, true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.onload = function() {
-          if (xhr.status === 200 && xhr.responseText.trim() === "success") {
-            alert("Classification updated successfully!");
-            location.reload();
-          } else {
-            alert("Error saving Classification changes: " + xhr.responseText);
-          }
-        };
-        xhr.send(`action=update_classification&code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
-      });
-
-      // Save Actual Uses Changes
-      document.getElementById('saveActualUsesChanges').addEventListener('click', function() {
-        const reportCode = document.getElementById('editReportCode').value;
-        const code = document.getElementById('editActualUsesCode').value;
-        const description = document.getElementById('editActualUsesDescription').value;
-        const assessment = document.getElementById('editActualUsesAssessment').value;
-        const status = document.getElementById('editActualUsesStatus').value;
-
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", window.location.href, true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.onload = function() {
-          if (xhr.status === 200 && xhr.responseText.trim() === "success") {
-            alert("Actual Uses updated successfully!");
-            location.reload();
-          } else {
-            alert("Error saving Actual Uses changes: " + xhr.responseText);
-          }
-        };
-        xhr.send(`action=update_actual_uses&reportCode=${reportCode}&code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
-      });
-
-      // Save Sub-Classes Changes
-      document.getElementById('saveSubClassesChanges').addEventListener('click', function() {
-        const code = document.getElementById('editSubClassesCode').value;
-        const description = document.getElementById('editSubClassesDescription').value;
-        const assessment = document.getElementById('editSubClassesAssessment').value;
-        const status = document.getElementById('editSubClassesStatus').value;
-
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", window.location.href, true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.onload = function() {
-          if (xhr.status === 200 && xhr.responseText.trim() === "success") {
-            alert("Sub-Classes updated successfully!");
-            location.reload();
-          } else {
-            alert("Error saving Sub-Classes changes: " + xhr.responseText);
-          }
-        };
-        xhr.send(`action=update_sub_classes&code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
-      });
-
-      // Delete functionality
-      let deleteId = null;
-      let deleteTable = null;
-
-      document.querySelectorAll(".delete-btn").forEach(button => {
-        button.addEventListener("click", function() {
-          deleteId = this.getAttribute("data-id");
-          deleteTable = this.getAttribute("data-table");
-          let modal = new bootstrap.Modal(document.getElementById("deleteModal"));
-          modal.show();
-        });
-      });
-
-      document.getElementById("confirmDeleteBtn").addEventListener("click", function() {
-        if (deleteId && deleteTable) {
-          const xhr = new XMLHttpRequest();
-          xhr.open("POST", window.location.href, true);
-          xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-          xhr.onload = function() {
-            if (xhr.status === 200 && xhr.responseText.trim() === "success") {
-              alert("Record deleted successfully!");
+        fetch(window.location.href, {
+          method: "POST",
+          body: formData
+        })
+          .then(response => response.text())
+          .then(data => {
+            if (data.trim() === "success") {
+              alert("Record added successfully!");
               location.reload();
             } else {
-              alert("Error deleting record: " + xhr.responseText);
+              alert("Error adding record: " + data);
             }
-          };
-          xhr.send(`action=delete_record&id=${deleteId}&table=${deleteTable}`);
-        }
-      });
+          });
 
-      // Pagination for tables
-      const tables = ["classificationTable", "actualUsesTable", "subClassesTable"];
-      const rowsPerPage = 5;
-      const paginationContainers = {}; // Store pagination containers
+        $(modal).modal("hide");
+      } else {
+        form.reportValidity();
+      }
+    });
+  });
 
-      tables.forEach(tableId => {
-        const table = document.getElementById(tableId);
-        const tbody = table.querySelector("tbody");
-        const rows = Array.from(tbody.querySelectorAll("tr"));
-        const totalPages = Math.ceil(rows.length / rowsPerPage);
+  // Edit buttons
+  document.querySelectorAll('.edit-btn').forEach(button => {
+    button.addEventListener('click', function() {
+      const table = this.getAttribute('data-table');
 
-        // Create pagination container only once
-        if (!paginationContainers[tableId]) {
-          const pagination = document.createElement("div");
-          pagination.classList.add("mt-3", "pagination-container", "d-flex", "justify-content-center", "align-items-center");
-          pagination.setAttribute("data-table", tableId);
-          table.parentNode.appendChild(pagination);
-          paginationContainers[tableId] = pagination;
-        }
+      if (table === 'classification') {
+        document.getElementById('editClassificationCode').value = this.getAttribute('data-code');
+        document.getElementById('editClassificationDescription').value = this.getAttribute('data-description');
+        document.getElementById('editClassificationAssessment').value = this.getAttribute('data-assessment');
+        document.getElementById('editClassificationStatus').value = this.getAttribute('data-status');
+      } else if (table === 'actual_uses') {
+        document.getElementById('editReportCode').value = this.getAttribute('data-report-code');
+        document.getElementById('editActualUsesCode').value = this.getAttribute('data-code');
+        document.getElementById('editActualUsesDescription').value = this.getAttribute('data-description');
+        document.getElementById('editActualUsesAssessment').value = this.getAttribute('data-assessment');
+        document.getElementById('editActualUsesStatus').value = this.getAttribute('data-status');
+      } else if (table === 'sub_classes') {
+        document.getElementById('editSubClassesCode').value = this.getAttribute('data-code');
+        document.getElementById('editSubClassesDescription').value = this.getAttribute('data-description');
+        document.getElementById('editSubClassesAssessment').value = this.getAttribute('data-assessment');
+        document.getElementById('editSubClassesStatus').value = this.getAttribute('data-status');
+      }
+    });
+  });
 
-        const pagination = paginationContainers[tableId];
-        let currentPage = 1;
+  // Save Classification Changes
+  document.getElementById('saveClassificationChanges').addEventListener('click', function() {
+    const code = document.getElementById('editClassificationCode').value;
+    const description = document.getElementById('editClassificationDescription').value;
+    const assessment = document.getElementById('editClassificationAssessment').value;
+    const status = document.getElementById('editClassificationStatus').value;
 
-        function renderPage(page) {
-          // Hide/show pagination based on table visibility
-          if (table.classList.contains("d-none")) {
-            pagination.style.display = "none";
-            return;
-          } else {
-            pagination.style.display = "flex";
-          }
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", window.location.href, true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.onload = function() {
+      if (xhr.status === 200 && xhr.responseText.trim() === "success") {
+        alert("Classification updated successfully!");
+        location.reload();
+      } else {
+        alert("Error saving Classification changes: " + xhr.responseText);
+      }
+    };
+    xhr.send(`action=update_classification&code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
+  });
 
-          currentPage = page;
-          tbody.innerHTML = "";
-          const start = (page - 1) * rowsPerPage;
-          const end = start + rowsPerPage;
-          rows.slice(start, end).forEach(row => tbody.appendChild(row));
+  // Save Actual Uses Changes
+  document.getElementById('saveActualUsesChanges').addEventListener('click', function() {
+    const reportCode = document.getElementById('editReportCode').value;
+    const code = document.getElementById('editActualUsesCode').value;
+    const description = document.getElementById('editActualUsesDescription').value;
+    const assessment = document.getElementById('editActualUsesAssessment').value;
+    const status = document.getElementById('editActualUsesStatus').value;
 
-          // Clear and rebuild pagination controls
-          pagination.innerHTML = "";
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", window.location.href, true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.onload = function() {
+      if (xhr.status === 200 && xhr.responseText.trim() === "success") {
+        alert("Actual Uses updated successfully!");
+        location.reload();
+      } else {
+        alert("Error saving Actual Uses changes: " + xhr.responseText);
+      }
+    };
+    xhr.send(`action=update_actual_uses&reportCode=${reportCode}&code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
+  });
 
-          // Previous button
-          const prevBtn = document.createElement("button");
-          prevBtn.innerHTML = "&laquo;";
-          prevBtn.classList.add("btn", "btn-sm", "btn-outline-success");
-          prevBtn.disabled = page === 1;
-          prevBtn.addEventListener("click", () => renderPage(currentPage - 1));
-          pagination.appendChild(prevBtn);
+  // Save Sub-Classes Changes
+  document.getElementById('saveSubClassesChanges').addEventListener('click', function() {
+    const code = document.getElementById('editSubClassesCode').value;
+    const description = document.getElementById('editSubClassesDescription').value;
+    const assessment = document.getElementById('editSubClassesAssessment').value;
+    const status = document.getElementById('editSubClassesStatus').value;
 
-          // Page info
-          const pageInfo = document.createElement("span");
-          pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-          pageInfo.classList.add("mx-2", "fw-semibold");
-          pagination.appendChild(pageInfo);
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", window.location.href, true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.onload = function() {
+      if (xhr.status === 200 && xhr.responseText.trim() === "success") {
+        alert("Sub-Classes updated successfully!");
+        location.reload();
+      } else {
+        alert("Error saving Sub-Classes changes: " + xhr.responseText);
+      }
+    };
+    xhr.send(`action=update_sub_classes&code=${code}&description=${description}&assessment=${assessment}&status=${status}`);
+  });
 
-          // Next button
-          const nextBtn = document.createElement("button");
-          nextBtn.innerHTML = "&raquo;";
-          nextBtn.classList.add("btn", "btn-sm", "btn-outline-success");
-          nextBtn.disabled = page === totalPages;
-          nextBtn.addEventListener("click", () => renderPage(currentPage + 1));
-          pagination.appendChild(nextBtn);
-        }
+  // Delete functionality
+  let deleteId = null;
+  let deleteTable = null;
 
-        // Store render function for later use
-        table.renderPage = renderPage;
+  document.querySelectorAll(".delete-btn").forEach(button => {
+    button.addEventListener("click", function() {
+      deleteId = this.getAttribute("data-id");
+      deleteTable = this.getAttribute("data-table");
+      let modal = new bootstrap.Modal(document.getElementById("deleteModal"));
+      modal.show();
+    });
+  });
 
-        // Initial render
-        renderPage(1);
-      });
-
-      // Update changeCategoryType to properly handle pagination
-      const originalChangeCategoryType = window.changeCategoryType;
-      window.changeCategoryType = function(type) {
-        // Hide all tables first
-        document.getElementById("classificationTable").classList.add("d-none");
-        document.getElementById("actualUsesTable").classList.add("d-none");
-        document.getElementById("subClassesTable").classList.add("d-none");
-
-        // Update dropdown text
-        document.getElementById("categoryTypeDropdown").textContent = type;
-
-        // Show selected table and trigger pagination render
-        if (type === "Classification") {
-          const table = document.getElementById("classificationTable");
-          table.classList.remove("d-none");
-          if (table.renderPage) table.renderPage(1);
-        } else if (type === "ActualUses") {
-          const table = document.getElementById("actualUsesTable");
-          table.classList.remove("d-none");
-          if (table.renderPage) table.renderPage(1);
-        } else if (type === "SubClasses") {
-          const table = document.getElementById("subClassesTable");
-          table.classList.remove("d-none");
-          if (table.renderPage) table.renderPage(1);
+  document.getElementById("confirmDeleteBtn").addEventListener("click", function() {
+    if (deleteId && deleteTable) {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", window.location.href, true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onload = function() {
+        if (xhr.status === 200 && xhr.responseText.trim() === "success") {
+          alert("Record deleted successfully!");
+          location.reload();
+        } else {
+          alert("Error deleting record: " + xhr.responseText);
         }
       };
+      xhr.send(`action=delete_record&id=${deleteId}&table=${deleteTable}`);
+    }
+  });
+
+  // ============================================================
+  // Independent Pagination for Each Table (fixed + clean version)
+  // ============================================================
+
+  const tableConfigs = [
+    { tableId: "classificationTable", paginationId: "classificationPagination" },
+    { tableId: "actualUsesTable", paginationId: "actualUsesPagination" },
+    { tableId: "subClassesTable", paginationId: "subClassesPagination" }
+  ];
+
+  const rowsPerPage = 5;
+
+  tableConfigs.forEach(({ tableId, paginationId }) => {
+    const table = document.getElementById(tableId);
+    const tbody = table.querySelector("tbody");
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+    const pagination = document.getElementById(paginationId);
+    const totalPages = Math.max(1, Math.ceil(rows.length / rowsPerPage));
+    let currentPage = 1;
+
+    function renderPage(page) {
+      if (page < 1) page = 1;
+      if (page > totalPages) page = totalPages;
+      currentPage = page;
+
+      tbody.innerHTML = "";
+      const start = (page - 1) * rowsPerPage;
+      const end = start + rowsPerPage;
+      rows.slice(start, end).forEach(row => tbody.appendChild(row));
+
+      pagination.innerHTML = "";
+
+      const prev = document.createElement("button");
+      prev.innerHTML = "&laquo;";
+      prev.classList.add("btn", "btn-sm", "btn-outline-success");
+      prev.disabled = currentPage === 1;
+      prev.addEventListener("click", () => renderPage(currentPage - 1));
+      pagination.appendChild(prev);
+
+      const info = document.createElement("span");
+      info.textContent = `Page ${currentPage} of ${totalPages}`;
+      info.classList.add("mx-2", "fw-semibold");
+      pagination.appendChild(info);
+
+      const next = document.createElement("button");
+      next.innerHTML = "&raquo;";
+      next.classList.add("btn", "btn-sm", "btn-outline-success");
+      next.disabled = currentPage === totalPages;
+      next.addEventListener("click", () => renderPage(currentPage + 1));
+      pagination.appendChild(next);
+    }
+
+    table.renderPage = renderPage;
+    renderPage(1);
+  });
+
+  // Dropdown logic
+  window.changeCategoryType = function(type) {
+    const sections = {
+      Classification: "classificationContainer",
+      ActualUses: "actualUsesContainer",
+      SubClasses: "subClassesContainer"
+    };
+
+    Object.values(sections).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add("d-none");
     });
-  </script>
+
+    document.getElementById("categoryTypeDropdown").textContent = type;
+
+    const selectedId = sections[type];
+    const selected = document.getElementById(selectedId);
+    if (selected) {
+      selected.classList.remove("d-none");
+      const table = selected.querySelector("table");
+      if (table && typeof table.renderPage === "function") {
+        table.renderPage(1);
+      }
+    }
+  };
+});
+</script>
+
 </body>
 
 </html>
