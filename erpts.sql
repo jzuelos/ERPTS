@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 29, 2025 at 12:34 AM
+-- Generation Time: Nov 02, 2025 at 05:24 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -39,88 +39,10 @@ CREATE TABLE `activity_log` (
 --
 
 INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
-(5, 12, 'Created new user: test', '2025-09-21 13:17:28'),
-(6, 9, 'Created new user: test2', '2025-09-21 13:20:15'),
-(7, 9, 'Updated user ID: 13', '2025-09-21 13:23:22'),
-(8, 9, 'Logged in to the system', '2025-09-21 13:34:52'),
-(9, 9, 'Added Municipality: Eefgsdgehjhqa', '2025-09-21 13:41:58'),
-(10, 9, 'Added Barangay: 312312', '2025-09-21 13:45:24'),
-(11, 9, 'Logged in to the system', '2025-09-21 15:19:01'),
-(12, 9, 'Logged in to the system', '2025-09-21 17:25:56'),
-(13, 9, 'Logged in to the system', '2025-09-22 16:20:38'),
-(14, 9, 'Logged out of the system', '2025-09-23 15:02:53'),
-(15, 9, 'Logged in to the system', '2025-09-23 15:03:25'),
-(16, 9, 'Logged in to the system', '2025-09-24 00:50:10'),
-(17, 9, 'Logged in to the system', '2025-10-01 13:01:12'),
-(18, 9, 'Logged out of the system', '2025-10-01 13:09:16'),
-(19, 9, 'Logged in to the system', '2025-10-01 13:27:00'),
-(20, 9, 'Logged in to the system', '2025-10-02 08:52:13'),
-(21, 9, 'Logged in to the system', '2025-10-02 09:24:29'),
-(22, 9, 'Logged in to the system', '2025-10-02 10:15:40'),
-(23, 9, 'Logged in to the system', '2025-10-02 10:24:32'),
-(24, 9, 'Logged in to the system', '2025-10-03 12:45:32'),
-(25, 9, 'Logged in to the system', '2025-10-05 14:01:05'),
-(26, 9, 'Logged in to the system', '2025-10-07 07:12:48'),
-(27, 9, 'Logged in to the system', '2025-10-07 13:52:04'),
-(28, 9, 'Logged in to the system', '2025-10-08 12:22:00'),
-(29, 9, 'Logged out of the system', '2025-10-08 15:27:04'),
-(30, 9, 'Logged in to the system', '2025-10-10 06:44:12'),
-(31, 9, 'Logged in to the system', '2025-10-10 14:39:36'),
-(32, 9, 'Logged out of the system', '2025-10-10 14:39:40'),
-(33, 9, 'Logged in to the system', '2025-10-10 14:40:00'),
-(34, 9, 'Logged in to the system', '2025-10-11 10:18:03'),
-(35, 9, 'Logged in to the system', '2025-10-11 10:38:33'),
-(36, 9, 'Logged in to the system', '2025-10-12 09:41:57'),
-(37, 9, 'Logged in to the system', '2025-10-13 09:09:50'),
-(38, 9, 'Logged in to the system', '2025-10-13 14:36:24'),
-(39, 9, 'Logged in to the system', '2025-10-13 15:15:13'),
-(40, 9, 'Logged out of the system', '2025-10-13 15:25:47'),
-(41, 9, 'Logged out of the system', '2025-10-13 18:27:18'),
-(42, 9, 'Logged in to the system', '2025-10-14 16:14:08'),
-(43, 9, 'Added new property\nProperty ID: 161\n\nLocation Details:\n• House Number: 432\n• Municipality: Paracale\n• District: District 1\n• Barangay: Mangkasay\n\nProperty Details:\n• Land Area: 543 sq.m\n• Documents: affidavit, barangay\n\nAssociated Owners (1):\n• Jose Cruz (ID: 4)\n\nFAAS record created for this property.', '2025-10-14 17:17:40'),
-(44, 9, 'Failed to add property\nError: Column \'province\' cannot be null\nAttempted location: House #423, Municipality ID: Jose Panganiban', '2025-10-14 17:38:15'),
-(45, 9, 'Failed to add property\nError: Column \'province\' cannot be null\nAttempted location: House #423, Municipality: Jose Panganiban', '2025-10-14 17:42:23'),
-(46, 9, 'Failed to add property\nError: Column \'province\' cannot be null\nAttempted location: House #423, Municipality: Jose Panganiban', '2025-10-14 17:43:29'),
-(47, 9, 'Failed to add property\nError: Column \'province\' cannot be null\nAttempted location: House #423, Municipality ID: Jose Panganiban', '2025-10-14 17:43:49'),
-(48, 9, 'Failed to add property\nError: Column \'province\' cannot be null\nAttempted location: House #423, Municipality ID: Jose Panganiban', '2025-10-14 17:44:24'),
-(49, 9, 'Logged in to the system', '2025-10-15 03:58:29'),
-(50, 9, 'Added new property\nProperty ID: 162\n\nLocation Details:\n• House Number: 432\n• Municipality: ID: Talisay\n• District: District 2\n• Barangay: ID: Gabon\n\nProperty Details:\n• Land Area: 532 sq.m\n• Documents: barangay\n\nAssociated Owners (1):\n• Jose Cruz (ID: 4)\n\nFAAS record created for this property.', '2025-10-15 06:50:06'),
-(51, 9, 'Logged in to the system', '2025-10-15 13:12:07'),
-(52, 9, 'Updated tax declaration\nProperty ID: 147\nFAAS ID: 36\nLocation: House #23, ID: Gahon, ID: District 2, ID: Daet\n\nTax Declaration Details:\n• ARP Number: GR-2023-II-01-012-00023\n• Tax Year: 2025-09-27\n• Provincial Assessor: Mark Bertillo\n• Provincial Date: 2025-09-10\n• Municipal Assessor: Maria Reyes\n• Municipal Date: 2025-09-11\n• Previous Owner: No\n• Previous Assessed Value: ₱5,000.00\n\nTotal Property Value: ₱0.00', '2025-10-15 22:14:55'),
-(53, 9, 'Updated tax declaration\nProperty ID: 157\nFAAS ID: 43\nLocation: House #5345, ID: Camambugan, ID: District 2, ID: Daet\n\nTax Declaration Details:\n• ARP Number: GR-2023-II-03-014-00342\n• Tax Year: 2025-10-15\n• Provincial Assessor: Juan Dela Cruz\n• Provincial Date: 2025-10-15\n• Municipal Assessor: Maria Reyes\n• Municipal Date: 2025-10-15\n\nTotal Property Value: ₱81,600.00', '2025-10-16 03:35:45'),
-(54, 9, 'Logged in to the system', '2025-10-19 11:46:06'),
-(55, 9, 'Updated tax declaration\nProperty ID: 144\nFAAS ID: 33\nLocation: House #23, ID: Kalamunding, ID: District 1, ID: Labo\n\nChanges:\n• ARP Number changed from \'31-2314-23-42-341-23123\' to \'GR-2023-II-02-012-00231\'', '2025-10-19 11:49:43'),
-(56, 9, 'Deleted land record\nProperty ID: 144\nLand ID: 55\nLocation: House #23, ID: Kalamunding, ID: District 1, ID: Labo\n\nDeleted Land Details:\n• Classification: Agricultural\n• Area: 23 sq.m\n• Market Value: ₱460.00\n• Assessed Value: ₱15.64', '2025-10-19 11:58:15'),
-(57, 9, 'Logged in to the system', '2025-10-20 02:56:32'),
-(58, 9, 'Logged out of the system', '2025-10-20 02:57:15'),
-(59, 12, 'Logged in to the system', '2025-10-20 02:57:24'),
-(60, 12, 'Logged out of the system', '2025-10-20 02:57:48'),
-(61, 9, 'Logged in to the system', '2025-10-20 02:58:04'),
-(62, 9, 'Printed Property Report\n• Classification: Residential\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-10-26 16:59:14'),
-(63, 9, 'Printed Property Report\n• Classification: Agricultural\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-10-26 16:59:20'),
-(64, 9, 'Printed Property Report\n• Classification: Agricultural\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-10-26 17:00:09'),
-(65, 9, 'Printed Property Report\n• Classification: Residential\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-10-26 17:13:11'),
-(66, 9, 'Printed Property Report\n• Classification: Agricultural\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-10-26 17:13:52'),
-(67, 9, 'Printed Property Report\n• Classification: Commercial\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-10-26 17:14:03'),
-(68, 9, 'Updated tax declaration\nProperty ID: 147\nFAAS ID: 36\nLocation: House #23, ID: Gahon, ID: District 2, ID: Daet\n\nChanges:\n• Total Property Value changed from \'₱0.00\' to \'₱64,993.92\'', '2025-10-26 17:28:34'),
-(69, 9, 'Ownership Transfer Completed\nProperty ID: 147\nLocation: House #23, Unknown, Unknown, Unknown\nTax Declaration ID: 3\nARP Number: GR-2023-II-01-012-00023\nTax Year: 2025-09-27\n\nPrevious Owners:\n• Maria Lopez Reyes (ID: 2)\n\nRemoved Owners:\n• Maria Lopez Reyes (ID: 2)\n\nAdded Owners (New Title Holders):\n• Isabel Delos Ramos (ID: 11)\n\nCurrent Owners After Transfer:\n• Isabel Delos Ramos (ID: 11)\n\n--- Record Snapshot (Before Transfer) ---\nRPU Declaration:\n  • ARP: GR-2023-II-01-012-00023\n  • Total Property Value: ₱64,993.92\nRPU Identification:\n  • PIN: 110123456789\n  • Taxability: taxable\nProperty Info:\n  • House #: 23\n  • Land Area: 453 sq.m\nLand Records: 1 record(s) captured\n  • Total Land Market Value: ₱60,000.00\n\nTransfer Status: Successfully completed\nSnapshot stored in owner_audit_log for historical reference', '2025-10-26 17:50:59'),
-(71, 9, 'Failed Ownership Transfer\nProperty ID: 157\nLocation: House #5345, Unknown, Unknown, Unknown\nTax Declaration ID: 4\nError: Cannot add or update a child row: a foreign key constraint fails (`erpts`.`land`, CONSTRAINT `faas_id` FOREIGN KEY (`faas_id`) REFERENCES `faas` (`faas_id`) ON DELETE CASCADE)', '2025-10-26 20:07:37'),
-(72, 9, 'Ownership Transfer Completed\nProperty ID: 157\nLocation: House #5345, Unknown, Unknown, Unknown\nTax Declaration ID: 4\nARP Number: GR-2023-II-03-014-00342\nTax Year: 2025-10-15\n\nPrevious Owners:\n• Ramon Torres Mendoza (ID: 12)\n\nRemoved Owners:\n• Ramon Torres Mendoza (ID: 12)\n\nAdded Owners (New Title Holders):\n• Jose Antonio Cruz (ID: 4)\n\nCurrent Owners After Transfer:\n• Jose Antonio Cruz (ID: 4)\n\n--- Record Snapshot (Before Transfer) ---\nRPU Declaration:\n  • ARP: GR-2023-II-03-014-00342\n  • Total Property Value: ₱81,600.00\nRPU Identification:\n  • PIN: 5324234134512\n  • Taxability: taxable\nProperty Info:\n  • House #: 5345\n  • Land Area: 5345 sq.m\nLand Records: 1 record(s) captured\n  • Total Land Market Value: ₱60,000.00\n\nTransfer Status: Successfully completed\nSnapshot stored in owner_audit_log for historical reference', '2025-10-26 20:27:40'),
-(73, 9, 'FAAS relationships nullified for FAAS ID 43 (property 157)', '2025-10-26 20:27:40'),
-(74, 9, 'Logged in to the system', '2025-10-27 04:04:21'),
-(75, 9, 'Logged in to the system', '2025-10-27 10:44:40'),
-(76, 9, 'Logged out of the system', '2025-10-27 12:31:11'),
-(77, 9, 'Logged in to the system', '2025-10-27 13:07:15'),
-(78, 9, 'Logged in to the system', '2025-10-27 13:23:06'),
-(79, 12, 'Logged in to the system', '2025-10-27 13:23:40'),
-(80, 12, 'Logged out of the system', '2025-10-27 13:23:42'),
 (81, 12, 'Failed login attempt - Incorrect password (Attempt 1 from IP: ::1)', '2025-10-27 13:23:48'),
 (82, 12, 'Failed login attempt - Incorrect password (Attempt 1 from IP: ::1)', '2025-10-27 13:25:00'),
 (83, 12, 'Failed login attempt - Incorrect password (Attempt 1 from IP: ::1)', '2025-10-27 13:25:08'),
 (84, 12, 'Failed login attempt - Incorrect password (Attempt 1 from IP: ::1)', '2025-10-27 13:27:57'),
-(85, 9, 'Logged in to the system', '2025-10-27 14:30:14'),
-(86, 9, 'Logged out of the system', '2025-10-27 14:30:31'),
-(87, 9, 'Logged in to the system', '2025-10-28 07:54:10'),
 (88, 9, 'Exported statistics chart\n• Chart Type: Classification\n• Chart Title: Land Classification Distribution\n• Export Format: PNG Image\n• Export Time: 2025-10-28 11:35:27', '2025-10-28 10:35:27'),
 (89, 9, 'Printed Property Report\n• Classification: All\n• Province: All\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-10-28 15:31:29'),
 (90, 9, 'Printed Property Report\n• Classification: Agricultural\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-10-28 15:32:19'),
@@ -198,7 +120,17 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (162, NULL, 'Failed login from IP: ::1 - Username \'username\' not found', '2025-10-28 18:20:50'),
 (163, NULL, 'Temporary lock activated from IP: ::1', '2025-10-28 18:20:50'),
 (164, 9, 'Logged in from IP: ::1', '2025-10-28 22:54:49'),
-(165, 9, 'Exported statistics chart from Dashboard\n• Chart Type: Property\n• Chart Title: Property Statistics Overview\n• Export Format: PNG Image\n• Export Time: 2025-10-29 00:24:30', '2025-10-28 23:24:30');
+(165, 9, 'Exported statistics chart from Dashboard\n• Chart Type: Property\n• Chart Title: Property Statistics Overview\n• Export Format: PNG Image\n• Export Time: 2025-10-29 00:24:30', '2025-10-28 23:24:30'),
+(166, 9, 'Logged out of the system', '2025-11-02 13:06:40'),
+(167, NULL, 'Temporary lock activated for IP: ::1', '2025-11-02 13:06:52'),
+(168, NULL, 'Failed login from IP: ::1 - Username not found', '2025-11-02 13:06:52'),
+(169, NULL, 'Permanent lock activated for IP: ::1', '2025-11-02 13:12:05'),
+(170, NULL, 'Failed login from IP: ::1 - Username not found', '2025-11-02 13:12:05'),
+(171, 9, 'Unbanned IP address: ::1', '2025-11-02 15:25:07'),
+(172, 9, 'Unbanned IP address: ::1', '2025-11-02 15:55:23'),
+(173, NULL, 'Permanent lock activated for IP: ::1', '2025-11-02 15:56:59'),
+(174, NULL, 'Failed login from IP: ::1 - Username not found', '2025-11-02 15:56:59'),
+(175, 9, 'Unbanned IP address: ::1', '2025-11-02 16:06:23');
 
 -- --------------------------------------------------------
 
@@ -639,6 +571,28 @@ INSERT INTO `faas` (`faas_id`, `pro_id`, `rpu_idno`) VALUES
 (42, 156, 63),
 (43, 157, NULL),
 (47, 162, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ip_ban_history`
+--
+
+CREATE TABLE `ip_ban_history` (
+  `history_id` int(11) NOT NULL,
+  `ip_address` varchar(45) NOT NULL,
+  `banned_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `unbanned_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `unbanned_by` int(11) DEFAULT NULL,
+  `unbanned_by_name` varchar(150) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `ip_ban_history`
+--
+
+INSERT INTO `ip_ban_history` (`history_id`, `ip_address`, `banned_at`, `unbanned_at`, `unbanned_by`, `unbanned_by_name`) VALUES
+(1, '::1', '2025-11-02 15:56:59', '2025-11-02 16:06:23', 9, 'John Lloyd Zuelos');
 
 -- --------------------------------------------------------
 
@@ -1170,7 +1124,7 @@ INSERT INTO `transactions` (`transaction_id`, `transaction_code`, `name`, `conta
 (45, 'TX-1002', 'Maria Santos', '+639181753453', 'New Property Declaration #TX-1002 is being processed. Documents under review as of 10/29/2025. For more info. visit https://erptstrack.erpts.online', 'In Progress', '2025-10-02 10:19:56', '2025-10-28 23:07:54', 'New Declaration of Real Property'),
 (47, 'TX-1004', 'Josefa Manalo', '+639423645758', 'Property Consolidation request #TX-1004 received 10/29/2025. Your application is now pending review. For more info. visit https://erptstrack.erpts.online', 'Pending', '2025-10-02 10:19:56', '2025-10-28 23:08:05', 'Consolidation'),
 (48, 'TX-1005', 'Carlos Cruz', '+639254353421', 'Transfer of Ownership #TX-1005 is being processed. Documents under review as of 10/29/2025. For more info. visit https://erptstrack.erpts.online', 'In Progress', '2025-10-02 10:19:56', '2025-10-28 23:08:13', 'Simple Transfer of Ownership'),
-(51, 'TX-1008', 'Elena Bautista', '+639165217083', 'Property Consolidation #TX-1008 completed 10/28/2025. Ready for pickup at our office. For more info. visit https://erptstrack.erpts.online', 'Completed', '2025-10-02 10:19:56', '2025-10-28 14:15:18', 'Consolidation');
+(51, 'TX-1008', 'Elena Bautista', '+639165217083', 'Property Consolidation #TX-1008 is being processed. Documents under review as of 11/02/2025. For more info. visit https://erptstrack.erpts.online', 'In Progress', '2025-10-02 10:19:56', '2025-11-02 15:05:00', 'Consolidation');
 
 -- --------------------------------------------------------
 
@@ -1331,7 +1285,9 @@ INSERT INTO `transaction_logs` (`log_id`, `transaction_id`, `transaction_code`, 
 (223, 47, 'TX-1004', 'Updated', 'Transaction updated', 9, '2025-10-28 23:08:05'),
 (224, 48, 'TX-1005', 'Updated', 'Transaction updated', 9, '2025-10-28 23:08:13'),
 (225, 65, '58187', 'Papers Received', 'Papers received by client', 9, '2025-10-28 23:16:32'),
-(226, 65, '58187', 'SMS Sent', 'Papers received confirmation sent to +639165217083', 9, '2025-10-28 23:16:32');
+(226, 65, '58187', 'SMS Sent', 'Papers received confirmation sent to +639165217083', 9, '2025-10-28 23:16:32'),
+(227, 51, 'TX-1008', 'Updated', 'Transaction updated', 9, '2025-11-02 15:05:00'),
+(228, 51, 'TX-1008', 'SMS Sent', 'Status changed: \'Completed\' → \'In Progress\'. Notification sent to +639165217083', 9, '2025-11-02 15:05:01');
 
 -- --------------------------------------------------------
 
@@ -1443,6 +1399,15 @@ ALTER TABLE `district`
 ALTER TABLE `faas`
   ADD PRIMARY KEY (`faas_id`),
   ADD KEY `pro_id` (`pro_id`);
+
+--
+-- Indexes for table `ip_ban_history`
+--
+ALTER TABLE `ip_ban_history`
+  ADD PRIMARY KEY (`history_id`),
+  ADD KEY `idx_ip_address` (`ip_address`),
+  ADD KEY `idx_unbanned_at` (`unbanned_at`),
+  ADD KEY `fk_unbanned_by` (`unbanned_by`);
 
 --
 -- Indexes for table `ip_lockout`
@@ -1589,7 +1554,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=166;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=176;
 
 --
 -- AUTO_INCREMENT for table `admin_certification`
@@ -1628,10 +1593,16 @@ ALTER TABLE `faas`
   MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
+-- AUTO_INCREMENT for table `ip_ban_history`
+--
+ALTER TABLE `ip_ban_history`
+  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `ip_lockout`
 --
 ALTER TABLE `ip_lockout`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `land`
@@ -1733,7 +1704,7 @@ ALTER TABLE `transaction_files`
 -- AUTO_INCREMENT for table `transaction_logs`
 --
 ALTER TABLE `transaction_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=227;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=229;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -1765,6 +1736,12 @@ ALTER TABLE `certification`
 --
 ALTER TABLE `faas`
   ADD CONSTRAINT `pro_id` FOREIGN KEY (`pro_id`) REFERENCES `p_info` (`p_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `ip_ban_history`
+--
+ALTER TABLE `ip_ban_history`
+  ADD CONSTRAINT `fk_ip_history_unbanned_by` FOREIGN KEY (`unbanned_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `land`

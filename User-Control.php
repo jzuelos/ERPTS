@@ -18,26 +18,52 @@ function logActivity($conn, $userId, $action)
   $stmt->close();
 }
 
-// Function to unban IP address
+// Function to unban IP address (move to history and delete from ip_lockout)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["unban_ip"])) {
   $lockoutId = filter_input(INPUT_POST, 'lockout_id', FILTER_SANITIZE_NUMBER_INT);
+  $ipAddress = filter_input(INPUT_POST, 'ip_address', FILTER_SANITIZE_STRING);
 
-  $stmt = $conn->prepare("DELETE FROM ip_lockout WHERE id = ?");
-  $stmt->bind_param("i", $lockoutId);
+  // Get lockout data first
+  $getLockout = $conn->prepare("SELECT ip_address, last_attempt FROM ip_lockout WHERE id = ?");
+  $getLockout->bind_param("i", $lockoutId);
+  $getLockout->execute();
+  $lockoutData = $getLockout->get_result()->fetch_assoc();
+  $getLockout->close();
 
-  if ($stmt->execute()) {
-    // Log the unban action
-    if (isset($_SESSION['user_id'])) {
-      $adminId = $_SESSION['user_id'];
-      $ipAddress = filter_input(INPUT_POST, 'ip_address', FILTER_SANITIZE_STRING);
-      logActivity($conn, $adminId, "Unbanned IP address: $ipAddress");
+  if ($lockoutData && isset($_SESSION['user_id'])) {
+    $adminId = $_SESSION['user_id'];
+
+    // Get admin name
+    $getAdmin = $conn->prepare("SELECT CONCAT(first_name, ' ', last_name) as full_name FROM users WHERE user_id = ?");
+    $getAdmin->bind_param("i", $adminId);
+    $getAdmin->execute();
+    $adminData = $getAdmin->get_result()->fetch_assoc();
+    $adminName = $adminData['full_name'] ?? 'Unknown';
+    $getAdmin->close();
+
+    // Insert into history table
+    $insertHistory = $conn->prepare("INSERT INTO ip_ban_history (ip_address, banned_at, unbanned_at, unbanned_by, unbanned_by_name) VALUES (?, ?, NOW(), ?, ?)");
+    $insertHistory->bind_param("ssis", $lockoutData['ip_address'], $lockoutData['last_attempt'], $adminId, $adminName);
+
+    if ($insertHistory->execute()) {
+      // Delete from ip_lockout
+      $deleteLockout = $conn->prepare("DELETE FROM ip_lockout WHERE id = ?");
+      $deleteLockout->bind_param("i", $lockoutId);
+
+      if ($deleteLockout->execute()) {
+        logActivity($conn, $adminId, "Unbanned IP address: $ipAddress");
+        echo "<script>alert('IP address unbanned successfully!'); window.location.href='User-Control.php';</script>";
+      } else {
+        echo "<script>alert('Error deleting lockout: " . $deleteLockout->error . "');</script>";
+      }
+      $deleteLockout->close();
+    } else {
+      echo "<script>alert('Error adding to history: " . $insertHistory->error . "');</script>";
     }
-    echo "<script>alert('IP address unbanned successfully!'); window.location.href='User-Control.php';</script>";
+    $insertHistory->close();
   } else {
-    echo "<script>alert('Error unbanning IP: " . $stmt->error . "');</script>";
+    echo "<script>alert('IP lockout not found or user not logged in');</script>";
   }
-
-  $stmt->close();
 }
 
 // Function to update user details with input filtering
@@ -66,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
     exit();
   }
 
-  // ✅ Fetch old user data before updating
+  // Fetch old user data before updating
   $oldStmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
   $oldStmt->bind_param("i", $userId);
   $oldStmt->execute();
@@ -79,7 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
     exit();
   }
 
-  // ✅ Build UPDATE query (with or without password)
+  // Build UPDATE query (with or without password)
   if (!empty($_POST["password"])) {
     $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
     $query = "UPDATE users SET 
@@ -139,7 +165,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
   }
 
   if ($stmt->execute()) {
-    // ✅ Log admin activity with proper formatting
+    // Log admin activity with proper formatting
     if (isset($_SESSION['user_id'])) {
       $adminId = $_SESSION['user_id'];
       $fullname = trim("$first_name $middle_name $last_name");
@@ -147,7 +173,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
       // Helper function to get municipality name
       function getMunicipalityName($conn, $m_id)
       {
-        if (empty($m_id)) return 'None';
+        if (empty($m_id))
+          return 'None';
         $stmt = $conn->prepare("SELECT m_description FROM municipality WHERE m_id = ?");
         $stmt->bind_param("i", $m_id);
         $stmt->execute();
@@ -160,7 +187,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
       // Helper function to get district name
       function getDistrictName($conn, $district_id)
       {
-        if (empty($district_id)) return 'None';
+        if (empty($district_id))
+          return 'None';
         $stmt = $conn->prepare("SELECT description FROM district WHERE district_id = ?");
         $stmt->bind_param("i", $district_id);
         $stmt->execute();
@@ -173,7 +201,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
       // Helper function to get barangay name
       function getBarangayName($conn, $brgy_id)
       {
-        if (empty($brgy_id)) return 'None';
+        if (empty($brgy_id))
+          return 'None';
         $stmt = $conn->prepare("SELECT brgy_name FROM brgy WHERE brgy_id = ?");
         $stmt->bind_param("i", $brgy_id);
         $stmt->execute();
@@ -220,28 +249,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
         $changes[] = "• Role changed from '{$oldData['user_type']}' to '$user_type'";
       }
 
-      // ✅ Format status as Enabled/Disabled
+      // Format status as Enabled/Disabled
       if ($oldData['status'] != $status) {
         $oldStatus = ($oldData['status'] == 1) ? 'Enabled' : 'Disabled';
         $newStatus = ($status == 1) ? 'Enabled' : 'Disabled';
         $changes[] = "• Status changed from '$oldStatus' to '$newStatus'";
       }
 
-      // ✅ Show municipality name instead of ID
+      // Show municipality name instead of ID
       if ($oldData['m_id'] != $municipality) {
         $oldMunName = getMunicipalityName($conn, $oldData['m_id']);
         $newMunName = getMunicipalityName($conn, $municipality);
         $changes[] = "• Municipality changed from '$oldMunName' to '$newMunName'";
       }
 
-      // ✅ Show district name instead of ID
+      // Show district name instead of ID
       if ($oldData['district_id'] != $district) {
         $oldDistName = getDistrictName($conn, $oldData['district_id']);
         $newDistName = getDistrictName($conn, $district);
         $changes[] = "• District changed from '$oldDistName' to '$newDistName'";
       }
 
-      // ✅ Show barangay name instead of ID
+      // Show barangay name instead of ID
       if ($oldData['brgy_id'] != $barangay) {
         $oldBrgyName = getBarangayName($conn, $oldData['brgy_id']);
         $newBrgyName = getBarangayName($conn, $barangay);
@@ -253,8 +282,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
         $changes[] = "• Password was updated";
       }
 
-      // 🧾 Create readable multiline log text
-      $logMessage  = "Updated user account\n";
+      // Create readable multiline log text
+      $logMessage = "Updated user account\n";
       $logMessage .= "Username: $username\n";
       $logMessage .= "Full Name: $fullname\n";
       $logMessage .= "Role: $user_type\n\n";
@@ -265,7 +294,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
         $logMessage .= "No changes detected.";
       }
 
-      // ✅ Save clean message
+      // Save clean message
       logActivity($conn, $adminId, $logMessage);
     }
 
@@ -324,15 +353,28 @@ if ($result) {
   $result->free();
 }
 
-// ✅ Fetch IP Lockouts from database
+// Fetch ACTIVE IP Lockouts (only is_permanent = 1)
 $ip_lockout = [];
-$lockout_query = "SELECT * FROM ip_lockout ORDER BY last_attempt DESC";
+$lockout_query = "SELECT * FROM ip_lockout WHERE is_permanent = 1 ORDER BY last_attempt DESC";
 $lockout_result = $conn->query($lockout_query);
 if ($lockout_result) {
   while ($row = $lockout_result->fetch_assoc()) {
     $ip_lockout[] = $row;
   }
   $lockout_result->free();
+}
+
+// Fetch IP Ban History
+$ip_history = [];
+$history_query = "SELECT history_id, ip_address, banned_at, unbanned_at, unbanned_by, unbanned_by_name 
+                  FROM ip_ban_history 
+                  ORDER BY unbanned_at DESC";
+$history_result = $conn->query($history_query);
+if ($history_result) {
+  while ($row = $history_result->fetch_assoc()) {
+    $ip_history[] = $row;
+  }
+  $history_result->free();
 }
 
 $conn->close();
@@ -417,7 +459,7 @@ $conn->close();
           <div class="form-check form-switch ms-3">
             <input class="form-check-input" type="checkbox" id="bannedToggle">
             <label class="form-check-label fw-semibold text-danger" for="bannedToggle">
-              <i class="bi bi-shield-lock"></i> Banned Accounts / IP
+              <i class="bi bi-shield-lock"></i> Banned IP Addresses
             </label>
           </div>
         </div>
@@ -442,7 +484,8 @@ $conn->close();
               <tr class="border-bottom">
                 <td><?= htmlspecialchars($user['user_id'] ?? '') ?></td>
                 <td class="fw-semibold"><?= htmlspecialchars($user['username'] ?? '') ?></td>
-                <td><?= htmlspecialchars(trim("{$user['first_name']} {$user['middle_name']} {$user['last_name']}")) ?></td>
+                <td><?= htmlspecialchars(trim("{$user['first_name']} {$user['middle_name']} {$user['last_name']}")) ?>
+                </td>
                 <td><?= htmlspecialchars($user['user_type'] ?? '') ?></td>
                 <td>
                   <?php if ($user['status'] == 1): ?>
@@ -452,8 +495,7 @@ $conn->close();
                   <?php endif; ?>
                 </td>
                 <td class="text-center">
-                  <a href="#" data-toggle="modal"
-                    data-target="#editUserModal-<?= $user['user_id'] ?>"
+                  <a href="#" data-toggle="modal" data-target="#editUserModal-<?= $user['user_id'] ?>"
                     class="btn btn-outline-primary btn-sm rounded-circle">
                     <i class="bi bi-pencil-square"></i>
                   </a>
@@ -464,8 +506,21 @@ $conn->close();
         </table>
       </div>
 
-      <!-- BANNED ACCOUNTS/IP TABLE (FROM DATABASE) -->
+      <!-- BANNED IP ADDRESSES TABLE (is_permanent = 1) -->
       <div id="bannedTable" class="table-responsive d-none">
+        <!-- IP Ban History Toggle inside Banned Section -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold text-danger mb-0">
+            <i class="bi bi-shield-lock me-2"></i>Banned IP Addresses
+          </h5>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="historyToggle">
+            <label class="form-check-label fw-semibold text-secondary" for="historyToggle">
+              <i class="bi bi-clock-history"></i> Show History
+            </label>
+          </div>
+        </div>
+
         <table class="table table-hover align-middle mb-0">
           <thead class="bg-danger text-white text-center">
             <tr>
@@ -504,19 +559,69 @@ $conn->close();
                     ?>
                   </td>
                   <td>
-                    <?php if ($lockout['is_permanent'] == 1): ?>
-                      <span class="badge bg-danger">Permanent Ban</span>
-                    <?php else: ?>
-                      <span class="badge bg-warning text-dark">Temporary Lock</span>
-                    <?php endif; ?>
+                    <span class="badge bg-danger">Permanent Ban</span>
                   </td>
                   <td><?= date('Y-m-d H:i:s', strtotime($lockout['last_attempt'])) ?></td>
                   <td class="text-center">
-                    <button class="btn btn-outline-success btn-sm unban-btn"
-                      data-id="<?= $lockout['id'] ?>"
+                    <button class="btn btn-outline-success btn-sm unban-btn" data-id="<?= $lockout['id'] ?>"
                       data-ip="<?= htmlspecialchars($lockout['ip_address']) ?>">
                       <i class="bi bi-unlock"></i> Unban
                     </button>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- IP BAN HISTORY TABLE -->
+      <div id="historyTable" class="table-responsive d-none">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-secondary text-white text-center">
+            <tr>
+              <th style="width: 8%">ID</th>
+              <th style="width: 20%">IP Address</th>
+              <th style="width: 20%">Banned At</th>
+              <th style="width: 20%">Unbanned At</th>
+              <th style="width: 32%">Unbanned By</th>
+            </tr>
+          </thead>
+          <tbody class="text-start">
+            <?php if (empty($ip_history)): ?>
+              <tr>
+                <td colspan="5" class="text-center text-muted py-4">
+                  <i class="bi bi-info-circle me-2"></i>No IP ban history found
+                </td>
+              </tr>
+            <?php else: ?>
+              <?php foreach ($ip_history as $history): ?>
+                <tr>
+                  <td><?= htmlspecialchars($history['history_id']) ?></td>
+                  <td class="fw-semibold"><?= htmlspecialchars($history['ip_address']) ?></td>
+                  <td>
+                    <?php
+                    echo !empty($history['banned_at'])
+                      ? date('Y-m-d H:i:s', strtotime($history['banned_at']))
+                      : '<span class="text-muted">N/A</span>';
+                    ?>
+                  </td>
+                  <td>
+                    <?php
+                    echo !empty($history['unbanned_at'])
+                      ? date('Y-m-d H:i:s', strtotime($history['unbanned_at']))
+                      : '<span class="text-muted">N/A</span>';
+                    ?>
+                  </td>
+                  <td>
+                    <?php
+                    $name = trim($history['unbanned_by_name'] ?? '');
+                    if ($name !== '') {
+                      echo htmlspecialchars($name);
+                    } else {
+                      echo '<span class="text-muted">ID: ' . htmlspecialchars($history['unbanned_by'] ?? 'N/A') . '</span>';
+                    }
+                    ?>
                   </td>
                 </tr>
               <?php endforeach; ?>
@@ -532,7 +637,8 @@ $conn->close();
 
 
   <?php foreach ($users as $user): ?>
-    <div class="modal fade" id="editUserModal-<?= $user['user_id'] ?>" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editUserModal-<?= $user['user_id'] ?>" tabindex="-1" aria-labelledby="editUserModalLabel"
+      aria-hidden="true">
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
 
@@ -668,7 +774,8 @@ $conn->close();
 
                   <div class="mb-3">
                     <label class="form-label">Municipality</label>
-                    <select class="form-select municipality-select" name="municipality" data-user-id="<?= $user['user_id'] ?>">
+                    <select class="form-select municipality-select" name="municipality"
+                      data-user-id="<?= $user['user_id'] ?>">
                       <option value="">Select municipality</option>
                       <?php foreach ($municipalities as $mun): ?>
                         <option value="<?= $mun['m_id'] ?>" <?= (isset($user['m_id']) && $user['m_id'] == $mun['m_id']) ? 'selected' : '' ?>>
@@ -680,14 +787,16 @@ $conn->close();
 
                   <div class="mb-3">
                     <label class="form-label">District</label>
-                    <select class="form-select district-select" name="district" data-user-id="<?= $user['user_id'] ?>" disabled>
+                    <select class="form-select district-select" name="district" data-user-id="<?= $user['user_id'] ?>"
+                      disabled>
                       <option value="">Select district</option>
                     </select>
                   </div>
 
                   <div class="mb-3">
                     <label class="form-label">Barangay</label>
-                    <select class="form-select barangay-select" name="barangay" data-user-id="<?= $user['user_id'] ?>" data-selected-id="<?= $user['brgy_id'] ?? '' ?>" disabled>
+                    <select class="form-select barangay-select" name="barangay" data-user-id="<?= $user['user_id'] ?>"
+                      data-selected-id="<?= $user['brgy_id'] ?? '' ?>" disabled>
                       <option value="">Select barangay</option>
                     </select>
                   </div>
@@ -717,7 +826,8 @@ $conn->close();
   <?php endforeach; ?>
 
   <!-- UNBAN CONFIRMATION MODAL -->
-  <div class="modal fade" id="confirmUnbanModal" tabindex="-1" aria-labelledby="confirmUnbanModalLabel" aria-hidden="true">
+  <div class="modal fade" id="confirmUnbanModal" tabindex="-1" aria-labelledby="confirmUnbanModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-success shadow">
         <div class="modal-header bg-success text-white">
@@ -735,7 +845,7 @@ $conn->close();
             <p class="fw-semibold mb-3">
               Are you sure you want to unban the IP address <span id="unbanTarget" class="text-danger"></span>?
             </p>
-            <p class="text-muted small">This will immediately remove all restrictions for this IP address.</p>
+            <p class="text-muted small">This will move the IP to history and remove all restrictions.</p>
           </div>
           <div class="modal-footer justify-content-center">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -766,11 +876,11 @@ $conn->close();
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 
   <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
       // User status filter
-      $("input[name='userStatusFilter']").change(function() {
+      $("input[name='userStatusFilter']").change(function () {
         var showDisabled = $("#showDisabled").is(":checked");
-        $("#defaultUsersTable tbody tr").each(function() {
+        $("#defaultUsersTable tbody tr").each(function () {
           var statusText = $(this).find("td:eq(4)").text().trim();
           if (statusText === "Disabled") {
             $(this).toggle(showDisabled);
@@ -820,7 +930,7 @@ $conn->close();
       }
 
       // Initialize dropdowns when modal opens (edit user)
-      $('.modal').on('shown.bs.modal', function() {
+      $('.modal').on('shown.bs.modal', function () {
         const modal = $(this);
         const municipalitySelect = modal.find('.municipality-select');
         const districtSelect = modal.find('.district-select');
@@ -837,7 +947,7 @@ $conn->close();
       });
 
       // Municipality change event (updates both district + barangay)
-      $('.municipality-select').on('change', function() {
+      $('.municipality-select').on('change', function () {
         const municipalityId = $(this).val();
         const userId = $(this).data('user-id');
         const districtSelect = $(`.district-select[data-user-id="${userId}"]`);
@@ -850,18 +960,34 @@ $conn->close();
     });
   </script>
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       const bannedToggle = document.getElementById("bannedToggle");
+      const historyToggle = document.getElementById("historyToggle");
       const defaultTable = document.getElementById("defaultUsersTable");
       const bannedTable = document.getElementById("bannedTable");
+      const historyTable = document.getElementById("historyTable");
 
-      bannedToggle.addEventListener("change", function() {
+      bannedToggle.addEventListener("change", function () {
         if (this.checked) {
           bannedTable.classList.remove("d-none");
           defaultTable.classList.add("d-none");
+          // Reset history toggle when switching to banned view
+          historyToggle.checked = false;
+          historyTable.classList.add("d-none");
         } else {
           bannedTable.classList.add("d-none");
           defaultTable.classList.remove("d-none");
+          historyTable.classList.add("d-none");
+        }
+      });
+
+      historyToggle.addEventListener("change", function () {
+        if (this.checked) {
+          historyTable.classList.remove("d-none");
+          bannedTable.querySelector('table').classList.add("d-none");
+        } else {
+          historyTable.classList.add("d-none");
+          bannedTable.querySelector('table').classList.remove("d-none");
         }
       });
     });
