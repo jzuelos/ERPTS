@@ -103,7 +103,7 @@
   <!-- Header -->
   <?php include 'header.php'; ?>
 
-  <div class="container my-5">
+ <div class="container my-5">
     <div class="card shadow-lg border-0 rounded-3 mx-auto" style="max-width: 1200px;">
       <div class="card-body p-5">
 
@@ -238,7 +238,7 @@
       </div>
     </div>
   </div>
-
+  
   <footer class="text-center p-3" style="background-color: rgba(0,0,0,0.05);">
     © 2024 Electronic Real Property Tax System. All Rights Reserved.
   </footer>
