@@ -1,5 +1,5 @@
 <?php
-$user_role = 'admin'; // Demo - change to $_SESSION['user_type'] ?? 'user';
+$user_role = $_SESSION['user_type'] ?? 'user';
 ?>
 
 <!-- Header Navigation -->
