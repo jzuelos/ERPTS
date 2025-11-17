@@ -235,73 +235,76 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="printCertificationModalLabel">
-                    <i class="bi bi-printer"></i> Print Certification Details
+                    <i class="bi bi-printer"></i> Print Tax Declaration
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="printCertificationForm" method="POST" action="save_print_certification.php">
+            <form id="printCertificationForm">
                 <div class="modal-body">
                     <input type="hidden" name="property_id" id="printPropertyId">
                     <input type="hidden" name="faas_id" id="printFaasId" value="<?= $faas_id_for_print ?>">
 
                     <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> Please fill in the certification details before printing the tax declaration.
+                        <i class="bi bi-info-circle"></i> You can optionally fill in certification details, or skip directly to printing.
                     </div>
 
                     <div class="row">
                         <div class="col-md-12 mb-3">
                             <label for="ownerAdmin" class="form-label">
-                                Owner/Administration <span class="text-danger">*</span>
+                                Owner/Administration <span class="text-muted">(Optional)</span>
                             </label>
                             <input type="text" class="form-control" id="ownerAdmin" name="owner_admin"
-                                placeholder="Enter owner or administrator name" required>
+                                placeholder="Enter owner or administrator name">
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label for="certificationDate" class="form-label">
-                                Date <span class="text-danger">*</span>
+                                Date <span class="text-muted">(Optional)</span>
                             </label>
                             <input type="date" class="form-control" id="certificationDate" name="certification_date"
-                                value="<?= date('Y-m-d') ?>" required>
+                                value="<?= date('Y-m-d') ?>">
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label for="certificationFee" class="form-label">
-                                Certification Fee <span class="text-danger">*</span>
+                                Certification Fee <span class="text-muted">(Optional)</span>
                             </label>
                             <div class="input-group">
                                 <span class="input-group-text">₱</span>
                                 <input type="number" class="form-control" id="certificationFee" name="certification_fee"
-                                    placeholder="0.00" step="0.01" min="0" required>
+                                    placeholder="0.00" step="0.01" min="0">
                             </div>
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label for="orNumber" class="form-label">
-                                OR Number <span class="text-danger">*</span>
+                                OR Number <span class="text-muted">(Optional)</span>
                             </label>
                             <input type="text" class="form-control" id="orNumber" name="or_number"
                                 placeholder="Enter Official Receipt Number"
-                                maxlength="7" style="text-transform: uppercase;" required>
+                                maxlength="7" style="text-transform: uppercase;">
                             <small id="orFeedback" class="text-danger"></small>
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label for="datePaid" class="form-label">
-                                Date Paid <span class="text-danger">*</span>
+                                Date Paid <span class="text-muted">(Optional)</span>
                             </label>
                             <input type="date" class="form-control" id="datePaid" name="date_paid"
-                                value="<?= date('Y-m-d') ?>" required>
+                                value="<?= date('Y-m-d') ?>">
                         </div>
                     </div>
 
                     <div class="alert alert-warning mt-3">
                         <i class="bi bi-exclamation-triangle"></i>
-                        <strong>Note:</strong> This information will be saved and associated with this tax declaration print request.
+                        <strong>Note:</strong> If you fill in any certification details, they will be saved and printed with the tax declaration.
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-outline-primary" onclick="printDirectly()">
+                        <i class="bi bi-printer"></i> Print Without Details
+                    </button>
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-save"></i> Save & Print
                     </button>
@@ -378,6 +381,14 @@
                     this.value = this.value.slice(0, 7);
                 }
 
+                // Only check for duplicates if OR number is provided
+                if (this.value.length === 0) {
+                    feedback.textContent = '';
+                    this.classList.remove('is-invalid');
+                    if (submitBtn) submitBtn.disabled = false;
+                    return;
+                }
+
                 if (this.value.length < 3) {
                     feedback.textContent = '';
                     this.classList.remove('is-invalid');
@@ -414,13 +425,40 @@
     }
 
     // ================================
-    // Handle Form Submission
+    // Print Directly Without Saving Certification Details
+    // ================================
+    function printDirectly() {
+        const propertyId = document.getElementById('printPropertyId').value;
+        const faasId = document.getElementById('printFaasId').value;
+        
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('printCertificationModal'));
+        modal.hide();
+        
+        // Open DRP without certification details
+        window.open('DRP.php?p_id=' + propertyId, '_blank');
+    }
+
+    // ================================
+    // Handle Form Submission (Save & Print)
     // ================================
     document.getElementById('printCertificationForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
         const formData = new FormData(this);
+        
+        // Check if any certification field is filled
+        const hasData = formData.get('owner_admin') || 
+                       formData.get('certification_fee') || 
+                       formData.get('or_number');
 
+        if (!hasData) {
+            // No data provided, just print directly
+            printDirectly();
+            return;
+        }
+
+        // Save certification details and then print
         fetch('save_print_certification.php', {
                 method: 'POST',
                 body: formData
@@ -432,16 +470,24 @@
                     const modal = bootstrap.Modal.getInstance(document.getElementById('printCertificationModal'));
                     modal.hide();
 
-                    // Open DRP with OR number included
-                    window.open(
-                        'DRP.php?p_id=' + data.property_id +
-                        '&cert_id=' + data.cert_id +
-                        '&or_number=' + encodeURIComponent(data.or_number),
-                        '_blank'
-                    );
+                    // Open DRP with OR number included if provided
+                    let printUrl = 'DRP.php?p_id=' + data.property_id;
+                    if (data.cert_id) {
+                        printUrl += '&cert_id=' + data.cert_id;
+                    }
+                    if (data.or_number) {
+                        printUrl += '&or_number=' + encodeURIComponent(data.or_number);
+                    }
+                    
+                    window.open(printUrl, '_blank');
 
                     // Show success message
                     alert('Certification details saved successfully!');
+                    
+                    // Reset form
+                    this.reset();
+                    document.getElementById('certificationDate').value = '<?= date('Y-m-d') ?>';
+                    document.getElementById('datePaid').value = '<?= date('Y-m-d') ?>';
                 } else {
                     alert('Error: ' + (data.message || 'Failed to save certification details'));
                 }
