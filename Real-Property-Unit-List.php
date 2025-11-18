@@ -27,6 +27,7 @@ if ($conn->connect_error) {
 $sql = "SELECT 
   p.p_id,
   p.street,
+  p.house_no,
   p.block_no,
   p.barangay AS barangay_name,
   p.district AS district_name,
@@ -145,7 +146,7 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
               <tr>
                 <th>OD ID</th>
                 <th>Owner</th>
-                <th>Location <br><small>(Street, Barangay, City, Province)</small></th>
+                <th>Location <br><small>(House/Block/, Street, Barangay, City, Province)</small></th>
                 <th>Land Area</th>
                 <th>Edit</th>
               </tr>
@@ -160,7 +161,7 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
                   <td><?= htmlspecialchars($unit['p_id']) ?></td>
                   <td><?= htmlspecialchars($owner) ?></td>
                   <td>
-                    <?= htmlspecialchars("{$unit['street']}, {$unit['barangay_name']}, {$unit['municipality_name']}, {$unit['province_name']}") ?>
+                    <?= htmlspecialchars("{$unit['house_no']} / {$unit['block_no']} / {$unit['street']}, {$unit['barangay_name']}, {$unit['municipality_name']}, {$unit['province_name']}") ?>
                   </td>
                   <td><?= htmlspecialchars($unit['land_area']) ?></td>
                   <td><a href="FAAS.php?id=<?= htmlspecialchars($unit['p_id']) ?>" class="btn btn-primary">EDIT</a></td>

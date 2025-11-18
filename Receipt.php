@@ -9,6 +9,66 @@ if (!isset($_SESSION['user_id'])) {
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
+
+// Database connection
+require_once 'database.php';
+
+$conn = Database::getInstance();
+
+// Fetch receipt data with property and user details
+$query = "SELECT 
+    pc.cert_id,
+    pc.or_number,
+    pc.owner_admin,
+    pc.certification_date,
+    pc.date_paid,
+    pc.certification_fee,
+    pc.property_id,
+    pc.faas_id,
+    p.house_no,
+    p.barangay,
+    p.city,
+    p.province,
+    rd.arp_no,
+    CONCAT(u.first_name, ' ', u.last_name) as created_by_name
+FROM print_certifications pc
+LEFT JOIN p_info p ON pc.property_id = p.p_id
+LEFT JOIN faas f ON pc.faas_id = f.faas_id
+LEFT JOIN rpu_dec rd ON f.faas_id = rd.faas_id
+LEFT JOIN users u ON pc.created_by = u.user_id
+ORDER BY pc.created_at DESC";
+
+$result = mysqli_query($conn, $query);
+
+// Fetch monthly collection data
+$monthlyQuery = "SELECT 
+    MONTH(date_paid) as month,
+    SUM(certification_fee) as total
+FROM print_certifications
+WHERE YEAR(date_paid) = YEAR(CURDATE())
+GROUP BY MONTH(date_paid)
+ORDER BY MONTH(date_paid)";
+
+$monthlyResult = mysqli_query($conn, $monthlyQuery);
+$monthlyData = array_fill(1, 12, 0);
+while ($row = mysqli_fetch_assoc($monthlyResult)) {
+    $monthlyData[$row['month']] = $row['total'];
+}
+
+// Fetch yearly collection data
+$yearlyQuery = "SELECT 
+    YEAR(date_paid) as year,
+    SUM(certification_fee) as total
+FROM print_certifications
+WHERE YEAR(date_paid) >= YEAR(CURDATE()) - 4
+GROUP BY YEAR(date_paid)
+ORDER BY YEAR(date_paid)";
+
+$yearlyResult = mysqli_query($conn, $yearlyQuery);
+$yearlyData = [];
+while ($row = mysqli_fetch_assoc($yearlyResult)) {
+    $yearlyData[$row['year']] = $row['total'];
+}
 ?>
 
 <!doctype html>
@@ -39,19 +99,17 @@ header("Pragma: no-cache");
   <div class="container mt-4">
 
     <!-- Chart Filter -->
-      <div class="row align-items-center g-3">
-        <div class="col-md-12 text-end">
-          <select id="chartFilter" class="form-select w-auto d-inline-block">
-            <option value="monthly">Monthly Collection</option>
-            <option value="yearly">Yearly Collection</option>
-          </select>
-              <div class="chart-card">
-      <canvas id="collectionChart"></canvas>
-    </div>
+    <div class="row align-items-center g-3">
+      <div class="col-md-12 text-end">
+        <select id="chartFilter" class="form-select w-auto d-inline-block">
+          <option value="monthly">Monthly Collection</option>
+          <option value="yearly">Yearly Collection</option>
+        </select>
+        <div class="chart-card">
+          <canvas id="collectionChart"></canvas>
+        </div>
       </div>
     </div>
-
-    <!-- Chart -->
 
     <!-- RECEIPT TABLE + SEARCH + PRINT CONTROLS CONTAINER -->
     <div class="receipt-section p-3 rounded shadow-sm bg-white">
@@ -76,77 +134,69 @@ header("Pragma: no-cache");
             </tr>
           </thead>
           <tbody>
-            <!-- SAMPLE ROW 1 -->
+            <?php
+            if (mysqli_num_rows($result) > 0) {
+                $counter = 1;
+                while ($row = mysqli_fetch_assoc($result)) {
+                    $receiptNum = "RCPT-" . str_pad($row['cert_id'], 3, '0', STR_PAD_LEFT);
+                    $formattedDate = date('Y-m-d h:i A', strtotime($row['date_paid']));
+                    $formattedFee = number_format($row['certification_fee'], 2);
+                    
+                    // Property address
+                    $propertyAddress = trim($row['house_no'] . ' ' . $row['barangay'] . ', ' . $row['city'] . ', ' . $row['province']);
+            ?>
             <tr>
-              <td><input type="checkbox" class="rowCheck"></td>
-              <td><strong>RCPT-001</strong></td>
-              <td>OR-98432</td>
-              <td>Juan Dela Cruz</td>
-              <td><small class="text-muted">2025-02-10 10:45 AM</small></td>
-              <td><span class="fee-badge">₱ 1,200</span></td>
+              <td><input type="checkbox" class="rowCheck" data-cert-id="<?php echo $row['cert_id']; ?>"></td>
+              <td><strong><?php echo $receiptNum; ?></strong></td>
+              <td><?php echo htmlspecialchars($row['or_number']); ?></td>
+              <td><?php echo htmlspecialchars($row['owner_admin']); ?></td>
+              <td><small class="text-muted"><?php echo $formattedDate; ?></small></td>
+              <td><span class="fee-badge">₱ <?php echo $formattedFee; ?></span></td>
               <td>
-               <button class="btn btn-sm btn-details">
-                    <i class="fas fa-info-circle me-1"></i> Details
-                    </button>
-
-              </td>
-            </tr>
-            <tr class="collapse collapse-row" id="details1">
-              <td colspan="7">
-                <div class="p-2">
-                  <strong><i class="fas fa-file-alt me-2"></i>Transaction Details:</strong><br>
-                  Payment for property certification and documentation.
-                </div>
-              </td>
-            </tr>
-
-            <!-- SAMPLE ROW 2 -->
-            <tr>
-              <td><input type="checkbox" class="rowCheck"></td>
-              <td><strong>RCPT-002</strong></td>
-              <td>OR-45678</td>
-              <td>Maria Santos</td>
-              <td><small class="text-muted">2025-02-09 03:15 PM</small></td>
-              <td><span class="fee-badge">₱ 800</span></td>
-              <td>
-               <button class="btn btn-sm btn-details">
-                <i class="fas fa-info-circle me-1"></i> Details
+                <button class="btn btn-sm btn-details" data-bs-toggle="collapse" data-bs-target="#details<?php echo $counter; ?>">
+                  <i class="fas fa-info-circle me-1"></i> Details
                 </button>
-
               </td>
             </tr>
-            <tr class="collapse collapse-row" id="details2">
+            <tr class="collapse collapse-row" id="details<?php echo $counter; ?>">
               <td colspan="7">
-                <div class="p-2">
-                  <strong><i class="fas fa-file-alt me-2"></i>Transaction Details:</strong><br>
-                  Payment for land record updates and official documents.
+                <div class="p-3">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <strong><i class="fas fa-file-alt me-2"></i>Transaction Details:</strong><br>
+                      <small class="text-muted">
+                        <strong>Property ID:</strong> <?php echo $row['property_id']; ?><br>
+                        <strong>FAAS ID:</strong> <?php echo $row['faas_id']; ?><br>
+                        <strong>ARP No:</strong> <?php echo htmlspecialchars($row['arp_no'] ?? 'N/A'); ?><br>
+                        <strong>Address:</strong> <?php echo htmlspecialchars($propertyAddress); ?><br>
+                      </small>
+                    </div>
+                    <div class="col-md-6">
+                      <strong><i class="fas fa-calendar me-2"></i>Payment Information:</strong><br>
+                      <small class="text-muted">
+                        <strong>Certification Date:</strong> <?php echo date('F d, Y', strtotime($row['certification_date'])); ?><br>
+                        <strong>Date Paid:</strong> <?php echo date('F d, Y', strtotime($row['date_paid'])); ?><br>
+                        <strong>Processed By:</strong> <?php echo htmlspecialchars($row['created_by_name']); ?><br>
+                      </small>
+                    </div>
+                  </div>
                 </div>
               </td>
             </tr>
-
-            <!-- SAMPLE ROW 3 -->
+            <?php
+                    $counter++;
+                }
+            } else {
+            ?>
             <tr>
-              <td><input type="checkbox" class="rowCheck"></td>
-              <td><strong>RCPT-003</strong></td>
-              <td>OR-23456</td>
-              <td>Pedro Reyes</td>
-              <td><small class="text-muted">2025-02-08 11:30 AM</small></td>
-              <td><span class="fee-badge">₱ 1,500</span></td>
-              <td>
-                <button class="btn btn-sm btn-details">
-                    <i class="fas fa-info-circle me-1"></i> Details
-                    </button>
-
+              <td colspan="7" class="text-center text-muted py-4">
+                <i class="fas fa-inbox fa-3x mb-3"></i><br>
+                No receipt records found
               </td>
             </tr>
-            <tr class="collapse collapse-row" id="details3">
-              <td colspan="7">
-                <div class="p-2">
-                  <strong><i class="fas fa-file-alt me-2"></i>Transaction Details:</strong><br>
-                  Annual property tax payment for residential lot.
-                </div>
-              </td>
-            </tr>
+            <?php
+            }
+            ?>
           </tbody>
         </table>
       </div>
@@ -158,7 +208,7 @@ header("Pragma: no-cache");
           <label for="printAll" class="mb-0">Print all</label>
         </div>
 
-        <a href="printreceipt.php" id="printSelectedBtn" class="btn btn-print">
+        <a href="#" id="printSelectedBtn" class="btn btn-print">
           <i class="fas fa-print me-2"></i> Print Selected
         </a>
       </div>
@@ -180,95 +230,118 @@ header("Pragma: no-cache");
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-// ===== CHART.JS MONTHLY/YEARLY =====
-let ctx = document.getElementById("collectionChart");
-let chart;
+    // Monthly and Yearly data from PHP
+    const monthlyData = <?php echo json_encode(array_values($monthlyData)); ?>;
+    const yearlyData = <?php echo json_encode($yearlyData); ?>;
 
-function loadChart(type) {
-  if (chart) chart.destroy();
+    let ctx = document.getElementById("collectionChart");
+    let chart;
 
-  let labels = type === "monthly"
-    ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
-    : ["2021", "2022", "2023", "2024", "2025"];
+    function loadChart(type) {
+      if (chart) chart.destroy();
 
-  let data = type === "monthly"
-    ? [5000, 4200, 4800, 5300, 6000, 5800]
-    : [45000, 49000, 52000, 58000, 65000];
+      let labels, data;
+      
+      if (type === "monthly") {
+        labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        data = monthlyData;
+      } else {
+        labels = Object.keys(yearlyData);
+        data = Object.values(yearlyData);
+      }
 
-  chart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: labels,
-      datasets: [{
-        label: "Collection (₱)",
-        data: data,
-        backgroundColor: "rgba(69, 149, 119, 0.7)",
-        borderColor: "#38776b",
-        borderWidth: 2,
-        borderRadius: 6,
-        hoverBackgroundColor: "rgba(69, 149, 119, 0.9)"
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: {
-          display: true,
-          position: 'top'
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function(value) {
-              return '₱' + value.toLocaleString();
+      chart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: "Collection (₱)",
+            data: data,
+            backgroundColor: "rgba(69, 149, 119, 0.7)",
+            borderColor: "#38776b",
+            borderWidth: 2,
+            borderRadius: 6,
+            hoverBackgroundColor: "rgba(69, 149, 119, 0.9)"
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return '₱' + value.toLocaleString();
+                }
+              }
             }
           }
         }
-      }
+      });
     }
-  });
-}
 
-document.getElementById("chartFilter").addEventListener("change", function () {
-  loadChart(this.value);
-});
-
-loadChart("monthly");
-
-
-  </script>
-
-  <script>
-const detailButtons = document.querySelectorAll('.btn-details');
-
-detailButtons.forEach((button, index) => {
-  const targetId = `#details${index + 1}`; // match row IDs
-  button.addEventListener('click', () => {
-    const detailsRow = document.querySelector(targetId);
-    const isOpen = detailsRow.classList.contains('show');
-
-    // Close all other rows
-    document.querySelectorAll('.collapse-row.show').forEach(row => {
-      if (row !== detailsRow) row.classList.remove('show');
+    document.getElementById("chartFilter").addEventListener("change", function () {
+      loadChart(this.value);
     });
 
-    // Toggle clicked row
-    if (isOpen) {
-      detailsRow.classList.remove('show');
-      console.log(targetId + " is now CLOSED");
-    } else {
-      detailsRow.classList.add('show');
-      console.log(targetId + " is now OPEN");
-    }
-  });
-});
+    loadChart("monthly");
 
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+      const searchValue = this.value.toLowerCase();
+      const tableRows = document.querySelectorAll('#receiptTable tbody tr:not(.collapse-row)');
+      
+      tableRows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchValue) ? '' : 'none';
+        
+        // Hide associated detail rows too
+        const nextRow = row.nextElementSibling;
+        if (nextRow && nextRow.classList.contains('collapse-row')) {
+          nextRow.style.display = text.includes(searchValue) ? '' : 'none';
+        }
+      });
+    });
 
-</script>
+    // Select All functionality
+    document.getElementById('selectAll').addEventListener('change', function() {
+      const checkboxes = document.querySelectorAll('.rowCheck');
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+      });
+    });
 
+    // Print All functionality
+    document.getElementById('printAll').addEventListener('change', function() {
+      const selectAll = document.getElementById('selectAll');
+      if (this.checked) {
+        selectAll.checked = true;
+        selectAll.dispatchEvent(new Event('change'));
+      }
+    });
+
+    // Print Selected functionality
+    document.getElementById('printSelectedBtn').addEventListener('click', function() {
+      const selectedCheckboxes = document.querySelectorAll('.rowCheck:checked');
+      
+      if (selectedCheckboxes.length === 0) {
+        alert('Please select at least one receipt to print.');
+        return;
+      }
+
+      const certIds = Array.from(selectedCheckboxes).map(cb => cb.dataset.certId);
+      
+      // Redirect to print page with selected IDs
+      window.location.href = 'printreceipt.php?cert_ids=' + certIds.join(',');
+    });
+  </script>
 
 </body>
 </html>
