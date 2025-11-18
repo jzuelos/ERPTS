@@ -22,7 +22,7 @@ $user_role = $_SESSION['user_type'] ?? 'user';
     <?php endif; ?>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ms-auto">
+      <ul class="navbar-nav ms-auto align-items-center">
         <li class="nav-item">
           <a class="nav-link px-3" href="/ERPTS/Home.php">
             <i class="fas fa-home me-2"></i>Home
@@ -62,6 +62,19 @@ $user_role = $_SESSION['user_type'] ?? 'user';
           </a>
         </li>
 
+        <!-- Admin notification bell -->
+        <?php if ($user_role === 'admin'): ?>
+        <li class="nav-item ms-3">
+          <a class="nav-link position-relative" href="/ERPTS/Notifications.php">
+            <i class="fas fa-bell fa-lg text-warning"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              3 <!-- Example: number of notifications -->
+              <span class="visually-hidden">unread notifications</span>
+            </span>
+          </a>
+        </li>
+        <?php endif; ?>
+
         <li class="nav-item ms-3">
           <a href="/ERPTS/logout.php" class="btn btn-danger">
             <i class="fas fa-sign-out-alt me-2"></i>Log Out
@@ -71,6 +84,7 @@ $user_role = $_SESSION['user_type'] ?? 'user';
     </div>
   </div>
 </nav>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script>
