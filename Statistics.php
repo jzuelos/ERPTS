@@ -5,7 +5,6 @@ session_start();
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['action'] === 'log_export') {
     header('Content-Type: application/json');
     
-    // Check if user is logged in
     if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         echo json_encode(['success' => false, 'error' => 'Not authenticated']);
         exit;
@@ -16,7 +15,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['ac
     try {
         $conn = Database::getInstance();
         
-        // Get JSON input
         $input = file_get_contents('php://input');
         $data = json_decode($input, true);
         
@@ -28,14 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['ac
         $chart_title = $conn->real_escape_string($data['chart_title']);
         $chart_type = $conn->real_escape_string($data['chart_type']);
         
-        // Create detailed action message
         $action = "Exported statistics chart\n";
         $action .= "• Chart Type: " . ucfirst(str_replace('_', ' ', $chart_type)) . "\n";
         $action .= "• Chart Title: {$chart_title}\n";
         $action .= "• Export Format: PNG Image\n";
         $action .= "• Export Time: " . date('Y-m-d H:i:s');
         
-        // Insert into activity_log
         $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
         $stmt->bind_param("is", $user_id, $action);
         
@@ -62,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['ac
     exit;
 }
 
-// Redirect to login if not logged in
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
   header("Location: index.php");
   exit;
@@ -111,7 +106,6 @@ $total_barangays = $conn->query($query_barangays)->fetch_assoc()['total'];
 $query_users = "SELECT COUNT(*) AS total FROM users WHERE status = 1";
 $total_users = $conn->query($query_users)->fetch_assoc()['total'];
 
-// Count different action types from activity_log
 $login_count = 0;
 $logout_count = 0;
 $create_count = 0;
@@ -161,6 +155,45 @@ $query_certifications = "SELECT COUNT(*) AS total FROM print_certifications";
 $total_certifications = $conn->query($query_certifications)->fetch_assoc()['total'];
 
 // ============================================
+// RECEIPT COLLECTION STATISTICS
+// ============================================
+// Monthly collection for current year
+$receiptMonthlyQuery = "SELECT 
+    MONTH(date_paid) as month,
+    SUM(certification_fee) as total
+FROM print_certifications
+WHERE YEAR(date_paid) = YEAR(CURDATE())
+GROUP BY MONTH(date_paid)
+ORDER BY MONTH(date_paid)";
+
+$receiptMonthlyResult = $conn->query($receiptMonthlyQuery);
+$receiptMonthlyData = array_fill(1, 12, 0);
+while ($row = $receiptMonthlyResult->fetch_assoc()) {
+    $receiptMonthlyData[$row['month']] = (float)$row['total'];
+}
+
+// Yearly collection (last 5 years)
+$receiptYearlyQuery = "SELECT 
+    YEAR(date_paid) as year,
+    SUM(certification_fee) as total
+FROM print_certifications
+WHERE YEAR(date_paid) >= YEAR(CURDATE()) - 4
+GROUP BY YEAR(date_paid)
+ORDER BY YEAR(date_paid)";
+
+$receiptYearlyResult = $conn->query($receiptYearlyQuery);
+$receiptYearlyLabels = [];
+$receiptYearlyData = [];
+while ($row = $receiptYearlyResult->fetch_assoc()) {
+    $receiptYearlyLabels[] = $row['year'];
+    $receiptYearlyData[] = (float)$row['total'];
+}
+
+// Total collection
+$totalCollectionQuery = "SELECT SUM(certification_fee) as total FROM print_certifications";
+$totalCollection = $conn->query($totalCollectionQuery)->fetch_assoc()['total'] ?? 0;
+
+// ============================================
 // MONTHLY TRENDS (Last 6 months)
 // ============================================
 $monthly_properties = [];
@@ -175,15 +208,12 @@ for ($i = 5; $i >= 0; $i--) {
   
   $months_labels[] = $month_label;
   
-  // Properties created in this month
   $q = "SELECT COUNT(*) as count FROM p_info WHERE created_at BETWEEN '$month_start' AND '$month_end 23:59:59'";
   $monthly_properties[] = $conn->query($q)->fetch_assoc()['count'];
   
-  // Transactions in this month
   $q = "SELECT COUNT(*) as count FROM transactions WHERE created_at BETWEEN '$month_start' AND '$month_end 23:59:59'";
   $monthly_transactions[] = $conn->query($q)->fetch_assoc()['count'];
   
-  // Logins in this month
   $q = "SELECT COUNT(*) as count FROM activity_log WHERE action LIKE '%Logged in%' AND log_time BETWEEN '$month_start' AND '$month_end 23:59:59'";
   $monthly_logins[] = $conn->query($q)->fetch_assoc()['count'];
 }
@@ -262,6 +292,16 @@ $transaction_breakdown = [
   'labels' => $transaction_type_labels,
   'data' => $transaction_type_data
 ];
+
+$receipt_collection_monthly = [
+  'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  'data' => array_values($receiptMonthlyData)
+];
+
+$receipt_collection_yearly = [
+  'labels' => $receiptYearlyLabels,
+  'data' => $receiptYearlyData
+];
 ?>
 
 <!doctype html>
@@ -299,6 +339,8 @@ $transaction_breakdown = [
           <option value="monthly">Monthly Trends (6 Months)</option>
           <option value="classification">Land Classification Breakdown</option>
           <option value="transaction_types">Transaction Type Breakdown</option>
+          <option value="receipt_monthly">Receipt Collection (Monthly)</option>
+          <option value="receipt_yearly">Receipt Collection (Yearly)</option>
         </select>
       </div>
 
@@ -334,7 +376,7 @@ $transaction_breakdown = [
 
       <!-- Statistics Summary Cards -->
       <div class="row mt-5">
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
           <div class="card text-center">
             <div class="card-body">
               <h5 class="card-title"><i class="fas fa-home text-primary"></i> Properties</h5>
@@ -343,7 +385,7 @@ $transaction_breakdown = [
             </div>
           </div>
         </div>
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
           <div class="card text-center">
             <div class="card-body">
               <h5 class="card-title"><i class="fas fa-users text-success"></i> Owners</h5>
@@ -352,12 +394,21 @@ $transaction_breakdown = [
             </div>
           </div>
         </div>
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
           <div class="card text-center">
             <div class="card-body">
               <h5 class="card-title"><i class="fas fa-file-alt text-warning"></i> Transactions</h5>
               <h2 class="text-warning"><?= $total_transactions ?></h2>
               <p class="text-muted">Total Transactions</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title"><i class="fas fa-coins text-info"></i> Collection</h5>
+              <h2 class="text-info">₱<?= number_format($totalCollection, 2) ?></h2>
+              <p class="text-muted">Total Receipts</p>
             </div>
           </div>
         </div>
@@ -384,7 +435,9 @@ $transaction_breakdown = [
       audit: <?= json_encode($audit_stats) ?>,
       monthly: <?= json_encode($monthly_trends) ?>,
       classification: <?= json_encode($classification_breakdown) ?>,
-      transaction_types: <?= json_encode($transaction_breakdown) ?>
+      transaction_types: <?= json_encode($transaction_breakdown) ?>,
+      receipt_monthly: <?= json_encode($receipt_collection_monthly) ?>,
+      receipt_yearly: <?= json_encode($receipt_collection_yearly) ?>
     };
 
     let currentChart = null;
@@ -433,8 +486,21 @@ $transaction_breakdown = [
         }
       };
 
-      // Adjust options for pie/doughnut charts
-      if (currentChartType === 'pie' || currentChartType === 'doughnut') {
+      // Special formatting for receipt charts
+      if (type === 'receipt_monthly' || type === 'receipt_yearly') {
+        if (currentChartType !== 'pie' && currentChartType !== 'doughnut') {
+          chartConfig.options.scales = {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return '₱' + value.toLocaleString();
+                }
+              }
+            }
+          };
+        }
+      } else if (currentChartType === 'pie' || currentChartType === 'doughnut') {
         chartConfig.options.scales = undefined;
       } else {
         chartConfig.options.scales = {
@@ -457,7 +523,9 @@ $transaction_breakdown = [
         audit: 'Transaction & Audit Trail Statistics',
         monthly: 'Monthly Trends (Last 6 Months)',
         classification: 'Land Classification Distribution',
-        transaction_types: 'Transaction Types Distribution'
+        transaction_types: 'Transaction Types Distribution',
+        receipt_monthly: 'Receipt Collection - Monthly (' + new Date().getFullYear() + ')',
+        receipt_yearly: 'Receipt Collection - Yearly (Last 5 Years)'
       };
       return titles[type] || 'Statistics';
     }
@@ -496,6 +564,20 @@ $transaction_breakdown = [
             }
           ]
         };
+      } else if (type === 'receipt_monthly' || type === 'receipt_yearly') {
+        const data = statisticsData[type];
+        const color = 'rgba(69, 149, 119, 0.7)';
+        chartData = {
+          labels: data.labels,
+          datasets: [{
+            label: 'Collection (₱)',
+            data: data.data,
+            backgroundColor: color,
+            borderColor: '#38776b',
+            borderWidth: 2,
+            borderRadius: 6
+          }]
+        };
       } else {
         const data = statisticsData[type];
         chartData = {
@@ -529,7 +611,6 @@ $transaction_breakdown = [
       if (currentChart) {
         const selectedStat = document.getElementById('chartSelector').value;
         const chartTitle = getChartTitle(selectedStat);
-        const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
         
         // Log the export activity
         logExportActivity(chartTitle, selectedStat);

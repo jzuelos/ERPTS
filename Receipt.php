@@ -40,7 +40,7 @@ ORDER BY pc.created_at DESC";
 
 $result = mysqli_query($conn, $query);
 
-// Fetch monthly collection data
+// Fetch monthly collection data for current year
 $monthlyQuery = "SELECT 
     MONTH(date_paid) as month,
     SUM(certification_fee) as total
@@ -52,10 +52,10 @@ ORDER BY MONTH(date_paid)";
 $monthlyResult = mysqli_query($conn, $monthlyQuery);
 $monthlyData = array_fill(1, 12, 0);
 while ($row = mysqli_fetch_assoc($monthlyResult)) {
-    $monthlyData[$row['month']] = $row['total'];
+    $monthlyData[$row['month']] = (float)$row['total'];
 }
 
-// Fetch yearly collection data
+// Fetch yearly collection data (last 5 years)
 $yearlyQuery = "SELECT 
     YEAR(date_paid) as year,
     SUM(certification_fee) as total
@@ -67,8 +67,12 @@ ORDER BY YEAR(date_paid)";
 $yearlyResult = mysqli_query($conn, $yearlyQuery);
 $yearlyData = [];
 while ($row = mysqli_fetch_assoc($yearlyResult)) {
-    $yearlyData[$row['year']] = $row['total'];
+    $yearlyData[$row['year']] = (float)$row['total'];
 }
+
+// Calculate total collection
+$totalQuery = "SELECT SUM(certification_fee) as total FROM print_certifications";
+$totalCollection = mysqli_query($conn, $totalQuery)->fetch_assoc()['total'] ?? 0;
 ?>
 
 <!doctype html>
@@ -98,14 +102,29 @@ while ($row = mysqli_fetch_assoc($yearlyResult)) {
 
   <div class="container mt-4">
 
-    <!-- Chart Filter -->
-    <div class="row align-items-center g-3">
-      <div class="col-md-12 text-end">
-        <select id="chartFilter" class="form-select w-auto d-inline-block">
-          <option value="monthly">Monthly Collection</option>
-          <option value="yearly">Yearly Collection</option>
-        </select>
+    <!-- Collection Summary Card -->
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card shadow-sm">
+          <div class="card-body text-center">
+            <h5 class="card-title"><i class="fas fa-coins me-2"></i>Total Certification Fee Collection</h5>
+            <h2 class="text-success">₱ <?php echo number_format($totalCollection, 2); ?></h2>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="row mb-4">
+      <div class="col-md-12">
         <div class="chart-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Collection Overview</h5>
+            <select id="chartFilter" class="form-select w-auto">
+              <option value="monthly">Monthly Collection (Current Year)</option>
+              <option value="yearly">Yearly Collection (Last 5 Years)</option>
+            </select>
+          </div>
           <canvas id="collectionChart"></canvas>
         </div>
       </div>
@@ -232,25 +251,33 @@ while ($row = mysqli_fetch_assoc($yearlyResult)) {
   <script>
     // Monthly and Yearly data from PHP
     const monthlyData = <?php echo json_encode(array_values($monthlyData)); ?>;
-    const yearlyData = <?php echo json_encode($yearlyData); ?>;
+    const yearlyDataRaw = <?php echo json_encode($yearlyData); ?>;
+    
+    // Prepare yearly data
+    const yearlyLabels = Object.keys(yearlyDataRaw);
+    const yearlyValues = Object.values(yearlyDataRaw);
 
     let ctx = document.getElementById("collectionChart");
-    let chart;
+    let collectionChart;
 
     function loadChart(type) {
-      if (chart) chart.destroy();
+      if (collectionChart) {
+        collectionChart.destroy();
+      }
 
-      let labels, data;
+      let labels, data, chartTitle;
       
       if (type === "monthly") {
         labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         data = monthlyData;
+        chartTitle = "Monthly Collection for " + new Date().getFullYear();
       } else {
-        labels = Object.keys(yearlyData);
-        data = Object.values(yearlyData);
+        labels = yearlyLabels;
+        data = yearlyValues;
+        chartTitle = "Yearly Collection (Last 5 Years)";
       }
 
-      chart = new Chart(ctx, {
+      collectionChart = new Chart(ctx, {
         type: "bar",
         data: {
           labels: labels,
@@ -271,6 +298,14 @@ while ($row = mysqli_fetch_assoc($yearlyResult)) {
             legend: {
               display: true,
               position: 'top'
+            },
+            title: {
+              display: true,
+              text: chartTitle,
+              font: {
+                size: 16,
+                weight: 'bold'
+              }
             }
           },
           scales: {
@@ -291,6 +326,7 @@ while ($row = mysqli_fetch_assoc($yearlyResult)) {
       loadChart(this.value);
     });
 
+    // Initialize with monthly chart
     loadChart("monthly");
 
     // Search functionality
