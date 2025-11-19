@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 02, 2025 at 05:34 PM
+-- Generation Time: Nov 19, 2025 at 03:49 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -130,7 +130,24 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (172, 9, 'Unbanned IP address: ::1', '2025-11-02 15:55:23'),
 (173, NULL, 'Permanent lock activated for IP: ::1', '2025-11-02 15:56:59'),
 (174, NULL, 'Failed login from IP: ::1 - Username not found', '2025-11-02 15:56:59'),
-(175, 9, 'Unbanned IP address: ::1', '2025-11-02 16:06:23');
+(175, 9, 'Unbanned IP address: ::1', '2025-11-02 16:06:23'),
+(176, 9, 'Logged out of the system', '2025-11-02 16:36:44'),
+(177, 9, 'Logged in from IP: ::1', '2025-11-02 16:36:59'),
+(178, 9, 'Updated user account\nUsername: user\nFull Name: Juan Dela Cruz\nRole: Admin\n\nChanges:\n• Email changed from \'user@email.com\' to \'jzuelos@gmail.com\'\n• Role changed from \'user\' to \'Admin\'', '2025-11-02 16:37:11'),
+(179, 9, 'Logged out of the system', '2025-11-02 16:52:42'),
+(180, 9, 'Logged in from IP: ::1', '2025-11-02 16:53:23'),
+(181, 9, 'Updated user account\nUsername: user\nFull Name: Juan Dela Cruz\nRole: User\n\nChanges:\n• Role changed from \'admin\' to \'User\'', '2025-11-02 16:53:33'),
+(182, 9, 'Logged out of the system', '2025-11-02 16:54:08'),
+(183, 9, 'Logged in from IP: ::1', '2025-11-16 13:36:20'),
+(184, 9, 'Logged in from IP: ::1', '2025-11-17 06:50:45'),
+(185, 9, 'Logged in from IP: ::1', '2025-11-17 08:12:19'),
+(186, 9, 'Logged in from IP: ::1', '2025-11-17 08:27:05'),
+(187, 9, 'Viewed/Printed Declaration of Real Property (DRP)\n• Property ID: 147\n• ARP Number: GR-2023-II-01-012-00023\n• Property Index Number (PIN): 110123456789\n• Owner: Isabel Delos Ramos\n• Owner Address: Burgos St., Barangay 11, Labo, Camarines Norte\n• Location: 23 Mabini Street, Gahon, Camarines Norte\n• Total Land Area: 453\n• Tax Effectivity: 2025\n• Total Market Value: ₱60,000.00\n• Total Assessed Value: ₱4,993.92', '2025-11-17 09:22:04'),
+(188, 9, 'Viewed/Printed Declaration of Real Property (DRP)\n• Property ID: 147\n• ARP Number: GR-2023-II-01-012-00023\n• Property Index Number (PIN): 110123456789\n• Owner: Isabel Delos Ramos\n• Owner Address: Burgos St., Barangay 11, Labo, Camarines Norte\n• Location: 23 Mabini Street, Gahon, Camarines Norte\n• Total Land Area: 453\n• Tax Effectivity: 2025\n• Total Market Value: ₱60,000.00\n• Total Assessed Value: ₱4,993.92', '2025-11-17 09:23:39'),
+(189, 9, 'Viewed/Printed Declaration of Real Property (DRP)\n• Property ID: 147\n• ARP Number: GR-2023-II-01-012-00023\n• Property Index Number (PIN): 110123456789\n• Owner: Isabel Delos Ramos\n• Owner Address: Burgos St., Barangay 11, Labo, Camarines Norte\n• Location: 23 Mabini Street, Gahon, Camarines Norte\n• Total Land Area: 453\n• Tax Effectivity: 2025\n• Total Market Value: ₱60,000.00\n• Total Assessed Value: ₱4,993.92', '2025-11-17 09:26:27'),
+(190, 9, 'Logged in from IP: ::1', '2025-11-18 17:01:15'),
+(191, 9, 'Viewed/Printed Declaration of Real Property (DRP)\n• Property ID: 147\n• ARP Number: GR-2023-II-01-012-00023\n• Property Index Number (PIN): 110123456789\n• Owner: Isabel Delos Ramos\n• Owner Address: Burgos St., Barangay 11, Labo, Camarines Norte\n• Location: 23 Mabini Street, Gahon, Camarines Norte\n• Total Land Area: 453\n• Tax Effectivity: 2025\n• Total Market Value: ₱60,000.00\n• Total Assessed Value: ₱4,993.92', '2025-11-18 17:04:47'),
+(192, 9, 'Viewed/Printed Declaration of Real Property (DRP)\n• Property ID: 147\n• ARP Number: GR-2023-II-01-012-00023\n• Property Index Number (PIN): 110123456789\n• Owner: Isabel Delos Ramos\n• Owner Address: Burgos St., Barangay 11, Labo, Camarines Norte\n• Location: 23 Mabini Street, Gahon, Camarines Norte\n• Total Land Area: 453\n• Tax Effectivity: 2025\n• Total Market Value: ₱60,000.00\n• Total Assessed Value: ₱4,993.92\n• OR Number: 5442342\n• Certification Fee: ₱50.00\n• Date Paid: 2025-11-18', '2025-11-18 17:05:11');
 
 -- --------------------------------------------------------
 
@@ -609,6 +626,13 @@ CREATE TABLE `ip_lockout` (
   `last_attempt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `ip_lockout`
+--
+
+INSERT INTO `ip_lockout` (`id`, `ip_address`, `attempts`, `lock_until`, `is_permanent`, `last_attempt`) VALUES
+(23, '::1', 0, 0, 0, '2025-11-18 17:01:15');
+
 -- --------------------------------------------------------
 
 --
@@ -848,7 +872,8 @@ INSERT INTO `print_certifications` (`cert_id`, `property_id`, `faas_id`, `owner_
 (12, 157, 43, 'Renz Dioneda', '2025-10-16', 55.00, '6423452', '2025-10-16', 9, '2025-10-16 11:36:51'),
 (13, 144, 33, 'James Gacho', '2025-10-19', 45.00, '5443212', '2025-10-19', 9, '2025-10-19 19:50:15'),
 (14, 144, 33, 'James Gacho', '2025-10-19', 60.00, '6432312', '2025-10-19', 9, '2025-10-19 20:02:09'),
-(15, 144, 33, 'James Gacho', '2025-10-19', 60.00, '6432311', '2025-10-19', 9, '2025-10-19 20:07:31');
+(15, 144, 33, 'James Gacho', '2025-10-19', 60.00, '6432311', '2025-10-19', 9, '2025-10-19 20:07:31'),
+(16, 147, 36, 'Renz Dioneda', '2025-11-18', 50.00, '5442342', '2025-11-18', 9, '2025-11-19 01:05:11');
 
 -- --------------------------------------------------------
 
@@ -1324,7 +1349,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `last_name`, `first_name`, `middle_name`, `gender`, `birthdate`, `marital_status`, `tin`, `house_number`, `street`, `brgy_id`, `district_id`, `m_id`, `province`, `contact_number`, `email`, `status`, `user_type`) VALUES
 (9, 'admin', '$2y$10$uJGu7hoKfqtqSLE2EyV2GetTumt1zHaZOnvIpBeGC5dcwWBr25fc.', 'Zuelos', 'John Lloyd', 'Cruz', 'Male', '2001-11-11', 'Single', '000-123-456-789', '5', 'Purok', 66, 18, 14, 'Camarines Norte', '09123456789', 'johnlloydzuelos@gmail.com', 1, 'admin'),
-(12, 'user', '$2y$10$gmDQWOOqOOy8uUra8gGPQOA.FUDHTpucmbrNQ7mk..FbM/3ndQNt2', 'Cruz', 'Juan', 'Dela', 'Male', '2000-01-01', 'Single', 'NA', '1', 'Purok 1', 4, NULL, 1, 'Camarines Norte', '09123456789', 'user@email.com', 1, 'user');
+(12, 'user', '$2y$10$gmDQWOOqOOy8uUra8gGPQOA.FUDHTpucmbrNQ7mk..FbM/3ndQNt2', 'Cruz', 'Juan', 'Dela', 'Male', '2000-01-01', 'Single', 'NA', '1', 'Purok 1', 4, NULL, 1, 'Camarines Norte', '09123456789', 'jzuelos@gmail.com', 1, 'user');
 
 -- --------------------------------------------------------
 
@@ -1554,7 +1579,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=176;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=193;
 
 --
 -- AUTO_INCREMENT for table `admin_certification`
@@ -1602,7 +1627,7 @@ ALTER TABLE `ip_ban_history`
 -- AUTO_INCREMENT for table `ip_lockout`
 --
 ALTER TABLE `ip_lockout`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `land`
@@ -1638,7 +1663,7 @@ ALTER TABLE `owner_audit_log`
 -- AUTO_INCREMENT for table `print_certifications`
 --
 ALTER TABLE `print_certifications`
-  MODIFY `cert_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `cert_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `propertyowner`
