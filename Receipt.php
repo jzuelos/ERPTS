@@ -1,22 +1,63 @@
 <?php
 session_start();
 
+// Redirect to login page if user is not authenticated
 if (!isset($_SESSION['user_id'])) {
-  header("Location: index.php");
-  exit;
+    header("Location: index.php");
+    exit;
 }
 
+// Prevent browser caching
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
 // Database connection
 require_once 'database.php';
-
 $conn = Database::getInstance();
 
-// Fetch receipt data with property and user details
-$query = "SELECT 
+
+// Handle Pagination
+$limit = 5; // Number of rows per page
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$start = ($page - 1) * $limit;
+
+// Handle Server-Side Search
+// Capture search term from GET request
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$searchSQL = '';
+
+if (!empty($search)) {
+    $searchEscaped = mysqli_real_escape_string($conn, $search);
+    $searchSQL = " AND (
+        pc.cert_id = '$searchEscaped' OR
+        pc.or_number LIKE '%$searchEscaped%' OR
+        pc.owner_admin LIKE '%$searchEscaped%'
+    )";
+}
+
+
+
+
+// Count total rows for pagination
+$countQuery = "
+SELECT COUNT(*) as total
+FROM print_certifications pc
+LEFT JOIN p_info p ON pc.property_id = p.p_id
+LEFT JOIN faas f ON pc.faas_id = f.faas_id
+LEFT JOIN rpu_dec rd ON f.faas_id = rd.faas_id
+LEFT JOIN users u ON pc.created_by = u.user_id
+WHERE 1 $searchSQL
+";
+
+$countResult = mysqli_query($conn, $countQuery);
+$totalRows = mysqli_fetch_assoc($countResult)['total'];
+$totalPages = ceil($totalRows / $limit);
+
+
+// Fetch receipt data with pagination and search applied
+$query = "
+SELECT 
     pc.cert_id,
     pc.or_number,
     pc.owner_admin,
@@ -36,18 +77,21 @@ LEFT JOIN p_info p ON pc.property_id = p.p_id
 LEFT JOIN faas f ON pc.faas_id = f.faas_id
 LEFT JOIN rpu_dec rd ON f.faas_id = rd.faas_id
 LEFT JOIN users u ON pc.created_by = u.user_id
-ORDER BY pc.created_at DESC";
+WHERE 1 $searchSQL
+ORDER BY pc.created_at DESC
+LIMIT $start, $limit
+";
 
 $result = mysqli_query($conn, $query);
 
-// Fetch monthly collection data for current year
-$monthlyQuery = "SELECT 
-    MONTH(date_paid) as month,
-    SUM(certification_fee) as total
+// Fetch monthly collection data (current year)
+$monthlyQuery = "
+SELECT MONTH(date_paid) as month, SUM(certification_fee) as total
 FROM print_certifications
 WHERE YEAR(date_paid) = YEAR(CURDATE())
 GROUP BY MONTH(date_paid)
-ORDER BY MONTH(date_paid)";
+ORDER BY MONTH(date_paid)
+";
 
 $monthlyResult = mysqli_query($conn, $monthlyQuery);
 $monthlyData = array_fill(1, 12, 0);
@@ -55,14 +99,15 @@ while ($row = mysqli_fetch_assoc($monthlyResult)) {
     $monthlyData[$row['month']] = (float)$row['total'];
 }
 
-// Fetch yearly collection data (last 5 years)
-$yearlyQuery = "SELECT 
-    YEAR(date_paid) as year,
-    SUM(certification_fee) as total
+
+// Fetch yearly collection data 
+$yearlyQuery = "
+SELECT YEAR(date_paid) as year, SUM(certification_fee) as total
 FROM print_certifications
 WHERE YEAR(date_paid) >= YEAR(CURDATE()) - 4
 GROUP BY YEAR(date_paid)
-ORDER BY YEAR(date_paid)";
+ORDER BY YEAR(date_paid)
+";
 
 $yearlyResult = mysqli_query($conn, $yearlyQuery);
 $yearlyData = [];
@@ -73,7 +118,10 @@ while ($row = mysqli_fetch_assoc($yearlyResult)) {
 // Calculate total collection
 $totalQuery = "SELECT SUM(certification_fee) as total FROM print_certifications";
 $totalCollection = mysqli_query($conn, $totalQuery)->fetch_assoc()['total'] ?? 0;
+
 ?>
+
+
 
 <!doctype html>
 <html lang="en">
@@ -125,6 +173,13 @@ $totalCollection = mysqli_query($conn, $totalQuery)->fetch_assoc()['total'] ?? 0
               <option value="yearly">Yearly Collection (Last 5 Years)</option>
             </select>
           </div>
+      <!-- ADD THIS BELOW -->
+          <div class="d-flex gap-2 mb-3">
+            <input type="date" id="startDate" class="form-control w-auto">
+            <input type="date" id="endDate" class="form-control w-auto">
+            <button id="applyDateFilter" class="btn btn-success">Filter</button>
+              <button id="resetDateFilter" class="btn btn-secondary">Reset</button>
+          </div>
           <canvas id="collectionChart"></canvas>
         </div>
       </div>
@@ -134,11 +189,16 @@ $totalCollection = mysqli_query($conn, $totalQuery)->fetch_assoc()['total'] ?? 0
     <div class="receipt-section p-3 rounded shadow-sm bg-white">
 
       <!-- Search Bar -->
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <input type="text" id="searchInput" class="form-control" placeholder="Search by receipt number, owner, or OR number...">
-      </div>
+      <form method="GET" class="d-flex justify-content-between align-items-center mb-3" action="#receipts">
+        <input type="text" name="search" id="searchInput" class="form-control"
+              placeholder="Search by Receipt #, OR #, or Owner..."
+              value="<?php echo htmlspecialchars($search); ?>">
+        <button type="submit" class="btn btn-primary ms-2">Search</button>
+      </form>
+
 
       <!-- Table Wrapper -->
+       <a id="receipts"></a>
       <div class="table-responsive">
         <table id="receiptTable" class="table table-hover align-middle">
           <thead>
@@ -219,7 +279,29 @@ $totalCollection = mysqli_query($conn, $totalQuery)->fetch_assoc()['total'] ?? 0
           </tbody>
         </table>
       </div>
+      <!-- Pagination -->
+      <nav aria-label="Receipt pagination" class="mt-3">
+        <ul class="pagination justify-content-center">
 
+          <!-- Previous Button -->
+          <li class="page-item <?php echo ($page <= 1) ? 'disabled' : ''; ?>">
+            <a class="page-link" href="?page=<?php echo $page - 1; ?>&search=<?php echo urlencode($search); ?>#receipts">&laquo;</a>
+          </li>
+
+          <!-- Current Page Indicator -->
+          <li class="page-item disabled">
+            <a class="page-link bg-light fw-bold">
+              Page <?php echo $page; ?> of <?php echo $totalPages; ?>
+            </a>
+          </li>
+
+          <!-- Next Button -->
+          <li class="page-item <?php echo ($page >= $totalPages) ? 'disabled' : ''; ?>">
+            <a class="page-link" href="?page=<?php echo $page + 1; ?>&search=<?php echo urlencode($search); ?>#receipts">&raquo;</a>
+          </li>
+
+        </ul>
+      </nav>
       <!-- PRINT CONTROLS -->
       <div class="print-controls d-flex justify-content-end align-items-center mt-3 gap-3">
         <div>
@@ -249,102 +331,120 @@ $totalCollection = mysqli_query($conn, $totalQuery)->fetch_assoc()['total'] ?? 0
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // Monthly and Yearly data from PHP
-    const monthlyData = <?php echo json_encode(array_values($monthlyData)); ?>;
-    const yearlyDataRaw = <?php echo json_encode($yearlyData); ?>;
-    
-    // Prepare yearly data
-    const yearlyLabels = Object.keys(yearlyDataRaw);
-    const yearlyValues = Object.values(yearlyDataRaw);
+// Prepare original monthly/yearly data from PHP
+const monthlyDataOriginal = <?php echo json_encode(array_values($monthlyData)); ?>;
+const yearlyDataRawOriginal = <?php echo json_encode($yearlyData); ?>;
 
-    let ctx = document.getElementById("collectionChart");
-    let collectionChart;
+const yearlyLabelsOriginal = Object.keys(yearlyDataRawOriginal);
+const yearlyValuesOriginal = Object.values(yearlyDataRawOriginal);
 
-    function loadChart(type) {
-      if (collectionChart) {
-        collectionChart.destroy();
-      }
+let ctx = document.getElementById("collectionChart");
+let collectionChart;
 
-      let labels, data, chartTitle;
-      
-      if (type === "monthly") {
-        labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        data = monthlyData;
-        chartTitle = "Monthly Collection for " + new Date().getFullYear();
-      } else {
-        labels = yearlyLabels;
-        data = yearlyValues;
-        chartTitle = "Yearly Collection (Last 5 Years)";
-      }
+// Function to load chart
+function loadChart(type, filteredMonthly = null, filteredYearly = null) {
+  if (collectionChart) {
+    collectionChart.destroy();
+  }
 
-      collectionChart = new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels: labels,
-          datasets: [{
-            label: "Collection (₱)",
-            data: data,
-            backgroundColor: "rgba(69, 149, 119, 0.7)",
-            borderColor: "#38776b",
-            borderWidth: 2,
-            borderRadius: 6,
-            hoverBackgroundColor: "rgba(69, 149, 119, 0.9)"
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          plugins: {
-            legend: {
-              display: true,
-              position: 'top'
-            },
-            title: {
-              display: true,
-              text: chartTitle,
-              font: {
-                size: 16,
-                weight: 'bold'
-              }
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                callback: function(value) {
-                  return '₱' + value.toLocaleString();
-                }
-              }
-            }
-          }
+  let labels, data, chartTitle;
+
+  if (type === "monthly") {
+    labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    data = filteredMonthly || monthlyDataOriginal;
+    chartTitle = "Monthly Collection for " + new Date().getFullYear();
+  } else {
+    labels = yearlyLabelsOriginal;
+    data = filteredYearly || yearlyValuesOriginal;
+    chartTitle = "Yearly Collection (Last 5 Years)";
+  }
+
+  collectionChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Collection (₱)",
+        data: data,
+        backgroundColor: "rgba(69, 149, 119, 0.7)",
+        borderColor: "#38776b",
+        borderWidth: 2,
+        borderRadius: 6,
+        hoverBackgroundColor: "rgba(69, 149, 119, 0.9)"
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: true, position: 'top' },
+        title: { display: true, text: chartTitle, font: { size: 16, weight: 'bold' } }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { callback: value => '₱' + value.toLocaleString() }
         }
-      });
+      }
     }
+  });
+}
 
-    document.getElementById("chartFilter").addEventListener("change", function () {
-      loadChart(this.value);
+// Event listener for dropdown filter
+document.getElementById("chartFilter").addEventListener("change", function () {
+  loadChart(this.value);
+});
+
+// -----------------------------
+// Date filter functionality
+// -----------------------------
+document.getElementById("applyDateFilter").addEventListener("click", function() {
+  const start = document.getElementById("startDate").value;
+  const end = document.getElementById("endDate").value;
+  const filterType = document.getElementById("chartFilter").value;
+
+  if (!start || !end) {
+    alert("Please select both start and end dates.");
+    return;
+  }
+
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+
+  if (filterType === "monthly") {
+    // Filter monthly data
+    const filteredMonthly = monthlyDataOriginal.map((value, index) => {
+      const monthDate = new Date(new Date().getFullYear(), index, 1);
+      return (monthDate >= startDate && monthDate <= endDate) ? value : 0;
     });
-
-    // Initialize with monthly chart
-    loadChart("monthly");
-
-    // Search functionality
-    document.getElementById('searchInput').addEventListener('keyup', function() {
-      const searchValue = this.value.toLowerCase();
-      const tableRows = document.querySelectorAll('#receiptTable tbody tr:not(.collapse-row)');
-      
-      tableRows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchValue) ? '' : 'none';
-        
-        // Hide associated detail rows too
-        const nextRow = row.nextElementSibling;
-        if (nextRow && nextRow.classList.contains('collapse-row')) {
-          nextRow.style.display = text.includes(searchValue) ? '' : 'none';
-        }
-      });
+    loadChart("monthly", filteredMonthly);
+  } else {
+    // Filter yearly data
+    const filteredYearly = yearlyValuesOriginal.map((value, index) => {
+      const year = parseInt(yearlyLabelsOriginal[index]);
+      const yearDate = new Date(year, 0, 1);
+      return (yearDate >= startDate && yearDate <= endDate) ? value : 0;
     });
+    loadChart("yearly", null, filteredYearly);
+  }
+});
+
+// Reset button functionality
+document.getElementById("resetDateFilter").addEventListener("click", function() {
+    // Clear date inputs
+    document.getElementById("startDate").value = '';
+    document.getElementById("endDate").value = '';
+
+    // Reload chart with original data
+    const chartType = document.getElementById("chartFilter").value;
+    loadChart(chartType);
+});
+
+
+// Initialize chart with monthly data
+loadChart("monthly");
+
+
 
     // Select All functionality
     document.getElementById('selectAll').addEventListener('change', function() {
@@ -378,6 +478,21 @@ $totalCollection = mysqli_query($conn, $totalQuery)->fetch_assoc()['total'] ?? 0
       window.location.href = 'printreceipt.php?cert_ids=' + certIds.join(',');
     });
   </script>
+
+  <script>
+  // If the URL contains ?page=, scroll to the table after reload
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.location.search.includes("page=")) {
+      const tableSection = document.getElementById("receiptTable");
+      if (tableSection) {
+        tableSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  });
+</script>
+
+
+
 
 </body>
 </html>
