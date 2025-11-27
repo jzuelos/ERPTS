@@ -306,6 +306,61 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_user"])) {
   $stmt->close();
 }
 
+// Function to delete user with confirmation
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delete_user"])) {
+  $userId = filter_input(INPUT_POST, 'userId', FILTER_SANITIZE_NUMBER_INT);
+
+  if (!$userId) {
+    echo "<script>alert('Invalid user ID'); window.location.href='User-Control.php';</script>";
+    exit();
+  }
+
+  // Fetch user data before deletion for logging
+  $getUserStmt = $conn->prepare("SELECT username, first_name, middle_name, last_name, email, user_type FROM users WHERE user_id = ?");
+  $getUserStmt->bind_param("i", $userId);
+  $getUserStmt->execute();
+  $userData = $getUserStmt->get_result()->fetch_assoc();
+  $getUserStmt->close();
+
+  if (!$userData) {
+    echo "<script>alert('User not found'); window.location.href='User-Control.php';</script>";
+    exit();
+  }
+
+  // Prevent deletion of current logged-in user
+  if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $userId) {
+    echo "<script>alert('You cannot delete your own account!'); window.location.href='User-Control.php';</script>";
+    exit();
+  }
+
+  // Delete the user
+  $deleteStmt = $conn->prepare("DELETE FROM users WHERE user_id = ?");
+  $deleteStmt->bind_param("i", $userId);
+
+  if ($deleteStmt->execute()) {
+    // Log the deletion activity
+    if (isset($_SESSION['user_id'])) {
+      $adminId = $_SESSION['user_id'];
+      $fullname = trim("{$userData['first_name']} {$userData['middle_name']} {$userData['last_name']}");
+
+      $logMessage = "Deleted user account\n";
+      $logMessage .= "User ID: $userId\n";
+      $logMessage .= "Username: {$userData['username']}\n";
+      $logMessage .= "Full Name: $fullname\n";
+      $logMessage .= "Email: {$userData['email']}\n";
+      $logMessage .= "Role: {$userData['user_type']}";
+
+      logActivity($conn, $adminId, $logMessage);
+    }
+
+    echo "<script>alert('User deleted successfully!'); window.location.href='User-Control.php';</script>";
+  } else {
+    echo "<script>alert('Error deleting user: " . $deleteStmt->error . "');</script>";
+  }
+
+  $deleteStmt->close();
+}
+
 // ---------- LOAD DATA FOR DROPDOWNS ---------- //
 $username = $_SESSION['username'] ?? 'Admin';
 
@@ -466,7 +521,6 @@ $conn->close();
       </div>
 
       <!-- USERS TABLES SECTION -->
-      <!-- DEFAULT USERS TABLE -->
       <div id="defaultUsersTable" class="table-responsive">
         <table class="table table-hover align-middle mb-0">
           <thead class="bg-dark text-white text-center">
@@ -496,9 +550,21 @@ $conn->close();
                 </td>
                 <td class="text-center">
                   <a href="#" data-toggle="modal" data-target="#editUserModal-<?= $user['user_id'] ?>"
-                    class="btn btn-outline-primary btn-sm rounded-circle">
+                    class="btn btn-outline-primary btn-sm rounded-circle me-1" title="Edit User">
                     <i class="bi bi-pencil-square"></i>
                   </a>
+                  <?php if ($user['user_type'] === 'admin'): ?>
+                    <button class="btn btn-outline-secondary btn-sm rounded-circle" disabled
+                      title="Admin accounts cannot be deleted">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  <?php else: ?>
+                    <button type="button" class="btn btn-outline-danger btn-sm rounded-circle delete-user-btn"
+                      data-user-id="<?= $user['user_id'] ?>" data-username="<?= htmlspecialchars($user['username']) ?>"
+                      data-fullname="<?= htmlspecialchars(trim("{$user['first_name']} {$user['middle_name']} {$user['last_name']}")) ?>">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  <?php endif; ?>
                 </td>
               </tr>
             <?php endforeach; ?>
@@ -858,8 +924,56 @@ $conn->close();
     </div>
   </div>
 
+  <!-- DELETE USER CONFIRMATION MODAL -->
+  <div class="modal fade" id="confirmDeleteUserModal" tabindex="-1" aria-labelledby="confirmDeleteUserModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-danger shadow">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="confirmDeleteUserModalLabel">
+            <i class="bi bi-exclamation-triangle me-2"></i>Confirm Delete User
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="POST" id="deleteUserForm">
+          <input type="hidden" name="delete_user" value="1">
+          <input type="hidden" name="userId" id="deleteUserId">
 
+          <div class="modal-body">
+            <div class="alert alert-warning" role="alert">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              <strong>Warning!</strong> This action cannot be undone.
+            </div>
 
+            <p class="fw-semibold mb-3">
+              Are you sure you want to delete this user?
+            </p>
+
+            <div class="card bg-light">
+              <div class="card-body">
+                <p class="mb-2"><strong>Username:</strong> <span id="deleteUsername" class="text-danger"></span></p>
+                <p class="mb-0"><strong>Full Name:</strong> <span id="deleteFullname" class="text-danger"></span></p>
+              </div>
+            </div>
+
+            <p class="text-muted small mt-3 mb-0">
+              <i class="bi bi-info-circle me-1"></i>
+              All data associated with this user will be permanently deleted from the system.
+            </p>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="bi bi-x-circle me-1"></i>Cancel
+            </button>
+            <button type="submit" class="btn btn-danger">
+              <i class="bi bi-trash me-1"></i>Yes, Delete User
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer class="bg-body-tertiary text-center text-lg-start mt-auto">
@@ -1018,6 +1132,33 @@ $conn->close();
       });
     });
   </script>
+
+  <script>
+    // Delete User Confirmation Modal
+    document.addEventListener('DOMContentLoaded', () => {
+      const deleteButtons = document.querySelectorAll('.delete-user-btn');
+      const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteUserModal'));
+      const deleteUserIdInput = document.getElementById('deleteUserId');
+      const deleteUsernameSpan = document.getElementById('deleteUsername');
+      const deleteFullnameSpan = document.getElementById('deleteFullname');
+
+      // When a Delete button is clicked
+      deleteButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const userId = button.getAttribute('data-user-id');
+          const username = button.getAttribute('data-username');
+          const fullname = button.getAttribute('data-fullname');
+
+          deleteUserIdInput.value = userId;
+          deleteUsernameSpan.textContent = username;
+          deleteFullnameSpan.textContent = fullname;
+
+          confirmDeleteModal.show();
+        });
+      });
+    });
+  </script>
+
 
 </body>
 
