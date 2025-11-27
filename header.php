@@ -62,17 +62,19 @@ $user_role = $_SESSION['user_type'] ?? 'user';
           </a>
         </li>
 
-        <!-- Admin notification bell -->
+
+        <!-- Admin notification bell - FIXED VERSION -->
         <?php if ($user_role === 'admin'): ?>
-        <li class="nav-item ms-3">
-          <a class="nav-link position-relative" href="#" id="notificationBell">
-            <i class="fas fa-bell fa-lg text-warning"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notifBadge">
-              3
-              <span class="visually-hidden">unread notifications</span>
-            </span>
-          </a>
-        </li>
+          <li class="nav-item ms-3">
+            <a class="nav-link position-relative" href="#" id="notificationBell" style="padding: 0.5rem 1rem;">
+              <i class="fas fa-bell fa-lg text-warning"></i>
+              <span class="position-absolute badge rounded-pill bg-danger" id="notifBadge"
+                style="top: 8px; right: 8px; font-size: 0.65rem; padding: 0.25em 0.5em; min-width: 18px; display: none;">
+                0
+                <span class="visually-hidden">unread notifications</span>
+              </span>
+            </a>
+          </li>
         <?php endif; ?>
 
         <li class="nav-item ms-3">
@@ -89,9 +91,6 @@ $user_role = $_SESSION['user_type'] ?? 'user';
 <div id="notificationPanel" class="notification-dropdown shadow-lg">
   <div class="notif-header">
     <h5 class="mb-0">Notifications</h5>
-    <button id="notifSettings" class="btn-icon">
-      <i class="fas fa-ellipsis-h"></i>
-    </button>
   </div>
 
   <div class="notif-tabs">
@@ -102,7 +101,7 @@ $user_role = $_SESSION['user_type'] ?? 'user';
   <div class="notif-content" id="notificationList">
     <div class="notif-section-header">
       <span class="section-title">Recent</span>
-      <a href="#" class="see-all-link">See all</a>
+      <a href="#" class="see-all-link mark-all-read-btn">Mark all as read</a>
     </div>
 
     <!-- Loading State -->
@@ -125,7 +124,9 @@ $user_role = $_SESSION['user_type'] ?? 'user';
   </div>
 
   <div class="notif-footer">
-    <a href="#" class="see-previous-link">See previous notifications</a>
+    <a href="#" class="see-previous-link mark-all-read-btn">
+      <i class="fas fa-check-double me-2"></i>Mark all as read
+    </a>
   </div>
 </div>
 
@@ -135,7 +136,7 @@ $user_role = $_SESSION['user_type'] ?? 'user';
     const navbar = document.querySelector(".navbar");
     const navbarHeight = navbar.offsetHeight;
     document.body.style.paddingTop = navbarHeight + "px";
-    
+
     // Add active class to current page
     const currentLocation = location.pathname;
     const navLinks = document.querySelectorAll('.nav-link');
@@ -148,96 +149,99 @@ $user_role = $_SESSION['user_type'] ?? 'user';
 </script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  const dropdowns = document.querySelectorAll('.nav-item.dropdown');
+  document.addEventListener("DOMContentLoaded", function () {
+    const dropdowns = document.querySelectorAll('.nav-item.dropdown');
 
-  dropdowns.forEach(dropdown => {
-    let timeout;
+    dropdowns.forEach(dropdown => {
+      let timeout;
 
-    dropdown.addEventListener('mouseenter', function () {
-      clearTimeout(timeout);
-      const menu = this.querySelector('.dropdown-menu');
-      menu.style.display = 'block';
-      setTimeout(() => {
-        menu.style.opacity = '1';
-      }, 10);
-    });
-
-    dropdown.addEventListener('mouseleave', function () {
-      const menu = this.querySelector('.dropdown-menu');
-      timeout = setTimeout(() => {
-        menu.style.opacity = '0';
+      dropdown.addEventListener('mouseenter', function () {
+        clearTimeout(timeout);
+        const menu = this.querySelector('.dropdown-menu');
+        menu.style.display = 'block';
         setTimeout(() => {
-          menu.style.display = 'none';
-        }, 300);
-      }, 200);
+          menu.style.opacity = '1';
+        }, 10);
+      });
+
+      dropdown.addEventListener('mouseleave', function () {
+        const menu = this.querySelector('.dropdown-menu');
+        timeout = setTimeout(() => {
+          menu.style.opacity = '0';
+          setTimeout(() => {
+            menu.style.display = 'none';
+          }, 300);
+        }, 200);
+      });
     });
   });
-});
 </script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  const bell = document.getElementById("notificationBell");
-  const panel = document.getElementById("notificationPanel");
-  const notifTabs = document.querySelectorAll(".notif-tab");
-  const notifBadge = document.getElementById("notifBadge");
-  const notifList = document.getElementById("notificationList");
-  const notifLoading = document.getElementById("notifLoading");
-  const notifEmpty = document.getElementById("notifEmpty");
-  const markAllReadBtn = document.getElementById("markAllReadBtn");
-  
-  let allNotifications = [];
-  let currentTab = 'all';
+  document.addEventListener("DOMContentLoaded", function () {
+    const bell = document.getElementById("notificationBell");
+    const panel = document.getElementById("notificationPanel");
+    const notifTabs = document.querySelectorAll(".notif-tab");
+    const notifBadge = document.getElementById("notifBadge");
+    const notifList = document.getElementById("notificationList");
+    const notifLoading = document.getElementById("notifLoading");
+    const notifEmpty = document.getElementById("notifEmpty");
+    const markAllReadBtn = document.querySelectorAll(".mark-all-read-btn"); // Get all mark as read buttons
 
-  // Function to get icon based on notification type
-  function getNotificationIcon(type) {
-    const icons = {
-      'danger': 'fa-exclamation-circle',
-      'warning': 'fa-exclamation-triangle',
-      'success': 'fa-check-circle',
-      'info': 'fa-info-circle',
-      'default': 'fa-bell'
-    };
-    return icons[type] || icons['default'];
-  }
+    let allNotifications = [];
+    let currentTab = 'all';
 
-  // Function to get avatar class based on type
-  function getAvatarClass(type) {
-    const classes = {
-      'danger': 'bg-danger',
-      'warning': 'bg-warning',
-      'success': 'bg-success',
-      'info': 'bg-info',
-      'default': ''
-    };
-    return classes[type] || classes['default'];
-  }
+    console.log('Notification system initialized'); // Debug log
+    console.log('Badge element found:', notifBadge !== null); // Debug log
 
-  // Function to render notifications
-  function renderNotifications(notifications) {
-    // Clear existing notifications (except header and states)
-    const existingItems = notifList.querySelectorAll('.notif-item');
-    existingItems.forEach(item => item.remove());
-
-    if (notifications.length === 0) {
-      notifLoading.style.display = 'none';
-      notifEmpty.style.display = 'block';
-      return;
+    // Function to get icon based on notification type
+    function getNotificationIcon(type) {
+      const icons = {
+        'danger': 'fa-exclamation-circle',
+        'warning': 'fa-exclamation-triangle',
+        'success': 'fa-check-circle',
+        'info': 'fa-info-circle',
+        'default': 'fa-bell'
+      };
+      return icons[type] || icons['default'];
     }
 
-    notifLoading.style.display = 'none';
-    notifEmpty.style.display = 'none';
+    // Function to get avatar class based on type
+    function getAvatarClass(type) {
+      const classes = {
+        'danger': 'bg-danger',
+        'warning': 'bg-warning',
+        'success': 'bg-success',
+        'info': 'bg-info',
+        'default': ''
+      };
+      return classes[type] || classes['default'];
+    }
 
-    notifications.forEach(notif => {
-      const notifItem = document.createElement('div');
-      notifItem.className = 'notif-item' + (notif.unread ? ' unread' : '');
-      notifItem.dataset.notifId = notif.id;
+    // Function to render notifications
+    function renderNotifications(notifications) {
+      // Clear existing notifications (except header and states)
+      const existingItems = notifList.querySelectorAll('.notif-item');
+      existingItems.forEach(item => item.remove());
 
-      const avatarClass = getAvatarClass(notif.type);
-      const icon = getNotificationIcon(notif.type);
+      if (notifications.length === 0) {
+        notifLoading.style.display = 'none';
+        notifEmpty.style.display = 'block';
+        return;
+      }
 
-      notifItem.innerHTML = `
+      notifLoading.style.display = 'none';
+      notifEmpty.style.display = 'none';
+
+      notifications.forEach(notif => {
+        const notifItem = document.createElement('div');
+        notifItem.className = 'notif-item' + (notif.unread ? ' unread' : '');
+        notifItem.dataset.notifId = notif.id;
+
+        const avatarClass = getAvatarClass(notif.type);
+        const icon = getNotificationIcon(notif.type);
+
+        notifItem.innerHTML = `
         <div class="notif-avatar ${avatarClass}">
           <i class="fas ${icon}"></i>
         </div>
@@ -248,161 +252,198 @@ document.addEventListener("DOMContentLoaded", function () {
         ${notif.unread ? '<span class="unread-indicator"></span>' : ''}
       `;
 
-      // Add click handler to mark as read
-      notifItem.addEventListener('click', function() {
-        markAsRead(notif.id);
-        this.classList.remove('unread');
-        const indicator = this.querySelector('.unread-indicator');
-        if (indicator) {
-          indicator.remove();
-        }
-        updateBadgeCount();
+        // Add click handler to mark as read
+        notifItem.addEventListener('click', function () {
+          markAsRead(notif.id);
+          this.classList.remove('unread');
+          const indicator = this.querySelector('.unread-indicator');
+          if (indicator) {
+            indicator.remove();
+          }
+          updateBadgeCount();
+        });
+
+        notifList.appendChild(notifItem);
       });
+    }
 
-      notifList.appendChild(notifItem);
-    });
-  }
+    // Function to fetch notifications
+    async function fetchNotifications() {
+      try {
+        console.log('Fetching notifications...'); // Debug
+        const response = await fetch('fetch_notifications.php');
+        const data = await response.json();
+        
+        console.log('Notification data received:', data); // Debug
 
-  // Function to fetch notifications
-  async function fetchNotifications() {
-    try {
-      const response = await fetch('fetch_notifications.php');
-      const data = await response.json();
-
-      if (data.success) {
-        allNotifications = data.notifications;
-        renderNotifications(allNotifications);
-        updateBadgeCount();
-      } else {
-        console.error('Error fetching notifications:', data.error);
+        if (data.success) {
+          allNotifications = data.notifications;
+          console.log('Total notifications:', allNotifications.length); // Debug
+          console.log('Unread notifications:', allNotifications.filter(n => n.unread).length); // Debug
+          renderNotifications(allNotifications);
+          updateBadgeCount();
+        } else {
+          console.error('Error fetching notifications:', data.error);
+          notifLoading.style.display = 'none';
+          notifEmpty.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Error:', error);
         notifLoading.style.display = 'none';
         notifEmpty.style.display = 'block';
       }
-    } catch (error) {
-      console.error('Error:', error);
-      notifLoading.style.display = 'none';
-      notifEmpty.style.display = 'block';
     }
-  }
 
-  // Function to mark notification as read
-  async function markAsRead(notifId) {
-    // Update local state
-    const notif = allNotifications.find(n => n.id === notifId);
-    if (notif) {
-      notif.unread = false;
+    // Function to mark notification as read
+    async function markAsRead(notifId) {
+      // Update local state
+      const notif = allNotifications.find(n => n.id === notifId);
+      if (notif) {
+        notif.unread = false;
+      }
+
+      // Send to backend
+      try {
+        await fetch('mark_notification_read.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notif_id: notifId })
+        });
+      } catch (error) {
+        console.error('Error marking notification as read:', error);
+      }
     }
-    
-    // Send to backend
-    try {
-      await fetch('mark_notification_read.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({notif_id: notifId})
+
+    // Function to update badge count
+    function updateBadgeCount() {
+      const unreadCount = allNotifications.filter(n => n.unread).length;
+      console.log('Updating badge count:', unreadCount); // Debug
+      
+      if (notifBadge) {
+        if (unreadCount > 0) {
+          notifBadge.textContent = unreadCount;
+          notifBadge.style.display = 'inline-flex';
+          console.log('Badge shown with count:', unreadCount); // Debug
+        } else {
+          notifBadge.textContent = '0';
+          notifBadge.style.display = 'none';
+          console.log('Badge hidden (no unread)'); // Debug
+        }
+      } else {
+        console.error('notifBadge element not found!'); // Debug
+      }
+    }
+
+    // Function to filter notifications by tab
+    function filterNotifications(tab) {
+      currentTab = tab;
+      let filtered = allNotifications;
+
+      if (tab === 'unread') {
+        filtered = allNotifications.filter(n => n.unread);
+      }
+
+      renderNotifications(filtered);
+    }
+
+    // Toggle notification panel
+    if (bell) {
+      bell.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const isVisible = panel.classList.contains("show");
+        panel.classList.toggle("show");
+
+        // Fetch notifications when opening panel
+        if (!isVisible) {
+          fetchNotifications();
+        }
       });
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
     }
-  }
 
-  // Function to update badge count
-  function updateBadgeCount() {
-    const unreadCount = allNotifications.filter(n => n.unread).length;
-    if (notifBadge) {
-      notifBadge.textContent = unreadCount;
-      notifBadge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
-    }
-  }
-
-  // Function to filter notifications by tab
-  function filterNotifications(tab) {
-    currentTab = tab;
-    let filtered = allNotifications;
-    
-    if (tab === 'unread') {
-      filtered = allNotifications.filter(n => n.unread);
-    }
-    
-    renderNotifications(filtered);
-  }
-
-  // Toggle notification panel
-  bell.addEventListener("click", function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const isVisible = panel.classList.contains("show");
-    panel.classList.toggle("show");
-    
-    // Fetch notifications when opening panel
-    if (!isVisible) {
-      fetchNotifications();
-    }
-  });
-
-  // Close when clicking outside
-  document.addEventListener("click", function (e) {
-    if (!panel.contains(e.target) && !bell.contains(e.target)) {
-      panel.classList.remove("show");
-    }
-  });
-
-  // Prevent panel from closing when clicking inside
-  panel.addEventListener("click", function(e) {
-    e.stopPropagation();
-  });
-
-  // Tab switching
-  notifTabs.forEach(tab => {
-    tab.addEventListener("click", function() {
-      notifTabs.forEach(t => t.classList.remove("active"));
-      this.classList.add("active");
-
-      const tabType = this.getAttribute("data-tab");
-      filterNotifications(tabType);
-    });
-  });
-
-  // Mark all as read
-  markAllReadBtn.addEventListener("click", async function(e) {
-    e.preventDefault();
-    
-    allNotifications.forEach(n => n.unread = false);
-    
-    // Remove unread indicators from DOM
-    document.querySelectorAll('.notif-item').forEach(item => {
-      item.classList.remove('unread');
-      const indicator = item.querySelector('.unread-indicator');
-      if (indicator) {
-        indicator.remove();
+    // Close when clicking outside
+    document.addEventListener("click", function (e) {
+      if (!panel.contains(e.target) && bell && !bell.contains(e.target)) {
+        panel.classList.remove("show");
       }
     });
-    
-    updateBadgeCount();
-    
-    // Send to backend
-    try {
-      await fetch('mark_all_notifications_read.php', {method: 'POST'});
-    } catch (error) {
-      console.error('Error marking all as read:', error);
+
+    // Prevent panel from closing when clicking inside
+    if (panel) {
+      panel.addEventListener("click", function (e) {
+        e.stopPropagation();
+      });
     }
+
+    // Tab switching
+    notifTabs.forEach(tab => {
+      tab.addEventListener("click", function () {
+        notifTabs.forEach(t => t.classList.remove("active"));
+        this.classList.add("active");
+
+        const tabType = this.getAttribute("data-tab");
+        filterNotifications(tabType);
+      });
+    });
+
+    // Mark all as read (for both "See all" and "See previous" buttons)
+    if (markAllReadBtn.length > 0) {
+      markAllReadBtn.forEach(btn => {
+        btn.addEventListener("click", async function (e) {
+          e.preventDefault();
+
+          // Get the current tab to show appropriate message
+          const hasUnread = allNotifications.some(n => n.unread);
+          
+          if (!hasUnread) {
+            console.log('No unread notifications to mark');
+            return;
+          }
+
+          allNotifications.forEach(n => n.unread = false);
+
+          // Remove unread indicators from DOM
+          document.querySelectorAll('.notif-item').forEach(item => {
+            item.classList.remove('unread');
+            const indicator = item.querySelector('.unread-indicator');
+            if (indicator) {
+              indicator.remove();
+            }
+          });
+
+          updateBadgeCount();
+
+          // Send to backend with mark_all flag
+          try {
+            await fetch('mark_notification_read.php', { 
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ mark_all: true })
+            });
+            console.log('All notifications marked as read');
+          } catch (error) {
+            console.error('Error marking all as read:', error);
+          }
+        });
+      });
+    }
+
+    // Close with Escape key
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && panel && panel.classList.contains("show")) {
+        panel.classList.remove("show");
+      }
+    });
+
+    // Auto-refresh notifications every 30 seconds
+    setInterval(() => {
+      if (panel && panel.classList.contains("show")) {
+        fetchNotifications();
+      }
+    }, 30000);
+
+    // Initial fetch on page load to update badge
+    fetchNotifications();
   });
-
-  // Close with Escape key
-  document.addEventListener("keydown", function(e) {
-    if (e.key === "Escape" && panel.classList.contains("show")) {
-      panel.classList.remove("show");
-    }
-  });
-
-  // Auto-refresh notifications every 30 seconds
-  setInterval(() => {
-    if (panel.classList.contains("show")) {
-      fetchNotifications();
-    }
-  }, 30000);
-
-  // Initial fetch on page load to update badge
-  fetchNotifications();
-});
 </script>
