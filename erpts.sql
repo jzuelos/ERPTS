@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 19, 2025 at 03:49 PM
+-- Generation Time: Nov 26, 2025 at 04:39 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -147,7 +147,24 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (189, 9, 'Viewed/Printed Declaration of Real Property (DRP)\n• Property ID: 147\n• ARP Number: GR-2023-II-01-012-00023\n• Property Index Number (PIN): 110123456789\n• Owner: Isabel Delos Ramos\n• Owner Address: Burgos St., Barangay 11, Labo, Camarines Norte\n• Location: 23 Mabini Street, Gahon, Camarines Norte\n• Total Land Area: 453\n• Tax Effectivity: 2025\n• Total Market Value: ₱60,000.00\n• Total Assessed Value: ₱4,993.92', '2025-11-17 09:26:27'),
 (190, 9, 'Logged in from IP: ::1', '2025-11-18 17:01:15'),
 (191, 9, 'Viewed/Printed Declaration of Real Property (DRP)\n• Property ID: 147\n• ARP Number: GR-2023-II-01-012-00023\n• Property Index Number (PIN): 110123456789\n• Owner: Isabel Delos Ramos\n• Owner Address: Burgos St., Barangay 11, Labo, Camarines Norte\n• Location: 23 Mabini Street, Gahon, Camarines Norte\n• Total Land Area: 453\n• Tax Effectivity: 2025\n• Total Market Value: ₱60,000.00\n• Total Assessed Value: ₱4,993.92', '2025-11-18 17:04:47'),
-(192, 9, 'Viewed/Printed Declaration of Real Property (DRP)\n• Property ID: 147\n• ARP Number: GR-2023-II-01-012-00023\n• Property Index Number (PIN): 110123456789\n• Owner: Isabel Delos Ramos\n• Owner Address: Burgos St., Barangay 11, Labo, Camarines Norte\n• Location: 23 Mabini Street, Gahon, Camarines Norte\n• Total Land Area: 453\n• Tax Effectivity: 2025\n• Total Market Value: ₱60,000.00\n• Total Assessed Value: ₱4,993.92\n• OR Number: 5442342\n• Certification Fee: ₱50.00\n• Date Paid: 2025-11-18', '2025-11-18 17:05:11');
+(192, 9, 'Viewed/Printed Declaration of Real Property (DRP)\n• Property ID: 147\n• ARP Number: GR-2023-II-01-012-00023\n• Property Index Number (PIN): 110123456789\n• Owner: Isabel Delos Ramos\n• Owner Address: Burgos St., Barangay 11, Labo, Camarines Norte\n• Location: 23 Mabini Street, Gahon, Camarines Norte\n• Total Land Area: 453\n• Tax Effectivity: 2025\n• Total Market Value: ₱60,000.00\n• Total Assessed Value: ₱4,993.92\n• OR Number: 5442342\n• Certification Fee: ₱50.00\n• Date Paid: 2025-11-18', '2025-11-18 17:05:11'),
+(193, 9, 'Logged in from IP: ::1', '2025-11-19 14:51:18'),
+(194, 9, 'Logged in from IP: ::1', '2025-11-20 06:26:03'),
+(195, 9, 'Logged out of the system', '2025-11-20 06:40:21'),
+(196, 12, 'Logged in from IP: ::1', '2025-11-20 06:40:30'),
+(197, 12, 'Logged out of the system', '2025-11-20 06:40:36'),
+(198, 9, 'Logged in from IP: ::1', '2025-11-20 06:40:42'),
+(199, 9, 'Logged out of the system', '2025-11-20 07:20:23'),
+(200, 9, 'Logged in from IP: ::1', '2025-11-20 07:20:28'),
+(201, 9, 'Logged out of the system', '2025-11-20 07:23:30'),
+(202, 9, 'Logged in from IP: ::1', '2025-11-20 07:23:47'),
+(203, 9, 'Created new user account. Username: ASFDGAADSFFG, Full Name: PDIJGS  ASDIGJAS, Role: User.', '2025-11-20 07:33:42'),
+(204, 9, 'Logged in from IP: ::1', '2025-11-26 12:35:51'),
+(205, 9, 'Logged out of the system', '2025-11-26 13:09:37'),
+(206, 12, 'Logged in from IP: ::1', '2025-11-26 13:09:42'),
+(207, 12, 'Logged out of the system', '2025-11-26 13:16:47'),
+(208, 9, 'Logged in from IP: ::1', '2025-11-26 13:16:53'),
+(209, 9, 'Added new property\nProperty ID: 163\n\nLocation Details:\n• House Number: 423\n• Municipality: ID: Daet\n• District: District 2\n• Barangay: ID: Alawihao\n\nProperty Details:\n• Land Area: 231 sq.m\n• Documents: barangay\n\nAssociated Owners (1):\n• Ricardo Cruz (ID: 14)\n\nFAAS record created for this property.', '2025-11-26 14:25:43');
 
 -- --------------------------------------------------------
 
@@ -587,7 +604,8 @@ INSERT INTO `faas` (`faas_id`, `pro_id`, `rpu_idno`) VALUES
 (36, 147, 62),
 (42, 156, 63),
 (43, 157, NULL),
-(47, 162, NULL);
+(47, 162, NULL),
+(48, 163, NULL);
 
 -- --------------------------------------------------------
 
@@ -631,7 +649,7 @@ CREATE TABLE `ip_lockout` (
 --
 
 INSERT INTO `ip_lockout` (`id`, `ip_address`, `attempts`, `lock_until`, `is_permanent`, `last_attempt`) VALUES
-(23, '::1', 0, 0, 0, '2025-11-18 17:01:15');
+(23, '::1', 0, 0, 0, '2025-11-19 14:51:18');
 
 -- --------------------------------------------------------
 
@@ -749,6 +767,28 @@ INSERT INTO `municipality` (`m_id`, `m_code`, `m_description`, `m_status`, `r_id
 (10, '09', 'San Vicente', 'Active', 5),
 (11, '08', 'San Lorenzo Ruiz', 'Active', 5),
 (12, '10', 'Santa Elena', 'Active', 5);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notification_reads`
+--
+
+CREATE TABLE `notification_reads` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `log_id` int(11) NOT NULL,
+  `read_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Tracks which notifications have been read by each user';
+
+--
+-- Dumping data for table `notification_reads`
+--
+
+INSERT INTO `notification_reads` (`id`, `user_id`, `log_id`, `read_at`) VALUES
+(1, 9, 173, '2025-11-20 08:06:39'),
+(2, 9, 181, '2025-11-20 08:06:58'),
+(3, 9, 178, '2025-11-26 12:56:58');
 
 -- --------------------------------------------------------
 
@@ -910,7 +950,8 @@ INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`, 
 (82, 161, 4, 1, '2025-10-14 17:17:40', NULL),
 (83, 162, 4, 1, '2025-10-15 06:50:06', NULL),
 (84, 147, 11, 1, '2025-10-26 17:50:59', 9),
-(86, 157, 4, 1, '2025-10-26 20:27:40', 9);
+(86, 157, 4, 1, '2025-10-26 20:27:40', 9),
+(87, 163, 14, 1, '2025-11-26 14:25:43', NULL);
 
 -- --------------------------------------------------------
 
@@ -966,7 +1007,8 @@ INSERT INTO `p_info` (`p_id`, `house_no`, `block_no`, `province`, `city`, `distr
 (147, 23, 3, 'Camarines Norte', 'Daet', 'District 2', 'Gahon', 'Mabini Street', 0, 453, 'Commercial lot with Affidavit and Barangay Clearan', 'Affidavit, Barangay Clearance', '2025-08-31 19:01:44', '2025-10-11 10:24:47', 1, NULL, NULL),
 (156, 42134, 4, 'Camarines Norte', 'Daet', 'District 2', 'Bagasbas', 'Quezon Avenue', 1, 432, 'Agricultural lot with supporting affidavit', 'Affidavit', '2025-09-05 14:01:18', '2025-09-20 13:22:18', 0, '2025-09-13 14:29:21', 9),
 (157, 5345, 4, 'Camarines Norte', 'Daet', 'District 2', 'Camambugan', 'San Roque', 0, 5345, 'Residential lot with Barangay Clearance', 'Barangay Clearance', '2025-09-05 14:13:20', '2025-09-20 13:22:18', 1, NULL, NULL),
-(162, 432, 0, 'Camarines Norte', 'Talisay', 'District 2', 'Gabon', '', 0, 532, '   ', 'barangay', '2025-10-15 06:50:06', '2025-10-15 06:50:06', 1, NULL, NULL);
+(162, 432, 0, 'Camarines Norte', 'Talisay', 'District 2', 'Gabon', '', 0, 532, '   ', 'barangay', '2025-10-15 06:50:06', '2025-10-15 06:50:06', 1, NULL, NULL),
+(163, 423, 0, 'Camarines Norte', 'Daet', 'District 2', 'Alawihao', '', 0, 231, '   ', 'barangay', '2025-11-26 14:25:43', '2025-11-26 14:25:43', 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1349,7 +1391,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `last_name`, `first_name`, `middle_name`, `gender`, `birthdate`, `marital_status`, `tin`, `house_number`, `street`, `brgy_id`, `district_id`, `m_id`, `province`, `contact_number`, `email`, `status`, `user_type`) VALUES
 (9, 'admin', '$2y$10$uJGu7hoKfqtqSLE2EyV2GetTumt1zHaZOnvIpBeGC5dcwWBr25fc.', 'Zuelos', 'John Lloyd', 'Cruz', 'Male', '2001-11-11', 'Single', '000-123-456-789', '5', 'Purok', 66, 18, 14, 'Camarines Norte', '09123456789', 'johnlloydzuelos@gmail.com', 1, 'admin'),
-(12, 'user', '$2y$10$gmDQWOOqOOy8uUra8gGPQOA.FUDHTpucmbrNQ7mk..FbM/3ndQNt2', 'Cruz', 'Juan', 'Dela', 'Male', '2000-01-01', 'Single', 'NA', '1', 'Purok 1', 4, NULL, 1, 'Camarines Norte', '09123456789', 'jzuelos@gmail.com', 1, 'user');
+(12, 'user', '$2y$10$gmDQWOOqOOy8uUra8gGPQOA.FUDHTpucmbrNQ7mk..FbM/3ndQNt2', 'Cruz', 'Juan', 'Dela', 'Male', '2000-01-01', 'Single', 'NA', '1', 'Purok 1', 4, NULL, 1, 'Camarines Norte', '09123456789', 'jzuelos@gmail.com', 1, 'user'),
+(16, 'ASFDGAADSFFG', '$2y$10$zIQiVTqz40g5X8hOCK2g3ux8wFh61iKwfTFr5VgHINGYNAkBZddwW', 'ASDIGJAS', 'PDIJGS', '', 'Male', '2025-11-12', 'Single', '123452341231342', '423', 'Luzaragga', 1, 1, 1, 'Camarines Norte', '09123456789', 'lloydzuelos@gmail.com', 0, 'user');
 
 -- --------------------------------------------------------
 
@@ -1461,6 +1504,15 @@ ALTER TABLE `land_use`
 ALTER TABLE `municipality`
   ADD PRIMARY KEY (`m_id`),
   ADD KEY `r_id` (`r_id`);
+
+--
+-- Indexes for table `notification_reads`
+--
+ALTER TABLE `notification_reads`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_user_notification` (`user_id`,`log_id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `log_id` (`log_id`);
 
 --
 -- Indexes for table `owners_tb`
@@ -1579,7 +1631,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=193;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=210;
 
 --
 -- AUTO_INCREMENT for table `admin_certification`
@@ -1615,7 +1667,7 @@ ALTER TABLE `district`
 -- AUTO_INCREMENT for table `faas`
 --
 ALTER TABLE `faas`
-  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `faas_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `ip_ban_history`
@@ -1627,7 +1679,7 @@ ALTER TABLE `ip_ban_history`
 -- AUTO_INCREMENT for table `ip_lockout`
 --
 ALTER TABLE `ip_lockout`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `land`
@@ -1646,6 +1698,12 @@ ALTER TABLE `land_use`
 --
 ALTER TABLE `municipality`
   MODIFY `m_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT for table `notification_reads`
+--
+ALTER TABLE `notification_reads`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `owners_tb`
@@ -1669,7 +1727,7 @@ ALTER TABLE `print_certifications`
 -- AUTO_INCREMENT for table `propertyowner`
 --
 ALTER TABLE `propertyowner`
-  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
+  MODIFY `pO_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
 
 --
 -- AUTO_INCREMENT for table `province`
@@ -1681,7 +1739,7 @@ ALTER TABLE `province`
 -- AUTO_INCREMENT for table `p_info`
 --
 ALTER TABLE `p_info`
-  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=163;
+  MODIFY `p_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=164;
 
 --
 -- AUTO_INCREMENT for table `received_papers`
@@ -1735,7 +1793,7 @@ ALTER TABLE `transaction_logs`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 -- --------------------------------------------------------
 
@@ -1779,6 +1837,13 @@ ALTER TABLE `land`
 --
 ALTER TABLE `municipality`
   ADD CONSTRAINT `municipality_ibfk_1` FOREIGN KEY (`r_id`) REFERENCES `region` (`r_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `notification_reads`
+--
+ALTER TABLE `notification_reads`
+  ADD CONSTRAINT `fk_notif_log` FOREIGN KEY (`log_id`) REFERENCES `activity_log` (`log_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_notif_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `print_certifications`
