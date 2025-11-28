@@ -713,9 +713,6 @@ $conn->close();
             <h5 class="modal-title fw-bold">
               <i class="bi bi-pencil-square me-2"></i> Edit User
             </h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
           </div>
 
           <!-- Modal Form -->
@@ -873,9 +870,10 @@ $conn->close();
 
             <!-- Footer Buttons -->
             <div class="modal-footer bg-light">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">
                 <i class="bi bi-x-circle"></i> Close
               </button>
+
               <button type="reset" class="btn btn-primary">
                 <i class="bi bi-arrow-counterclockwise"></i> Reset
               </button>
