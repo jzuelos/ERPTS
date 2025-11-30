@@ -156,7 +156,7 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
                 $ownerRaw = isset($unit['owner']) ? $unit['owner'] : '';
                 $owner = trim((string) $ownerRaw) !== '' ? $ownerRaw : 'None';
                 $rowClass = ($unit['is_active'] == 0) ? 'table-secondary' : ''; // highlight inactive
-                ?>
+              ?>
                 <tr class="<?= $rowClass ?>">
                   <td><?= htmlspecialchars($unit['p_id']) ?></td>
                   <td><?= htmlspecialchars($owner) ?></td>
@@ -223,7 +223,7 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
                   echo "<tr>
                     <td>" . htmlspecialchars($unit['p_id']) . "</td>
                     <td>" . htmlspecialchars($owner) . "</td>
-                    <td>" . htmlspecialchars($unit['street'] . ', ' . $unit['barangay'] . ', ' . $unit['city'] . ', ' . $unit['province']) . "</td>
+                    <td>" . htmlspecialchars($unit['street'] . ', ' . $unit['barangay_name'] . ', ' . $unit['municipality_name'] . ', ' . $unit['province_name']) . "</td>
                     <td>" . htmlspecialchars($unit['land_area']) . "</td>
                   </tr>";
                 }
@@ -310,13 +310,13 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
       tableBody.innerHTML = '';
       var propertyUnits = <?php echo json_encode($propertyUnits); ?>;
 
-      propertyUnits.forEach(function (unit) {
+      propertyUnits.forEach(function(unit) {
         var row = `<tr>
-                <td>${unit.p_id}</td>
-                <td>${unit.owner}</td>
-                <td>${unit.house_no}, ${unit.barangay}, ${unit.city}, ${unit.province}</td>
-                <td>${unit.land_area}</td>
-               </tr>`;
+          <td>${unit.p_id}</td>
+          <td>${unit.owner}</td>
+          <td>${unit.house_no}, ${unit.barangay_name}, ${unit.municipality_name}, ${unit.province_name}</td>
+          <td>${unit.land_area}</td>
+        </tr>`;
         tableBody.innerHTML += row;
       });
 
@@ -327,11 +327,11 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
       var searchQuery = document.getElementById("modalSearchInput").value.toLowerCase();
       var tableRows = document.getElementById("modalTableBody").getElementsByTagName("tr");
 
-      Array.from(tableRows).forEach(function (row) {
+      Array.from(tableRows).forEach(function(row) {
         var cells = row.getElementsByTagName("td");
         var matchFound = false;
 
-        Array.from(cells).forEach(function (cell) {
+        Array.from(cells).forEach(function(cell) {
           if (cell.innerText.toLowerCase().includes(searchQuery)) {
             matchFound = true;
           }
@@ -348,7 +348,7 @@ if ($barangayResult && $barangayResult->num_rows > 0) {
 
   <!-- Initialize -->
   <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
       $('#barangayDropdown').select2({
         placeholder: "Select Barangay",
         width: '50%'
