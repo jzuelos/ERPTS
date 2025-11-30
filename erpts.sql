@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.2
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 29, 2025 at 06:07 PM
+-- Generation Time: Dec 01, 2025 at 12:10 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -45,13 +45,7 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (84, 12, 'Failed login attempt - Incorrect password (Attempt 1 from IP: ::1)', '2025-10-27 13:27:57'),
 (88, 9, 'Exported statistics chart\n• Chart Type: Classification\n• Chart Title: Land Classification Distribution\n• Export Format: PNG Image\n• Export Time: 2025-10-28 11:35:27', '2025-10-28 10:35:27'),
 (89, 9, 'Printed Property Report\n• Classification: All\n• Province: All\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-10-28 15:31:29'),
-(90, 9, 'Printed Property Report\n• Classification: Agricultural\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-10-28 15:32:19'),
-(91, 9, 'Printed Property Report\n• Classification: Agricultural\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-10-28 15:32:47'),
-(92, 9, 'Printed Property Report\n• Classification: Agricultural\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-10-28 15:35:41'),
-(93, 9, 'Printed Property Report\n• Classification: Agricultural\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-10-28 15:37:23'),
 (94, 9, 'Printed Property Report\n• Classification: All\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: September 15, 2025 - October 15, 2025', '2025-10-28 15:38:37'),
-(95, 9, 'Printed Property Report\n• Classification: All\n• Province: Camarines Norte\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: September 01, 2025 - October 15, 2025', '2025-10-28 15:39:04'),
-(96, 9, 'Printed Property Report\n• Classification: All\n• Province: Camarines Norte\n• Municipality/City: Daet\n• District: District 2\n• Barangay: All\n• Date Range: September 01, 2025 - October 15, 2025', '2025-10-28 15:39:20'),
 (97, 9, 'Logged out of the system', '2025-10-28 16:53:33'),
 (98, 12, 'Failed login attempt \n• Incorrect Password', '2025-10-28 16:56:28'),
 (99, 12, 'Failed login attempt \n• Incorrect Password', '2025-10-28 16:56:32'),
@@ -75,40 +69,13 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (117, 9, 'User logged in to the system from IP: ::1', '2025-10-28 17:23:14'),
 (118, 9, 'Logged out of the system', '2025-10-28 17:23:27'),
 (119, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:23:36'),
-(120, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:23:48'),
-(121, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:23:55'),
-(122, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:24:09'),
-(123, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:24:15'),
-(124, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:29:50'),
-(125, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:29:53'),
-(126, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:29:56'),
 (127, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:30:00'),
-(128, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:30:03'),
-(129, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:30:42'),
-(130, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:30:48'),
-(131, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:30:52'),
-(132, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:35:30'),
-(133, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:35:35'),
-(134, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:35:39'),
-(135, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:42:12'),
 (136, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:42:15'),
 (137, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:42:19'),
-(138, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:50:59'),
 (139, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:51:03'),
-(140, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:51:07'),
 (141, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:55:14'),
-(142, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:55:21'),
-(143, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:55:25'),
-(144, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 17:59:58'),
-(145, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:00:06'),
-(146, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:00:10'),
-(147, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:01:41'),
 (148, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:01:45'),
-(149, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:01:49'),
-(150, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:06:28'),
-(151, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:06:31'),
 (152, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:06:36'),
-(153, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:09:19'),
 (154, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:09:22'),
 (155, NULL, 'Failed login attempt from IP: ::1 - Username \'username\' not found', '2025-10-28 18:09:27'),
 (156, NULL, 'Failed login from IP: ::1 - Username \'username\' not found', '2025-10-28 18:12:48'),
@@ -148,24 +115,24 @@ INSERT INTO `activity_log` (`log_id`, `user_id`, `action`, `log_time`) VALUES
 (190, 9, 'Logged in from IP: ::1', '2025-11-18 17:01:15'),
 (191, 9, 'Viewed/Printed Declaration of Real Property (DRP)\n• Property ID: 147\n• ARP Number: GR-2023-II-01-012-00023\n• Property Index Number (PIN): 110123456789\n• Owner: Isabel Delos Ramos\n• Owner Address: Burgos St., Barangay 11, Labo, Camarines Norte\n• Location: 23 Mabini Street, Gahon, Camarines Norte\n• Total Land Area: 453\n• Tax Effectivity: 2025\n• Total Market Value: ₱60,000.00\n• Total Assessed Value: ₱4,993.92', '2025-11-18 17:04:47'),
 (192, 9, 'Viewed/Printed Declaration of Real Property (DRP)\n• Property ID: 147\n• ARP Number: GR-2023-II-01-012-00023\n• Property Index Number (PIN): 110123456789\n• Owner: Isabel Delos Ramos\n• Owner Address: Burgos St., Barangay 11, Labo, Camarines Norte\n• Location: 23 Mabini Street, Gahon, Camarines Norte\n• Total Land Area: 453\n• Tax Effectivity: 2025\n• Total Market Value: ₱60,000.00\n• Total Assessed Value: ₱4,993.92\n• OR Number: 5442342\n• Certification Fee: ₱50.00\n• Date Paid: 2025-11-18', '2025-11-18 17:05:11'),
-(193, 9, 'Logged in from IP: ::1', '2025-11-19 14:51:18'),
-(194, 9, 'Logged in from IP: ::1', '2025-11-20 06:26:03'),
 (195, 9, 'Logged out of the system', '2025-11-20 06:40:21'),
-(196, 12, 'Logged in from IP: ::1', '2025-11-20 06:40:30'),
 (197, 12, 'Logged out of the system', '2025-11-20 06:40:36'),
-(198, 9, 'Logged in from IP: ::1', '2025-11-20 06:40:42'),
 (199, 9, 'Logged out of the system', '2025-11-20 07:20:23'),
-(200, 9, 'Logged in from IP: ::1', '2025-11-20 07:20:28'),
 (201, 9, 'Logged out of the system', '2025-11-20 07:23:30'),
 (202, 9, 'Logged in from IP: ::1', '2025-11-20 07:23:47'),
 (203, 9, 'Created new user account. Username: ASFDGAADSFFG, Full Name: PDIJGS  ASDIGJAS, Role: User.', '2025-11-20 07:33:42'),
 (204, 9, 'Logged in from IP: ::1', '2025-11-26 12:35:51'),
 (205, 9, 'Logged out of the system', '2025-11-26 13:09:37'),
-(206, 12, 'Logged in from IP: ::1', '2025-11-26 13:09:42'),
 (207, 12, 'Logged out of the system', '2025-11-26 13:16:47'),
 (208, 9, 'Logged in from IP: ::1', '2025-11-26 13:16:53'),
 (209, 9, 'Added new property\nProperty ID: 163\n\nLocation Details:\n• House Number: 423\n• Municipality: ID: Daet\n• District: District 2\n• Barangay: ID: Alawihao\n\nProperty Details:\n• Land Area: 231 sq.m\n• Documents: barangay\n\nAssociated Owners (1):\n• Ricardo Cruz (ID: 14)\n\nFAAS record created for this property.', '2025-11-26 14:25:43'),
-(210, 9, 'Logged in from IP: ::1', '2025-11-27 14:16:50');
+(210, 9, 'Logged in from IP: ::1', '2025-11-27 14:16:50'),
+(211, 9, 'Logged in from IP: ::1', '2025-11-30 19:04:37'),
+(213, 9, 'Printed Property Report\n• Classification: All\n• Province: All\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-11-30 19:15:15'),
+(215, 9, 'Printed Property Report\n• Classification: All\n• Province: All\n• Municipality/City: All\n• District: All\n• Barangay: All\n• Date Range: All', '2025-11-30 19:26:46'),
+(220, 9, 'Viewed/Printed Declaration of Real Property (DRP)\n• Property ID: 147\n• ARP Number: GR-2023-II-01-012-00023\n• Property Index Number (PIN): 110123456789\n• Owner: Isabel Delos Ramos\n• Owner Address: Burgos St., Barangay 11, Labo, Camarines Norte\n• Location: 23 Mabini Street, Gahon, Camarines Norte\n• Total Land Area: 453\n• Tax Effectivity: 2025\n• Total Market Value: ₱60,000.00\n• Total Assessed Value: ₱4,993.92', '2025-11-30 22:13:14'),
+(221, 9, 'Updated land record\nProperty ID: 162\nLand ID: 64\nFAAS ID: 47\nLocation: House #432, Unknown, Unknown, Unknown\n\nChanges:\n• Sub-Class changed from \'House and Lot\' to \'Condominium\'\n• Actual Use changed from \'Residential\' to \'Commercial Zone – Retail\'\n• Adjusted Market Value changed from \'₱10,500.00\' to \'₱0.00\'\n• Assessed Value changed from \'₱2,100.00\' to \'₱0.00\'', '2025-11-30 22:29:18'),
+(223, 9, 'Updated land record\nProperty ID: 162\nLand ID: 64\nFAAS ID: 47\nLocation: House #432, Unknown, Unknown, Unknown\n\nChanges:\n• Adjustment Factor changed from \'20.00%\' to \'70%\'\n• Adjusted Market Value changed from \'₱2,100.00\' to \'₱7,350.00\'\n• Assessed Value changed from \'₱420.00\' to \'₱1,470.00\'', '2025-11-30 22:31:05');
 
 -- --------------------------------------------------------
 
@@ -523,7 +490,10 @@ CREATE TABLE `certification` (
 --
 
 INSERT INTO `certification` (`cert_id`, `verified`, `noted`, `recom_approval`, `recom_date`, `plotted`, `appraised`, `appraised_date`, `approved`, `approved_date`, `idle`, `contested`, `land_id`) VALUES
-(2, 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', 'Malapajo, Antonio Menorca', '2025-04-28', 'Malapajo, Antonio Menorca', 'Lingon, Nestor Jacolbia', '2025-04-28', 'Lingon, Nestor Jacolbia', '2025-04-28', 0, 0, 56);
+(9, 'Roberto Villanueva', 'Melissa Dizon', 'Ramon Bautista', '2025-12-01', 'Plotted by Carlo Sebastian', 'Appraised by Ana Rodriguez', '2025-12-01', 'Maria Santos', '2025-12-01', 0, 0, 56),
+(10, 'Roberto Villanueva', 'Melissa Dizon', 'Ramon Bautista', '2025-12-01', 'Plotted by Carlo Sebastian', 'Appraised by Ana Rodriguez', '2025-12-01', 'Luis Cruz', '2025-12-01', 0, 0, 61),
+(11, 'Roberto Villanueva', 'Melissa Dizon', 'Ramon Bautista', '2025-12-01', 'Plotted by Carlo Sebastian', 'Appraised by Ana Rodriguez', '2025-12-01', 'Luis Cruz', '2025-12-01', 0, 0, 63),
+(12, 'Roberto Villanueva', 'Melissa Dizon', 'Ramon Bautista', '2025-12-01', 'Plotted by Carlo Sebastian', 'Appraised by Ana Rodriguez', '2025-12-01', 'Maria Santos', '2025-12-01', 0, 0, 64);
 
 -- --------------------------------------------------------
 
@@ -605,7 +575,7 @@ INSERT INTO `faas` (`faas_id`, `pro_id`, `rpu_idno`) VALUES
 (36, 147, 62),
 (42, 156, 63),
 (43, 157, NULL),
-(47, 162, NULL),
+(47, 162, 65),
 (48, 163, NULL);
 
 -- --------------------------------------------------------
@@ -702,7 +672,8 @@ CREATE TABLE `land` (
 INSERT INTO `land` (`land_id`, `oct_no`, `survey_no`, `north`, `east`, `south`, `west`, `boun_desc`, `last_name`, `first_name`, `middle_name`, `contact_no`, `email`, `house_street`, `barangay`, `district`, `municipality`, `province`, `land_desc`, `classification`, `sub_class`, `area`, `actual_use`, `unit_value`, `market_value`, `adjust_factor`, `adjust_percent`, `adjust_value`, `adjust_mv`, `assess_lvl`, `assess_value`, `faas_id`, `created_at`, `updated_at`) VALUES
 (56, '1234', '3412', 'Lot 22', 'Barangay Road', 'Vacant Lot', 'Riverbank', 'Commercial property near public market', 'Reyes', 'Maria', 'Lopez', '09181234567', 'maria.reyes@example.com', 'Mabini Street', 'Gahon', 'District 2', 'Daet', 'Camarines Norte', 'Commercial lot', 'Commercial', 'Business Establishment', 432, 'Commercial', 34.00, 14688.00, 'Standard', 0.00, 0.00, 14688.00, 34.00, 4993.92, 33, '2025-08-27 16:41:18', '2025-09-09 14:40:08'),
 (61, '56789', '98765', 'Main Road', 'Creek', 'Farm Lot', 'River', 'Bounded by creek and residential area', 'Villanueva', 'Carlos', 'M.', '09171234567', 'carlos.villanueva@example.com', 'Purok 5, Rizal Street', 'Lag-on', 'District 4', 'Daet', 'Camarines Norte', 'Agricultural lot used for coconut plantation', 'Agricultural', 'Coconut Farm', 1200, 'Agricultural', 50.00, 60000.00, 'Depreciation', 10.00, -6000.00, 54000.00, 40.00, 21600.00, NULL, '2025-10-10 16:04:03', '2025-10-26 20:27:40'),
-(63, '56789', '98765', 'Main Road', 'Creek', 'Farm Lot', 'River', 'Bounded by creek and residential area', 'Villanueva', 'Carlos', 'M.', '09171234567', 'carlos.villanueva@example.com', 'Purok 5, Rizal Street', 'Lag-on', 'District 4', 'Daet', 'Camarines Norte', 'Agricultural lot used for coconut plantation', 'Agricultural', 'Coconut Farm', 1200, 'Agricultural', 50.00, 60000.00, 'Depreciation', 10.00, -6000.00, 54000.00, 34.00, 4993.92, 36, '2025-10-19 16:09:02', '2025-10-19 16:09:02');
+(63, '56789', '98765', 'Main Road', 'Creek', 'Farm Lot', 'River', 'Bounded by creek and residential area', 'Villanueva', 'Carlos', 'M.', '09171234567', 'carlos.villanueva@example.com', 'Purok 5, Rizal Street', 'Lag-on', 'District 4', 'Daet', 'Camarines Norte', 'Agricultural lot used for coconut plantation', 'Agricultural', 'Coconut Farm', 1200, 'Agricultural', 50.00, 60000.00, 'Depreciation', 10.00, -6000.00, 54000.00, 34.00, 4993.92, 36, '2025-10-19 16:09:02', '2025-10-19 16:09:02'),
+(64, '7890', '5621', 'Residential Lot - North Boundary', 'Adjacent Property - East', 'Road - South', 'Creek - West', 'Bounded by road and residential properties', 'Dela Cruz', 'Juan', 'S.', '09170000000', 'juan.delacruz@example.com', 'Purok 3, Mabini Street', 'Gahon', 'District 2', 'Daet', 'Camarines Norte', 'Residential lot used for housing', 'Residential', 'Condominium', 350, 'Commercial Zone – Retail', 30.00, 10500.00, 'Standard', 70.00, -3150.00, 7350.00, 20.00, 1470.00, 47, '2024-12-31 16:00:00', '2025-11-30 22:31:05');
 
 -- --------------------------------------------------------
 
@@ -802,40 +773,13 @@ INSERT INTO `notification_reads` (`id`, `user_id`, `log_id`, `read_at`) VALUES
 (18, 9, 156, '2025-11-27 15:30:27'),
 (19, 9, 155, '2025-11-27 15:30:27'),
 (20, 9, 154, '2025-11-27 15:30:27'),
-(21, 9, 153, '2025-11-27 15:30:27'),
 (22, 9, 152, '2025-11-27 15:30:27'),
-(23, 9, 151, '2025-11-27 15:30:27'),
-(24, 9, 150, '2025-11-27 15:30:27'),
-(25, 9, 149, '2025-11-27 15:30:27'),
 (26, 9, 148, '2025-11-27 15:30:27'),
-(27, 9, 147, '2025-11-27 15:30:27'),
-(28, 9, 146, '2025-11-27 15:30:27'),
-(29, 9, 145, '2025-11-27 15:30:27'),
-(30, 9, 144, '2025-11-27 15:30:27'),
-(31, 9, 143, '2025-11-27 15:30:27'),
-(32, 9, 142, '2025-11-27 15:30:27'),
 (33, 9, 141, '2025-11-27 15:30:27'),
-(34, 9, 140, '2025-11-27 15:30:27'),
 (35, 9, 139, '2025-11-27 15:30:27'),
-(36, 9, 138, '2025-11-27 15:30:27'),
 (37, 9, 137, '2025-11-27 15:30:27'),
 (38, 9, 136, '2025-11-27 15:30:27'),
-(39, 9, 135, '2025-11-27 15:30:27'),
-(40, 9, 134, '2025-11-27 15:30:27'),
-(41, 9, 133, '2025-11-27 15:30:27'),
-(42, 9, 132, '2025-11-27 15:30:27'),
-(43, 9, 131, '2025-11-27 15:30:27'),
-(44, 9, 130, '2025-11-27 15:30:27'),
-(45, 9, 129, '2025-11-27 15:30:27'),
-(46, 9, 128, '2025-11-27 15:30:27'),
 (47, 9, 127, '2025-11-27 15:30:27'),
-(48, 9, 126, '2025-11-27 15:30:27'),
-(49, 9, 125, '2025-11-27 15:30:27'),
-(50, 9, 124, '2025-11-27 15:30:27'),
-(51, 9, 123, '2025-11-27 15:30:27'),
-(52, 9, 122, '2025-11-27 15:30:27'),
-(53, 9, 121, '2025-11-27 15:30:27'),
-(54, 9, 120, '2025-11-27 15:30:27'),
 (55, 9, 119, '2025-11-27 15:30:27'),
 (56, 9, 116, '2025-11-27 15:30:27'),
 (57, 9, 115, '2025-11-27 15:30:27'),
@@ -850,13 +794,7 @@ INSERT INTO `notification_reads` (`id`, `user_id`, `log_id`, `read_at`) VALUES
 (66, 9, 100, '2025-11-27 15:30:27'),
 (67, 9, 99, '2025-11-27 15:30:27'),
 (68, 9, 98, '2025-11-27 15:30:27'),
-(69, 9, 96, '2025-11-27 15:30:27'),
-(70, 9, 95, '2025-11-27 15:30:27'),
 (71, 9, 94, '2025-11-27 15:30:27'),
-(72, 9, 93, '2025-11-27 15:30:27'),
-(73, 9, 92, '2025-11-27 15:30:27'),
-(74, 9, 91, '2025-11-27 15:30:27'),
-(75, 9, 90, '2025-11-27 15:30:27'),
 (76, 9, 89, '2025-11-27 15:30:27'),
 (77, 9, 84, '2025-11-27 15:30:27'),
 (78, 9, 83, '2025-11-27 15:30:27'),
@@ -1016,12 +954,12 @@ INSERT INTO `propertyowner` (`pO_id`, `property_id`, `owner_id`, `is_retained`, 
 (75, 144, 8, 0, '2025-09-23 22:35:46', 9),
 (76, 144, 11, 0, '2025-09-23 23:10:56', 9),
 (77, 144, 12, 0, '2025-09-23 23:33:55', 9),
-(78, 144, 10, 0, '2025-09-24 00:51:05', 9),
+(78, 156, 10, 1, '2025-09-24 00:51:05', 9),
 (79, 144, 22, 1, '2025-09-24 00:53:05', 9),
 (80, 144, 4, 1, '2025-10-02 15:21:57', 9),
 (81, 147, 2, 0, '2025-10-11 10:43:15', 9),
 (82, 161, 4, 1, '2025-10-14 17:17:40', NULL),
-(83, 162, 4, 1, '2025-10-15 06:50:06', NULL),
+(83, 162, 3, 1, '2025-10-15 06:50:06', NULL),
 (84, 147, 11, 1, '2025-10-26 17:50:59', 9),
 (86, 157, 4, 1, '2025-10-26 20:27:40', 9),
 (87, 163, 14, 1, '2025-11-26 14:25:43', NULL);
@@ -1169,9 +1107,10 @@ CREATE TABLE `rpu_dec` (
 --
 
 INSERT INTO `rpu_dec` (`dec_id`, `arp_no`, `pro_assess`, `pro_date`, `mun_assess`, `mun_date`, `td_cancel`, `previous_pin`, `tax_year`, `entered_by`, `entered_year`, `prev_own`, `prev_assess`, `faas_id`, `total_property_value`) VALUES
-(1, 'GR-2023-II-02-012-00231', 'Provincial Assessor Maria Santos', '2025-08-05', 'Municipal Assessor Luis Cruz', '2025-08-06', 0, 110, '2025-08-07', 1, '2025-08-07', 'Ricardo Delos Reyes', 7000.00, 33, 20157.56),
-(3, 'GR-2023-II-01-012-00023', 'Mark Bertillo', '2025-09-10', 'Maria Reyes', '2025-09-11', 0, 110, '2025-09-27', 2, '2025-09-23', 'No', 5000.00, 36, 64993.92),
-(4, 'GR-2023-II-03-014-00342', 'Juan Dela Cruz', '2025-10-15', 'Maria Reyes', '2025-10-15', 0, 2147483647, '2025-10-15', 0, '2025-10-15', '', 0.00, NULL, 81600.00);
+(1, 'GR-2023-II-02-012-00231', ' Maria Santos', '2025-08-05', 'Municipal Assessor Luis Cruz', '2025-08-06', 0, 110, '2025-08-07', 1, '2025-08-07', 'Ricardo Delos Reyes', 7000.00, 33, 20157.56),
+(3, 'GR-2023-II-01-012-00023', 'Mark Bertillo', '2025-09-10', 'Maria Reyes', '2025-09-11', 0, 0, '2025-09-27', 2, '2025-09-23', 'No', 5000.00, 36, 64993.92),
+(4, 'GR-2023-II-03-014-00342', 'Juan Dela Cruz', '2025-10-15', 'Maria Reyes', '2025-10-15', 0, 0, '2025-10-15', 0, '2025-10-15', '', 0.00, NULL, 81600.00),
+(5, 'GR-2027-II-01-012-00065', 'Mark Bertillo', '2027-01-01', 'Municipal Assessor Luis Cruz', '2027-01-02', 0, 0, '2027-01-03', 3, '2027-01-03', 'No', 0.00, 47, 1470.00);
 
 -- --------------------------------------------------------
 
@@ -1193,10 +1132,11 @@ CREATE TABLE `rpu_idnum` (
 --
 
 INSERT INTO `rpu_idnum` (`rpu_id`, `arp`, `pin`, `taxability`, `effectivity`, `faas_id`) VALUES
-(46, '4234-2423-4224-342', '1103456423442', 'taxable', '2025', 33),
-(62, 'GR-2023-II-01-012-00023', '110123456789', 'taxable', '2025', 36),
-(63, '423234', '110-42342342-', 'taxable', '2025', 42),
-(64, '3212-3412-3121-422', '5324234134512', 'taxable', '2027', 43);
+(46, 'GR-2025-II-01-012-00046', '1103456423442', 'taxable', '2025', 33),
+(62, 'GR-2025-II-01-012-00062', '110123456789', 'taxable', '2025', 36),
+(63, 'GR-2025-II-01-012-00063', '110-42342342-', 'taxable', '2025', 42),
+(64, 'GR-2027-II-01-012-00064', '5324234134512', 'taxable', '2027', 43),
+(65, 'GR-2027-II-01-012-00065', '11032143221', 'taxable', '2027', 47);
 
 -- --------------------------------------------------------
 
@@ -1492,6 +1432,15 @@ CREATE TABLE `vw_print_certifications` (
 ,`created_by_name` varchar(101)
 );
 
+-- --------------------------------------------------------
+
+--
+-- Structure for view `vw_print_certifications`
+--
+DROP TABLE IF EXISTS `vw_print_certifications`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_print_certifications`  AS SELECT `pc`.`cert_id` AS `cert_id`, `pc`.`property_id` AS `property_id`, `pc`.`faas_id` AS `faas_id`, `pc`.`owner_admin` AS `owner_admin`, `pc`.`certification_date` AS `certification_date`, `pc`.`certification_fee` AS `certification_fee`, `pc`.`or_number` AS `or_number`, `pc`.`date_paid` AS `date_paid`, `pc`.`created_by` AS `created_by`, `pc`.`created_at` AS `created_at`, `p`.`house_no` AS `house_no`, `p`.`barangay` AS `barangay`, `p`.`city` AS `city`, `p`.`province` AS `province`, `rd`.`arp_no` AS `tax_declaration_number`, concat(`u`.`first_name`,' ',`u`.`last_name`) AS `created_by_name` FROM ((((`print_certifications` `pc` join `p_info` `p` on(`pc`.`property_id` = `p`.`p_id`)) join `faas` `f` on(`pc`.`faas_id` = `f`.`faas_id`)) left join `rpu_dec` `rd` on(`f`.`faas_id` = `rd`.`faas_id`)) left join `users` `u` on(`pc`.`created_by` = `u`.`user_id`)) ORDER BY `pc`.`created_at` DESC ;
+
 --
 -- Indexes for dumped tables
 --
@@ -1704,7 +1653,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=211;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=224;
 
 --
 -- AUTO_INCREMENT for table `admin_certification`
@@ -1722,7 +1671,7 @@ ALTER TABLE `brgy`
 -- AUTO_INCREMENT for table `certification`
 --
 ALTER TABLE `certification`
-  MODIFY `cert_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `cert_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `classification`
@@ -1758,7 +1707,7 @@ ALTER TABLE `ip_lockout`
 -- AUTO_INCREMENT for table `land`
 --
 ALTER TABLE `land`
-  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+  MODIFY `land_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT for table `land_use`
@@ -1830,13 +1779,13 @@ ALTER TABLE `region`
 -- AUTO_INCREMENT for table `rpu_dec`
 --
 ALTER TABLE `rpu_dec`
-  MODIFY `dec_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `dec_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `rpu_idnum`
 --
 ALTER TABLE `rpu_idnum`
-  MODIFY `rpu_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+  MODIFY `rpu_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
 
 --
 -- AUTO_INCREMENT for table `subclass`
@@ -1867,15 +1816,6 @@ ALTER TABLE `transaction_logs`
 --
 ALTER TABLE `users`
   MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
-
--- --------------------------------------------------------
-
---
--- Structure for view `vw_print_certifications`
---
-DROP TABLE IF EXISTS `vw_print_certifications`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_print_certifications`  AS SELECT `pc`.`cert_id` AS `cert_id`, `pc`.`property_id` AS `property_id`, `pc`.`faas_id` AS `faas_id`, `pc`.`owner_admin` AS `owner_admin`, `pc`.`certification_date` AS `certification_date`, `pc`.`certification_fee` AS `certification_fee`, `pc`.`or_number` AS `or_number`, `pc`.`date_paid` AS `date_paid`, `pc`.`created_by` AS `created_by`, `pc`.`created_at` AS `created_at`, `p`.`house_no` AS `house_no`, `p`.`barangay` AS `barangay`, `p`.`city` AS `city`, `p`.`province` AS `province`, `rd`.`arp_no` AS `tax_declaration_number`, concat(`u`.`first_name`,' ',`u`.`last_name`) AS `created_by_name` FROM ((((`print_certifications` `pc` join `p_info` `p` on(`pc`.`property_id` = `p`.`p_id`)) join `faas` `f` on(`pc`.`faas_id` = `f`.`faas_id`)) left join `rpu_dec` `rd` on(`f`.`faas_id` = `rd`.`faas_id`)) left join `users` `u` on(`pc`.`created_by` = `u`.`user_id`)) ORDER BY `pc`.`created_at` DESC ;
 
 --
 -- Constraints for dumped tables

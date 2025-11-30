@@ -198,8 +198,8 @@ $monthly_trends = [
 ];
 
 // Dummy data
-$building_count = 843;
-$plant_count = 327;
+$building_count = 341;
+$plant_count = 187;
 ?>
 
 <!doctype html>
@@ -286,7 +286,7 @@ $plant_count = 327;
                   <select id="chartSelector" class="form-select form-select-sm">
                     <option value="property">Property Statistics</option>
                     <option value="user">User Activity</option>
-                    <option value="audit">Transactions & Audit</option>
+                    <option value="audit" selected>Transactions & Audit</option>
                     <option value="monthly">Monthly Trends (6 Months)</option>
                   </select>
                 </div>
@@ -581,7 +581,7 @@ $plant_count = 327;
     });
 
     // Initialize with property statistics
-    updateChart('property');
+    updateChart('audit');
   </script>
 </body>
 
