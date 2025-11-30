@@ -141,30 +141,42 @@
     $stmt->close();
   }
 
-  // Base query
+  // FIXED QUERY - Using GROUP_CONCAT to combine multiple owners
   $sql = "
-  SELECT 
-    r.pin AS property_index_no,
-    d.arp_no AS tax_declaration_no,
-    CONCAT(p.street, ', ', p.barangay, ', ', p.city, ', ', p.province) AS property_location,
-    p.land_area AS area,
-    'Land' AS kind,
-    l.adjust_mv AS market_value,
-    l.assess_value AS assessed_value
-  FROM faas f
-  LEFT JOIN p_info p ON f.pro_id = p.p_id
-  LEFT JOIN rpu_idnum r ON f.rpu_idno = r.rpu_id
-  LEFT JOIN rpu_dec d ON f.faas_id = d.faas_id
-  LEFT JOIN land l ON f.faas_id = l.faas_id
-  WHERE 1=1
-  ";
+SELECT 
+  r.pin AS property_index_no,
+  d.arp_no AS tax_declaration_no,
+  GROUP_CONCAT(
+    DISTINCT CONCAT(o.own_fname, ' ', o.own_mname, ' ', o.own_surname) 
+    SEPARATOR ', '
+  ) AS owner_name,
+  GROUP_CONCAT(
+    DISTINCT CONCAT(o.house_no, ' ', o.street, ', ', o.barangay, ', ', o.city, ', ', o.province)
+    SEPARATOR ' | '
+  ) AS owner_address,
+  CONCAT(p.street, ', ', p.barangay, ', ', p.city, ', ', p.province) AS property_location,
+  p.land_area AS area,
+  'Land' AS kind,
+  l.adjust_mv AS market_value,
+  l.assess_value AS assessed_value
+FROM faas f
+LEFT JOIN p_info p ON f.pro_id = p.p_id
+LEFT JOIN rpu_idnum r ON f.rpu_idno = r.rpu_id
+LEFT JOIN rpu_dec d ON f.faas_id = d.faas_id
+LEFT JOIN land l ON f.faas_id = l.faas_id
+LEFT JOIN propertyowner po ON po.property_id = p.p_id AND po.is_retained = 1
+LEFT JOIN owners_tb o ON o.own_id = po.owner_id
+WHERE d.arp_no IS NOT NULL 
+  AND d.arp_no != '' 
+  AND d.arp_no != '0'
+";
 
   // Apply filters if not printing all
   if (!$print_all) {
     if (!empty($classification) && !empty($classification_name)) {
       $sql .= " AND l.classification = '" . $conn->real_escape_string($classification_name) . "'";
     }
-    
+
     if (!empty($province)) {
       $stmt = $conn->prepare("SELECT province_name FROM province WHERE province_id = ?");
       $stmt->bind_param("i", $province);
@@ -175,7 +187,7 @@
       }
       $stmt->close();
     }
-    
+
     if (!empty($municipality)) {
       $stmt = $conn->prepare("SELECT m_description FROM municipality WHERE m_id = ?");
       $stmt->bind_param("i", $municipality);
@@ -186,7 +198,7 @@
       }
       $stmt->close();
     }
-    
+
     if (!empty($district)) {
       $stmt = $conn->prepare("SELECT description FROM district WHERE district_id = ?");
       $stmt->bind_param("i", $district);
@@ -197,7 +209,7 @@
       }
       $stmt->close();
     }
-    
+
     if (!empty($barangay)) {
       $stmt = $conn->prepare("SELECT brgy_name FROM brgy WHERE brgy_id = ?");
       $stmt->bind_param("i", $barangay);
@@ -208,7 +220,7 @@
       }
       $stmt->close();
     }
-    
+
     if (!empty($from_date)) {
       $sql .= " AND DATE(p.created_at) >= '" . $conn->real_escape_string($from_date) . "'";
     }
@@ -217,11 +229,16 @@
     }
   }
 
+  // GROUP BY to prevent duplicates
+  $sql .= " GROUP BY f.faas_id, r.pin, d.arp_no, p.street, p.barangay, p.city, p.province, p.land_area, l.adjust_mv, l.assess_value";
+  $sql .= " ORDER BY d.arp_no ASC";
+
   $result = $conn->query($sql);
 
   // ACTIVITY LOGGING
   if ($user_id) {
-    function getValue($conn, $table, $column, $id_column, $id) {
+    function getValue($conn, $table, $column, $id_column, $id)
+    {
       if (!$id) return null;
       $stmt = $conn->prepare("SELECT $column FROM $table WHERE $id_column = ?");
       $stmt->bind_param("i", $id);
@@ -289,8 +306,8 @@
           <tr>
             <td><?= htmlspecialchars($row['property_index_no']) ?></td>
             <td><?= htmlspecialchars($row['tax_declaration_no']) ?></td>
-            <td></td>
-            <td></td>
+            <td><?= htmlspecialchars($row['owner_name'] ?: 'N/A') ?></td>
+            <td><?= htmlspecialchars($row['owner_address'] ?: 'N/A') ?></td>
             <td><?= htmlspecialchars($row['property_location']) ?></td>
             <td><?= htmlspecialchars($row['area']) ?></td>
             <td><?= htmlspecialchars($row['kind']) ?></td>
