@@ -112,8 +112,8 @@
           <a href="Home.php" class="btn btn-outline-secondary btn-sm">
             <i class="fas fa-arrow-left"></i> Back
           </a>
-          <h4 class="fw-bold text-success text-center flex-grow-1 mb-0">
-            PROPERTY BY CLASSIFICATION AGRICULTURAL (AG)
+          <h4 id="dynamicTitle" class="fw-bold text-success text-center flex-grow-1 mb-0">
+              PROPERTY BY CLASSIFICATION
           </h4>
           <div style="width: 70px;"></div>
         </div>
@@ -460,6 +460,21 @@
 
     });
   </script>
+
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const title = document.getElementById("dynamicTitle");
+    const classificationSelect = document.getElementById("classificationSelect");
+
+    classificationSelect.addEventListener("change", function () {
+        const selectedText = classificationSelect.options[classificationSelect.selectedIndex].text;
+
+        // Update the title
+        title.textContent = "PROPERTY BY CLASSIFICATION " + selectedText.toUpperCase();
+    });
+});
+</script>
+
 
 </body>
 
