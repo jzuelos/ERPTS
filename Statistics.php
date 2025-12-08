@@ -3,59 +3,58 @@ session_start();
 
 // Handle AJAX request for logging export activity
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['action'] === 'log_export') {
-    header('Content-Type: application/json');
-    
-    if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-        echo json_encode(['success' => false, 'error' => 'Not authenticated']);
-        exit;
-    }
-    
-    require_once 'database.php';
-    
-    try {
-        $conn = Database::getInstance();
-        
-        $input = file_get_contents('php://input');
-        $data = json_decode($input, true);
-        
-        if (!$data || !isset($data['user_id']) || !isset($data['chart_title']) || !isset($data['chart_type'])) {
-            throw new Exception('Invalid request data');
-        }
-        
-        $user_id = (int)$data['user_id'];
-        $chart_title = $conn->real_escape_string($data['chart_title']);
-        $chart_type = $conn->real_escape_string($data['chart_type']);
-        
-        $action = "Exported statistics chart\n";
-        $action .= "• Chart Type: " . ucfirst(str_replace('_', ' ', $chart_type)) . "\n";
-        $action .= "• Chart Title: {$chart_title}\n";
-        $action .= "• Export Format: PNG Image\n";
-        $action .= "• Export Time: " . date('Y-m-d H:i:s');
-        
-        $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
-        $stmt->bind_param("is", $user_id, $action);
-        
-        if ($stmt->execute()) {
-            echo json_encode([
-                'success' => true,
-                'message' => 'Export activity logged successfully',
-                'log_id' => $stmt->insert_id
-            ]);
-        } else {
-            throw new Exception('Failed to insert log: ' . $stmt->error);
-        }
-        
-        $stmt->close();
-        $conn->close();
-        
-    } catch (Exception $e) {
-        echo json_encode([
-            'success' => false,
-            'error' => $e->getMessage()
-        ]);
-    }
-    
+  header('Content-Type: application/json');
+
+  if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    echo json_encode(['success' => false, 'error' => 'Not authenticated']);
     exit;
+  }
+
+  require_once 'database.php';
+
+  try {
+    $conn = Database::getInstance();
+
+    $input = file_get_contents('php://input');
+    $data = json_decode($input, true);
+
+    if (!$data || !isset($data['user_id']) || !isset($data['chart_title']) || !isset($data['chart_type'])) {
+      throw new Exception('Invalid request data');
+    }
+
+    $user_id = (int)$data['user_id'];
+    $chart_title = $conn->real_escape_string($data['chart_title']);
+    $chart_type = $conn->real_escape_string($data['chart_type']);
+
+    $action = "Exported statistics chart\n";
+    $action .= "• Chart Type: " . ucfirst(str_replace('_', ' ', $chart_type)) . "\n";
+    $action .= "• Chart Title: {$chart_title}\n";
+    $action .= "• Export Format: PNG Image\n";
+    $action .= "• Export Time: " . date('Y-m-d H:i:s');
+
+    $stmt = $conn->prepare("INSERT INTO activity_log (user_id, action, log_time) VALUES (?, ?, NOW())");
+    $stmt->bind_param("is", $user_id, $action);
+
+    if ($stmt->execute()) {
+      echo json_encode([
+        'success' => true,
+        'message' => 'Export activity logged successfully',
+        'log_id' => $stmt->insert_id
+      ]);
+    } else {
+      throw new Exception('Failed to insert log: ' . $stmt->error);
+    }
+
+    $stmt->close();
+    $conn->close();
+  } catch (Exception $e) {
+    echo json_encode([
+      'success' => false,
+      'error' => $e->getMessage()
+    ]);
+  }
+
+  exit;
 }
 
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
@@ -118,7 +117,7 @@ $result_activity = $conn->query($query_activity);
 if ($result_activity && $result_activity->num_rows > 0) {
   while ($row = $result_activity->fetch_assoc()) {
     $action = strtolower($row['action']);
-    
+
     if (strpos($action, 'logged in') !== false) {
       $login_count++;
     } elseif (strpos($action, 'logged out') !== false) {
@@ -145,7 +144,8 @@ $pending_transactions = $conn->query($query_pending)->fetch_assoc()['total'];
 $query_in_progress = "SELECT COUNT(*) AS total FROM transactions WHERE status = 'In Progress'";
 $in_progress_transactions = $conn->query($query_in_progress)->fetch_assoc()['total'];
 
-$query_completed = "SELECT COUNT(*) AS total FROM transactions WHERE status = 'Completed'";
+// Fetch completed transactions from received_papers table
+$query_completed = "SELECT COUNT(*) AS total FROM received_papers";
 $completed_transactions = $conn->query($query_completed)->fetch_assoc()['total'];
 
 $query_received = "SELECT COUNT(*) AS total FROM received_papers";
@@ -169,7 +169,7 @@ ORDER BY MONTH(date_paid)";
 $receiptMonthlyResult = $conn->query($receiptMonthlyQuery);
 $receiptMonthlyData = array_fill(1, 12, 0);
 while ($row = $receiptMonthlyResult->fetch_assoc()) {
-    $receiptMonthlyData[$row['month']] = (float)$row['total'];
+  $receiptMonthlyData[$row['month']] = (float)$row['total'];
 }
 
 // Yearly collection (last 5 years)
@@ -185,8 +185,8 @@ $receiptYearlyResult = $conn->query($receiptYearlyQuery);
 $receiptYearlyLabels = [];
 $receiptYearlyData = [];
 while ($row = $receiptYearlyResult->fetch_assoc()) {
-    $receiptYearlyLabels[] = $row['year'];
-    $receiptYearlyData[] = (float)$row['total'];
+  $receiptYearlyLabels[] = $row['year'];
+  $receiptYearlyData[] = (float)$row['total'];
 }
 
 // Total collection
@@ -205,15 +205,15 @@ for ($i = 5; $i >= 0; $i--) {
   $month_start = date('Y-m-01', strtotime("-$i months"));
   $month_end = date('Y-m-t', strtotime("-$i months"));
   $month_label = date('M Y', strtotime("-$i months"));
-  
+
   $months_labels[] = $month_label;
-  
+
   $q = "SELECT COUNT(*) as count FROM p_info WHERE created_at BETWEEN '$month_start' AND '$month_end 23:59:59'";
   $monthly_properties[] = $conn->query($q)->fetch_assoc()['count'];
-  
+
   $q = "SELECT COUNT(*) as count FROM transactions WHERE created_at BETWEEN '$month_start' AND '$month_end 23:59:59'";
   $monthly_transactions[] = $conn->query($q)->fetch_assoc()['count'];
-  
+
   $q = "SELECT COUNT(*) as count FROM activity_log WHERE action LIKE '%Logged in%' AND log_time BETWEEN '$month_start' AND '$month_end 23:59:59'";
   $monthly_logins[] = $conn->query($q)->fetch_assoc()['count'];
 }
@@ -306,6 +306,7 @@ $receipt_collection_yearly = [
 
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -427,7 +428,7 @@ $receipt_collection_yearly = [
 
   <script>
     const userId = <?= $_SESSION['user_id'] ?? 0 ?>;
-    
+
     // Data from PHP
     const statisticsData = {
       property: <?= json_encode($property_stats) ?>,
@@ -461,7 +462,7 @@ $receipt_collection_yearly = [
 
     function createChart(type, data) {
       const ctx = document.getElementById('mainChart').getContext('2d');
-      
+
       if (currentChart) {
         currentChart.destroy();
       }
@@ -480,7 +481,9 @@ $receipt_collection_yearly = [
             title: {
               display: true,
               text: getChartTitle(type),
-              font: { size: 16 }
+              font: {
+                size: 16
+              }
             }
           }
         }
@@ -537,8 +540,7 @@ $receipt_collection_yearly = [
       if (type === 'monthly') {
         chartData = {
           labels: statisticsData.monthly.labels,
-          datasets: [
-            {
+          datasets: [{
               label: 'Properties Created',
               data: statisticsData.monthly.properties,
               backgroundColor: colors[0],
@@ -611,10 +613,10 @@ $receipt_collection_yearly = [
       if (currentChart) {
         const selectedStat = document.getElementById('chartSelector').value;
         const chartTitle = getChartTitle(selectedStat);
-        
+
         // Log the export activity
         logExportActivity(chartTitle, selectedStat);
-        
+
         // Export the chart
         const link = document.createElement('a');
         link.download = `statistics-${selectedStat}-${Date.now()}.png`;
@@ -626,31 +628,32 @@ $receipt_collection_yearly = [
     // Function to log export activity
     function logExportActivity(chartTitle, chartType) {
       const currentFileName = window.location.pathname.split('/').pop();
-      
+
       fetch(`${currentFileName}?action=log_export`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user_id: userId,
-          chart_title: chartTitle,
-          chart_type: chartType
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            chart_title: chartTitle,
+            chart_type: chartType
+          })
         })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          console.log('Export activity logged successfully');
-        }
-      })
-      .catch(error => {
-        console.error('Error logging export activity:', error);
-      });
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            console.log('Export activity logged successfully');
+          }
+        })
+        .catch(error => {
+          console.error('Error logging export activity:', error);
+        });
     }
 
     // Initialize with property statistics
     updateChart('property');
   </script>
 </body>
+
 </html>

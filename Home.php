@@ -132,7 +132,9 @@ if ($result_activity && $result_activity->num_rows > 0) {
   }
 }
 
-// Transaction Stats
+// ============================================
+// TRANSACTION/AUDIT STATISTICS
+// ============================================
 $query_transactions = "SELECT COUNT(*) AS total FROM transactions";
 $total_transactions = $conn->query($query_transactions)->fetch_assoc()['total'];
 
@@ -142,7 +144,8 @@ $pending_transactions = $conn->query($query_pending)->fetch_assoc()['total'];
 $query_in_progress = "SELECT COUNT(*) AS total FROM transactions WHERE status = 'In Progress'";
 $in_progress_transactions = $conn->query($query_in_progress)->fetch_assoc()['total'];
 
-$query_completed = "SELECT COUNT(*) AS total FROM transactions WHERE status = 'Completed'";
+// Fetch completed transactions from received_papers table
+$query_completed = "SELECT COUNT(*) AS total FROM received_papers";
 $completed_transactions = $conn->query($query_completed)->fetch_assoc()['total'];
 
 $query_received = "SELECT COUNT(*) AS total FROM received_papers";
