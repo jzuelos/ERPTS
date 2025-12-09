@@ -257,6 +257,7 @@
       const barangaySelect = document.getElementById("barangaySelect");
       const fromDate = document.getElementById("fromDate");
       const toDate = document.getElementById("toDate");
+      const title = document.getElementById("dynamicTitle");
       const printBtn = document.getElementById("printBtn");
       const resetBtn = document.getElementById("resetBtn");
 
@@ -425,38 +426,42 @@
         window.open("report-print.php?" + params.toString(), "_blank");
       });
 
-      // Reset
-      resetBtn.addEventListener("click", () => {
-        // Clear all fields
-        formElements.forEach(el => {
-          if (!el) return;
-          if (el.tagName === "SELECT") {
+// Reset
+resetBtn.addEventListener("click", () => {
+    // Clear all fields
+    formElements.forEach(el => {
+        if (!el) return;
+        if (el.tagName === "SELECT") {
             el.selectedIndex = 0;
-          } else {
+        } else {
             el.value = "";
-          }
-          el.classList.remove("is-invalid"); // ✅ Clear red borders
-        });
+        }
+        el.classList.remove("is-invalid");
+    });
 
-        // Re-lock province and keep "Camarines Norte" selected
-        [...provinceSelect.options].forEach(opt => {
-          opt.selected = opt.textContent.trim().toLowerCase() === "camarines norte";
-        });
-        provinceSelect.disabled = true;
+    // Reset title
+    title.textContent = "PROPERTY BY CLASSIFICATION";
 
-        // Reset dependent selects
-        districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
-        districtSelect.disabled = true;
-        barangaySelect.innerHTML = '<option value="" disabled selected>Select Barangay</option>';
-        barangaySelect.disabled = true;
+    // Re-lock province and keep "Camarines Norte" selected
+    [...provinceSelect.options].forEach(opt => {
+        opt.selected = opt.textContent.trim().toLowerCase() === "camarines norte";
+    });
+    provinceSelect.disabled = true;
 
-        //  Re-enable and uncheck Print All
-        printAllCheck.disabled = false;
-        printAllCheck.checked = false;
+    // Reset dependent selects
+    districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
+    districtSelect.disabled = true;
+    barangaySelect.innerHTML = '<option value="" disabled selected>Select Barangay</option>';
+    barangaySelect.disabled = true;
 
-        // Refresh state
-        toggleFilters();
-      });
+    // Re-enable and uncheck Print All
+    printAllCheck.disabled = false;
+    printAllCheck.checked = false;
+
+    // Refresh state
+    toggleFilters();
+});
+
 
     });
   </script>
