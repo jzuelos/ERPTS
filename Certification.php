@@ -19,10 +19,15 @@ if (isset($_POST['action']) && $_POST['action'] === 'add') {
   $position = trim($_POST['position'] ?? '');
   $status = trim($_POST['status'] ?? 'Active');
 
+  if (empty($name)) {
+    echo json_encode(['success' => false, 'message' => 'Name is required']);
+    exit;
+  }
+
   $stmt = $conn->prepare("INSERT INTO admin_certification (name, position, status) VALUES (?, ?, ?)");
   $stmt->bind_param("sss", $name, $position, $status);
   $success = $stmt->execute();
-  echo json_encode(['success' => $success]);
+  echo json_encode(['success' => $success, 'message' => $success ? 'Record added successfully' : 'Failed to add record']);
   exit;
 }
 
@@ -33,10 +38,15 @@ if (isset($_POST['action']) && $_POST['action'] === 'edit') {
   $position = trim($_POST['position'] ?? '');
   $status = trim($_POST['status'] ?? '');
 
+  if (empty($name)) {
+    echo json_encode(['success' => false, 'message' => 'Name is required']);
+    exit;
+  }
+
   $stmt = $conn->prepare("UPDATE admin_certification SET name=?, position=?, status=? WHERE id=?");
   $stmt->bind_param("sssi", $name, $position, $status, $id);
   $success = $stmt->execute();
-  echo json_encode(['success' => $success]);
+  echo json_encode(['success' => $success, 'message' => $success ? 'Record updated successfully' : 'Failed to update record']);
   exit;
 }
 
@@ -46,7 +56,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete') {
   $stmt = $conn->prepare("DELETE FROM admin_certification WHERE id=?");
   $stmt->bind_param("i", $id);
   $success = $stmt->execute();
-  echo json_encode(['success' => $success]);
+  echo json_encode(['success' => $success, 'message' => $success ? 'Record deleted successfully' : 'Failed to delete record']);
   exit;
 }
 
@@ -67,11 +77,29 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
   <link rel="stylesheet" href="main_layout.css">
   <link rel="stylesheet" href="header.css">
   <link rel="stylesheet" href="certi.css">
+  <style>
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+    }
+  </style>
 </head>
 
 <body>
 
   <?php include 'header.php'; ?>
+
+  <!-- Toast Notification -->
+  <div class="toast-container">
+    <div id="notificationToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="toastMessage"></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
 
   <main class="container my-5">
     <div class="mb-4 d-flex justify-content-start">
@@ -88,7 +116,7 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h5 class="section-title mb-0">Land Category Information</h5>
         <div class="d-flex align-items-center custom-spacing">
-          <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+          <button class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#addModal">
             <i class="fas fa-plus"></i> Add
           </button>
           <div class="input-group" style="width: 250px;">
@@ -113,33 +141,45 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
               </tr>
             </thead>
             <tbody>
-              <?php foreach ($certifications as $row): ?>
-                <tr>
-                  <td><?= htmlspecialchars($row['id']); ?></td>
-                  <td><?= htmlspecialchars($row['name']); ?></td>
-                  <td><?= htmlspecialchars($row['position']); ?></td>
-                  <td><span
-                      class="badge bg-<?= strtolower($row['status']) === 'active' ? 'success' : 'secondary'; ?>"><?= htmlspecialchars($row['status']); ?></span>
-                  </td>
-                  <td>
-                    <button class="btn btn-sm btn-outline-primary me-1 edit-btn" data-id="<?= $row['id']; ?>"
-                      data-name="<?= htmlspecialchars($row['name']); ?>"
-                      data-position="<?= htmlspecialchars($row['position']); ?>"
-                      data-status="<?= htmlspecialchars($row['status']); ?>" data-bs-toggle="modal"
-                      data-bs-target="#editModal">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger delete-btn" data-id="<?= $row['id']; ?>">
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                  </td>
+              <?php if (empty($certifications)): ?>
+                <tr id="noRecordsRow">
+                  <td colspan="5" class="text-center text-muted py-4">No records found</td>
                 </tr>
-              <?php endforeach; ?>
+              <?php else: ?>
+                <?php foreach ($certifications as $row): ?>
+                  <tr>
+                    <td><?= htmlspecialchars($row['id']); ?></td>
+                    <td><?= htmlspecialchars($row['name']); ?></td>
+                    <td><?= htmlspecialchars($row['position']); ?></td>
+                    <td>
+                      <span class="badge bg-<?= strtolower($row['status']) === 'active' ? 'success' : 'secondary'; ?>">
+                        <?= htmlspecialchars($row['status']); ?>
+                      </span>
+                    </td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-primary me-1 edit-btn" 
+                        data-id="<?= $row['id']; ?>"
+                        data-name="<?= htmlspecialchars($row['name']); ?>"
+                        data-position="<?= htmlspecialchars($row['position']); ?>"
+                        data-status="<?= htmlspecialchars($row['status']); ?>" 
+                        data-bs-toggle="modal"
+                        data-bs-target="#editModal">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger delete-btn" 
+                        data-id="<?= $row['id']; ?>"
+                        data-name="<?= htmlspecialchars($row['name']); ?>">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php endif; ?>
             </tbody>
           </table>
         </div>
         <!-- Pagination container -->
-  <div id="classificationPagination" class="mt-3 text-center"></div>
+        <div id="classificationPagination" class="mt-3 text-center"></div>
       </div>
     </div>
   </main>
@@ -155,7 +195,7 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
         <div class="modal-body">
           <form id="addForm">
             <div class="mb-3">
-              <label class="form-label">Name</label>
+              <label class="form-label">Name <span class="text-danger">*</span></label>
               <input type="text" class="form-control" name="name" required>
             </div>
             <div class="mb-3">
@@ -175,7 +215,9 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary">Add</button>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add
+              </button>
             </div>
           </form>
         </div>
@@ -195,8 +237,8 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
           <div class="modal-body">
             <input type="hidden" name="id" id="editId">
             <div class="mb-3">
-              <label class="form-label">Name</label>
-              <input type="text" class="form-control" id="editName" name="name">
+              <label class="form-label">Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="editName" name="name" required>
             </div>
             <div class="mb-3">
               <label class="form-label">Position</label>
@@ -216,9 +258,42 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Save Changes
+            </button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">
+            <i class="fas fa-exclamation-triangle"></i> Confirm Deletion
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center py-4">
+          <i class="fas fa-trash-alt text-danger" style="font-size: 3rem;"></i>
+          <h5 class="mt-3 mb-3">Are you sure?</h5>
+          <p class="text-muted mb-0">
+            You are about to delete:<br>
+            <strong id="deleteRecordName" class="text-dark"></strong>
+          </p>
+          <p class="text-danger small mt-2 mb-0">This action cannot be undone!</p>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+          <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+            <i class="fas fa-trash-alt"></i> Yes, Delete
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -228,13 +303,47 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
+    // Toast notification function
+    function showToast(message, type = 'success') {
+      const toast = $('#notificationToast');
+      const toastBody = $('#toastMessage');
+      
+      toast.removeClass('bg-success bg-danger bg-warning text-white');
+      
+      if (type === 'success') {
+        toast.addClass('bg-success text-white');
+      } else if (type === 'error') {
+        toast.addClass('bg-danger text-white');
+      } else if (type === 'warning') {
+        toast.addClass('bg-warning text-dark');
+      }
+      
+      toastBody.text(message);
+      
+      const bsToast = new bootstrap.Toast(toast[0], { delay: 3000 });
+      bsToast.show();
+    }
+
     $(function () {
       // ADD
       $('#addForm').submit(function (e) {
         e.preventDefault();
+        const submitBtn = $(this).find('button[type="submit"]');
+        const originalText = submitBtn.html();
+        submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Adding...');
+        
         $.post('Certification.php', $(this).serialize() + '&action=add', function (resp) {
-          if (resp.success) location.reload();
-        }, 'json');
+          submitBtn.prop('disabled', false).html(originalText);
+          if (resp.success) {
+            showToast(resp.message || 'Record added successfully', 'success');
+            setTimeout(() => location.reload(), 1000);
+          } else {
+            showToast(resp.message || 'Failed to add record', 'error');
+          }
+        }, 'json').fail(function() {
+          submitBtn.prop('disabled', false).html(originalText);
+          showToast('An error occurred. Please try again.', 'error');
+        });
       });
 
       // EDIT - load data into modal
@@ -243,13 +352,9 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
         $('#editName').val($(this).data('name'));
         $('#editPosition').val($(this).data('position'));
 
-        // Normalize status (trim + lowercase)
         const status = ($(this).data('status') || '').trim().toLowerCase();
-
-        // Reset both radios first
         $('#editActive, #editInactive').prop('checked', false);
-
-        // Select the correct one
+        
         if (status === 'active') {
           $('#editActive').prop('checked', true);
         } else if (status === 'inactive') {
@@ -260,94 +365,158 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
       // SAVE EDIT
       $('#editForm').submit(function (e) {
         e.preventDefault();
+        const submitBtn = $(this).find('button[type="submit"]');
+        const originalText = submitBtn.html();
+        submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
+        
         $.post('Certification.php', $(this).serialize() + '&action=edit', function (resp) {
-          if (resp.success) location.reload();
-        }, 'json');
+          submitBtn.prop('disabled', false).html(originalText);
+          if (resp.success) {
+            showToast(resp.message || 'Record updated successfully', 'success');
+            setTimeout(() => location.reload(), 1000);
+          } else {
+            showToast(resp.message || 'Failed to update record', 'error');
+          }
+        }, 'json').fail(function() {
+          submitBtn.prop('disabled', false).html(originalText);
+          showToast('An error occurred. Please try again.', 'error');
+        });
       });
 
-      // DELETE
+      // DELETE - Show confirmation modal
+      let deleteId = null;
       $('.delete-btn').click(function () {
-        if (!confirm('Are you sure you want to delete this record?')) return;
-        $.post('Certification.php', { action: 'delete', id: $(this).data('id') }, function (resp) {
-          if (resp.success) location.reload();
-        }, 'json');
+        deleteId = $(this).data('id');
+        const recordName = $(this).data('name');
+        $('#deleteRecordName').text(recordName);
+        
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        deleteModal.show();
+      });
+
+      // Confirm delete action
+      $('#confirmDeleteBtn').click(function () {
+        if (!deleteId) return;
+        
+        const btn = $(this);
+        const originalText = btn.html();
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Deleting...');
+        
+        $.post('Certification.php', { action: 'delete', id: deleteId }, function (resp) {
+          btn.prop('disabled', false).html(originalText);
+          
+          const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+          deleteModal.hide();
+          
+          if (resp.success) {
+            showToast(resp.message || 'Record deleted successfully', 'success');
+            setTimeout(() => location.reload(), 1000);
+          } else {
+            showToast(resp.message || 'Failed to delete record', 'error');
+          }
+        }, 'json').fail(function() {
+          btn.prop('disabled', false).html(originalText);
+          showToast('An error occurred. Please try again.', 'error');
+        });
+      });
+
+      // Reset deleteId when modal is closed
+      $('#deleteModal').on('hidden.bs.modal', function () {
+        deleteId = null;
       });
     });
 
-    // SEARCH FUNCTION
+    // SEARCH FUNCTION with pagination reset
     $('#tableSearch').on('keyup', function () {
       const value = $(this).val().toLowerCase();
-      $('#classificationTable tbody tr').filter(function () {
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+      const rows = $('#classificationTable tbody tr');
+      
+      let visibleCount = 0;
+      rows.each(function() {
+        const shouldShow = $(this).text().toLowerCase().indexOf(value) > -1;
+        $(this).toggle(shouldShow);
+        if (shouldShow) visibleCount++;
       });
+      
+      // Re-initialize pagination after search
+      if (visibleCount > 0) {
+        paginateTable("classificationTable", "classificationPagination", 5);
+      } else {
+        $('#classificationPagination').html('<p class="text-muted">No matching records found</p>');
+      }
     });
 
+    // PAGINATION FUNCTION
+    function paginateTable(tableId, paginationId, rowsPerPage = 10) {
+      const table = document.getElementById(tableId);
+      const tbody = table.querySelector("tbody");
+      const rows = Array.from(tbody.querySelectorAll("tr")).filter(row => 
+        row.style.display !== 'none' && !row.id.includes('noRecords')
+      );
+      const pagination = document.getElementById(paginationId);
+
+      if (rows.length === 0) {
+        pagination.innerHTML = "";
+        return;
+      }
+
+      let currentPage = 1;
+      const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+      function renderTable() {
+        rows.forEach((row, index) => {
+          row.style.display =
+            index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage
+              ? ""
+              : "none";
+        });
+      }
+
+      function renderPagination() {
+        pagination.innerHTML = "";
+
+        const prevBtn = document.createElement("button");
+        prevBtn.className = "btn btn-sm btn-outline-success me-2";
+        prevBtn.innerHTML = "&laquo; Prev";
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.onclick = () => {
+          if (currentPage > 1) {
+            currentPage--;
+            renderTable();
+            renderPagination();
+          }
+        };
+
+        const pageIndicator = document.createElement("span");
+        pageIndicator.className = "mx-2";
+        pageIndicator.innerText = `Page ${currentPage} of ${totalPages}`;
+
+        const nextBtn = document.createElement("button");
+        nextBtn.className = "btn btn-sm btn-outline-success ms-2";
+        nextBtn.innerHTML = "Next &raquo;";
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.onclick = () => {
+          if (currentPage < totalPages) {
+            currentPage++;
+            renderTable();
+            renderPagination();
+          }
+        };
+
+        pagination.appendChild(prevBtn);
+        pagination.appendChild(pageIndicator);
+        pagination.appendChild(nextBtn);
+      }
+
+      renderTable();
+      renderPagination();
+    }
+
+    // Initialize after DOM is ready
+    document.addEventListener("DOMContentLoaded", function () {
+      paginateTable("classificationTable", "classificationPagination", 5);
+    });
   </script>
-
-<script>
-function paginateTable(tableId, paginationId, rowsPerPage = 10) {
-  const table = document.getElementById(tableId);
-  const tbody = table.querySelector("tbody");
-  const rows = Array.from(tbody.querySelectorAll("tr"));
-  const pagination = document.getElementById(paginationId);
-
-  let currentPage = 1;
-  const totalPages = Math.ceil(rows.length / rowsPerPage);
-
-  function renderTable() {
-    rows.forEach((row, index) => {
-      row.style.display =
-        index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage
-          ? ""
-          : "none";
-    });
-  }
-
-  function renderPagination() {
-    pagination.innerHTML = "";
-
-    const prevBtn = document.createElement("button");
-    prevBtn.className = "btn btn-sm btn-outline-success me-2";
-    prevBtn.innerHTML = "&laquo; Prev";
-    prevBtn.disabled = currentPage === 1;
-    prevBtn.onclick = () => {
-      if (currentPage > 1) {
-        currentPage--;
-        renderTable();
-        renderPagination();
-      }
-    };
-
-    const pageIndicator = document.createElement("span");
-    pageIndicator.className = "mx-2";
-    pageIndicator.innerText = `Page ${currentPage} of ${totalPages}`;
-
-    const nextBtn = document.createElement("button");
-    nextBtn.className = "btn btn-sm btn-outline-success ms-2";
-    nextBtn.innerHTML = "Next &raquo;";
-    nextBtn.disabled = currentPage === totalPages;
-    nextBtn.onclick = () => {
-      if (currentPage < totalPages) {
-        currentPage++;
-        renderTable();
-        renderPagination();
-      }
-    };
-
-    pagination.appendChild(prevBtn);
-    pagination.appendChild(pageIndicator);
-    pagination.appendChild(nextBtn);
-  }
-
-  renderTable();
-  renderPagination();
-}
-
-// Initialize after DOM is ready
-document.addEventListener("DOMContentLoaded", function () {
-  paginateTable("classificationTable", "classificationPagination", 5);
-});
-</script>
 
 </body>
 
